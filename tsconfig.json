@@ -1,0 +1,42 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "lib": [
+            "esnext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "skipLibCheck": true,
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "preserve",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "types": [
+            "vite/client",
+            "node"
+        ],
+        "baseUrl": ".",
+    },
+    "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "template",
+        "bin",
+        "docs/snippets"
+    ],
+    "include": [
+        ".vitepress/**/*.ts",
+        ".vitepress/**/*.d.ts",
+        ".vitepress/**/*.tsx",
+        ".vitepress/**/*.vue",
+        "scripts/**/*.ts"
+    ]
+}

@@ -1,0 +1,152 @@
+### Breaking Changes:
+- SubGHz: Add back region lock and manual bypass option (#47 by @Sil333033 & @Willy-JL)
+  - Need to update via qFlipper / Mobile App / Momentum WebUpdater once to setup region file
+  - If you want to remove restrictions, enable `MNTM > Protocols > SubGHz Bypass Region Lock`
+- Apps: Moved GPIO and WiFi apps in GPIO subfolders (by @Willy-JL)
+  - Also MFKey32 replaced by new MFKey and UHF RFID moved to RFID folder
+  - Might have to re-favorite / re-keybind / re-add to main menu if you used these
+- BadKB: Moved back to badusb folder for compatibility (by @Willy-JL)
+  - Need to accept the prompt to move to badusb folder when opening BadKB
+- UL: SubGHz: Removed Ext Power Amp, always enabled now (by @xMasterX)
+  - RabbitLabs Flux Capacitor will continue working, don't worry about the missing option
+- SubGHz: Reworked last settings logic, cleanup unused code (by @xMasterX & @Willy-JL)
+  - Need to reconfigure your Radio / Receive Settings once
+  - From now on it will be 100% backwards compatible
+- OFW: Infrared: New GPIO settings and detection system (by @gsurkov)
+  - Need to reconfigure your Infrared GPIO Settings once
+- JS: Rework storage `read()` and `write()` to use array buffers and support size and offset (by @Willy-JL)
+  - Need to update your scripts if using old string-based APIs, see included examples
+- BadKB & JS: Moved demo / example scripts to `Demos` / `Examples` folders (#68 by @AbeNaws & @Willy-JL)
+  - Might have to re-favorite / re-keybind if you used these
+- Updater: Gzipped resources for 220% faster FW upload, some UI improvements (#114 by @Willy-JL)
+  - Faster upload, especially Mobile App, slightly slower install
+  - Not as noticeable compared to mntm-001 due to all the other additions
+  - For same content, gzip or not makes a 220% upload improvement
+  - Progress bar shows percentage to show it's not stuck
+  - Shouldn't cause issues, but worth noting as a substancial change
+
+### Added:
+- Apps:
+  - NFC: MFKey, new version with Nested cracking but not collecting yet (by @noproto)
+  - Games: Yappy Invaders (by @dagnazty)
+- BadKB: Allow choosing BT Pairing security mode: YesNo, PIN Type, PIN Y/N (by @Willy-JL)
+- NFC: Add MBTA CharlieCard parsing plugin (#62 #88 by @zacharyweiss)
+- SubGHz: Add Hormann BiSecur protocol, no decrypt or counter yet (#118 by @user890104)
+- UL: RFID: Electra intercom protocol support, used in Romania (by @Leptopt1los)
+- Archive: Favorite-able and open-able `.wav` and `.mag` files (#97 #110 by @zacharyweiss)
+- MNTM Settings: Added Shell Color spoofing support, new `Misc > Spoofing Options` menu (by @Willy-JL)
+- Asset Packs: MNTM: Fully themed dolphin to yappy icons (#29 #35 #45 #63 #64 #65 #72 #73 #82 #83 #84 #87 #92 #98 #113 by @Kuronons)
+- Desktop: Add Dolphin 3d printing and wardriving animations (#86 by @Davim09)
+- Furi: Show icons at boot instead of text, similar to hackrf portapack mayhem 2.0 (by @Willy-JL)
+- JS: Add gpio module (by @Sil333033)
+- JS: Add textbox module (by @Willy-JL)
+- JS: Add widget module (#56 #103 by @jamisonderek)
+- JS: Add badusb keyboard layouts: `badusb.setup({ ..., layout_path: "/ext/..." })` (#31 by @Willy-JL)
+- JS: Add `badusb.altPrint()` and `badusb.altPrintln()` to avoid layout issues on Windows targets (#30 #33 by @oldip)
+- JS: Add `dialog.pickFile()` for selecting files (by @Willy-JL)
+- JS: Add `serial.end()` and `serial.readAny()` (by @Willy-JL)
+- JS: Add storage `append()`, `copy()`, `move()`, `mkdir()` (by @Willy-JL)
+- JS: Add `parse_int()`, `to_upper_case()`, `to_lower_case()` (#17 by @Spooks4576)
+- JS: Add `__filepath` and `__dirpath` globals (#55 by @jamisonderek)
+- JS: Add REPL interactive console script (by @Willy-JL)
+- Storage: Formatting disk images sets volume name from file name (#80 by @jetblk)
+- Storage: Added back FAT32 format when applicable (by @Willy-JL)
+- UL: SubGHz: Add FAAC RC XT 0xB button code on arrow buttons for programming mode (by @xMasterX)
+- UL: SubGHz: Added support for amp on GDO2 pin (by @quen0n)
+- UL: SubGHz: New frequency 430.50 (by @MizumasuShoichi)
+- OFW: FuriHal: Add ADC API (by @skotopes)
+- OFW: NFC: FeliCa poller (by @RebornedBrain)
+- OFW: API: Add crypto1 to the public API (by @Astrrra)
+- OFW: API: `saved_struct_get_metadata` introduced (by @CookiePLMonster)
+- OFW: Infrared: Support for Pioneer SR IR remotes added (by @radioegor146)
+- OFW: BadUSB: Media keys, Fn/Globe key commands (by @nminaylov)
+- OFW: BadUSB: F13-F24 function key support added (by @gchai)
+- OFW: BadUSB: it-IT-mac layout (by @nminaylov)
+- OFW: BadUSB: Support for DEFAULT_STRING_DELAY (by @atomofiron)
+- OFW: BadUSB: ChromeOS demo added (by @kowalski7cc)
+- OFW: CLI: JS command (by @nminaylov)
+- OFW: Desktop: Wrong PIN Attempt count on the login screen added (by @FireFly7386)
+- OFW: Desktop: Freedom_2_dolphins animation added (by @Astrrra)
+
+### Updated:
+- Apps:
+  - ESP Flasher: Add S3 Marauder and S2 S3 Wardriver bins (by @Willy-JL), add AirTag Scanner bins (by @MatthewKuKanich)
+  - Marauder: Save dumps for wardriving and evilportal commands (by @Willy-JL)
+  - FindMy Flipper: Add Tile support, option to show MAC, battery level, more fixes (#41 #58 #100 by @MatthewKuKanich)
+  - BLE Spam: Custom NameFlood and SwiftPair random names in `apps_data/ble_spam` (by @AbeNaws), fix LED indicator issues (by @Willy-JL)
+  - MFKey: Fix some crashes and free some RAM (by @noproto & @Willy-JL)
+  - NFC Magic: Gen2 writing support, Gen4 NTAG password and PACK fixes (by @Astrrra)
+  - Unitemp: Fix rendering issues (by @xMasterX) and exit crash (#108 by @Willy-JL)
+  - Mass Storage: Auto unlock when connected to qFlipper (by @Willy-JL)
+  - OFW: BT/USB Remote: App improvements and other fixes (by @gsurkov)
+  - Update Infrared apps to use new settings file (by @Willy-JL)
+  - Fix many issues and crashes with UART related apps (by @Willy-JL & @xMasterX)
+  - All other apps updated to latest versions
+- Main Menu: Rework MNTM menu style, fix long dolphin name, add battery % and 5v Indicator (#105 by @MatthewKuKanich)
+- Asset Packs: WatchDogs: New passport and profile pics (#39 by @Kuronons)
+- CLI: Most commands are now external, saves some DFU (by @Willy-JL)
+- SubGHz: Rework GPS as plugin, more fixes and improvements (by @Willy-JL)
+- Infrared: Add AC model Pioneer Inverter to universals (#117 by @djcas9)
+- BadKB: Save BT settings without MNTM Settings (by @Willy-JL)
+- UL: Infared: Update universal remotes (by @amec0e)
+- UL: Bip parser refactor (by @Leptopt1los & @xMasterX)
+- OFW: Infrared: Update universal remotes (by @aprosvetova & @zhiyan114 & @protik09 & @KRukus9)
+- OFW: Infrared: Asynchronous Infrared remote manipulation (by @gsurkov)
+- OFW: NFC: MF DESFire multiple file rights support (by @gornekich)
+- OFW: Desktop: Adding VGM visual to L1_Mods animation (by @Kuronons)
+- OFW: Desktop: Cleanup error popups (by @skotopes)
+- OFW: iButton: New UI (by @Astrrra)
+- OFW: Furi: TLSF memory allocator, less free flash, moar free ram (by @DrZlo13)
+- OFW: GUI: Unicode support, new canvas API (by @skotopes)
+- OFW: API: asserts replaced with checks (by @skotopes)
+- OFW: RFID: RFID improvements (by @gsurkov)
+- OFW: BLE: Update radio stack to v1.19.0 (by @skotopes)
+
+### Fixed:
+- Desktop: Unload animations before FAP is loaded, fixes crashes opening apps with big animations (by @Willy-JL)
+- SubGHz: Detect if VGM is active and don't disable it (#5 by @Willy-JL & @HaxSam)
+- MNTM Settings: Fix ghost apps when migrating from old configs (#22 by @Willy-JL)
+- MNTM Settings: Fix "reset menu" still importing from XFW app list (by @Willy-JL)
+- MNTM Settings: Fix MNTM-DEV git hash formatting (#104 by @zacharyweiss)
+- BadKB: Fix some bugs with BT Remember (by @Willy-JL)
+- File Browser: Respect "show hidden files" when not specified (by @Willy-JL)
+- Updater: Overwrite slideshow when previous firmware left it (by @Willy-JL)
+- JS: Allow pressing back in Keyboard and Submenu (by @Willy-JL)
+- JS: Fix `Math.random()` boundaries (#61 #67 by @Willy-JL)
+- JS: Fix `storage.virtualQuit()` and `badusb.quit()` for same script (#75 by @jamisonderek & @Willy-JL)
+- JS: Fix `to_string()` for negative numbers (by @Willy-JL)
+- JS: Fix serial bugs with expansion (by @Willy-JL)
+- API: Fix assets in SDK when using ufbt (by @Willy-JL)
+- GUI: Fix array out of bounds in menu exit (by @Willy-JL)
+- GUI: Fix 256+ lines textbox overflow/crash/hang (by @Willy-JL)
+- GUI: Elements module for new canvas API fix (by @Willy-JL)
+- Infrared: Fix crash on duty_cycle=1 (by @Willy-JL)
+- NFC: Removed duplicated EMV parser plugin (by @Willy-JL)
+- UL: GUI: Allow setting view dispatcher callbacks to NULL (by @xMasterX)
+- UL: iButton: Updated DS1420 for latest changes (by @xMasterX)
+- UL: NFC: Some code cleanup and proper log levels in nfc parsers (by @xMasterX)
+- UL: SubGHz: Add Manually Sommer FM fixes (by @xMasterX)
+- UL: NFC: Temp fix for `iso14443_4_layer_decode_block` crash (by @xMasterX)
+- OFW: API: Fix missing weekday in `datetime_timestamp_to_datetime` conversion (by @skotopes)
+- OFW: BLE: BLE/GAP fixes (by @hedger)
+- OFW: iButton: Emulation regression fix (by @gsurkov)
+- OFW: Infrared: Fixes and more (by @gsurkov)
+- OFW: NFC: Add Plantain legacy keys (by @gornekich)
+- OFW: NFC: Add support for S(WTX) request in `iso14443_4a_poller` (by @leommxj)
+- OFW: NFC: Fix mf desfire detect (by @gornekich)
+- OFW: NFC: Fixed plugins and UI (by @RebornedBrain)
+- OFW: NFC: Hide unlock with reader for MFU-C (by @bettse)
+- OFW: NFC: Mifare Ultralight naming fix (by @RebornedBrain)
+- OFW: NFC: Mosgortrans parser output fixes (by @Astrrra)
+- OFW: NFC: Parsers small fixes (by @Astrrra)
+- OFW: NFC: SLIX privacy password reveal and DESFire detect fix (by @gornekich)
+- OFW: NFC: Troika parser visual fixes (by @Astrrra)
+- OFW: NFC: UI fixes (by @gornekich)
+- OFW: NFC: Wording fixes (by @Astrrra)
+- OFW: SubGHz: DIP decoding for Linear Delta-3 fixed (by @brandonweeks)
+
+### Removed:
+- Apps:
+  - MFKey32, superseded by new MFKey with Nested cracking
+- MNTM Settings: Removed `Protocols > BadKB / BadBT` options, now configured only in BadKB app
+- MNTM Settings: Removed `Misc > Change Device Name`, now in `Misc > Spoofing Options > Flipper Name`

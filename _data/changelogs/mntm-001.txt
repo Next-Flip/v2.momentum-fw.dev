@@ -1,0 +1,83 @@
+### Added:
+- Apps:
+  - FindMy Flipper (by @MatthewKuKanich)
+  - Air Labyrinth (by @jamisonderek)
+  - OFW: Video Game Module Tool
+  - OFW: Air Arkanoid
+  - OFW: VGM AirMouse
+- OFW: JavaScript support
+- New JavaScript Modules:
+  - UsbDisk, like Mass Storage (by @Willy-JL)
+  - BadUSB: Add `badusb.quit()`, allows switching between BadUSB and UsbDisk (by @Willy-JL)
+  - Storage (by @Willy-JL)
+  - SubGHz (by @Sil333033)
+  - Submenu (by @Spooks4576)
+  - BleBeacon (by @Spooks4576)
+  - Keyboard (by @Spooks4576)
+  - Math (by @Spooks4576)
+- VGM: Custom color options (by @HaxSam)
+- VGM: Rainbow mode (by @HaxSam @EclipseFox25)
+- Asset Packs: Add Momentum pack (by @Kuronons)
+- Expansion: Add is_connected API to check for VGM (by @HaxSam)
+- SubGhz: Add entry in Apps > SubGhz to open main SubGhz app (by @Willy-JL)
+- Main Menu: New MNTM menu style (by @MatthewKuKanich)
+- Storage: New Virtual Mount API for FATFS disk images (by @Willy-JL)
+- Archive: Support viewing (mount) disk images content, open disk images in mass storage app, keep clipboard between tabs (allows transferring to/from disk images) (by @Willy-JL)
+- OFW: BLE: Refactoring, support for custom app profiles, support of extra beacons
+
+### Updated:
+- Apps:
+  - ESP Flasher: Marauder bins support Samsung Evil Portal (by @0xchocolate)
+  - NFC Maker: Support multiple NTAG types (by @Willy-JL)
+  - BLE Spam: Ported to new beacons API, runs in background (by @Willy-JL)
+  - BLE Spam: Added settings list flood (by @Willy-JL)
+  - BLE Spam: Added new fastpair device (Momentum Firmware) (by @Mr-Proxy-source)
+  - MassStorage: Format new images to exFAT automatically (by @Willy-JL)
+- Passport: New background (by @Kuronons), Hide Lvl/Tot text, Tot shows levels 0 to 30 (actual total progress), change level 30 to 9999xp (by @Willy-JL)
+- System: Big cleanup of APIs, updater and flash DFU's (by @Willy-JL)
+- BadKB: Refactor app for new BLE and to be more maintainable (by @Willy-JL)
+- BadKB: Allow changing connection mode and configs with ID/BT_ID commands (by @Willy-JL)
+- Settings: Moved to external FAPs (no end-user-facing changes) and allow CPU sleep in them (by @Willy-JL)
+- Settings: Always format SD as exFAT (better in every way, but temporary until enough DFU is back) (by @Willy-JL)
+- NFC: Improve NDEF parser detection and safety (by @Willy-JL)
+- NFC: Add 41 new MFC dict keys from RRG pm3 repo (by @Willy-JL)
+- SubGhz: Display Weather Station temperature in units matching system locale (by @cquick01)
+- About: Display actual region code (by @Willy-JL)
+- Furi: Reset log level on flash for more responsiveness (by @Willy-JL)
+- Momentum Settings: Clearer GPIO Pins text (by @Willy-JL)
+- Settings: Battery info shows mA also while napping (may be inaccurate) (by @Willy-JL)
+- Loader: Allow setting menu apps to go CPU sleep (by @Willy-JL)
+- Asset Packs: Rename passport_DB to passport_128x64 (previous was leftover from long ago and didn't make sense) (by @Willy-JL)
+
+### Fixed:
+- Apps:
+  - BLE Spam: Fix hang on hold ok while running and wrong click index in crash submenu (by @Willy-JL)
+  - Flizzer Tracker: Fix crash on open (by @xMasterX)
+  - Geiger Counter: Fix furi_hal_gpio crash (by @Willy-JL)
+  - Mifare Fuzzer: Fix protocol mismatch crashes (by @Willy-JL)
+  - NFC Maker: Fixed WiFi Login issues (by @Willy-JL)
+  - BT Remote: Fix kb combo for Push to Talk / Teams / macOS (by @cpressland)
+  - SubGhz Remote: Support custom modulation presets (by @Willy-JL)
+  - Marauder: Fix scripts not loading correctly and script pcap setting behavior (by @Willy-JL)
+- Desktop: Fix keybinds buffer overrun issues (by @Willy-JL)
+- Asset Packs: Fix parsing of font descent value (by @Willy-JL)
+- FBT: Auto prioritize system asset pack icons when building apps (by @Willy-JL)
+- RGB Backlight: Fix static color random flickering (by @HaxSam)
+- RGB Backlight: Dont update while screen is off and other improvements (by @HaxSam)
+- Momentum Settings: Fix crash on frequency remove for leftmost index (by @Willy-JL)
+- SubGhz: Ignore filters at driver level, better efficiency (by @Willy-JL)
+- SubGhz: "Use Defaults" supports having just custom static/hopper frequency lists (by @Willy-JL)
+- SubGhz: Fix LED blinking from Decode RAW > Signal Info (by @Willy-JL)
+- UL: NFC: Fixed stuck Saved success screen (by @xMasterX)
+- UL: NFC: Fixed crash when reading mifare classic tag then going to add manually menu and adding NFC-A tag (by @xMasterX)
+- UL: NFC: Fixed EMV txs render (by @xMasterX)
+- UL: NFC/LFRFID: Don't Stop emulation after 5 mins to avoid antenna damage if debug is ON (by @Leptopt1los)
+- UL: LFRFID: Fixed T5577 custom password input (by @Leptopt1los)
+- OFW: Expansion: Fix crashes when opening UART apps with serial module connected
+- OFW: Toolchain: FIxed issues on Windows
+
+### Removed:
+- Apps:
+  - Orgasmotron
+- Momentum Settings: Removed Eurocorp main menu style due to DFU flash size constraints and community poll (by @Willy-JL)
+- Gui: Removed unused ScummRoman fonts, moved to Chess app (only use that used it) (by @Willy-JL)

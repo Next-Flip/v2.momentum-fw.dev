@@ -1,0 +1,57 @@
+{
+    "name": "v2.momentum.dev",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prebuild": "bun scripts/prebuild.ts",
+        "build": "vitepress build",
+        "predev": "bun run prebuild",
+        "dev": "vitepress dev",
+        "preview": "vitepress preview",
+        "build:preview": "bun run build && bun run preview",
+        "lint": "bun run eslint --ext .js,.ts,.mts,.vue --ignore-path .eslintignore --fix \"./components\" \"./app\" \"./lib\"",
+        "pretty": "prettier --write \"./.vitepress/theme/**/*.{js,ts,vue}\"",
+        "clean": "rm -rf node_modules && rm -rf .vitepress/cache && rm -rf .vitepress/dist && bun install",
+        "clean:build": "bun run clean && bun run build",
+        "clean:preview": "bun run clean:build && bun run preview",
+        "check:meta": "bunx check-site-meta --no-analytics 4173"
+    },
+    "dependencies": {
+        "@types/markdown-it": "^14.1.2",
+        "@vercel/analytics": "^1.5.0",
+        "@vercel/speed-insights": "^1.2.0",
+        "@vueuse/core": "^13.2.0",
+        "loglevel": "^1.9.2",
+        "markdown-it": "^14.1.0",
+        "motion-v": "^1.1.0-alpha.1",
+        "nanoevents": "^9.1.0",
+        "oh-vue-icons": "^1.0.0-rc3",
+        "pako": "^2.1.0",
+        "protobufjs": "^7.4.0",
+        "semver": "^7.7.2",
+        "simple-async-sleep": "^1.0.3"
+    },
+    "devDependencies": {
+        "@tailwindcss/typography": "^0.5.9",
+        "@types/node": "^22.15.21",
+        "@types/semver": "^7.7.0",
+        "autoprefixer": "^10.4.21",
+        "eslint": "^9.27.0",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.4.0",
+        "eslint-plugin-vue": "^10.1.0",
+        "node-html-parser": "^7.0.1",
+        "ofetch": "^1.4.1",
+        "postcss": "^8.4.21",
+        "prettier": "^3.5.3",
+        "prettier-plugin-tailwindcss": "^0.6.11",
+        "tailwindcss": "^3.2.4",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.32.1",
+        "vitepress": "^1.6.3",
+        "vue": "^3.5.14"
+    },
+    "overrides": {
+        "mlly": "1.4.2"
+    }
+}
