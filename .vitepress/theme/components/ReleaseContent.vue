@@ -3,9 +3,10 @@ import MarkdownIt from "markdown-it";
 import { computed } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
-import { scrollToTop } from "../util";
+import { replaceIssuesAndMentions } from "../util";
 
 import ReleaseFiles from "./ReleaseFiles.vue";
+import ReleaseHeader from "./ReleaseHeader.vue";
 
 const { tr } = useI18n();
 
@@ -17,82 +18,53 @@ const md = new MarkdownIt({
 
 interface Props {
     selectedRelease: ReleaseItem | null;
+    isCurrentVersion: boolean;
 }
 
 const props = defineProps<Props>();
 
-const replaceIssuesAndMentions = (text: string): string => {
-    const a = (href: string, className: string, content: string) =>
-        `<a href="${href}" target="_blank" rel="noopener noreferrer" class="${className} font-bold transition-colors duration-200">${content}</a>`;
-
-    let result = text.replace(/(?<![a-zA-Z])@([a-zA-Z0-9_-]+)/g, (_, username) =>
-        a(
-            `https://github.com/${username}`,
-            "text-vp-brand-1 hover:text-vp-brand-2",
-            `@${username}`,
-        ),
-    );
-
-    result = result.replace(/#(\d+)/g, (_, issueNumber) =>
-        a(
-            `https://github.com/Next-Flip/Momentum-Firmware/issues/${issueNumber}`,
-            "text-mntm-yellow-1 hover:text-mntm-yellow-2",
-            `#${issueNumber}`,
-        ),
-    );
-
-    return result;
-};
+const emit = defineEmits<{
+    selectRelease: [release: ReleaseItem];
+}>();
 
 const parsedChangelog = computed(() => {
     if (!props.selectedRelease?.changelog) return "";
     const withGitHubLinks = replaceIssuesAndMentions(props.selectedRelease.changelog);
     return md.render(withGitHubLinks);
 });
+
+const handleSelectRelease = (release: ReleaseItem) => {
+    emit("selectRelease", release);
+};
 </script>
 
 <template>
     <main
-        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 border-r border-l border-dashed border-vp-divider"
+        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-xl border border-vp-divider"
     >
         <div
             v-if="selectedRelease"
             class="prose prose-gray dark:prose-invert max-w-none px-0 sm:px-6"
         >
-            <div
-                class="flex flex-col sticky top-[47px] sm:top-11 lg:top-[61px] pt-0 sm:pt-9 pb-11 z-[2]"
-            >
-                <div
-                    class="dark-blur flex flex-row justify-between items-center border-b border-dashed sm:border-solid sm:border sm:rounded-lg border-vp-divider px-2 py-2 cursor-pointer sm:hover:scale-[1.01] transition-all duration-200 sm:shadow-sm"
-                    @click="scrollToTop('smooth')"
-                >
-                    <div class="flex flex-row ml-1.5 items-center gap-2">
-                        <span
-                            class="text-lg leading-none font-semibold text-vp-1 uppercase font-mono"
-                        >
-                            {{
-                                selectedRelease.version ||
-                                `${selectedRelease.commit.substring(0, 8)}`
-                            }}
-                        </span>
-                    </div>
-                    <div
-                        class="flex items-center gap-4 text-sm text-vp-brand-1 rounded-full release-date px-2.5 py-1 border border-vp-1/5"
-                    >
-                        <span>{{ selectedRelease.date }}</span>
-                    </div>
-                </div>
-            </div>
+            <ReleaseHeader
+                :selectedRelease="selectedRelease"
+                :isCurrentVersion="props.isCurrentVersion"
+                @selectRelease="handleSelectRelease"
+            />
 
-            <ReleaseFiles :selected-release="selectedRelease" />
+            <ReleaseFiles
+                :selected-release="selectedRelease"
+                :isCurrentVersion="props.isCurrentVersion"
+            />
 
             <div v-if="selectedRelease.changelog" class="mb-8 px-4 sm:px-4">
                 <div
                     class="flex flex-row justify-between items-center pb-2 mb-3 border-b border-vp-divider"
                 >
-                    <span class="text-vp-1 text-base font-medium py-1 leading-6 tracking-wide">{{
-                        tr("releases_changelog")
-                    }}</span>
+                    <span
+                        class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
+                        >{{ tr("releases_changelog") }}</span
+                    >
                 </div>
                 <div
                     class="prose prose-sm dark:prose-invert text-vp-1 max-w-none"
@@ -134,15 +106,14 @@ const parsedChangelog = computed(() => {
 
 .dark .release-content {
     background-image: linear-gradient(
-        to top,
+        to bottom,
         color-mix(in srgb, var(--vp-c-brand-1) 1%, transparent) 0%,
-        /* color-mix(in srgb, var(--vp-c-bg-soft) 20%, transparent) 0%, */
-            color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
+        color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
     );
 }
 
 .release-date {
-    background-color: var(--vp-c-brand-soft);
+    background-color: color-mix(in srgb, var(--vp-c-brand-soft) 80%, transparent);
 }
 
 .prose h3 {

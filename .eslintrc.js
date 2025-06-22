@@ -21,6 +21,12 @@ module.exports = {
         "prefer-const": "warn",
         "react-hooks/exhaustive-deps": "warn",
         "@typescript-eslint/no-explicit-any": "warn",
+        "vue/block-order": [
+            "error",
+            {
+                order: ["script", "template", "style"],
+            },
+        ],
     },
     settings: {
         react: {

@@ -98,7 +98,7 @@ const getButtonScale = (file: any) => {
         >
             <div
                 :class="[
-                    'py-2 pr-2 text-vp-3 group-hover:text-vp-brand-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center justify-center flex-shrink-0 select-none',
+                    'py-2 pr-2 text-vp-3 group-hover:text-vp-1 text-sm font-medium rounded-md transition-all duration-100 flex items-center justify-center flex-shrink-0 select-none',
                 ]"
             >
                 <v-icon :name="getButtonIcon(file)" scale="0.9" />
@@ -115,7 +115,7 @@ const getButtonScale = (file: any) => {
                     {{ getFilename(file) }}
                 </span>
                 <div
-                    class="text-xs text-vp-brand-1/80 select-none font-mono whitespace-nowrap ml-auto"
+                    class="text-xs text-vp-brand-1/80 group-hover:text-vp-1 select-none font-mono whitespace-nowrap ml-auto"
                 >
                     {{
                         [
@@ -147,6 +147,7 @@ const getButtonScale = (file: any) => {
     border-color: var(--vp-c-brand-2) !important;
 }
 .dark .download-button:hover {
-    border-color: var(--mntm-yellow-1) !important;
+    background-color: var(--vp-c-brand-3) !important;
+    border-color: var(--vp-c-brand-3) !important;
 }
 </style>

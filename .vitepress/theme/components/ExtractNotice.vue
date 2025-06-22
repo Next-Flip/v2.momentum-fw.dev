@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
+import { recentReleases } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { ConnectionState } from "../types";
 
-const { tr } = useI18n();
+const { tr, getLocalizedPath } = useI18n();
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const connectionData = computed(
@@ -30,6 +31,15 @@ const shouldShow = computed(() => {
         flags.value.ableToExtract === false
     );
 });
+
+const extractNoticeText = computed(() => {
+    return tr("connection_unable_to_extract_desc", {
+        version: `${connectionData.value.deviceInfo?.firmware_version} (${connectionData.value.deviceInfo?.firmware_commit})`,
+        url: getLocalizedPath(
+            `/releases/${connectionData.value.deviceInfo?.firmware_version.includes("dev") ? recentReleases.devbuilds[0].commit : recentReleases.mainline[0].commit}`,
+        ),
+    });
+});
 </script>
 
 <template>
@@ -40,19 +50,16 @@ const shouldShow = computed(() => {
         <div
             class="extract-notice backdrop-blur-sm rounded-full overflow-visible w-min transition-all duration-200 pointer-events-auto"
         >
-            <div class="flex items-center justify-center gap-2 pl-2 pr-2.5 py-2">
+            <div class="flex items-center justify-center gap-2 px-2.5 py-1.5">
                 <v-icon
                     name="ri-error-warning-line"
-                    class="text-[var(--vp-c-warning-2)] shrink-0"
+                    class="text-vp-warning-2 shrink-0"
+                    scale="0.9"
                 />
                 <div class="notice-details text-left cursor-default">
                     <p
-                        v-html="
-                            tr('connection_unable_to_extract_desc', {
-                                version: `${connectionData.deviceInfo?.firmware_version} (${connectionData.deviceInfo?.firmware_commit})`,
-                            })
-                        "
-                        class="text-left text-[13px] text-vp-2 leading-6 m-0 overflow-hidden w-max box-content"
+                        v-html="extractNoticeText"
+                        class="text-left text-[12px] text-vp-2 leading-6 m-0 overflow-hidden w-max box-content"
                     ></p>
                 </div>
             </div>
@@ -62,6 +69,14 @@ const shouldShow = computed(() => {
 
 <style scoped>
 .extract-notice {
+    background-color: color-mix(in srgb, var(--vp-custom-block-warning-bg) 100%, transparent);
+    border: 1px solid color-mix(in srgb, var(--vp-c-warning-1) 10%, transparent);
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.02),
+        0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.dark .extract-notice {
     background-color: color-mix(in srgb, var(--vp-c-warning-1) 5%, transparent);
     border: 1px solid color-mix(in srgb, var(--vp-c-warning-1) 10%, transparent);
     box-shadow: var(--vp-shadow-2);

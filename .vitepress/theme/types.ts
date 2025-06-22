@@ -58,6 +58,7 @@ export const ConnectionState = {
     DISCONNECTED: "disconnected",
     CONNECTING: "connecting",
     CONNECTED: "connected",
+    DISCONNECTING: "disconnecting",
     ERROR: "error",
 } as const;
 

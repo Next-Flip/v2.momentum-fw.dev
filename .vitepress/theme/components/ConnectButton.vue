@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useClipboard, useMagicKeys, useObjectUrl, useWindowSize, whenever } from "@vueuse/core";
-import { useRoute } from "vitepress";
 import { computed, inject, onMounted, ref, shallowRef, watch } from "vue";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
@@ -11,11 +10,8 @@ import { bytesToSize, getRadioStackType } from "../util";
 
 import Tooltip from "./Tooltip.vue";
 
-const { tr } = useI18n();
+const { tr, getLocalizedPath } = useI18n();
 const width = ref(1024);
-const isSecondary = computed(() => width.value <= 1280);
-const route = useRoute();
-const isWiki = computed(() => route.path.includes("/wiki"));
 
 onMounted(() => {
     if (typeof window !== "undefined") {
@@ -133,6 +129,11 @@ const getConnectionDisplay = computed(() => {
                 text: tr("connection_connected"),
                 indicatorClass: "bg-green-500 border border-green-600",
             };
+        case "disconnecting":
+            return {
+                text: width.value < 1024 ? "" : tr("connection_disconnecting"),
+                indicatorClass: "bg-red-500 animate-pulse border border-red-600",
+            };
         case "error":
             return {
                 text: `${tr("connection_error")}: ${connectionData.value.error}`,
@@ -174,7 +175,7 @@ const handleMouse = (v: boolean) => {
 };
 
 const handleConnect = async () => {
-    if (!flags.value.connected && serialConnection) {
+    if (!flags.value.connected && connectionState.value !== "disconnecting" && serialConnection) {
         await serialConnection.connect();
     }
 };
@@ -197,21 +198,15 @@ whenever(cmd_c, () => handleConnect());
 
 <template>
     <div
-        :class="['VPFlyout connect-container ', { 'ml-6': isWiki }]"
+        :class="['VPFlyout connect-container ml-8']"
         @mouseenter="handleMouse(true)"
         @mouseleave="handleMouse(false)"
     >
-        <div
-            :class="[
-                'flex items-center justify-center',
-                isSecondary ? 'h-10' : 'h-[var(--vp-nav-height)]',
-            ]"
-        >
+        <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
             <button
                 @click="handleConnect"
                 :class="[
-                    `connect-button shadow-sm ${isSecondary ? 'absolute top-0 z-10 rounded-bl-lg rounded-br-lg' : 'rounded-lg'} group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-200 ease-in-out`,
-                    // `${isSecondary ? 'ml-auto' : ''}`,
+                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-200 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
                 ]"
                 type="button"
                 :aria-expanded="flyoutOpen"
@@ -244,19 +239,18 @@ whenever(cmd_c, () => handleConnect());
                     {{ deviceInfo?.hardware_name || hardwareNameDots }}
                 </span>
                 <span
-                    v-if="connectionState === 'connecting'"
+                    v-if="connectionState === 'connecting' || connectionState === 'disconnecting'"
                     :class="[
                         'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
-                        connectionState === 'connecting' ? 'mr-2' : '',
+                        connectionState === 'connecting' || connectionState === 'disconnecting'
+                            ? 'mr-2'
+                            : '',
                     ]"
                 >
                     {{ connectingDots }}
                 </span>
 
-                <div
-                    class="DocSearch-Button"
-                    v-if="connectionState === 'disconnected' && !isSecondary"
-                >
+                <div class="DocSearch-Button" v-if="connectionState === 'disconnected'">
                     <span class="DocSearch-Button-Keys"
                         ><kbd class="DocSearch-Button-Key"></kbd
                         ><kbd class="DocSearch-Button-Key">C</kbd></span
@@ -268,11 +262,15 @@ whenever(cmd_c, () => handleConnect());
                 <div class="menu-content">
                     <div class="menu-item">
                         <span class="menu-label">{{ tr("connection_firmware") }}</span>
-                        <span class="menu-value">{{
-                            deviceInfo?.firmware_version?.includes("dev")
-                                ? `${deviceInfo.firmware_version} (${deviceInfo.firmware_commit})`
-                                : deviceInfo?.firmware_version
-                        }}</span>
+                        <a
+                            class="menu-value vp-external-link-icon hover:underline"
+                            :href="`${getLocalizedPath(`/releases/${deviceInfo?.firmware_commit}`)}`"
+                            >{{
+                                deviceInfo?.firmware_version?.includes("dev")
+                                    ? `dev (${deviceInfo.firmware_commit})`
+                                    : deviceInfo?.firmware_version
+                            }}</a
+                        >
                     </div>
 
                     <div class="menu-item">
@@ -335,7 +333,7 @@ whenever(cmd_c, () => handleConnect());
                             </Tooltip>
                             <button
                                 @click="handleDisconnect"
-                                class="action-button !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-500/5 dark:hover:!bg-red-500/10"
+                                class="action-button !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-500/10 dark:hover:!bg-red-500/15"
                             >
                                 {{ tr("connection_disconnect") }}
                             </button>
@@ -348,13 +346,7 @@ whenever(cmd_c, () => handleConnect());
 </template>
 
 <style scoped>
-@media (min-width: 1281px) {
-    .connect-page-top {
-        display: none !important;
-    }
-}
-
-@media (max-width: 1280px) {
+@media (max-width: 956px) {
     .connect-nav-bar {
         display: none !important;
     }
@@ -409,12 +401,6 @@ whenever(cmd_c, () => handleConnect());
     position: relative;
 }
 
-@media (min-width: 1281px) {
-    .connect-container {
-        margin-left: 35px;
-    }
-}
-
 body[data-route*="/wiki"] {
     .VPFlyout {
         margin-left: 0;
@@ -429,24 +415,24 @@ body[data-route*="/wiki"] {
 .connect-button[aria-expanded="false"] + .menu {
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
+    transform: translateY(0) translateX(calc(-50%));
 }
 
 .VPFlyout:hover .menu,
 .connect-button[aria-expanded="true"] + .menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) translateX(calc(-50%));
 }
 
 @media (min-width: 1024px) {
     .connect-button[aria-expanded="false"] + .menu {
-        transform: translateX(calc(-50%)) translateY(-10px);
+        transform: translateY(0) translateX(calc(-50%));
     }
 
     .VPFlyout:hover .menu,
     .connect-button[aria-expanded="true"] + .menu {
-        transform: translateX(calc(-50%)) translateY(0);
+        transform: translateY(0) translateX(calc(-50%));
     }
 }
 
@@ -468,13 +454,10 @@ body[data-route*="/wiki"] {
     z-index: 10;
 }
 
-.connect-page-top .menu {
-    top: calc(var(--vp-nav-height) / 2 + 12px);
-}
-
 @media (min-width: 1024px) {
     .menu {
         left: 50%;
+        transform: translateX(calc(-50%));
         right: auto;
     }
 }
@@ -508,6 +491,7 @@ body[data-route*="/wiki"] {
 .menu-label {
     color: var(--vp-c-text-2);
     text-align: left;
+    min-width: 65px;
 }
 
 .menu-value {

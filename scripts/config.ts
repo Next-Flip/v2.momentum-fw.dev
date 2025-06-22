@@ -30,7 +30,7 @@ function generateConfigContent(
         text: item.commit + ` (${formatDate(item.date)})`,
         link: `/update/${item.commit}`,
     }));
-    const navDevbuildsItems = devbuildsItems.slice(0, 4).map((item) => ({
+    const navDevbuildsItems = devbuildsItems.slice(0, 1).map((item) => ({
         text: item.commit + ` (${formatDate(item.date)})`,
         link: `/update/${item.commit}`,
     }));
@@ -99,8 +99,8 @@ const MainlineItems = ${jsonToTypeScript(navMainlineItems)};
 const DevbuildsItems = ${jsonToTypeScript(navDevbuildsItems)};
 
 const InstallItems = [
-    { text: "${m.nav_mainline}", items: MainlineItems },
-    { text: "${m.nav_devbuilds}", items: DevbuildsItems },
+    { text: "${m.nav_recent}", items: [...MainlineItems, ...DevbuildsItems] },
+    { text: "${m.nav_web_flasher}", link: "/update" },
     {
         text: "${m.nav_releases}",
         link: "${isRoot ? "/releases" : `/${locale}/releases`}",

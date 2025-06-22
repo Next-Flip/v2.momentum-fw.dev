@@ -145,6 +145,29 @@ export const getRadioStackType = (radioStackType: string | number | undefined) =
     }
 };
 
+export const replaceIssuesAndMentions = (text: string): string => {
+    const a = (href: string, className: string, content: string) =>
+        `<a href="${href}" target="_blank" rel="noopener noreferrer" class="${className} font-bold transition-colors duration-200">${content}</a>`;
+
+    let result = text.replace(/(?<![a-zA-Z])@([a-zA-Z0-9_-]+)/g, (_, username) =>
+        a(
+            `https://github.com/${username}`,
+            "text-vp-brand-1 hover:text-vp-brand-2",
+            `@${username}`,
+        ),
+    );
+
+    result = result.replace(/#(\d+)/g, (_, issueNumber) =>
+        a(
+            `https://github.com/Next-Flip/Momentum-Firmware/issues/${issueNumber}`,
+            "text-mntm-yellow-1 hover:text-mntm-yellow-2",
+            `#${issueNumber}`,
+        ),
+    );
+
+    return result;
+};
+
 export const shortenTimeString = (timeString: string): string => {
     const { tr } = useI18n();
 

@@ -10,6 +10,7 @@ const { tr, getLocalizedPath } = useI18n();
 
 interface Props {
     selectedRelease: ReleaseItem | null;
+    isCurrentVersion: boolean;
 }
 
 const props = defineProps<Props>();
@@ -97,13 +98,14 @@ watch(
 </script>
 
 <template>
-    <div v-if="selectedRelease?.files" class="mb-8 px-4 sm:px-4">
+    <div v-if="selectedRelease?.files" class="md:mb-4 px-4 sm:px-4">
         <div
             class="flex flex-row justify-start items-end gap-1.5 pb-2 mb-3 border-b border-vp-divider"
         >
-            <span class="text-vp-1 text-base font-medium py-1 leading-6 tracking-wide">{{
-                tr("releases_files")
-            }}</span>
+            <span
+                class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
+                >{{ tr("releases_files") }}</span
+            >
         </div>
 
         <div v-if="categorizedFiles.regular.length > 0" class="mb-4">
@@ -154,7 +156,7 @@ watch(
         </div>
 
         <div
-            class="flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4"
+            class="flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4 pb-4"
         >
             <div class="flex flex-row gap-x-1.5 items-center text-sm mr-auto">
                 <Tooltip
@@ -184,7 +186,7 @@ watch(
                 <span
                     class="text-vp-1 text-base font-medium py-1 leading-6 tracking-wide whitespace-nowrap"
                 >
-                    {{ tr("releases_install") }}
+                    {{ isCurrentVersion ? tr("releases_reinstall") : tr("releases_install") }}
                 </span>
             </div>
             <div

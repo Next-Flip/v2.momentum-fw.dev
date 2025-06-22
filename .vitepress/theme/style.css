@@ -56,12 +56,12 @@
 }
 
 .dark {
-    --vp-c-bg: #17171a;
-    --vp-c-default-soft: #202025;
-    --vp-c-bg-alt: #202025;
-    --vp-c-bg-elv: #18181b;
-    --vp-c-bg-soft: #202025;
-    --vp-c-bg-dark: #151518;
+    --vp-c-bg: #0f0f12;
+    --vp-c-default-soft: #18181b;
+    --vp-c-bg-alt: #18181b;
+    --vp-c-bg-elv: #0a0a0d;
+    --vp-c-bg-soft: #18181b;
+    --vp-c-bg-dark: #0a0a0d;
     --mntm-purp-1: #ababfb;
     --mntm-purp-2: #6a6adf;
     --vp-home-hero-name-color: var(--vp-c-brand-1);
@@ -76,7 +76,7 @@
 }
 
 html.dark ::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-3) 100%, transparent);
+    background-color: color-mix(in srgb, var(--vp-c-brand-soft) 100%, transparent);
     color: white;
 }
 
@@ -535,11 +535,13 @@ body[data-route*="/wiki"] {
         var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + var(--vp-doc-top-height, 0px) +
             32px
     );
+    max-height: calc(100% - 289px);
 }
 
 .VPSidebar {
     box-shadow: none !important;
     padding-top: calc(var(--vp-nav-height) + 12px) !important;
+    /* max-height: calc(100% - 290px); */
 }
 
 .VPNavBarTitle.has-sidebar .title {
@@ -727,4 +729,9 @@ body[data-route*="/wiki"] {
 
 .VPTeamMembersItem.small .data {
     padding-top: 32px !important;
+}
+
+.menu,
+.VPMenu {
+    border-radius: 8px !important;
 }

@@ -100,10 +100,11 @@ const messages: MessageSchema = {
     nav_wiki: "Wiki",
     nav_resources: "Resources",
     nav_web_flasher: "Web Flasher",
+    nav_recent: "Recent",
 
     aside_title: "General Info",
     aside_desc:
-        'Mainline releases are stable and recommended for most users, following a release cycle closely aligned with the <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium">OFW</a> (official firmware), while dev builds are updated more frequently and include the latest features and bug fixes.',
+        'Mainline releases are stable and recommended for most users, following a release cycle closely aligned with the <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium">OFW</a> (official firmware), while dev builds are updated more frequently and include the latest features and bug fixes.',
     aside_latest_release: "Latest Release",
     aside_latest_devbuild: "Latest Dev Build",
     aside_last_build_date: "Last Build Date",
@@ -118,8 +119,9 @@ const messages: MessageSchema = {
     releases_mainline: "Mainline",
     releases_devbuilds: "Dev builds",
     releases_install: "Install via...",
+    releases_reinstall: "Reinstall via...",
     releases_install_tooltip:
-        "For more info on these installation methods or using a zipped archive, you can go here: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium'>{{text}}</a>",
+        "For more info on these installation methods or using a zipped archive, you can go here: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     releases_web_updater: "Web Updater",
     releases_flipper_lab: "Flipper Lab/App",
     releases_qflipper: "qFlipper",
@@ -129,6 +131,7 @@ const messages: MessageSchema = {
     releases_files_dev_description:
         "These files include SDK packages, binaries, and scripts for users to build custom applications or modify firmware.",
     releases_changelog: "Changelog",
+    releases_current_version: "Currently installed",
 
     footer_mainline: "Mainline",
     footer_devbuilds: "Devbuilds",
@@ -174,6 +177,7 @@ const messages: MessageSchema = {
     connection_disconnected: "Connect Flipper",
     connection_connect: "Connect",
     connection_connecting: "Connecting",
+    connection_disconnecting: "Disconnecting",
     connection_connected: "Connected:",
     connection_error: "Error",
     connection_export_title: "Export Device Info",
@@ -182,7 +186,7 @@ const messages: MessageSchema = {
     connection_disconnect: "Disconnect",
     connection_unable_to_extract: "Unable to flash asset packs",
     connection_unable_to_extract_desc:
-        "{{version}} is unable to flash asset packs. Update to a compatible Momentum <a href='https://momentum.dev/' target='_blank'>release</a>.",
+        "{{version}} is unable to flash asset packs. Update to a compatible Momentum <a href='{{url}}'>release</a>.",
     missing: "Missing",
     corrupt: "Corrupt",
     installed: "Installed",

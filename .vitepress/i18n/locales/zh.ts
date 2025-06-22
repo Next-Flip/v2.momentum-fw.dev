@@ -100,10 +100,11 @@ const messages: MessageSchema = {
     nav_wiki: "Wiki",
     nav_resources: "资源",
     nav_web_flasher: "网页更新器（浏览器）",
+    nav_recent: "最近更新",
 
     aside_title: "一般信息",
     aside_desc:
-        '主线版本稳定，推荐给大多数用户，遵循与 <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium">OFW</a>（官方固件）紧密对齐的发布周期，而开发版本更新更频繁，包含最新功能和漏洞修复。',
+        '主线版本稳定，推荐给大多数用户，遵循与 <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium">OFW</a>（官方固件）紧密对齐的发布周期，而开发版本更新更频繁，包含最新功能和漏洞修复。',
     aside_latest_release: "最新版本",
     aside_latest_devbuild: "最新开发版本",
     aside_last_build_date: "最后构建日期",
@@ -118,8 +119,9 @@ const messages: MessageSchema = {
     releases_mainline: "主线版本",
     releases_devbuilds: "开发版本",
     releases_install: "安装方法",
+    releases_reinstall: "…重新安装",
     releases_install_tooltip:
-        "这些安装方法或使用压缩包的详细信息，请访问: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium'>{{text}}</a>",
+        "这些安装方法或使用压缩包的详细信息，请访问: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     releases_web_updater: "通过…安装",
     releases_flipper_lab: "Flipper Lab/App",
     releases_qflipper: "qFlipper",
@@ -129,6 +131,7 @@ const messages: MessageSchema = {
     releases_files_dev_description:
         "这些文件包含 SDK 包、二进制文件和脚本，供用户构建自定义应用程序或修改固件。",
     releases_changelog: "更新日志",
+    releases_current_version: "当前安装的版本",
 
     footer_mainline: "主线版本",
     footer_devbuilds: "开发版本",
@@ -174,6 +177,7 @@ const messages: MessageSchema = {
     connection_disconnected: "连接 Flipper",
     connection_connect: "连接",
     connection_connecting: "连接中",
+    connection_disconnecting: "断开中",
     connection_connected: "已连接:",
     connection_error: "错误",
     connection_export_title: "导出设备信息",
@@ -182,7 +186,7 @@ const messages: MessageSchema = {
     connection_disconnect: "断开连接",
     connection_unable_to_extract: "无法提取资源包",
     connection_unable_to_extract_desc:
-        "{{version}} 无法提取资源包。更新到兼容的 Momentum <a href='https://momentum.dev/' target='_blank'>版本</a>。",
+        "{{version}} 无法提取资源包。更新到兼容的 Momentum <a href='{{url}}'>版本</a>。",
     missing: "缺失",
     corrupt: "损坏",
     installed: "已安装",

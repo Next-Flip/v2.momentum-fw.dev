@@ -100,10 +100,11 @@ const messages: MessageSchema = {
     nav_wiki: "Wiki",
     nav_resources: "リソース",
     nav_web_flasher: "ウェブアップデータ",
+    nav_recent: "最近のリリース",
 
     aside_title: "一般情報",
     aside_desc:
-        'メインラインリリースは安定しており、ほとんどのユーザーに推奨されます。<a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium">OFW</a>（公式ファームウェア）と密接に連携したリリースサイクルに従っており、開発ビルドはより頻繁に更新され、最新の機能やバグ修正が含まれています。',
+        'メインラインリリースは安定しており、ほとんどのユーザーに推奨されます。<a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium">OFW</a>（公式ファームウェア）と密接に連携したリリースサイクルに従っており、開発ビルドはより頻繁に更新され、最新の機能やバグ修正が含まれています。',
     aside_latest_release: "最新リリース",
     aside_latest_devbuild: "最新開発ビルド",
     aside_last_build_date: "最終ビルド日",
@@ -118,8 +119,9 @@ const messages: MessageSchema = {
     releases_mainline: "メインライン",
     releases_devbuilds: "開発ビルド",
     releases_install: "…でインストール",
+    releases_reinstall: "…で再インストール",
     releases_install_tooltip:
-        "これらのインストール方法やZIPアーカイブの使用についての詳細は、こちらをご覧ください: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium'>{{text}}</a>",
+        "これらのインストール方法やZIPアーカイブの使用についての詳細は、こちらをご覧ください: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     releases_web_updater: "Webアップデーター",
     releases_flipper_lab: "Flipper Lab/App",
     releases_qflipper: "qFlipper",
@@ -129,6 +131,7 @@ const messages: MessageSchema = {
     releases_files_dev_description:
         "これらのファイルには、カスタムアプリケーションを作成したり、ファームウェアを変更したりするための開発者向けのSDKパッケージ、バイナリ、スクリプトが含まれています。",
     releases_changelog: "変更履歴",
+    releases_current_version: "現在インストールされているバージョン",
 
     footer_mainline: "メインライン",
     footer_devbuilds: "開発ビルド",
@@ -171,6 +174,7 @@ const messages: MessageSchema = {
     connection_sd_card: "SD カード",
     connection_databases: "データベース",
     connection_radio_fw: "ラジオ FW",
+    connection_disconnecting: "切断中",
     connection_disconnected: "を接続する",
     connection_connecting: "接続中",
     connection_connect: "接続",
@@ -182,7 +186,7 @@ const messages: MessageSchema = {
     connection_disconnect: "切断",
     connection_unable_to_extract: "パックを抽出できません",
     connection_unable_to_extract_desc:
-        "{{version}} はパックを抽出できません。互換性のあるMomentum <a href='https://momentum.dev/' target='_blank'>リリース</a>に更新してください。",
+        "{{version}} はパックを抽出できません。互換性のあるMomentum <a href='{{url}}'>リリース</a>に更新してください。",
     missing: "不足",
     corrupt: "破損",
     installed: "インストール済み",

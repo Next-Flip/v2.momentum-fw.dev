@@ -314,16 +314,16 @@ onUnmounted(() => {
     >
         <div class="relative overflow-visible mb-[13px] pt-[7px] px-[7px] pb-0">
             <div
-                class="shadow absolute top-[-16px] left-[-16px] w-[calc(100%+32px)] h-[calc(100%+32px)] z-0 p-0 pointer-events-none"
+                class="absolute top-[-16px] left-[-16px] w-[calc(100%+32px)] h-[calc(100%+32px)] z-0 p-0 pointer-events-none"
                 aria-hidden="true"
             >
                 <canvas
                     ref="shadowCanvas"
-                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] brightness-[0.95] dark:brightness-[0.65] saturate-0 dark:saturate-100"
+                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-5 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65] saturate-0 dark:saturate-100"
                 ></canvas>
             </div>
             <div
-                class="relative w-full pt-[50%] overflow-hidden rounded-[7px] z-4 shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+                class="relative w-full pt-[50%] overflow-hidden rounded-[7px] z-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
             >
                 <img
                     v-for="(url, index) in allPreviewUrls"
@@ -337,7 +337,7 @@ onUnmounted(() => {
                         }
                     "
                     :class="[
-                        'absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-200 dark:saturate-100 dark:contrast-100 dark:brightness-100',
+                        'cell-image absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-200 dark:saturate-100 dark:contrast-100 dark:brightness-100',
                         {
                             'opacity-100 visible':
                                 index === currentImageIndex && loadedImages.has(index),
@@ -366,7 +366,7 @@ onUnmounted(() => {
                 >
                     <button
                         v-show="currentImageIndex > 0"
-                        class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/50 transition-all duration-200 pointer-events-auto flex items-center justify-center left-[6px] hover:bg-black/80 opacity-80 cursor-pointer text-neutral-200 hover:text-neutral-50"
+                        class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/70 backdrop-blur transition-all duration-200 pointer-events-auto flex items-center justify-center left-[6px] hover:bg-black/80 cursor-pointer text-neutral-200 hover:text-neutral-50"
                         @click="prevImage"
                         aria-label="Previous image"
                     >
@@ -374,7 +374,7 @@ onUnmounted(() => {
                     </button>
                     <button
                         v-show="currentImageIndex < allPreviewUrls.length - 1"
-                        class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/50 transition-all duration-200 pointer-events-auto flex items-center justify-center right-[6px] hover:bg-black/80 opacity-80 cursor-pointer text-neutral-200 hover:text-neutral-50"
+                        class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/70 backdrop-blur transition-all duration-200 pointer-events-auto flex items-center justify-center right-[6px] hover:bg-black/80 cursor-pointer text-neutral-200 hover:text-neutral-50"
                         @click="nextImage"
                         aria-label="Next image"
                     >
@@ -383,7 +383,7 @@ onUnmounted(() => {
                 </div>
                 <div
                     v-if="allPreviewUrls.length > 1"
-                    class="absolute bottom-[4px] left-1/2 -translate-x-1/2 z-6 flex justify-center items-center gap-[5px] opacity-100 xl:opacity-0 xl:invisible transition-opacity duration-200 group-hover:opacity-100 group-hover:visible rounded-[10px] bg-black/50 p-[4px]"
+                    class="absolute bottom-[4px] left-1/2 -translate-x-1/2 z-6 flex justify-center items-center gap-[5px] opacity-100 xl:opacity-0 xl:invisible transition-opacity duration-200 group-hover:opacity-100 group-hover:visible rounded-[10px] bg-black/70 backdrop-blur p-[4px]"
                 >
                     <button
                         v-for="(_, index) in allPreviewUrls"
@@ -501,7 +501,7 @@ onUnmounted(() => {
             <div class="asset-pack-actions flex gap-2 justify-end">
                 <div v-if="downloadUrl" class="action flex-1 z-[5] cursor-pointer">
                     <a
-                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-200 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-2 hover:!border-vp-brand-2 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
+                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-200 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 hover:!border-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
                         :class="{
                             'tracking-widest':
                                 serialConnection.connectionData.state ===
@@ -594,7 +594,7 @@ onUnmounted(() => {
 }
 
 .download-button-small:hover {
-    background-color: color-mix(in srgb, var(--vp-c-divider) 70%, transparent);
+    background-color: color-mix(in srgb, var(--vp-c-default-soft) 100%, transparent);
     border-color: color-mix(in srgb, var(--vp-c-divider) 70%, transparent);
 }
 
@@ -606,12 +606,8 @@ onUnmounted(() => {
     @apply bg-red-600 text-neutral-100 border-red-600;
 }
 
-.shadow {
-    opacity: 0.15;
-}
-
-.dark .shadow {
-    opacity: 0.25;
+.cell-image {
+    image-rendering: pixelated;
 }
 
 .pack-cell {

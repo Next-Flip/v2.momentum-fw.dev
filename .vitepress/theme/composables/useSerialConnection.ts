@@ -187,45 +187,87 @@ export const useSerialConnection = () => {
         }
     };
 
-    const performCleanup = async (reason: string = "manual") => {
+    const performCleanup = async () => {
+        const wasConnected = flags.connected;
+        connectionData.state = ConnectionState.DISCONNECTING;
+
         try {
-            const flipperModule = await getFlipperModule();
+            if (flipper) {
+                const flipperModule = await Promise.race([
+                    getFlipperModule(),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("timeout")), 2000),
+                    ),
+                ]);
 
-            if (flags.connected) {
-                if (flags.rpcActive) {
-                    await stopRpc();
+                if (wasConnected) {
+                    await Promise.race([
+                        stopRpc(),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error("timeout")), 2000),
+                        ),
+                    ]).catch((error) => log.warn("[Serial] stopRpc failed:", error));
+                    await asyncSleep(100);
+                }
+
+                await Promise.race([
+                    flipperModule.closeReader(),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("timeout")), 2000),
+                    ),
+                ]).catch((error) => log.warn("[Serial] closeReader failed:", error));
+
+                await asyncSleep(100);
+
+                await Promise.race([
+                    flipperModule.disconnect(),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("timeout")), 2000),
+                    ),
+                ]).catch((error) => log.warn("[Serial] disconnect failed:", error));
+
+                await asyncSleep(100);
+
+                if (flipperModule.emitter?.events) {
+                    flipperModule.emitter.events = {};
                 }
 
                 try {
-                    await flipperModule.closeReader();
+                    const rpcModule = (await Promise.race([
+                        // @ts-ignore - flipper module is JavaScript
+                        import("../flipper/protobuf/rpc"),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error("timeout")), 2000),
+                        ),
+                    ])) as any;
+                    rpcModule.flushCommandQueue();
                 } catch (error) {
-                    log.warn("[Serial] Warning: Reader close failed:", error);
+                    log.warn("[Serial] flush command queue failed:", error);
                 }
 
-                try {
-                    await flipperModule.disconnect();
-                } catch (error) {
-                    log.warn("[Serial] Warning: Flipper disconnect failed:", error);
+                flipper = null;
+            }
+
+            if (typeof navigator !== "undefined" && navigator.serial) {
+                const ports = await navigator.serial.getPorts();
+                for (const port of ports) {
+                    if (port.readable || port.writable) {
+                        try {
+                            if (port.readable?.locked) await port.readable.cancel();
+                            if (port.writable?.locked) await port.writable.abort();
+                            if (port.opened) await port.close();
+                        } catch (error) {
+                            log.warn("[Serial] Failed to close port:", error);
+                        }
+                    }
                 }
             }
-
-            try {
-                flipperModule.emitter.events = {};
-                // @ts-ignore - flipper module is JavaScript
-                const rpcModule = await import("../flipper/protobuf/rpc");
-                rpcModule.flushCommandQueue();
-            } catch (error) {
-                log.warn("[Serial] Warning: Force cleanup failed:", error);
-            }
-
-            if (reason === "manual") {
-                await new Promise((resolve) => setTimeout(resolve, 500));
-            }
-
-            resetFlagsAndState();
         } catch (error) {
-            log.error(`[Serial] ❌ Error during cleanup (${reason}):`, error);
+            log.error("[Serial] Cleanup error:", error);
+        } finally {
             resetFlagsAndState();
+            flipper = null;
+            log.debug("[Serial] Disconnected");
         }
     };
 
@@ -432,7 +474,7 @@ export const useSerialConnection = () => {
             await startRpc();
             await readBasicInfo();
             // small delay to not conflict the the storage info stuff before, causing either sdcard size not to load or installed packs not to load
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await asyncSleep(100);
             await updateExtractCapability();
 
             setupEventListeners();
@@ -460,7 +502,7 @@ export const useSerialConnection = () => {
     };
 
     const disconnect = async () => {
-        await performCleanup("manual");
+        await performCleanup();
     };
 
     const installAssetPack = async (packUrl: string) => {

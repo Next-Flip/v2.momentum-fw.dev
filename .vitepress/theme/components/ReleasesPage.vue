@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
 import { useData } from "vitepress";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
+import type { useSerialConnection } from "../composables/useSerialConnection";
 
 import ReleaseContent from "./ReleaseContent.vue";
 import ReleaseItems from "./ReleaseItems.vue";
@@ -15,6 +16,33 @@ const { width } = useWindowSize();
 const { params } = useData();
 const selectedRelease = ref<ReleaseItem | null>(null);
 const isInitialLoad = ref(true);
+
+const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
+
+const isCurrentVersion = computed(() => {
+    if (
+        !serialConnection?.flags.connected ||
+        !serialConnection?.connectionData.deviceInfo ||
+        !selectedRelease.value
+    ) {
+        return false;
+    }
+
+    const deviceInfo = serialConnection.connectionData.deviceInfo;
+    const release = selectedRelease.value;
+
+    if (release.version && release.version.startsWith("mntm-")) {
+        const deviceVersion = deviceInfo.firmware_version || "";
+        return deviceVersion.includes(release.version);
+    }
+
+    if (release.commit) {
+        const deviceCommit = deviceInfo.firmware_commit || "";
+        return deviceCommit === release.commit;
+    }
+
+    return false;
+});
 
 const findReleaseByVersion = (version: string): ReleaseItem | null => {
     if (!version) return null;
@@ -78,12 +106,6 @@ const handlePopState = () => {
     initializeSelectedRelease();
 };
 
-const downloadFile = (url: string) => {
-    if (typeof window !== "undefined") {
-        window.open(url, "_blank");
-    }
-};
-
 watch(
     () => params.value?.version,
     (newVersion) => {
@@ -112,10 +134,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="relative w-full py-12 pb-0 pt-0 px-0 items-center justify-center">
-        <div
-            class="releases-banner text-center z-[5] pb-8 pt-8 sm:py-10 lg:py-16 border-b border-vp-divider"
-        >
+    <div class="relative w-full py-12 pb-6 pt-0 px-0 items-center justify-center">
+        <div class="text-center z-[5] pb-8 pt-8 sm:py-10 lg:py-16">
             <h1
                 class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight"
             >
@@ -129,7 +149,7 @@ onUnmounted(() => {
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex flex-row justify-center">
                 <aside
-                    class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[26px] pt-8 pb-8"
+                    class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[26px] pt-5 pb-8"
                 >
                     <div class="sticky flex flex-col gap-8 top-20 lg:top-24 overflow-y-auto">
                         <ReleaseItems
@@ -149,7 +169,11 @@ onUnmounted(() => {
                     </div>
                 </aside>
 
-                <ReleaseContent :selectedRelease="selectedRelease" @downloadFile="downloadFile" />
+                <ReleaseContent
+                    :selectedRelease="selectedRelease"
+                    :isCurrentVersion="isCurrentVersion"
+                    @selectRelease="selectRelease"
+                />
 
                 <ReleasesAside :selectedRelease="selectedRelease" />
             </div>

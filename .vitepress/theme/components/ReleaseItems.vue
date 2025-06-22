@@ -92,7 +92,7 @@ onMounted(() => {
         <div ref="containerRef" class="overflow-y-auto flex flex-col pr-1 pl-0 relative">
             <div
                 v-if="backgroundPosition.show"
-                class="absolute left-0 rounded-md z-[1] transition-all duration-300 ease-out"
+                class="absolute left-0 rounded-[4px] z-[1] transition-all duration-300 ease-out"
                 :style="{
                     top: `${backgroundPosition.top}px`,
                     height: `${backgroundPosition.height}px`,
@@ -122,14 +122,14 @@ onMounted(() => {
                 :key="release.commit"
                 @click="selectRelease(release)"
                 :class="[
-                    'relative flex flex-row w-full text-left justify-between items-center rounded-md text-sm group py-1 pr-2.5 transition-all duration-200 z-[2]',
-                    isSelected(release) ? 'text-vp-brand-1 pl-6' : 'pl-4',
+                    'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-200 z-[2] !cursor-pointer',
+                    isSelected(release) ? 'text-vp-brand-1 pl-6 gap-x-2.5' : 'pl-4 gap-x-[18px]',
                     !isSelected(release) && 'release-item-bg',
                 ]"
             >
                 <span
                     :class="[
-                        'text-sm font-medium truncate text-left font-mono',
+                        'text-sm font-medium truncate text-left font-mono pointer-events-none',
                         isSelected(release)
                             ? 'text-vp-brand-1'
                             : 'text-vp-2 group-hover:text-vp-brand-1',
@@ -138,7 +138,7 @@ onMounted(() => {
                     {{ release.commit }}
                 </span>
                 <span
-                    class="text-[11px] text-right font-mono"
+                    class="text-[11px] text-right font-mono pointer-events-none"
                     :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
                 >
                     {{

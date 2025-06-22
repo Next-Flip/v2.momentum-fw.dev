@@ -100,10 +100,11 @@ const messages: MessageSchema = {
     nav_wiki: "Wiki",
     nav_resources: "리소스",
     nav_web_flasher: "웹 업데이터 (브라우저)",
+    nav_recent: "최근 릴리스",
 
     aside_title: "일반 정보",
     aside_desc:
-        '메인라인 릴리스는 안정적이며 대부분의 사용자에게 권장됩니다. <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium">OFW</a> (공식 펌웨어)와 밀접하게 일치하는 릴리스 주기를 따르며, 개발 빌드는 더 자주 업데이트되고 최신 기능과 버그 수정이 포함되어 있습니다.',
+        '메인라인 릴리스는 안정적이며 대부분의 사용자에게 권장됩니다. <a href="https://github.com/flipperdevices/flipperzero-firmware" target="_blank" rel="noopener noreferrer" class="text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium">OFW</a> (공식 펌웨어)와 밀접하게 일치하는 릴리스 주기를 따르며, 개발 빌드는 더 자주 업데이트되고 최신 기능과 버그 수정이 포함되어 있습니다.',
     aside_latest_release: "최신 릴리스",
     aside_latest_devbuild: "최신 개발빌드",
     aside_last_build_date: "마지막 빌드 날짜",
@@ -118,8 +119,9 @@ const messages: MessageSchema = {
     releases_mainline: "메인라인",
     releases_devbuilds: "개발빌드",
     releases_install: "설치 방법",
+    releases_reinstall: "…로 다시 설치",
     releases_install_tooltip:
-        "이 설치 방법이나 ZIP 아카이브 사용에 대한 자세한 정보는 여기를 참조하세요: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-200 font-medium'>{{text}}</a>",
+        "이 설치 방법이나 ZIP 아카이브 사용에 대한 자세한 정보는 여기를 참조하세요: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     releases_web_updater: "…으로 설치",
     releases_flipper_lab: "Flipper 앱",
     releases_qflipper: "qFlipper",
@@ -129,6 +131,7 @@ const messages: MessageSchema = {
     releases_files_dev_description:
         "이 파일에는 SDK 패키지, 바이너리, 스크립트가 포함되어 있으며, 사용자가 커스텀 애플리케이션을 빌드하거나 펌웨어를 수정하기 위한 개발자와 고급 사용자를 위한 스크립트가 포함되어 있습니다.",
     releases_changelog: "변경사항",
+    releases_current_version: "현재 설치된 버전",
 
     footer_mainline: "메인라인",
     footer_devbuilds: "개발빌드",
@@ -172,6 +175,7 @@ const messages: MessageSchema = {
     connection_databases: "데이터베이스",
     connection_radio_fw: "라디오 FW",
     connection_disconnected: "Flipper 연결",
+    connection_disconnecting: "연결 끊기",
     connection_connect: "연결",
     connection_connecting: "연결 중",
     connection_connected: "연결 완료:",
@@ -182,7 +186,7 @@ const messages: MessageSchema = {
     connection_disconnect: "연결 끊기",
     connection_unable_to_extract: "팩을 추출할 수 없음",
     connection_unable_to_extract_desc:
-        "{{version}} 는 팩을 추출할 수 없습니다. 호환되는 Momentum <a href='https://momentum.dev/' target='_blank'>릴리스</a>로 업데이트하세요.",
+        "{{version}} 는 팩을 추출할 수 없습니다. 호환되는 Momentum <a href='{{url}}'>릴리스</a>로 업데이트하세요.",
     missing: "누락",
     corrupt: "손상",
     installed: "설치됨",

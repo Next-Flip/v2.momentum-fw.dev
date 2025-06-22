@@ -1,6 +1,7 @@
 import { inject } from "@vercel/analytics";
 import { injectSpeedInsights } from "@vercel/speed-insights";
 import type { Theme } from "vitepress";
+import { useRoute } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { h } from "vue";
 import "./style.css";
@@ -43,12 +44,16 @@ import { ConnectionState } from "./types";
 export default {
     extends: DefaultTheme,
     Layout: () => {
+        const route = useRoute();
+        const isWiki = route.path.includes("/wiki");
+
         return h(DefaultTheme.Layout, null, {
             "nav-bar-content-before": () => h(ConnectButton, { class: "connect-nav-bar" }),
-            "page-top": () => h(ConnectButton, { class: "connect-page-top" }),
             "sidebar-nav-before": () => h(SidebarSearch),
             "home-hero-info-after": () => h(HomeActions),
-            "layout-bottom": () => [h(WarningPopup), h(Footer)],
+            ...(isWiki
+                ? { "doc-bottom": () => h(Footer) }
+                : { "layout-bottom": () => [h(WarningPopup), h(Footer)] }),
         });
     },
     enhanceApp({ app, router }) {

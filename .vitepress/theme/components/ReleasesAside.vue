@@ -107,7 +107,7 @@ watch(
 </script>
 
 <template>
-    <aside class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pl-8 pt-8 pb-8">
+    <aside class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pl-8 pt-5 pb-8">
         <div class="sticky top-20 lg:top-24 flex flex-col">
             <span class="text-vp-2 text-sm font-medium mb-0.5" v-html="tr('aside_desc')"></span>
 
@@ -120,7 +120,7 @@ watch(
                     v-show="item.condition"
                     class="flex flex-col items-start gap-y-0.5"
                 >
-                    <span class="text-vp-3 text-xs font-medium">
+                    <span class="text-vp-3 text-[11px] font-semibold uppercase">
                         {{ tr(item.key) }}
                     </span>
                     <div class="flex flex-row gap-x-1 items-center">

@@ -102,6 +102,7 @@ export type MessageSchema = {
     nav_wiki: string;
     nav_resources: string;
     nav_web_flasher: string;
+    nav_recent: string;
 
     aside_title: string;
     aside_desc: string;
@@ -119,6 +120,7 @@ export type MessageSchema = {
     releases_mainline: string;
     releases_devbuilds: string;
     releases_install: string;
+    releases_reinstall: string;
     releases_install_tooltip: string;
     releases_web_updater: string;
     releases_flipper_lab: string;
@@ -128,6 +130,7 @@ export type MessageSchema = {
     releases_files_dev: string;
     releases_files_dev_description: string;
     releases_changelog: string;
+    releases_current_version: string;
 
     footer_mainline: string;
     footer_devbuilds: string;
@@ -171,6 +174,7 @@ export type MessageSchema = {
     connection_databases: string;
     connection_radio_fw: string;
     connection_disconnected: string;
+    connection_disconnecting: string;
     connection_connect: string;
     connection_connecting: string;
     connection_connected: string;

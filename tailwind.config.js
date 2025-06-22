@@ -15,6 +15,8 @@ export default {
     theme: {
         extend: {
             colors: {
+                "vp-warning-1": "rgb(from var(--vp-c-warning-1) r g b / <alpha-value>)",
+                "vp-warning-2": "rgb(from var(--vp-c-warning-2) r g b / <alpha-value>)",
                 "vp-1": "rgb(from var(--vp-c-text-1) r g b / <alpha-value>)",
                 "vp-2": "rgb(from var(--vp-c-text-2) r g b / <alpha-value>)",
                 "vp-3": "rgb(from var(--vp-c-text-3) r g b / <alpha-value>)",

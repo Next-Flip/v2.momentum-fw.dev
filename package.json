@@ -1,5 +1,10 @@
 {
     "name": "v2.momentum.dev",
+    "version": "1.0.0",
+    "description": "Web-updater, asset pack downloader, and Wiki for momentum-fw.dev",
+    "author": "Next-Flip",
+    "license": "GPL-3.0",
+    "homepage": "https://github.com/Next-Flip/v2.momentum-fw.dev",
     "private": true,
     "type": "module",
     "scripts": {
