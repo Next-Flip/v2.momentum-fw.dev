@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from "../composables/useI18n";
 import { formatDate, isExternalLink } from "../util";
+
+const { getLocalizedPath } = useI18n();
 
 interface FooterItem {
     text?: string;
@@ -17,16 +20,16 @@ interface Props {
     title: string;
     items: FooterItem[];
     type?: "release" | "link";
-    isMainline?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     type: "link",
-    isMainline: false,
 });
 
 const getItemUrl = (item: FooterItem) => {
-    return item.url || item.link || "";
+    return props.type === "release"
+        ? getLocalizedPath(`/releases/${item.commit}`)
+        : item.url || item.link || "";
 };
 
 const getItemText = (item: FooterItem) => {

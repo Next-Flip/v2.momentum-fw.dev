@@ -101,7 +101,6 @@ const navigationLinks = computed(() => [
                             :title="tr('footer_mainline')"
                             :items="recentReleases.mainline"
                             type="release"
-                            :is-mainline="true"
                         />
 
                         <FooterSection
