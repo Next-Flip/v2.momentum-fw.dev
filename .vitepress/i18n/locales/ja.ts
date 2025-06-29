@@ -42,6 +42,14 @@ const messages: MessageSchema = {
     no_packs_found: "条件に一致するアセットパックが見つかりません",
     reset_filters: "フィルターをリセット",
 
+    home_changelog: "変更履歴",
+    home_up_to_date: "最新版です",
+    home_update_to: "更新",
+    home_latest_mainline: "最新メインライン",
+    home_latest_devbuild: "最新開発ビルド",
+    home_dev: "dev",
+    home_latest: "最新",
+
     warning_popup_description:
         "これはmomentum-fw.devのリデザインのプレビューです。コンテンツが不足（404）し、機能が壊れる可能性があり、外観/感じが変更され続けます。",
     warning_popup_dont_show_again: "次回から表示しない",
@@ -170,6 +178,7 @@ const messages: MessageSchema = {
 
     connection_device: "デバイス",
     connection_firmware: "ファームウェア",
+    connection_branch: "ブランチ",
     connection_build_date: "ビルド日",
     connection_sd_card: "SD カード",
     connection_databases: "データベース",
@@ -179,6 +188,7 @@ const messages: MessageSchema = {
     connection_connecting: "接続中",
     connection_connect: "接続",
     connection_connected: "接続済み:",
+    connection_waiting: "待機中",
     connection_error: "エラー",
     connection_export_title: "デバイス情報のエクスポート",
     connection_export: "輸出",
@@ -187,6 +197,12 @@ const messages: MessageSchema = {
     connection_unable_to_extract: "パックを抽出できません",
     connection_unable_to_extract_desc:
         "{{version}} はパックを抽出できません。互換性のあるMomentum <a href='{{url}}'>リリース</a>に更新してください。",
+    connection_serial_busy: "シリアル使用中",
+    connection_rpc_failed: "RPC失敗",
+    connection_device_not_found: "デバイスなし",
+    connection_serial_not_supported: "シリアル非対応",
+    connection_connection_failed: "接続失敗",
+    connection_connection_timeout: "接続超過",
     missing: "不足",
     corrupt: "破損",
     installed: "インストール済み",

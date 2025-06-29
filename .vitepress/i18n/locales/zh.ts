@@ -42,6 +42,14 @@ const messages: MessageSchema = {
     no_packs_found: "没有找到符合条件的资源包",
     reset_filters: "重置筛选",
 
+    home_changelog: "更新日志",
+    home_up_to_date: "已是最新版本",
+    home_update_to: "更新",
+    home_latest_mainline: "最新主线版本",
+    home_latest_devbuild: "最新开发版本",
+    home_dev: "开发",
+    home_latest: "最新",
+
     warning_popup_description:
         "这是 momentum-fw.dev 重新设计的预览版本。部分内容可能缺失（404），功能可能无法正常工作，界面外观将持续更新。",
     warning_popup_dont_show_again: "不再显示",
@@ -170,6 +178,7 @@ const messages: MessageSchema = {
 
     connection_device: "设备",
     connection_firmware: "固件",
+    connection_branch: "分支",
     connection_build_date: "构建日期",
     connection_sd_card: "SD 卡",
     connection_databases: "数据库",
@@ -179,6 +188,7 @@ const messages: MessageSchema = {
     connection_connecting: "连接中",
     connection_disconnecting: "断开中",
     connection_connected: "已连接:",
+    connection_waiting: "等待中",
     connection_error: "错误",
     connection_export_title: "导出设备信息",
     connection_export: "导出元数据",
@@ -187,6 +197,12 @@ const messages: MessageSchema = {
     connection_unable_to_extract: "无法提取资源包",
     connection_unable_to_extract_desc:
         "{{version}} 无法提取资源包。更新到兼容的 Momentum <a href='{{url}}'>版本</a>。",
+    connection_serial_busy: "串口繁忙",
+    connection_rpc_failed: "RPC 连接失败",
+    connection_device_not_found: "设备未找到",
+    connection_serial_not_supported: "串口不支持",
+    connection_connection_failed: "连接失败",
+    connection_connection_timeout: "连接超时",
     missing: "缺失",
     corrupt: "损坏",
     installed: "已安装",

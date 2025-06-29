@@ -27,6 +27,7 @@ export default {
                 "mntm-yellow-1": "rgb(from var(--mntm-yellow-1) r g b / <alpha-value>)",
                 "mntm-yellow-2": "rgb(from var(--mntm-yellow-2) r g b / <alpha-value>)",
                 "mntm-yellow-3": "rgb(from var(--mntm-yellow-3) r g b / <alpha-value>)",
+                "vp-border": "rgb(from var(--vp-c-border) r g b / <alpha-value>)",
                 "vp-divider": "rgb(from var(--vp-c-divider) r g b / <alpha-value>)",
                 "vp-bg": "rgb(from var(--vp-c-bg) r g b / <alpha-value>)",
                 "vp-elv": "rgb(from var(--vp-c-bg-elv) r g b / <alpha-value>)",

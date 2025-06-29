@@ -501,7 +501,7 @@ onUnmounted(() => {
             <div class="asset-pack-actions flex gap-2 justify-end">
                 <div v-if="downloadUrl" class="action flex-1 z-[5] cursor-pointer">
                     <a
-                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-200 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 hover:!border-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
+                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 hover:!border-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
                         :class="{
                             'tracking-widest':
                                 serialConnection.connectionData.state ===
@@ -545,7 +545,7 @@ onUnmounted(() => {
                                     }
                                 "
                                 :aria-label="downloadState.currentText.value"
-                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-200 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-vp-2 hover:text-vp-brand-1 select-none pointer-events-auto !z-[999]"
+                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-vp-2 hover:text-vp-brand-1 select-none pointer-events-auto !z-[999]"
                                 :class="{ 'scale-95': downloadState.isPressed.value }"
                                 @mousedown="downloadState.handleMouseDown"
                                 @mouseup="downloadState.handleMouseUp"
@@ -563,7 +563,7 @@ onUnmounted(() => {
                         <div v-if="installed" class="action w-10 z-[5]">
                             <button
                                 :aria-label="tr('delete')"
-                                class="delete-button inline-flex text-center font-semibold whitespace-nowrap transition-colors duration-200 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-red-500 hover:text-red-600 select-none pointer-events-auto !z-[999]"
+                                class="delete-button inline-flex text-center font-semibold whitespace-nowrap transition-colors duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-red-500 hover:text-red-600 select-none pointer-events-auto !z-[999]"
                                 :class="{
                                     'opacity-50 cursor-not-allowed pointer-events-none':
                                         serialConnection.queueState.queue.some(

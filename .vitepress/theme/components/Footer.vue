@@ -53,7 +53,7 @@ const navigationLinks = computed(() => [
         >
             <div
                 class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto"
-                :class="`${route.path.includes('/releases') ? 'max-w-7xl px-4 lg:px-8' : 'max-w-6xl'}`"
+                :class="`${route.path.includes('/releases') ? 'max-w-7xl lg:px-8' : 'max-w-6xl'}`"
             >
                 <div class="lg:max-w-md flex flex-col justify-start">
                     <div class="flex items-center space-x-3">
@@ -79,7 +79,7 @@ const navigationLinks = computed(() => [
                             href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="hover:text-vp-brand-1 transition-colors duration-200 hover:underline"
+                            class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"
                         >
                             GPL-3.0 © 2025 Next-Flip
                         </a>

@@ -50,14 +50,15 @@ const toggleDropdown = async () => {
 
 const scrollToSelectedRelease = () => {
     if (!dropdownMenuRef.value || !props.selectedRelease) return;
-
     const selectedElement = dropdownMenuRef.value.querySelector(".dropdown-item.is-selected");
+
     if (selectedElement) {
-        selectedElement.scrollIntoView({
-            behavior: "instant",
-            block: "center",
-            inline: "nearest",
-        });
+        const container = dropdownMenuRef.value;
+        const containerHeight = container.clientHeight;
+        const elementTop = (selectedElement as HTMLElement).offsetTop;
+        const elementHeight = (selectedElement as HTMLElement).offsetHeight;
+        const scrollTop = elementTop - containerHeight / 2 + elementHeight / 2;
+        container.scrollTop = Math.max(0, scrollTop);
     }
 };
 
@@ -149,7 +150,7 @@ onBeforeUnmount(() => {
                     v-if="isDropdownOpen"
                 >
                     <div
-                        class="bg-transparent transition-all duration-200 overflow-hidden max-h-80 flex flex-col w-full min-w-full"
+                        class="bg-transparent transition-all duration-200 overflow-hidden max-h-[275px] flex flex-col w-full min-w-full"
                         :class="{ 'is-visible': isDropdownOpen }"
                     >
                         <div
@@ -162,7 +163,7 @@ onBeforeUnmount(() => {
                             >
                                 <div
                                     v-if="section.releases.length > 0"
-                                    class="px-3 py-2 text-xs font-semibold text-vp-2 uppercase tracking-wide border-b border-vp-divider/40"
+                                    class="px-3 py-2 mb-2 text-xs font-semibold text-vp-2 uppercase tracking-wide border-b border-vp-divider/40"
                                     :class="{ 'mt-4': sectionIndex > 0 }"
                                 >
                                     {{ section.title }}

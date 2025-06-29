@@ -534,6 +534,10 @@ export function getRecentReleases() {
 }
 
 export const recentReleases = getRecentReleases();
+
+export const getReleaseByCommit = (commit: string) => {
+    return [...mainlineReleases, ...devbuildReleases].find((release) => release.commit === commit);
+};
 `;
 
         const releasesPath = join(DIR_DATA, "./releases.ts");

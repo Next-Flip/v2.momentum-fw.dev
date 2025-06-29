@@ -42,6 +42,14 @@ const messages: MessageSchema = {
     no_packs_found: "검색 결과가 없습니다",
     reset_filters: "필터 초기화",
 
+    home_changelog: "변경사항",
+    home_up_to_date: "최신 버전입니다",
+    home_update_to: "업데이트",
+    home_latest_mainline: "최신 메인라인",
+    home_latest_devbuild: "최신 개발빌드",
+    home_dev: "dev",
+    home_latest: "최신",
+
     warning_popup_description:
         "momentum-fw.dev 리디자인 미리보기입니다. 일부 콘텐츠가 누락(404)될 수 있으며, 기능이 작동하지 않을 수 있고, 디자인이 계속 변경될 수 있습니다.",
     warning_popup_dont_show_again: "다음에 표시하지 않기",
@@ -170,6 +178,7 @@ const messages: MessageSchema = {
 
     connection_device: "장치",
     connection_firmware: "펌웨어",
+    connection_branch: "브랜치",
     connection_build_date: "빌드 날짜",
     connection_sd_card: "SD 카드",
     connection_databases: "데이터베이스",
@@ -179,6 +188,7 @@ const messages: MessageSchema = {
     connection_connect: "연결",
     connection_connecting: "연결 중",
     connection_connected: "연결 완료:",
+    connection_waiting: "대기 중",
     connection_error: "오류",
     connection_export_title: "장치 정보 내보내기",
     connection_export: "내보내다",
@@ -187,6 +197,12 @@ const messages: MessageSchema = {
     connection_unable_to_extract: "팩을 추출할 수 없음",
     connection_unable_to_extract_desc:
         "{{version}} 는 팩을 추출할 수 없습니다. 호환되는 Momentum <a href='{{url}}'>릴리스</a>로 업데이트하세요.",
+    connection_serial_busy: "시리얼 사용 중",
+    connection_rpc_failed: "RPC 실패",
+    connection_device_not_found: "장치 없음",
+    connection_serial_not_supported: "시리얼 미지원",
+    connection_connection_failed: "연결 실패",
+    connection_connection_timeout: "시간 초과",
     missing: "누락",
     corrupt: "손상",
     installed: "설치됨",

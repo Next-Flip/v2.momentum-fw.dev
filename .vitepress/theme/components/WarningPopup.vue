@@ -82,7 +82,7 @@ function handleConfirm() {
                             </label>
                             <button
                                 @click="handleConfirm"
-                                class="w-full px-4 py-2 bg-vp-brand-2 hover:bg-vp-brand-3 focus:bg-vp-brand-3 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-vp-brand-1 focus:ring-offset-2 focus:ring-offset-vp-bg min-h-[38px]"
+                                class="w-full px-4 py-2 bg-vp-brand-2 hover:bg-vp-brand-3 focus:bg-vp-brand-3 text-white font-medium rounded-lg transition-colors duration-100 focus:outline-none focus:ring-2 focus:ring-vp-brand-1 focus:ring-offset-2 focus:ring-offset-vp-bg min-h-[38px]"
                             >
                                 {{ tr("warning_popup_continue") }}
                             </button>

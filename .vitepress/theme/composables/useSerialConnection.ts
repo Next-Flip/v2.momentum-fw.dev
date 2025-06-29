@@ -7,7 +7,10 @@ import {
     type ConnectionState as ConnectionStateType,
     type InstallStatus as InstallStatusType,
 } from "../types";
+import { useI18n } from "./useI18n";
 import { useProxiedUrl } from "./useProxiedUrl";
+
+const { tr } = useI18n();
 
 const asyncSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -73,22 +76,22 @@ const mapErrorToUserFriendly = (error: Error): string => {
         message.includes("failed to execute 'open' on 'serialport'") ||
         message.includes("serial port is busy - please refresh the page")
     ) {
-        return "Serial port is busy";
+        return "connection_serial_busy";
     }
     if (message.includes("could not start rpc session")) {
-        return "RPC connection failed";
+        return "connection_rpc_failed";
     }
     if (message.includes("no flipper device found")) {
-        return "Device not found";
+        return "connection_device_not_found";
     }
     if (message.includes("serial not supported")) {
-        return "Serial not supported";
+        return "connection_serial_not_supported";
     }
     if (message.includes("connection failed") || message.includes("networkerror")) {
-        return "Connection failed";
+        return "connection_connection_failed";
     }
     if (message.includes("timeout")) {
-        return "Connection timeout";
+        return "connection_connection_timeout";
     }
     if (error.message.length > 50) {
         return error.message.substring(0, 47) + "...";
@@ -190,6 +193,7 @@ export const useSerialConnection = () => {
     const performCleanup = async () => {
         const wasConnected = flags.connected;
         connectionData.state = ConnectionState.DISCONNECTING;
+        log.info("[Serial] Starting cleanup process");
 
         try {
             if (flipper) {
@@ -267,7 +271,7 @@ export const useSerialConnection = () => {
         } finally {
             resetFlagsAndState();
             flipper = null;
-            log.debug("[Serial] Disconnected");
+            log.info("[Serial] Cleanup completed - disconnected");
         }
     };
 
@@ -290,6 +294,7 @@ export const useSerialConnection = () => {
 
             flags.rpcActive = true;
             flags.rpcToggling = false;
+            log.info("[Serial] RPC session started successfully");
         } catch (error) {
             flags.rpcToggling = false;
             log.error("[Serial] RPC session failed:", error);
@@ -299,12 +304,14 @@ export const useSerialConnection = () => {
 
     const stopRpc = async () => {
         flags.rpcToggling = true;
+        log.debug("[Serial] Stopping RPC session");
 
         try {
             const flipperModule = await getFlipperModule();
             await flipperModule.commands.stopRpcSession();
             flags.rpcActive = false;
             flags.rpcToggling = false;
+            log.info("[Serial] RPC session stopped");
         } catch (error) {
             flags.rpcToggling = false;
             log.warn("[Serial] Warning: RPC session stop failed:", error);
@@ -322,7 +329,6 @@ export const useSerialConnection = () => {
                 error.name === "NotFoundError" &&
                 error.message.includes("No port selected by the user")
             ) {
-                log.debug("[Serial] User canceled port selection");
                 throw new Error("USER_CANCELED");
             }
             throw error;
@@ -349,6 +355,9 @@ export const useSerialConnection = () => {
             info.storage_sdcard_freeSpace = null;
 
             connectionData.deviceInfo = info;
+            log.info(
+                `[Serial] Device info loaded - ${info.hardware_name || "???"} (${info.firmware_version || "???"}, ${info.firmware_commit || "???"}, ${info.firmware_branch || "???"})`,
+            );
             readStorageInfo();
 
             return info;
@@ -372,9 +381,13 @@ export const useSerialConnection = () => {
                 updatedInfo.storage_sdcard_present = "installed";
                 updatedInfo.storage_sdcard_totalSpace = extInfo.totalSpace;
                 updatedInfo.storage_sdcard_freeSpace = extInfo.freeSpace;
+                log.debug(
+                    `[Serial] SD card detected - ${Math.round(extInfo.freeSpace / 1024 / 1024)}MB free`,
+                );
             } else {
                 updatedInfo.storage_sdcard_present = "missing";
                 updatedInfo.storage_databases_present = "missing";
+                log.debug("[Serial] No SD card detected");
             }
         } catch (error) {
             log.warn("[Serial] Failed to read external storage info:", error);
@@ -429,12 +442,13 @@ export const useSerialConnection = () => {
             let ports = await findKnownDevices();
 
             if (ports.length === 0) {
+                log.debug("[Serial] No known devices found, requesting port selection");
                 try {
                     await requestPort();
                     ports = await findKnownDevices();
                 } catch (error) {
                     if (error instanceof Error && error.message === "USER_CANCELED") {
-                        log.info("[Serial] User canceled - returning to disconnected state");
+                        log.info("[Serial] User canceled port selection");
                         connectionData.state = ConnectionState.DISCONNECTED;
                         connectionData.error = undefined;
                         return;
@@ -447,6 +461,7 @@ export const useSerialConnection = () => {
                 throw new Error("No known ports");
             }
 
+            log.debug(`[Serial] Found ${ports.length} device(s), attempting connection`);
             try {
                 await flipper.connect();
                 flags.connected = true;
@@ -456,11 +471,13 @@ export const useSerialConnection = () => {
                     (flipperError.message.includes("Cannot cancel a locked stream") ||
                         flipperError.message.includes("locked to a reader"))
                 ) {
+                    log.debug("[Serial] Port locked, attempting recovery");
                     try {
                         await flipper.closeReader();
                         await new Promise((resolve) => setTimeout(resolve, 1000));
                         await flipper.connect();
                         flags.connected = true;
+                        log.info("[Serial] Physical connection established after recovery");
                     } catch (retryError) {
                         log.error("[Serial] Retry failed:", retryError);
                         throw new Error("Serial port is busy - please refresh the page");
@@ -479,6 +496,9 @@ export const useSerialConnection = () => {
 
             setupEventListeners();
             connectionData.state = ConnectionState.CONNECTED;
+            log.info(
+                `[Serial] Hello ${connectionData.deviceInfo?.hardware_name}... you are connected!`,
+            );
         } catch (error) {
             flags.connected = false;
             flags.rpcActive = false;
@@ -490,12 +510,14 @@ export const useSerialConnection = () => {
             }
 
             const userFriendlyError =
-                error instanceof Error ? mapErrorToUserFriendly(error) : "Connection failed";
+                error instanceof Error
+                    ? mapErrorToUserFriendly(error)
+                    : tr("connection_connection_failed");
 
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = userFriendlyError;
-            log.debug(
-                "[Serial] Full technical error:",
+            log.error(
+                "[Serial] Connection failed:",
                 error instanceof Error ? error.message : error,
             );
         }
@@ -733,6 +755,7 @@ export const useSerialConnection = () => {
         }
 
         const installed: InstalledPacks = {};
+        log.debug("[Serial] Loading installed asset packs");
 
         try {
             const manifests = await flipper.commands.storage.list(ASSET_PACKS_MANIFESTS_DIR);
@@ -756,10 +779,17 @@ export const useSerialConnection = () => {
                     log.warn(`[Serial] Failed to load manifest data for pack: ${packId}`);
                 }
             }
+
+            const packCount = Object.keys(installed).length;
+            if (packCount > 0) {
+                log.info(`[Serial] Found ${packCount} installed asset pack(s)`);
+            }
         } catch (error) {
             if (error === "ERROR_STORAGE_NOT_EXIST") {
+                log.debug("[Serial] Asset packs directory not found (normal for first use)");
                 return {};
             }
+            log.warn("[Serial] Failed to load installed packs:", error);
             return {};
         }
 
@@ -775,6 +805,7 @@ export const useSerialConnection = () => {
             flags.progress = progress / stepCount + (1 / stepCount) * step;
         };
 
+        log.info(`[AssetPacks] Starting installation of pack: ${pack.id}`);
         flags.progress = 0;
         flags.installStatus = InstallStatus.LOADING;
         step++;
@@ -811,12 +842,15 @@ export const useSerialConnection = () => {
         }
 
         await createManifest(pack);
+        log.info(`[AssetPacks] Successfully installed pack: ${pack.id}`);
     };
 
     const processRemovePack = async (pack: any): Promise<void> => {
+        log.info(`[AssetPacks] Removing pack: ${pack.id}`);
         flags.installStatus = InstallStatus.DELETING;
         await removeOldPacks(pack);
         delete connectionData.installedPacks[pack.id];
+        log.info(`[AssetPacks] Successfully removed pack: ${pack.id}`);
     };
 
     const enqueue = async (pack: any, action: "install" | "remove"): Promise<void> => {
@@ -868,6 +902,10 @@ export const useSerialConnection = () => {
                 !semver.lt(version, "0.23.0") ||
                 connectionData.deviceInfo.firmware_origin_fork !== "Momentum" ||
                 !connectionData.deviceInfo.firmware_version.includes("mntm");
+
+            log.debug(
+                `[Serial] Extract capability: ${flags.ableToExtract ? "supported" : "not supported"} (version: ${version})`,
+            );
         } catch (error) {
             log.warn("[AssetPacks] Failed to check extract capability:", error);
             flags.ableToExtract = false;
@@ -884,7 +922,7 @@ export const useSerialConnection = () => {
             await flipper.connect();
             await startRpc();
             flags.restarting = false;
-            log.info("[Serial] Device: Restarted RPC");
+            log.info("[Serial] RPC connection restarted successfully");
         }
     };
 

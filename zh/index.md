@@ -5,8 +5,8 @@ layout: home
 hero:
   tagline: "功能丰富、稳定且可定制的\nFlipper Zero 固件"
   image:
-    dark: /banners/logo_dark.png
-    light: /banners/logo_light.png
+    dark: /banners/logo_dark_zh.png
+    light: /banners/logo_light_zh.png
     alt: Momentum Firmware
 
 features:
@@ -42,28 +42,28 @@ features:
 
 |功能|[&nearr;&nbsp;OFW](https://github.com/flipperdevices/flipperzero-firmware)|[&nearr;&nbsp;RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[&nearr;&nbsp;Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
 |-|:-:|:-:|:-:|:-:|
-|稳定更新|&#10003;|&#10007;|&#10003;|&#10003;|
-|（部分）滚动码支持|&#10033;<sup>1</sup>|&#10003;|&#10003;|&#10003;|
-|FindMy Flipper|&#10033;<sup>2</sup>|&#10003;|&#10003;|&#10003;|
-|BLE 垃圾信息|&#10007;|&#10003;|&#10003;|&#10003;|
-|Bad Keyboard（额外选项）|&#10007;|&#10003;<sup>3</sup>|&#10003;<sup>2</sup>|&#10003;|
-|Subdriving（保存 subghz 坐标）|&#10007;|&#10003;|&#10007;|&#10003;|
-|完全自定义（布局、菜单、按键绑定等）|&#10007;|&#10007;|&#10007;|&#10003;|
-|管理应用（用于简单配置）|&#10007;|&#10033;<sup>4</sup>|&#10007;|&#10003;|
-|增强的 RGB 背光模式（完全自定义和彩虹模式）|&#10007;|&#10003;|&#10007;|&#10003;|
-|欺骗（名称、Mac、序列号）|&#10007;|&#10003;|&#10003;|&#10003;|
-|改进的安全性（启动锁定、错误密码重置等）|&#10007;|&#10007;|&#10007;|&#10003;|
-|资源包|&#10007;|&#10033;<sup>5</sup>|&#10007;|&#10003;|
-|VGM 颜色选项|&#10007;|&#10003;|&#10007;|&#10003;|
-|增强的等级系统|&#10007;|&#10003;|&#10007;|&#10003;|
-|文件搜索|&#10007;|&#10007;|&#10007;|&#10003;|
-|磁盘镜像管理|&#10007;|&#10003;|&#10007;|&#10003;|
-|改进的错误消息（显示源路径）|&#10007;|&#10007;|&#10007;|&#10003;|
+|稳定更新|<span class="check">&#10003;</span>|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|（部分）滚动码支持|&#10033;<sup>1</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|FindMy Flipper|&#10033;<sup>2</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|BLE 垃圾信息|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Bad Keyboard（额外选项）|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>2</sup>|<span class="check-last">&#10003;</span>|
+|Subdriving（保存 subghz 坐标）|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|完全自定义（布局、菜单、按键绑定等）|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|管理应用（用于简单配置）|&#10007;|&#10033;<sup>4</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|增强的 RGB 背光模式（完全自定义和彩虹模式）|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|欺骗（名称、Mac、序列号）|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|改进的安全性（启动锁定、错误密码重置等）|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|资源包|&#10007;|&#10033;<sup>5</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|VGM 颜色选项|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|增强的等级系统|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|文件搜索|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|磁盘镜像管理|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|改进的错误消息（显示源路径）|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
 |预装外部应用（截至 04.2025）|3|421|226（带 [e] 包）|183|
 
 </div>
 
-<!-- <div class="footnotes-container">
+<div class="footnotes-container">
 
 <sup>1：官方固件可以配对一些滚动码接收器（比自定义固件少），并且不允许发送在野外捕获的滚动码信号（上面列出的自定义固件允许这样做，但您需要承担使原始遥控器不同步的风险）。</sup>
 
@@ -75,4 +75,4 @@ features:
 
 <sup>5：不同格式（manifest_xyz.txt），仅支持动画，不支持图标和字体</sup>
 
-</div> -->
+</div>

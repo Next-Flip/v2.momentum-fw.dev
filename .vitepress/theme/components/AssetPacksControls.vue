@@ -180,14 +180,14 @@ watch(
                     type="text"
                     name="search-input"
                     :placeholder="tr('search_placeholder')"
-                    class="search-input w-full py-2 pr-4 pl-9 rounded-lg border bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] text-vp-1 text-sm transition-all duration-200 ease-in-out leading-6 min-h-[38px]"
+                    class="search-input w-full py-2 pr-4 pl-9 rounded-lg border bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] text-vp-1 text-sm transition-all duration-100 ease-in-out leading-6 min-h-[38px]"
                     v-model="searchQuery"
                     @input="emitSearch"
                     :aria-label="tr('search_placeholder')"
                 />
                 <button
                     v-if="searchQuery"
-                    class="absolute right-3 bg-vp-soft border-none cursor-pointer text-vp-3 flex items-center justify-center p-[2px] rounded-full transition-all duration-200 hover:text-vp-2"
+                    class="absolute right-3 bg-vp-soft border-none cursor-pointer text-vp-3 flex items-center justify-center p-[2px] rounded-full transition-all duration-100 hover:text-vp-2"
                     @click="clearSearch"
                     :aria-label="tr('clear_search')"
                     :title="tr('clear_search')"
@@ -200,7 +200,7 @@ watch(
         <div class="grid grid-cols-[40px_1fr_1fr] gap-2.5 md:flex items-center justify-center">
             <button
                 @click="toggleSortDirection"
-                class="sort-direction-toggle w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] transition-all duration-200 hover:border-vp-brand-1 hover:text-vp-2 text-vp-3 cursor-pointer backdrop-blur"
+                class="sort-direction-toggle w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] transition-all duration-100 hover:border-vp-brand-1 hover:text-vp-2 text-vp-3 cursor-pointer backdrop-blur"
                 :aria-label="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
                 :title="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
             >
@@ -230,12 +230,12 @@ watch(
                     <div class="dropdown-menu-container" v-if="isSortDropdownOpen">
                         <div class="dropdown-menu" :class="{ 'is-visible': isSortDropdownOpen }">
                             <div
-                                class="flex flex-col overflow-hidden max-h-[200px] transition-all duration-200 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
+                                class="flex flex-col overflow-hidden max-h-[200px] transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
                             >
                                 <span
                                     v-for="option in sortOptions"
                                     :key="option.value"
-                                    class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0"
+                                    class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                     :class="{
                                         'is-selected': sortField === option.value,
                                     }"
@@ -284,12 +284,12 @@ watch(
                     <div class="dropdown-menu-container" v-if="isFilterDropdownOpen">
                         <div class="dropdown-menu" :class="{ 'is-visible': isFilterDropdownOpen }">
                             <div
-                                class="flex flex-col overflow-hidden max-h-[200px] w-full transition-all duration-200 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
+                                class="flex flex-col overflow-hidden max-h-[200px] w-full transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
                             >
                                 <span
                                     v-for="option in filterOptions"
                                     :key="option.value"
-                                    class="dropdown-item items-center justify-start gap-2 px-3 py-2 cursor-pointer flex transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0"
+                                    class="dropdown-item items-center justify-start gap-2 px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                     :class="{
                                         'is-selected': activeFilters.includes(
                                             option.value as FilterOption,
@@ -298,7 +298,7 @@ watch(
                                     @click="toggleFilterOption(option.value as FilterOption)"
                                 >
                                     <span
-                                        class="inline-flex items-center justify-center w-4 h-4 rounded-[4px] transition-all duration-200 checkbox flex-shrink-0"
+                                        class="inline-flex items-center justify-center w-4 h-4 rounded-[4px] transition-all duration-100 checkbox flex-shrink-0"
                                     >
                                         <v-icon
                                             v-if="

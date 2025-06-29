@@ -45,6 +45,14 @@ export type MessageSchema = {
     no_packs_found: string;
     reset_filters: string;
 
+    home_changelog: string;
+    home_up_to_date: string;
+    home_update_to: string;
+    home_latest: string;
+    home_latest_mainline: string;
+    home_latest_devbuild: string;
+    home_dev: string;
+
     warning_popup_description: string;
     warning_popup_dont_show_again: string;
     warning_popup_continue: string;
@@ -169,6 +177,7 @@ export type MessageSchema = {
 
     connection_device: string;
     connection_firmware: string;
+    connection_branch: string;
     connection_build_date: string;
     connection_sd_card: string;
     connection_databases: string;
@@ -178,6 +187,7 @@ export type MessageSchema = {
     connection_connect: string;
     connection_connecting: string;
     connection_connected: string;
+    connection_waiting: string;
     connection_error: string;
     connection_export_title: string;
     connection_export: string;
@@ -185,6 +195,12 @@ export type MessageSchema = {
     connection_disconnect: string;
     connection_unable_to_extract: string;
     connection_unable_to_extract_desc: string;
+    connection_serial_busy: string;
+    connection_rpc_failed: string;
+    connection_device_not_found: string;
+    connection_serial_not_supported: string;
+    connection_connection_failed: string;
+    connection_connection_timeout: string;
     missing: string;
     corrupt: string;
     installed: string;

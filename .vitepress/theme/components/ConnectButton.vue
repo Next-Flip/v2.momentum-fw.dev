@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useClipboard, useMagicKeys, useObjectUrl, useWindowSize, whenever } from "@vueuse/core";
 import { computed, inject, onMounted, ref, shallowRef, watch } from "vue";
+import { getReleaseByCommit } from "../../../_data/releases";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
@@ -8,6 +9,7 @@ import { useTempState } from "../composables/useTempState";
 import { ConnectionState } from "../types";
 import { bytesToSize, getRadioStackType } from "../util";
 
+import { MessageSchema } from ".vitepress/i18n";
 import Tooltip from "./Tooltip.vue";
 
 const { tr, getLocalizedPath } = useI18n();
@@ -46,6 +48,9 @@ const flags = computed(
 const connectionState = computed(() => connectionData.value.state);
 const deviceInfo = computed(() => connectionData.value.deviceInfo);
 const isConnected = computed(() => connectionState.value === "connected");
+const commitInReleases = computed(() =>
+    getReleaseByCommit(deviceInfo.value?.firmware_commit || ""),
+);
 
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
@@ -136,7 +141,7 @@ const getConnectionDisplay = computed(() => {
             };
         case "error":
             return {
-                text: `${tr("connection_error")}: ${connectionData.value.error}`,
+                text: `${tr("connection_error")}: ${tr(connectionData.value.error as keyof MessageSchema)}`,
                 indicatorClass: "bg-red-500 animate-pulse border border-red-600",
             };
         default:
@@ -206,7 +211,7 @@ whenever(cmd_c, () => handleConnect());
             <button
                 @click="handleConnect"
                 :class="[
-                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-200 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
+                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
                 ]"
                 type="button"
                 :aria-expanded="flyoutOpen"
@@ -217,7 +222,7 @@ whenever(cmd_c, () => handleConnect());
                         :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
                     ></span>
                     <span
-                        :class="`relative inline-flex size-2 rounded-full transition-all duration-200 ease-in-out ${getConnectionDisplay.indicatorClass}`"
+                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"
                     ></span>
                 </span>
 
@@ -264,7 +269,8 @@ whenever(cmd_c, () => handleConnect());
                         <span class="menu-label">{{ tr("connection_firmware") }}</span>
                         <a
                             class="menu-value vp-external-link-icon hover:underline"
-                            :href="`${getLocalizedPath(`/releases/${deviceInfo?.firmware_commit}`)}`"
+                            :title="deviceInfo?.firmware_branch || ''"
+                            :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`"
                             >{{
                                 deviceInfo?.firmware_version?.includes("dev")
                                     ? `dev (${deviceInfo.firmware_commit})`
@@ -386,9 +392,9 @@ whenever(cmd_c, () => handleConnect());
     border: 1px solid var(--vp-c-divider);
     width: auto;
     transition:
-        border-color 0.2s ease-in-out,
-        background-color 0.2s ease-in-out,
-        color 0.2s ease-in-out;
+        border-color 0.1s ease-in-out,
+        background-color 0.1s ease-in-out,
+        color 0.1s ease-in-out;
 }
 
 .connect-button:hover {

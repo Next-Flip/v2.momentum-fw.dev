@@ -42,6 +42,14 @@ const messages: MessageSchema = {
     no_packs_found: "No asset packs found matching your criteria",
     reset_filters: "Reset Filters",
 
+    home_changelog: "Changelog",
+    home_up_to_date: "You're up to date!",
+    home_update_to: "Update to",
+    home_latest_mainline: "latest mainline",
+    home_latest_devbuild: "You have the latest devbuild!",
+    home_dev: "dev",
+    home_latest: "latest",
+
     warning_popup_description:
         "This is a preview of the momentum-fw.dev redesign. Content will be missing (404), features may be broken, and the look/feel will continuously change.",
     warning_popup_dont_show_again: "I understand, don't show this again",
@@ -170,6 +178,7 @@ const messages: MessageSchema = {
 
     connection_device: "Device",
     connection_firmware: "Firmware",
+    connection_branch: "Branch",
     connection_build_date: "Build Date",
     connection_sd_card: "SD Card",
     connection_databases: "Databases",
@@ -179,6 +188,7 @@ const messages: MessageSchema = {
     connection_connecting: "Connecting",
     connection_disconnecting: "Disconnecting",
     connection_connected: "Connected:",
+    connection_waiting: "Waiting",
     connection_error: "Error",
     connection_export_title: "Export Device Info",
     connection_export: "Export Metadata",
@@ -187,6 +197,12 @@ const messages: MessageSchema = {
     connection_unable_to_extract: "Unable to flash asset packs",
     connection_unable_to_extract_desc:
         "{{version}} is unable to flash asset packs. Update to a compatible Momentum <a href='{{url}}'>release</a>.",
+    connection_serial_busy: "Serial port is busy",
+    connection_rpc_failed: "RPC connection failed",
+    connection_device_not_found: "Device not found",
+    connection_serial_not_supported: "Serial not supported",
+    connection_connection_failed: "Connection failed",
+    connection_connection_timeout: "Connection timeout",
     missing: "Missing",
     corrupt: "Corrupt",
     installed: "Installed",

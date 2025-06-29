@@ -49,7 +49,7 @@ const getItemText = (item: FooterItem) => {
                     :target="isExternalLink(getItemUrl(item)) ? '_blank' : undefined"
                     :rel="isExternalLink(getItemUrl(item)) ? 'noopener noreferrer' : undefined"
                     :class="[
-                        'text-[13px] text-vp-2 hover:text-vp-brand-1 transition-colors duration-200 flex items-center min-h-[1.25rem] leading-6 whitespace-nowrap overflow-hidden text-ellipsis',
+                        'text-[13px] text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 flex items-center min-h-[1.25rem] leading-6 whitespace-nowrap overflow-hidden text-ellipsis',
                         type === 'release' ? 'gap-2' : '',
                         isExternalLink(getItemUrl(item)) ? 'vp-external-link-icon' : '',
                     ]"

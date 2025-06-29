@@ -56,12 +56,13 @@
 }
 
 .dark {
-    --vp-c-bg: #0f0f12;
-    --vp-c-default-soft: #18181b;
-    --vp-c-bg-alt: #18181b;
-    --vp-c-bg-elv: #0a0a0d;
-    --vp-c-bg-soft: #18181b;
-    --vp-c-bg-dark: #0a0a0d;
+    --vp-c-bg: #141417;
+    --vp-c-default-soft: #1d1d20;
+    --vp-c-bg-alt: #1d1d20;
+    --vp-c-bg-elv: #0f0f12;
+    --vp-c-bg-soft: #1d1d20;
+    --vp-c-bg-soft-alt: #18181b;
+    --vp-c-bg-dark: #0f0f12;
     --mntm-purp-1: #ababfb;
     --mntm-purp-2: #6a6adf;
     --vp-home-hero-name-color: var(--vp-c-brand-1);
@@ -76,7 +77,7 @@
 }
 
 html.dark ::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-soft) 100%, transparent);
+    background-color: color-mix(in srgb, var(--vp-c-brand-3) 100%, transparent);
     color: white;
 }
 
@@ -148,29 +149,27 @@ body {
 
 .VPFeature {
     position: relative !important;
-    border-top: 1px solid var(--vp-c-divider) !important;
-    border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
-    transition: box-shadow 0.2s ease-in-out !important;
-    background-color: transparent !important;
-    background-image: linear-gradient(
-        to right,
-        color-mix(in srgb, var(--vp-c-divider) 50%, transparent),
-        color-mix(in srgb, var(--vp-c-bg-soft) 40%, transparent)
-    ) !important;
+    border: 1px solid color-mix(in srgb, var(--vp-c-divider) 40%, transparent) !important;
+    border-style: solid solid none solid !important;
+    backdrop-filter: blur(12px) !important;
+    transition:
+        box-shadow 0.2s ease-in-out,
+        transform 0.2s ease-in-out !important;
+    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 40%, transparent) !important;
+    cursor: default !important;
 }
 
 .dark .VPFeature {
-    background-image: linear-gradient(
-        to right,
-        color-mix(in srgb, var(--vp-c-bg-soft) 80%, transparent),
-        color-mix(in srgb, var(--vp-c-bg-soft) 10%, transparent)
-    ) !important;
+    border: 1px solid color-mix(in srgb, var(--vp-c-divider) 60%, transparent) !important;
+    transition:
+        box-shadow 0.2s ease-in-out,
+        transform 0.2s ease-in-out !important;
 }
-
+.VPFeature:hover {
+    box-shadow: inset 0 0 0 1px var(--vp-c-brand-2) !important;
+    transform: translateY(-5px);
+}
 .dark .VPFeature:hover {
-    cursor: pointer !important;
     box-shadow: inset 0 0 0 1px var(--mntm-yellow-1) !important;
 }
 
@@ -181,7 +180,6 @@ body {
     opacity: 9%;
     height: 24px;
     width: auto;
-    transition: opacity 0.1s ease-in-out;
     object-position: right center;
     object-fit: contain;
 }
@@ -291,6 +289,29 @@ body {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 70%, transparent) !important;
 }
 
+.VPHome:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/bg/011-w-2.png");
+    background-size: contain;
+    background-position: top;
+    background-repeat: no-repeat;
+    opacity: 0.019;
+    filter: saturate(0) invert(1);
+    mix-blend-mode: multiply;
+    z-index: -1;
+}
+
+.dark .VPHome:before {
+    mix-blend-mode: screen;
+    opacity: 0.013;
+    filter: saturate(0);
+}
+
 .VPHome .full-width-table .vp-doc table,
 .VPHome .full-width-table table {
     display: table;
@@ -381,6 +402,23 @@ body {
 .VPHome .full-width-table a:hover {
     color: var(--vp-c-brand-2);
     text-decoration: underline;
+}
+
+.VPHome .full-width-table td:not(:first-child):not(:last-child) {
+    color: var(--vp-c-text-2);
+}
+
+.VPHome .full-width-table td:last-child {
+    color: var(--vp-c-text-2);
+}
+
+.VPHome .full-width-table .check {
+    color: var(--mntm-purp-1);
+}
+
+.VPHome .full-width-table .check-last {
+    font-weight: 600;
+    color: var(--mntm-yellow-1);
 }
 
 .centered-content {
@@ -491,7 +529,8 @@ body[data-route*="/wiki"] {
     background-color: transparent !important;
 }
 .aside-curtain {
-    background: transparent !important;
+    position: absolute !important;
+    background: linear-gradient(transparent, var(--vp-c-bg-dark) 70%) !important;
 }
 
 .VPDoc {
@@ -541,7 +580,6 @@ body[data-route*="/wiki"] {
 .VPSidebar {
     box-shadow: none !important;
     padding-top: calc(var(--vp-nav-height) + 12px) !important;
-    /* max-height: calc(100% - 290px); */
 }
 
 .VPNavBarTitle.has-sidebar .title {
@@ -576,6 +614,12 @@ body[data-route*="/wiki"] {
 .outline-title,
 .VPSidebarItem.level-0 .text {
     font-size: 13px !important;
+}
+
+.VPLink {
+    transition:
+        background-color 0.1s,
+        color 0.1s !important;
 }
 
 .VPLink.link.link .text {
@@ -734,4 +778,8 @@ body[data-route*="/wiki"] {
 .menu,
 .VPMenu {
     border-radius: 8px !important;
+    transition-duration: 0.2s !important;
+    transition-timing-function: ease;
+    transition-delay: 0s;
+    transition-property: background-color;
 }

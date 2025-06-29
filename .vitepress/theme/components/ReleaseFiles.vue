@@ -124,7 +124,7 @@ watch(
                     :class="{ 'rotate-180': isDevelopmentSectionExpanded }"
                 />
                 <span
-                    class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-200"
+                    class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-100"
                     >{{ tr("releases_files_dev") }}</span
                 >
                 <span class="text-xs text-vp-3 mt-px mx-px">{{
@@ -198,7 +198,7 @@ watch(
                         :href="method.href"
                         target="_blank"
                         rel="noopener"
-                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-colors duration-200 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-2.5 sm:pr-2 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-colors duration-100 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
                     >
                         {{ method.name }}
                     </a>

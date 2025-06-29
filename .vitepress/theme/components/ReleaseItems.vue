@@ -122,7 +122,7 @@ onMounted(() => {
                 :key="release.commit"
                 @click="selectRelease(release)"
                 :class="[
-                    'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-200 z-[2] !cursor-pointer',
+                    'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
                     isSelected(release) ? 'text-vp-brand-1 pl-6 gap-x-2.5' : 'pl-4 gap-x-[18px]',
                     !isSelected(release) && 'release-item-bg',
                 ]"

@@ -48,7 +48,7 @@ const extractNoticeText = computed(() => {
         class="extract-notice-container flex justify-center items-center max-w-[1200px] my-0 mx-auto pt-5 px-6 pointer-events-none"
     >
         <div
-            class="extract-notice backdrop-blur-sm rounded-full overflow-visible w-min transition-all duration-200 pointer-events-auto"
+            class="extract-notice backdrop-blur-sm rounded-full overflow-visible w-min transition-all duration-100 pointer-events-auto"
         >
             <div class="flex items-center justify-center gap-2 px-2.5 py-1.5">
                 <v-icon

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useData, useRoute } from "vitepress";
-import { VPButton } from "vitepress/theme";
-import { computed, inject, onMounted } from "vue";
+import { computed, inject } from "vue";
+import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
+import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 
 import type { useSerialConnection } from "../composables/useSerialConnection";
@@ -9,75 +9,117 @@ import { ConnectionState } from "../types";
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialConnection")!;
 const { connectionData } = serialConnection;
-const { tr } = useI18n();
+const { tr, getLocalizedPath } = useI18n();
+const { dots } = useDots();
+
+const isConnected = computed(
+    () => connectionData.state === ConnectionState.CONNECTED && connectionData.deviceInfo,
+);
+const isConnecting = computed(
+    () => serialConnection.connectionData.state === ConnectionState.CONNECTING,
+);
 
 interface ActionButton {
     theme: "brand" | "alt";
     text: string;
     href: string;
+    isLatest?: boolean;
 }
 
 const dynamicButtons = computed((): ActionButton[] => {
+    const isConnecting = serialConnection.connectionData.state === ConnectionState.CONNECTING;
     const defaultButtons: ActionButton[] = [
         {
             theme: "brand",
-            text: tr("install"),
+            text: isConnecting ? dots.value : tr("install"),
             href: "/update",
         },
         {
             theme: "alt",
-            text: tr("nav_releases"),
+            text: isConnecting ? dots.value : tr("nav_releases"),
             href: "/releases",
         },
     ];
 
-    if (connectionData.state !== ConnectionState.CONNECTED || !connectionData.deviceInfo) {
+    const deviceInfo = connectionData.deviceInfo;
+    if (!isConnected.value || !deviceInfo) {
         return defaultButtons;
     }
 
-    const deviceInfo = connectionData.deviceInfo;
     const currentVersion = deviceInfo.firmware_version || "Unknown";
+    const currentCommit = deviceInfo.firmware_commit || "";
     const versionMatch = currentVersion.match(/mntm-(\d+(?:\.\d+)*)/);
-    const shortVersion = versionMatch ? versionMatch[1] : currentVersion;
+    const commitInReleases = getReleaseByCommit(currentCommit);
+    const latestMainline = mainlineReleases.length > 0 ? mainlineReleases[0] : null;
+    const latestDevbuild = devbuildReleases.length > 0 ? devbuildReleases[0] : null;
+    const isMainlineVersion = versionMatch && currentVersion.includes("mntm-");
+    const isLatestMainline =
+        latestMainline &&
+        (currentCommit === latestMainline.commit ||
+            currentVersion.includes(latestMainline.version || ""));
+    const isLatestDevbuild = latestDevbuild && currentCommit === latestDevbuild.commit;
+    let updateText: string;
+    let updateHref: string;
+    let isLatest = false;
+
+    if (isMainlineVersion) {
+        if (isLatestMainline) {
+            updateText = tr("home_up_to_date");
+            updateHref = `${getLocalizedPath("/update")}`;
+            isLatest = true;
+        } else {
+            const latestMainlineVersion = `${latestMainline?.version?.replace("mntm-", "").toUpperCase() || tr("home_latest_mainline")}`;
+            updateText = `${tr("home_update_to")} ${latestMainlineVersion}`;
+            updateHref = `${getLocalizedPath("/update")}/${latestMainline?.commit || latestMainlineVersion}`;
+        }
+    } else {
+        if (isLatestDevbuild) {
+            updateText = tr("home_latest_devbuild");
+            updateHref = `${getLocalizedPath("/update")}`;
+            isLatest = true;
+        } else {
+            const latestDevCommit = latestDevbuild?.commit?.substring(0, 8) || "latest";
+            updateText = `${tr("home_update_to")} ${latestDevCommit} (${tr("home_dev")})`;
+            updateHref = `${getLocalizedPath("/update")}/${latestDevbuild?.commit || ""}`;
+        }
+    }
 
     const connectedButtons: ActionButton[] = [
         {
             theme: "brand",
-            text: `Update from ${shortVersion}`,
-            href: "/update",
+            text: updateText,
+            href: updateHref,
+            isLatest,
         },
         {
             theme: "alt",
-            text: "Device Info",
-            href: "#device-info",
+            text: commitInReleases ? tr("home_changelog") : tr("nav_releases"),
+            href: `${getLocalizedPath("/releases")}/${commitInReleases?.commit || ""}`,
         },
     ];
 
     return connectedButtons;
 });
-
-onMounted(() => {
-    console.log(useData());
-    console.log(useRoute());
-});
 </script>
 
 <template>
-    <div
-        class="flex flex-wrap items-center justify-center pt-6 transition-all duration-200 sm:pt-8"
-    >
-        <div
-            v-for="button in dynamicButtons"
-            :key="button.href"
-            class="flex-shrink-0 p-1.5 transition-all duration-200"
-        >
-            <VPButton
-                tag="a"
-                size="medium"
-                :theme="button.theme"
-                :text="button.text"
-                :href="button.href"
-            />
+    <div class="flex flex-wrap items-center justify-center pt-6 sm:pt-8">
+        <div class="flex flex-row gap-4 flex-shrink-0 py-1.5">
+            <a
+                v-for="button in dynamicButtons"
+                :key="button.href"
+                :href="button.isLatest ? '#' : button.href"
+                :class="[
+                    'px-7 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100',
+                    isConnecting ? 'w-[100px]' : '',
+                    button.theme === 'brand'
+                        ? button.isLatest
+                            ? 'border-vp-brand-2 bg-vp-brand-2'
+                            : 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50'
+                        : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/20',
+                ]"
+                >{{ button.text }}</a
+            >
         </div>
     </div>
 </template>

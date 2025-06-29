@@ -387,7 +387,7 @@ const filteredAssetPacks = computed(() => {
             <p>{{ tr("no_packs_found") }}</p>
             <button
                 @click="resetFilters"
-                class="reset-button mt-3 bg-vp-brand-2 p-4 py-2 rounded-md text-[14px] cursor-pointer transition-colors duration-200 text-vp-1"
+                class="reset-button mt-3 bg-vp-brand-2 p-4 py-2 rounded-md text-[14px] cursor-pointer transition-colors duration-100 text-neutral-50"
             >
                 {{ tr("reset_filters") }}
             </button>
@@ -399,7 +399,7 @@ const filteredAssetPacks = computed(() => {
         >
             <button
                 @click="scrollToTop('smooth')"
-                class="bg-vp-brand-2 text-neutral-100 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-vp-brand-3 transition-colors duration-200 whitespace-nowrap"
+                class="bg-vp-brand-2 text-neutral-100 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
             >
                 {{ tr("return_to_top") }}
             </button>

@@ -42,23 +42,23 @@ features:
 
 |기능|[&nearr;&nbsp;OFW](https://github.com/flipperdevices/flipperzero-firmware)|[&nearr;&nbsp;RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[&nearr;&nbsp;Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
 |-|:-:|:-:|:-:|:-:|
-|안정적인 업데이트|&#10003;|&#10007;|&#10003;|&#10003;|
-|(일부) 롤링 코드 지원|&#10033;<sup>1</sup>|&#10003;|&#10003;|&#10003;|
-|FindMy Flipper|&#10033;<sup>2</sup>|&#10003;|&#10003;|&#10003;|
-|BLE 스팸|&#10007;|&#10003;|&#10003;|&#10003;|
-|Bad Keyboard<br>(추가 옵션)|&#10007;|&#10003;<sup>3</sup>|&#10003;<sup>2</sup>|&#10003;|
-|서브드라이빙<br>(subghz에 좌표 저장)|&#10007;|&#10003;|&#10007;|&#10003;|
-|완전한 사용자 정의<br>(레이아웃, 메뉴, 키 바인드 등)|&#10007;|&#10007;|&#10007;|&#10003;|
-|관리 앱<br>(손쉬운 구성)|&#10007;|&#10033;<sup>4</sup>|&#10007;|&#10003;|
-|향상된 RGB 백라이트 모드<br>(전체 사용자 정의 및 무지개 모드)|&#10007;|&#10003;|&#10007;|&#10003;|
-|스푸핑<br>(이름, MAC, 시리얼)|&#10007;|&#10003;|&#10003;|&#10003;|
-|향상된 보안<br>(부팅 시 잠금, 잘못된 핀 시 초기화 등)|&#10007;|&#10007;|&#10007;|&#10003;|
-|에셋 팩|&#10007;|&#10033;<sup>5</sup>|&#10007;|&#10003;|
-|VGM 색상 옵션|&#10007;|&#10003;|&#10007;|&#10003;|
-|향상된 레벨 시스템|&#10007;|&#10003;|&#10007;|&#10003;|
-|파일 검색|&#10007;|&#10007;|&#10007;|&#10003;|
-|디스크 이미지 관리|&#10007;|&#10003;|&#10007;|&#10003;|
-|향상된 오류 메시지<br>(소스 경로 표시)|&#10007;|&#10007;|&#10007;|&#10003;|
+|안정적인 업데이트|<span class="check">&#10003;</span>|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|(일부) 롤링 코드 지원|&#10033;<sup>1</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|FindMy Flipper|&#10033;<sup>2</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|BLE 스팸|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Bad Keyboard<br>(추가 옵션)|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>2</sup>|<span class="check-last">&#10003;</span>|
+|서브드라이빙<br>(subghz에 좌표 저장)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|완전한 사용자 정의<br>(레이아웃, 메뉴, 키 바인드 등)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|관리 앱<br>(손쉬운 구성)|&#10007;|&#10033;<sup>4</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|향상된 RGB 백라이트 모드<br>(전체 사용자 정의 및 무지개 모드)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|스푸핑<br>(이름, MAC, 시리얼)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|향상된 보안<br>(부팅 시 잠금, 잘못된 핀 시 초기화 등)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|에셋 팩|&#10007;|&#10033;<sup>5</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|VGM 색상 옵션|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|향상된 레벨 시스템|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|파일 검색|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|디스크 이미지 관리|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|향상된 오류 메시지<br>(소스 경로 표시)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
 |사전 설치된 외부 앱<br>(2025년 4월 기준)|3|421|226 ([e] 팩 포함)|183|
 
 </div>

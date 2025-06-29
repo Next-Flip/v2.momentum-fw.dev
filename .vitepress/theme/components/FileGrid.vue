@@ -134,7 +134,7 @@ const getButtonScale = (file: any) => {
 
 <style scoped>
 .download-button {
-    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 35%, transparent) !important;
+    background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent) !important;
     backdrop-filter: blur(10px) !important;
 }
 .dark .download-button {

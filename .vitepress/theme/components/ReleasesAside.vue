@@ -127,7 +127,7 @@ watch(
                         <a
                             v-if="item.href"
                             :href="item.href"
-                            class="text-vp-1 font-medium text-sm transition-colors duration-200 hover:text-vp-brand-1 cursor-pointer"
+                            class="text-vp-1 font-medium text-sm transition-colors duration-100 hover:text-vp-brand-1 cursor-pointer"
                         >
                             {{ item.value }}
                         </a>
@@ -136,7 +136,7 @@ watch(
                         </span>
                         <a
                             v-if="item.link"
-                            class="inline-flex items-center justify-center w-4 h-4 ml-1 text-vp-2 hover:text-vp-1 transition-colors duration-200 mb-px github-icon-link"
+                            class="inline-flex items-center justify-center w-4 h-4 ml-1 text-vp-2 hover:text-vp-1 transition-colors duration-100 mb-px github-icon-link"
                             :href="item.link"
                             aria-label="github"
                             target="_blank"
@@ -168,7 +168,7 @@ watch(
                         :href="link.href"
                         :target="link.external ? '_blank' : undefined"
                         :rel="link.external ? 'noopener noreferrer' : undefined"
-                        class="block text-vp-2 hover:text-vp-brand-1 transition-colors duration-200 font-medium vp-external-link-icon"
+                        class="block text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 font-medium vp-external-link-icon"
                     >
                         {{ tr(link.key) }}
                     </a>
