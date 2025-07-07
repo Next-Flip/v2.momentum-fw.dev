@@ -32,7 +32,7 @@ const socialLinks = computed(() => [
 ]);
 
 const navigationLinks = computed(() => [
-    { name: tr("nav_web_flasher"), url: "/update" },
+    { name: tr("nav_web_updater"), url: "/update" },
     { name: tr("nav_releases"), url: "/releases" },
     { name: tr("asset_packs"), url: "/asset-packs" },
     { name: tr("nav_wiki"), url: "/wiki" },
@@ -47,26 +47,17 @@ const navigationLinks = computed(() => [
 
 <template>
     <footer class="overflow-hidden footer" :style="{ '--footer-bg-width': '1152px' }">
-        <div
-            class="max-w-full mx-auto border-t border-vp-divider"
-            :class="`px-6 py-12 ${isWiki ? 'lg:px-0' : 'lg:px-11'}`"
-        >
-            <div
-                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto"
-                :class="`${route.path.includes('/releases') ? 'max-w-7xl lg:px-8' : 'max-w-6xl'}`"
-            >
+        <div class="max-w-full mx-auto border-t border-vp-divider"
+            :class="`px-6 py-12 ${isWiki ? 'lg:px-0' : 'lg:px-11'}`">
+            <div class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8"
+                :class="`${route.path.includes('/releases') ? 'max-w-7xl lg:px-8' : route.path.includes('/update') ? 'max-w-7xl' : 'max-w-6xl'}`">
                 <div class="lg:max-w-md flex flex-col justify-start">
                     <div class="flex items-center space-x-3">
-                        <a
-                            href="/"
+                        <a href="/"
                             class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
-                            @mouseenter="nextLogo"
-                        >
-                            <img
-                                :src="currentLogo"
-                                alt="Momentum Firmware"
-                                class="w-8 h-8 object-contain object-center"
-                            />
+                            @mouseenter="nextLogo">
+                            <img :src="currentLogo" alt="Momentum Firmware"
+                                class="w-8 h-8 object-contain object-center" />
                         </a>
                     </div>
 
@@ -75,39 +66,25 @@ const navigationLinks = computed(() => [
                     </p>
 
                     <p class="text-xs text-vp-3 mt-2">
-                        <a
-                            href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
-                            target="_blank"
+                        <a href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE" target="_blank"
                             rel="noopener noreferrer"
-                            class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"
-                        >
+                            class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline">
                             GPL-3.0 © 2025 Next-Flip
                         </a>
                     </p>
 
-                    <p
-                        class="text-xs text-[color-mix(in_srgb,var(--vp-c-text-3),transparent_50%)] mt-2 sm:mt-auto"
-                    >
+                    <p class="text-xs text-[color-mix(in_srgb,var(--vp-c-text-3),transparent_50%)] mt-2 sm:mt-auto">
                         {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
                     </p>
                 </div>
 
-                <div
-                    v-if="recentReleases.mainline.length > 0 || recentReleases.devbuilds.length > 0"
-                    :class="`grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-10 ${isWiki ? 'lg:gap-12' : 'lg:gap-20'}`"
-                >
+                <div v-if="recentReleases.mainline.length > 0 || recentReleases.devbuilds.length > 0"
+                    :class="`grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-10 ${isWiki ? 'lg:gap-12' : 'lg:gap-20'}`">
                     <div class="contents md:block md:space-y-6">
-                        <FooterSection
-                            :title="tr('footer_mainline')"
-                            :items="recentReleases.mainline"
-                            type="release"
-                        />
+                        <FooterSection :title="tr('footer_mainline')" :items="recentReleases.mainline" type="release" />
 
-                        <FooterSection
-                            :title="tr('footer_devbuilds')"
-                            :items="recentReleases.devbuilds.slice(0, 4)"
-                            type="release"
-                        />
+                        <FooterSection :title="tr('footer_devbuilds')" :items="recentReleases.devbuilds.slice(0, 4)"
+                            type="release" />
                     </div>
 
                     <FooterSection :title="tr('footer_navigation')" :items="navigationLinks" />

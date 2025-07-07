@@ -54,6 +54,73 @@ export interface AssetPacksResponse {
     packs: AssetPackEntry[];
 }
 
+export interface InstalledPackManifest {
+    sha256: string;
+    folders: string[];
+}
+
+export interface InstalledPacks {
+    [packId: string]: InstalledPackManifest;
+}
+
+export interface SerialConnectionData {
+    state: ConnectionState;
+    error?: string;
+    deviceInfo?: Record<string, any>;
+    installedPacks: InstalledPacks;
+}
+
+export interface ConnectionFlags {
+    serialSupported: boolean;
+    portSelectRequired: boolean;
+    connected: boolean;
+    rpcActive: boolean;
+    rpcToggling: boolean;
+    updateInProgress: boolean;
+    progress: number;
+    installStatus: InstallStatus | null;
+    ableToExtract: boolean | null;
+    ableToUpdate: boolean | null;
+    restarting: boolean;
+    screenStream: boolean;
+    screenStreamPaused: boolean;
+}
+
+export interface QueueState {
+    queue: any[];
+    queueActions: string[];
+    fakeExtractProgress: NodeJS.Timeout | null;
+}
+
+export interface FirmwareState {
+    updateStage: string;
+    writeProgress: {
+        filename: string;
+        progress: number;
+    };
+}
+
+export interface FirmwareChannel {
+    url: string;
+    version: string;
+}
+
+export interface FirmwareChannels {
+    [channelName: string]: FirmwareChannel;
+}
+
+export interface FirmwareOption {
+    label: string;
+    value: string;
+    version: string;
+}
+
+export interface FirmwareFile {
+    name: string;
+    size: number;
+    buffer: ArrayBuffer;
+}
+
 export const ConnectionState = {
     DISCONNECTED: "disconnected",
     CONNECTING: "connecting",
@@ -87,4 +154,7 @@ export const STORAGE_KEYS = {
     ASSET_PACK_SORT_FIELD: "momentum-asset-packs_sort-field",
     ASSET_PACK_SORT_DIRECTION: "momentum-asset-packs_sort-direction",
     ASSET_PACK_FILTERS: "momentum-asset-packs_filters",
+    UPDATER_LOGS_OPEN: "momentum-updater_logs_open",
+    UPDATER_SELECTED_CHANNEL: "momentum-updater_selected_channel",
+    UPDATER_SELECTED_VERSION: "momentum-updater_selected_version",
 } as const;

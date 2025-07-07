@@ -519,11 +519,7 @@ export const devbuildReleases: ReleaseItem[] = ${jsonToTypeScript(processedDevbu
 // Filter releases for navigation: only latest mainline + recent devbuilds
 export function getRecentReleases() {
     const latestMainline = mainlineReleases.length > 0 ? mainlineReleases[0] : null;
-    const latestMainlineTimestamp = latestMainline?.timestamp || 0;
-
-    const recentDevbuilds = devbuildReleases.filter(
-        (devbuild) => devbuild.timestamp && devbuild.timestamp > latestMainlineTimestamp
-    );
+    const recentDevbuilds = devbuildReleases.slice(0, 4);
 
     const recentMainlineItems = latestMainline ? [latestMainline] : [];
 

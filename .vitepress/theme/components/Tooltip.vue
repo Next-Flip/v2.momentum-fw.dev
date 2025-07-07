@@ -43,11 +43,11 @@ const showTooltip = () => {
     timeoutId.value =
         typeof window !== "undefined"
             ? window.setTimeout(() => {
-                  isVisible.value = true;
-                  nextTick(() => {
-                      positionTooltip();
-                  });
-              }, props.delay)
+                isVisible.value = true;
+                nextTick(() => {
+                    positionTooltip();
+                });
+            }, props.delay)
             : null;
 };
 
@@ -56,8 +56,8 @@ const hideTooltip = () => {
     timeoutId.value =
         typeof window !== "undefined"
             ? window.setTimeout(() => {
-                  isVisible.value = false;
-              }, props.hideDelay)
+                isVisible.value = false;
+            }, props.hideDelay)
             : null;
 };
 
@@ -70,8 +70,8 @@ const hideTooltipImmediate = () => {
     timeoutId.value =
         typeof window !== "undefined"
             ? window.setTimeout(() => {
-                  isVisible.value = false;
-              }, props.hideDelay)
+                isVisible.value = false;
+            }, props.hideDelay)
             : null;
 };
 
@@ -182,18 +182,12 @@ onBeforeUnmount(() => {
         </div>
         <teleport to="body">
             <transition name="tooltip-fade">
-                <div
-                    v-if="isVisible"
-                    :class="[
-                        'tooltip fixed z-10 backdrop-blur-md text-vp-1 border border-vp-divider rounded-md p-2 px-3 text-sm box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
-                        position,
-                        themeClass,
-                    ]"
-                    :style="tooltipStyle"
-                    ref="tooltip"
-                    @mouseenter="keepTooltipVisible"
-                    @mouseleave="hideTooltipImmediate"
-                >
+                <div v-if="isVisible" :class="[
+                    'tooltip fixed z-10 backdrop-blur-md text-vp-1 border border-vp-divider rounded-md p-1.5 px-3 text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
+                    position,
+                    themeClass,
+                ]" :style="tooltipStyle" ref="tooltip" @mouseenter="keepTooltipVisible"
+                    @mouseleave="hideTooltipImmediate">
                     <div class="text-center relative z-10 max-w-full">
                         <slot name="content"></slot>
                     </div>
@@ -212,7 +206,7 @@ onBeforeUnmount(() => {
 }
 
 .tooltip {
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05) !important;
     /* background-color: color-mix(in srgb, var(--vp-c-bg-elv) 90%, transparent); */
     background-color: color-mix(in srgb, var(--vp-c-neutral-inverse) 90%, transparent);
 }

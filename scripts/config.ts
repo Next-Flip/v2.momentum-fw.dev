@@ -99,8 +99,8 @@ const MainlineItems = ${jsonToTypeScript(navMainlineItems)};
 const DevbuildsItems = ${jsonToTypeScript(navDevbuildsItems)};
 
 const InstallItems = [
+    { text: "${m.nav_web_updater}", link: "${isRoot ? "/update" : `/${locale}/update`}" },
     { text: "${m.nav_recent}", items: [...MainlineItems, ...DevbuildsItems] },
-    { text: "${m.nav_web_flasher}", link: "/update" },
     {
         text: "${m.nav_releases}",
         link: "${isRoot ? "/releases" : `/${locale}/releases`}",

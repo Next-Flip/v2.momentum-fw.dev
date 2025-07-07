@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { useClipboard, useMagicKeys, useObjectUrl, useWindowSize, whenever } from "@vueuse/core";
-import { computed, inject, onMounted, ref, shallowRef, watch } from "vue";
-import { getReleaseByCommit } from "../../../_data/releases";
+import { useMagicKeys, useWindowSize, whenever } from "@vueuse/core";
+import { useRoute } from "vitepress";
+import { computed, onMounted, ref, watch } from "vue";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
-import { useI18n } from "../composables/useI18n";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useTempState } from "../composables/useTempState";
 import { ConnectionState } from "../types";
-import { bytesToSize, getRadioStackType } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
 import Tooltip from "./Tooltip.vue";
 
-const { tr, getLocalizedPath } = useI18n();
 const width = ref(1024);
+const route = useRoute();
 
 onMounted(() => {
     if (typeof window !== "undefined") {
@@ -29,34 +26,35 @@ onMounted(() => {
     }
 });
 
-const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
-const connectionData = computed(
-    () =>
-        serialConnection?.connectionData || {
-            state: ConnectionState.DISCONNECTED,
-            error: undefined,
-            deviceInfo: undefined,
-        },
-);
-const flags = computed(
-    () =>
-        serialConnection?.flags || {
-            connected: false,
-        },
-);
-
-const connectionState = computed(() => connectionData.value.state);
-const deviceInfo = computed(() => connectionData.value.deviceInfo);
-const isConnected = computed(() => connectionState.value === "connected");
-const commitInReleases = computed(() =>
-    getReleaseByCommit(deviceInfo.value?.firmware_commit || ""),
-);
+const {
+    connectionData,
+    flags,
+    firmwareState,
+    connectionState,
+    deviceInfo,
+    isConnected,
+    commitInReleases,
+    sdCardUsage,
+    getRadioVersion,
+    copyState,
+    saveState,
+    exportDeviceInfo,
+    handleConnect,
+    handleDisconnect,
+    tr,
+    getLocalizedPath,
+} = useConnectionInfo();
 
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
 const isAutoOpen = ref(false);
 const { dots: connectingDots } = useDots();
 const { dots: hardwareNameDots } = useDots();
+const dotsState = computed(() => {
+    return connectionState.value === "connecting" || connectionState.value === "disconnecting";
+});
+const isUpdatePage = computed(() => route.path.includes("/update"));
+const updateStage = computed(() => firmwareState.value.updateStage || "");
 
 watch(connectionState, (newState, oldState) => {
     if (newState === "connected" && oldState !== "connected") {
@@ -72,54 +70,6 @@ watch(connectionState, (newState, oldState) => {
             autoOpenTimeout.value = null;
         }, 2000);
     }
-});
-
-const copyState = useTempState({
-    beforeIcon: "oi-copy",
-    afterIcon: "oi-check",
-    beforeText: () => tr("copy_device_info"),
-    afterText: () => tr("copied"),
-});
-
-const saveState = useTempState({
-    beforeIcon: "ri-save-line",
-    afterIcon: "oi-check",
-    beforeText: () => tr("save_device_info"),
-    afterText: () => tr("saved"),
-});
-
-const sdCardUsage = computed(() => {
-    const device = deviceInfo.value;
-    const totalSpace = device?.storage_sdcard_totalSpace;
-    const freeSpace = device?.storage_sdcard_freeSpace;
-    const present = device?.storage_sdcard_present;
-
-    if (present === "loading") return "...";
-    if (!totalSpace || freeSpace === undefined) return null;
-
-    const usedSpace = totalSpace - freeSpace;
-    return `${bytesToSize(usedSpace)} / ${bytesToSize(totalSpace)}`;
-});
-
-const radioFwVersion = computed(() => {
-    const device = deviceInfo.value;
-    return device?.radio_alive !== false
-        ? device?.radio_stack_major +
-              "." +
-              device?.radio_stack_minor +
-              "." +
-              device?.radio_stack_sub
-        : tr("corrupt");
-});
-
-const radioStackType = computed(() => {
-    return getRadioStackType(deviceInfo.value?.radio_stack_type);
-});
-
-const getRadioVersion = computed(() => {
-    const version = radioFwVersion.value;
-    const type = radioStackType.value;
-    return version == undefined || type == undefined ? "" : version + " " + type;
 });
 
 const getConnectionDisplay = computed(() => {
@@ -152,43 +102,9 @@ const getConnectionDisplay = computed(() => {
     }
 });
 
-const exportDeviceInfo = async (action: "copy" | "save") => {
-    if (!deviceInfo.value) return;
-    const jsonString = JSON.stringify(deviceInfo.value, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-
-    if (action === "copy") {
-        useClipboard().copy(jsonString);
-        copyState.trigger();
-    } else if (action === "save") {
-        const url = useObjectUrl(shallowRef(blob));
-        const link = document.createElement("a");
-        link.href = url.value || "";
-        link.download = `${deviceInfo.value?.hardware_name || "flipper"}-device-info-${new Date().toISOString().split("T")[0]}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url.value || "");
-        saveState.trigger();
-    }
-};
-
 const handleMouse = (v: boolean) => {
-    if (!isAutoOpen.value) {
+    if (!isAutoOpen.value && !isUpdatePage.value) {
         flyoutOpen.value = v;
-    }
-};
-
-const handleConnect = async () => {
-    if (!flags.value.connected && connectionState.value !== "disconnecting" && serialConnection) {
-        await serialConnection.connect();
-    }
-};
-
-const handleDisconnect = async () => {
-    flyoutOpen.value = false;
-    if (serialConnection) {
-        await serialConnection.disconnect();
     }
 };
 
@@ -202,64 +118,47 @@ whenever(cmd_c, () => handleConnect());
 </script>
 
 <template>
-    <div
-        :class="['VPFlyout connect-container ml-8']"
-        @mouseenter="handleMouse(true)"
-        @mouseleave="handleMouse(false)"
-    >
+    <div :class="['VPFlyout connect-container ml-8']" @mouseenter="handleMouse(true)" @mouseleave="handleMouse(false)">
         <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
-            <button
-                @click="handleConnect"
-                :class="[
-                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
-                ]"
-                type="button"
-                :aria-expanded="flyoutOpen"
-            >
-                <span class="relative flex size-2 mr-2">
+            <button @click="handleConnect" :class="[
+                `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
+            ]" type="button" :aria-expanded="flyoutOpen">
+                <div v-if="flags.updateInProgress"
+                    class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2">
+                    <div
+                        class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin">
+                    </div>
+                </div>
+                <span v-else class="relative flex size-2 mr-2">
+                    <span v-if="isConnected"
+                        :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"></span>
                     <span
-                        v-if="isConnected"
-                        :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
-                    ></span>
-                    <span
-                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"
-                    ></span>
+                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"></span>
                 </span>
 
-                <span
-                    :class="[
-                        `connect-button-text text-sm font-medium min-h-5 ${
-                            isConnected ? 'mr-3' : ''
-                        }`,
-                    ]"
-                >
-                    {{ getConnectionDisplay.text }}
+                <span :class="[
+                    `connect-button-text text-sm font-medium min-h-5 ${isConnected && !flags.updateInProgress ? 'mr-3' : ''
+                    }`,
+                ]">
+                    {{ flags.updateInProgress ? tr(updateStage as any) || tr("update_stage_updating_short") :
+                        getConnectionDisplay.text }}
                 </span>
-                <span
-                    v-if="isConnected"
-                    :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${
-                        !deviceInfo?.hardware_name ? 'w-3' : ''
-                    }`"
-                >
+                <span v-if="isConnected && !flags.updateInProgress" :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${!deviceInfo?.hardware_name ? 'w-3' : ''
+                    }`">
                     {{ deviceInfo?.hardware_name || hardwareNameDots }}
                 </span>
-                <span
-                    v-if="connectionState === 'connecting' || connectionState === 'disconnecting'"
-                    :class="[
-                        'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
-                        connectionState === 'connecting' || connectionState === 'disconnecting'
-                            ? 'mr-2'
-                            : '',
-                    ]"
-                >
+                <span v-if="dotsState" :class="[
+                    'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
+                    dotsState
+                        ? 'mr-2'
+                        : '',
+                ]">
                     {{ connectingDots }}
                 </span>
 
                 <div class="DocSearch-Button" v-if="connectionState === 'disconnected'">
-                    <span class="DocSearch-Button-Keys"
-                        ><kbd class="DocSearch-Button-Key"></kbd
-                        ><kbd class="DocSearch-Button-Key">C</kbd></span
-                    >
+                    <span class="DocSearch-Button-Keys"><kbd class="DocSearch-Button-Key"></kbd><kbd
+                            class="DocSearch-Button-Key">C</kbd></span>
                 </div>
             </button>
 
@@ -267,16 +166,13 @@ whenever(cmd_c, () => handleConnect());
                 <div class="menu-content">
                     <div class="menu-item">
                         <span class="menu-label">{{ tr("connection_firmware") }}</span>
-                        <a
-                            class="menu-value vp-external-link-icon hover:underline"
+                        <a class="menu-value vp-external-link-icon hover:underline"
                             :title="deviceInfo?.firmware_branch || ''"
-                            :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`"
-                            >{{
+                            :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`">{{
                                 deviceInfo?.firmware_version?.includes("dev")
                                     ? `dev (${deviceInfo.firmware_commit})`
                                     : deviceInfo?.firmware_version
-                            }}</a
-                        >
+                            }}</a>
                     </div>
 
                     <div class="menu-item">
@@ -310,13 +206,9 @@ whenever(cmd_c, () => handleConnect());
                                     class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :class="{
                                         'scale-95': copyState.isPressed.value,
-                                    }"
-                                    :aria-label="copyState.currentText.value"
-                                    @click="() => exportDeviceInfo('copy')"
-                                    @mousedown="copyState.handleMouseDown"
-                                    @mouseup="copyState.handleMouseUp"
-                                    @mouseleave="copyState.handleMouseLeave"
-                                >
+                                    }" :aria-label="copyState.currentText.value"
+                                    @click="() => exportDeviceInfo('copy')" @mousedown="copyState.handleMouseDown"
+                                    @mouseup="copyState.handleMouseUp" @mouseleave="copyState.handleMouseLeave">
                                     <v-icon :name="copyState.currentIcon.value" scale="0.8" />
                                 </button>
                                 <template #content>{{ copyState.currentText.value }}</template>
@@ -326,21 +218,18 @@ whenever(cmd_c, () => handleConnect());
                                     class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :class="{
                                         'scale-95': saveState.isPressed.value,
-                                    }"
-                                    :aria-label="saveState.currentText.value"
-                                    @click="() => exportDeviceInfo('save')"
-                                    @mousedown="saveState.handleMouseDown"
-                                    @mouseup="saveState.handleMouseUp"
-                                    @mouseleave="saveState.handleMouseLeave"
-                                >
+                                    }" :aria-label="saveState.currentText.value"
+                                    @click="() => exportDeviceInfo('save')" @mousedown="saveState.handleMouseDown"
+                                    @mouseup="saveState.handleMouseUp" @mouseleave="saveState.handleMouseLeave">
                                     <v-icon :name="saveState.currentIcon.value" scale="0.8" />
                                 </button>
                                 <template #content>{{ saveState.currentText.value }}</template>
                             </Tooltip>
-                            <button
-                                @click="handleDisconnect"
-                                class="action-button !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-500/10 dark:hover:!bg-red-500/15"
-                            >
+                            <button @click="handleDisconnect" :disabled="flags.updateInProgress" :class="[
+                                'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
+                                flags.updateInProgress && 'opacity-50 !cursor-not-allowed',
+                                !flags.updateInProgress && 'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600'
+                            ]">
                                 {{ tr("connection_disconnect") }}
                             </button>
                         </div>
@@ -418,26 +307,26 @@ body[data-route*="/wiki"] {
     transition: color 0.25s;
 }
 
-.connect-button[aria-expanded="false"] + .menu {
+.connect-button[aria-expanded="false"]+.menu {
     opacity: 0;
     visibility: hidden;
     transform: translateY(0) translateX(calc(-50%));
 }
 
 .VPFlyout:hover .menu,
-.connect-button[aria-expanded="true"] + .menu {
+.connect-button[aria-expanded="true"]+.menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) translateX(calc(-50%));
 }
 
 @media (min-width: 1024px) {
-    .connect-button[aria-expanded="false"] + .menu {
+    .connect-button[aria-expanded="false"]+.menu {
         transform: translateY(0) translateX(calc(-50%));
     }
 
     .VPFlyout:hover .menu,
-    .connect-button[aria-expanded="true"] + .menu {
+    .connect-button[aria-expanded="true"]+.menu {
         transform: translateY(0) translateX(calc(-50%));
     }
 }

@@ -90,57 +90,39 @@ onMounted(() => {
             {{ title }}
         </h2>
         <div ref="containerRef" class="overflow-y-auto flex flex-col pr-1 pl-0 relative">
-            <div
-                v-if="backgroundPosition.show"
-                class="absolute left-0 rounded-[4px] z-[1] transition-all duration-300 ease-out"
-                :style="{
+            <div v-if="backgroundPosition.show"
+                class="absolute left-0 rounded-[4px] z-[1] transition-all duration-300 ease-out" :style="{
                     top: `${backgroundPosition.top}px`,
                     height: `${backgroundPosition.height}px`,
                     width: 'calc(100% - 4px)',
                     backgroundImage:
                         'linear-gradient(to left, var(--vp-c-brand-soft), transparent)',
-                }"
-            ></div>
+                }"></div>
 
-            <div
-                v-if="linePosition.show"
-                class="item-line absolute left-0 w-px z-10 transition-all duration-300 ease-out"
-                :style="{
+            <div v-if="linePosition.show"
+                class="item-line absolute left-0 w-px z-10 transition-all duration-300 ease-out" :style="{
                     top: `${linePosition.top}px`,
                     height: `${linePosition.height}px`,
                     transform: 'translateY(-50%)',
-                }"
-            ></div>
+                }"></div>
 
-            <div
-                class="absolute left-0 top-0 w-px bg-vp-divider z-[5]"
-                :style="{ height: `${contentHeight}px` }"
-            ></div>
+            <div class="absolute left-0 top-0 w-px bg-vp-divider z-[5]" :style="{ height: `${contentHeight}px` }"></div>
 
-            <button
-                v-for="release in releases"
-                :key="release.commit"
-                @click="selectRelease(release)"
-                :class="[
-                    'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
-                    isSelected(release) ? 'text-vp-brand-1 pl-6 gap-x-2.5' : 'pl-4 gap-x-[18px]',
-                    !isSelected(release) && 'release-item-bg',
-                ]"
-            >
-                <span
-                    :class="[
-                        'text-sm font-medium truncate text-left font-mono pointer-events-none',
-                        isSelected(release)
-                            ? 'text-vp-brand-1'
-                            : 'text-vp-2 group-hover:text-vp-brand-1',
-                    ]"
-                >
+            <button v-for="release in releases" :key="release.commit" @click="selectRelease(release)" :class="[
+                'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
+                isSelected(release) ? 'text-vp-brand-1 pl-6 gap-x-2.5' : 'pl-4 gap-x-[18px]',
+                !isSelected(release) && 'release-item-bg',
+            ]">
+                <span :class="[
+                    'text-sm font-medium truncate text-left font-mono pointer-events-none',
+                    isSelected(release)
+                        ? 'text-vp-brand-1'
+                        : 'text-vp-2 group-hover:text-vp-brand-1',
+                ]">
                     {{ release.commit }}
                 </span>
-                <span
-                    class="text-[11px] text-right font-mono pointer-events-none"
-                    :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
-                >
+                <span class="text-[11px] text-right font-mono pointer-events-none"
+                    :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']">
                     {{
                         shortenTimeString(
                             useTimeAgo(new Date((release.timestamp || 0) * 1000)).value,
@@ -173,24 +155,6 @@ onMounted(() => {
 
 .release-item-bg:hover::before {
     opacity: 1;
-}
-
-.overflow-y-auto::-webkit-scrollbar {
-    width: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-    background: transparent;
-    margin-right: 2px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background: var(--vp-c-divider);
-    border-radius: 4px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: var(--vp-c-text-3);
 }
 
 .item-line {

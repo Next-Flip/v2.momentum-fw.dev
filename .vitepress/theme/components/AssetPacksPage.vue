@@ -24,19 +24,24 @@ const connectionData = computed(
 );
 
 const hasLoadedInstalledPacks = ref(false);
+const loadingInstalledPacks = ref(false);
 const loadInstalledIfConnected = async () => {
     if (
         serialConnection &&
         connectionData.value.state === "connected" &&
-        !hasLoadedInstalledPacks.value
+        !hasLoadedInstalledPacks.value &&
+        !loadingInstalledPacks.value
     ) {
         try {
+            loadingInstalledPacks.value = true;
             if (serialConnection.loadInstalledPacks) {
                 await serialConnection.loadInstalledPacks();
             }
             hasLoadedInstalledPacks.value = true;
         } catch (error) {
             console.warn("[AssetPacks] Failed to load installed packs:", error);
+        } finally {
+            loadingInstalledPacks.value = false;
         }
     }
 };
@@ -95,9 +100,9 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
             hasUpdate: hasUpdate,
             tarFile: tarFile
                 ? {
-                      url: useProxiedUrl(tarFile.url || tarFile.path || ""),
-                      sha256: tarFile.sha256 || "",
-                  }
+                    url: useProxiedUrl(tarFile.url || tarFile.path || ""),
+                    sha256: tarFile.sha256 || "",
+                }
                 : undefined,
         };
     });
@@ -110,9 +115,10 @@ watchEffect(() => {
 
     if (connectionData.value.state === "disconnected") {
         hasLoadedInstalledPacks.value = false;
+        loadingInstalledPacks.value = false;
     }
 
-    if (isConnected && !hasLoadedInstalledPacks.value) {
+    if (isConnected && !hasLoadedInstalledPacks.value && !loadingInstalledPacks.value) {
         loadInstalledIfConnected();
     }
 });
@@ -142,7 +148,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.asset-packs-container > * {
+.asset-packs-container>* {
     position: relative;
     z-index: 2;
 }

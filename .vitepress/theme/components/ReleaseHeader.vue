@@ -96,101 +96,64 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div
-        class="flex flex-col sticky top-[47px] sm:top-11 lg:top-[66px] pt-0 sm:pt-6 pb-6 md:pb-11 z-[2]"
-    >
+    <div class="flex flex-col pt-0 pb-4 md:pb-8 z-[2] sticky top-[47px] sm:top-11 lg:top-[65px]">
         <div class="relative" ref="dropdownRef">
-            <div
-                class="dark-blur flex flex-row justify-between items-center border-b border-dashed sm:border-solid sm:border border-vp-divider overflow-hidden rounded-tl-xl rounded-tr-xl px-2 py-2 transition-all duration-200 sm:shadow-sm z-[1000]"
+            <div class="dark-blur flex flex-row justify-between items-center border-b border-solid sm:border-b border-vp-divider overflow-hidden px-3 py-2 transition-all duration-200 sm:shadow-sm z-[1000] cursor-pointer min-h-14"
                 :class="{
-                    'cursor-pointer lg:hover:scale-[1.01]': true,
-                    'md:cursor-pointer sm:rounded-lg': !isDropdownOpen,
+                    'md:cursor-pointer': !isDropdownOpen,
                     'sm:rounded-tl-lg sm:rounded-tr-lg': isDropdownOpen,
-                }"
-                @click="handleHeaderClick"
-            >
+                }" @click="handleHeaderClick">
                 <div class="flex flex-row ml-1.5 items-center gap-2">
                     <span class="text-lg leading-none font-semibold text-vp-1 uppercase font-mono">
                         {{ selectedRelease ? getReleaseDisplayName(selectedRelease) : "" }}
                     </span>
-                    <Tooltip
-                        v-if="props.isCurrentVersion"
-                        :delay="0"
-                        :position="'right'"
-                        :maxWidth="'320px'"
-                        :zIndex="9999"
-                    >
-                        <div
-                            class="flex items-center text-sm text-green-700 dark:text-green-400 rounded-full bg-green-300/20 dark:bg-green-900/20 p-0.5 border border-green-800/45 hover:border-green-700/45 transition-all duration-100"
-                            :aria-label="tr('releases_current_version')"
-                        >
+                    <Tooltip v-if="props.isCurrentVersion" :delay="0" :position="'right'" :maxWidth="'320px'"
+                        :zIndex="9999">
+                        <div class="flex items-center text-sm text-green-700 dark:text-green-400 rounded-full bg-green-300/20 dark:bg-green-900/20 p-0.5 border border-green-800/45 hover:border-green-700/45 transition-all duration-100"
+                            :aria-label="tr('releases_current_version')">
                             <v-icon name="oi-check" scale="0.65" />
                         </div>
                         <template #content>{{ tr("releases_current_version") }}</template>
                     </Tooltip>
-                    <div
-                        class="lg:hidden flex items-center text-vp-3 transition-transform duration-200"
-                        :class="{ 'rotate-180': isDropdownOpen }"
-                    >
+                    <div class="lg:hidden flex items-center text-vp-3 transition-transform duration-200"
+                        :class="{ 'rotate-180': isDropdownOpen }">
                         <v-icon name="oi-chevron-down" scale="0.85" />
                     </div>
                 </div>
                 <div class="flex flex-row items-center gap-2">
                     <div
-                        class="flex items-center gap-4 text-sm text-vp-brand-1 rounded-full release-date px-2.5 py-1 border border-vp-1/5"
-                    >
+                        class="flex items-center gap-4 text-sm text-vp-brand-1 rounded-full release-date px-2.5 py-1 border border-vp-1/5">
                         <span>{{ selectedRelease?.date }}</span>
                     </div>
                 </div>
             </div>
 
             <Transition name="fade-dropdown">
-                <div
-                    class="lg:hidden absolute top-full left-0 w-full -z-[1] p-[7px] bg-vp-bg shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b sm:border-l sm:border-r border-vp-divider sm:rounded-bl-lg sm:rounded-br-lg"
-                    v-if="isDropdownOpen"
-                >
-                    <div
-                        class="bg-transparent transition-all duration-200 overflow-hidden max-h-[275px] flex flex-col w-full min-w-full"
-                        :class="{ 'is-visible': isDropdownOpen }"
-                    >
-                        <div
-                            ref="dropdownMenuRef"
-                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
-                        >
-                            <template
-                                v-for="(section, sectionIndex) in releaseSections"
-                                :key="section.title"
-                            >
-                                <div
-                                    v-if="section.releases.length > 0"
+                <div class="lg:hidden absolute top-full left-0 w-full -z-[1] p-[7px] bg-vp-bg shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
+                    v-if="isDropdownOpen">
+                    <div class="bg-transparent transition-all duration-200 overflow-hidden max-h-[275px] flex flex-col w-full min-w-full"
+                        :class="{ 'is-visible': isDropdownOpen }">
+                        <div ref="dropdownMenuRef"
+                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute">
+                            <template v-for="(section, sectionIndex) in releaseSections" :key="section.title">
+                                <div v-if="section.releases.length > 0"
                                     class="px-3 py-2 mb-2 text-xs font-semibold text-vp-2 uppercase tracking-wide border-b border-vp-divider/40"
-                                    :class="{ 'mt-4': sectionIndex > 0 }"
-                                >
+                                    :class="{ 'mt-4': sectionIndex > 0 }">
                                     {{ section.title }}
                                 </div>
-                                <div
-                                    v-for="release in section.releases"
-                                    :key="`${section.title}-${release.commit}`"
+                                <div v-for="release in section.releases" :key="`${section.title}-${release.commit}`"
                                     class="dropdown-item flex flex-row min-h-7 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0 rounded-[4px]"
                                     :class="{
                                         'is-selected': isSelected(release),
-                                    }"
-                                    @click="selectRelease(release)"
-                                >
-                                    <span
-                                        class="font-medium text-vp-1 font-mono flex-shrink-0"
-                                        :class="{
-                                            'text-vp-brand-1': isSelected(release),
-                                        }"
-                                    >
+                                    }" @click="selectRelease(release)">
+                                    <span class="font-medium text-vp-1 font-mono flex-shrink-0" :class="{
+                                        'text-vp-brand-1': isSelected(release),
+                                    }">
                                         {{ getReleaseDisplayName(release) }}
                                     </span>
-                                    <span
-                                        class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
-                                        :class="{
-                                            'text-vp-brand-1/60': isSelected(release),
-                                        }"
-                                    >
+                                    <span class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono" :class="{
+                                        'text-vp-brand-1/60': isSelected(release),
+                                    }">
                                         {{ formatFullDate(release.timestamp || 0) }}
                                     </span>
                                 </div>

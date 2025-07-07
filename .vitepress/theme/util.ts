@@ -1,4 +1,13 @@
+import log from "loglevel";
+import type { ReleaseItem } from "../../_data/releases";
+import { devbuildReleases, mainlineReleases } from "../../_data/releases";
+import messages, { SupportedLocales } from "../i18n/index.js";
 import { useI18n } from "./composables/useI18n";
+// @ts-ignore - pako is a global library
+import pako from "pako";
+// @ts-ignore - untar is a global library
+import { untar } from "./untar/untar.js";
+
 
 export function devMode() {
     if (typeof window === "undefined") return false;
@@ -76,12 +85,14 @@ export const formatMonthDay = (dateInput: number) => {
     };
 };
 
-export const bytesToSize = (bytes: number) => {
-    const sizes = ["Bytes", "KiB", "MiB", "GiB", "TiB"];
+export const bytesToSize = (bytes: number, useStandardUnits = false) => {
+    const sizes = useStandardUnits ? ["Bytes", "KB", "MB", "GB", "TB"] : ["Bytes", "KiB", "MiB", "GiB", "TiB"];
+    const base = useStandardUnits ? 1000 : 1024;
+    
     if (bytes === 0) return "n/a";
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    if (i === 0) return `${bytes} ${sizes[i]})`;
-    return `${(bytes / 1024 ** i).toFixed(1)}${sizes[i]}`;
+    const i = Math.floor(Math.log(bytes) / Math.log(base));
+    if (i === 0) return `${bytes} ${sizes[i]}`;
+    return `${(bytes / Math.pow(base, i)).toFixed(useStandardUnits ? 2 : 1)} ${sizes[i]}`;
 };
 
 export const getRadioStackType = (radioStackType: string | number | undefined) => {
@@ -218,4 +229,112 @@ export const downloadFile = (url: string) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+};
+
+export async function fetchFirmware(url: string) {
+    const buffer = await fetch(url)
+        .then(async response => {
+            if (response.status >= 400) {
+                throw new Error('Failed to fetch resources (' + response.status + ')');
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (contentType?.includes('text/html')) {
+                if (url.startsWith('/')) {
+                    throw new Error();
+                }
+            }
+            
+            const buffer = await response.arrayBuffer();
+            log.debug(`[Firmware] Downloaded ${buffer.byteLength} bytes`);
+            
+            return unpack(buffer);
+        });
+
+    return buffer;
+}
+
+export async function fetchRegions() {
+    return fetch('https://update.flipperzero.one/regions/api/v0/bundle')
+        .then((response) => {
+            if (response.status >= 400) {
+                throw new Error('Failed to fetch region (' + response.status + ')');
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error.text);
+            } else if (result.success) {
+                return result.success;
+            }
+        });
+}
+
+export function unpack(buffer: ArrayBuffer) {
+    try {
+        log.debug(`[Firmware] Unpacking ${buffer.byteLength} byte archive`);
+        // @ts-ignore - pako is a global library
+        const ungzipped = pako.ungzip(new Uint8Array(buffer));
+        // @ts-ignore - untar is a global library
+        const result = untar(ungzipped.buffer);
+        log.debug(`[Firmware] Extracted ${result.length} files`);
+        return result;
+    } catch (error) {
+        log.error("[Firmware] Unpack failed:", error);
+        throw error;
+    }
+}
+
+export function findReleaseByVersion(version: string): ReleaseItem | null {
+    if (!version) return null;
+
+    const allReleases = [...mainlineReleases, ...devbuildReleases];
+
+    let release = allReleases.find((r) => r.commit === version);
+    if (release) return release;
+
+    release = allReleases.find((r) => r.commit.startsWith(version));
+    if (release) return release;
+
+    release = allReleases.find((r) => r.version && r.version.includes(version));
+    if (release) return release;
+
+    return null;
+}
+
+export const formatFileDate = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
+export const parseUploadedFileName = (filename: string): string | null => {
+    const mntmMatch = filename.match(/mntm-(\d+)/);
+    if (mntmMatch) {
+        return `${mntmMatch[1]}`;
+    }
+
+    const devMatch = filename.match(/mntm-dev-([a-f0-9]{7,})/);
+    if (devMatch) {
+        return devMatch[1];
+    }
+
+    const commitMatch = filename.match(/update-([a-f0-9]{7,})/);
+    if (commitMatch) {
+        return commitMatch[1];
+    }
+
+    return null;
+};
+
+export const getCurrentLocale = (): SupportedLocales => {
+    if (typeof window === "undefined") return "en";
+    const pathSegments = window.location.pathname.split("/").filter(Boolean);
+    const potentialLocale = pathSegments[0];
+    const supportedLocales = Object.keys(messages) as SupportedLocales[];
+    return supportedLocales.includes(potentialLocale as SupportedLocales) ? (potentialLocale as SupportedLocales) : "en";
 };

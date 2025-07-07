@@ -18,6 +18,12 @@ export function useProxiedUrl(url: string): string {
                     return `/assets${assetPath}`;
                 }
             }
+            if (url.includes("/builds/firmware")) {
+                const firmwarePath = url.split("up.momentum-fw.dev/builds/firmware")[1];
+                if (firmwarePath) {
+                    return `/firmware${firmwarePath}`;
+                }
+            }
             if (url.includes("/asset-packs/directory.json")) {
                 return "/api/asset-packs/directory.json";
             }

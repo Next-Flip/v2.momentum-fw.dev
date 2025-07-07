@@ -39,38 +39,19 @@ const handleSelectRelease = (release: ReleaseItem) => {
 </script>
 
 <template>
-    <main
-        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-xl border border-vp-divider"
-    >
-        <div
-            v-if="selectedRelease"
-            class="prose prose-gray dark:prose-invert max-w-none px-0 sm:px-6"
-        >
-            <ReleaseHeader
-                :selectedRelease="selectedRelease"
-                :isCurrentVersion="props.isCurrentVersion"
-                @selectRelease="handleSelectRelease"
-            />
+    <main v-if="selectedRelease"
+        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-lg border border-vp-divider overflow-clip">
+        <ReleaseHeader :selectedRelease="selectedRelease" :isCurrentVersion="props.isCurrentVersion"
+            @selectRelease="handleSelectRelease" />
 
-            <ReleaseFiles
-                :selected-release="selectedRelease"
-                :isCurrentVersion="props.isCurrentVersion"
-            />
+        <ReleaseFiles :selected-release="selectedRelease" :isCurrentVersion="props.isCurrentVersion" />
 
-            <div v-if="selectedRelease.changelog" class="mb-8 px-4 sm:px-4">
-                <div
-                    class="flex flex-row justify-between items-center pb-2 mb-3 border-b border-vp-divider"
-                >
-                    <span
-                        class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
-                        >{{ tr("releases_changelog") }}</span
-                    >
-                </div>
-                <div
-                    class="prose prose-sm dark:prose-invert text-vp-1 max-w-none"
-                    v-html="parsedChangelog"
-                ></div>
+        <div v-if="selectedRelease.changelog" class="mb-8 px-6 sm:px-10 prose prose-gray dark:prose-invert max-w-none">
+            <div class="flex flex-row justify-between items-center pb-2 mb-3 border-b border-vp-divider">
+                <span class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase">{{
+                    tr("releases_changelog") }}</span>
             </div>
+            <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-none" v-html="parsedChangelog"></div>
         </div>
     </main>
 </template>
@@ -97,19 +78,16 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .release-content {
     position: relative;
     background-color: transparent;
-    background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-brand-1) 2%, transparent) 100%
-    );
+    background-image: linear-gradient(to bottom,
+            color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
+            color-mix(in srgb, var(--vp-c-brand-1) 2%, transparent) 100%);
+    backdrop-filter: blur(10px);
 }
 
 .dark .release-content {
-    background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--vp-c-brand-1) 1%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
-    );
+    background-image: linear-gradient(to bottom,
+            color-mix(in srgb, var(--vp-c-brand-1) 1%, transparent) 0%,
+            color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%);
 }
 
 .release-date {
@@ -140,6 +118,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .prose :where(h3):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: var(--vp-c-text-1) !important;
 }
+
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
     color: var(--vp-c-brand-1) !important;
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
@@ -155,16 +134,14 @@ const handleSelectRelease = (release: ReleaseItem) => {
     opacity: 0.25;
 }
 
-.prose a[href^="https://github.com/"]
-{
+.prose a[href^="https://github.com/"] {
     color: var(--vp-c-brand-1);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s ease;
 }
 
-.prose a[href^="https://github.com/"]:hover
-{
+.prose a[href^="https://github.com/"]:hover {
     color: var(--vp-c-brand-2);
     text-decoration: underline;
 }

@@ -53,6 +53,8 @@
     --vp-custom-block-tip-text: var(--vp-c-text-1);
     --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
     --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+
+    --mntm-footer-height: 289px;
 }
 
 .dark {
@@ -71,14 +73,59 @@
     --vp-home-hero-image-filter: blur(44px);
 }
 
-::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-soft) 100%, transparent);
+/* ::selection {
+    background-color: color-mix(in srgb, var(--vp-c-brand-3) 10%, transparent);
     color: black;
 }
 
 html.dark ::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-3) 100%, transparent);
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
     color: white;
+} */
+
+.overflow-y-auto::-webkit-scrollbar {
+    width: 5px;
+    /* z-index: 1000 !important; */
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+    margin-right: 2px;
+    /* z-index: 1000 !important; */
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background: var(--vp-c-divider);
+    border-radius: 5px;
+    /* z-index: 1000 !important; */
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--vp-c-text-3);
+    /* z-index: 1000 !important; */
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+    height: 5px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+    margin-right: 2px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: var(--vp-c-divider);
+    border-radius: 5px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: var(--vp-c-text-3);
+}
+
+.overflow-y-auto::-webkit-scrollbar-corner,
+.overflow-x-auto::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 .custom-block.mntm {
@@ -289,14 +336,14 @@ body {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 70%, transparent) !important;
 }
 
-.VPHome:before {
+body:before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url("/bg/011-w-2.png");
+    background-image: url("/bg/try-2.png");
     background-size: contain;
     background-position: top;
     background-repeat: no-repeat;
@@ -306,9 +353,9 @@ body {
     z-index: -1;
 }
 
-.dark .VPHome:before {
+.dark body:before {
     mix-blend-mode: screen;
-    opacity: 0.013;
+    opacity: 0.007;
     filter: saturate(0);
 }
 
@@ -782,4 +829,8 @@ body[data-route*="/wiki"] {
     transition-timing-function: ease;
     transition-delay: 0s;
     transition-property: background-color;
+}
+
+.dropdown-button.is-active .select-icon {
+    transform: rotate(180deg);
 }

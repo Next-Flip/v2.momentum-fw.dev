@@ -1,0 +1,245 @@
+<script setup lang="ts">
+import { useWindowSize } from "@vueuse/core";
+import { computed, inject, nextTick, ref, watch } from "vue";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
+import { useI18n } from "../composables/useI18n";
+import type { useSerialConnection } from "../composables/useSerialConnection";
+
+import Tooltip from "./Tooltip.vue";
+
+const { tr } = useI18n();
+
+interface Props {
+    isExpanded: boolean;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    toggle: [];
+}>();
+
+const {
+    copyState,
+    isConnected,
+} = useConnectionInfo();
+
+const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
+const { width: windowWidth } = useWindowSize();
+
+const logs = computed(() => isConnected.value ? serialConnection?.logs || [] : []);
+const logContainer = ref<HTMLElement | null>(null);
+const autoScroll = ref(true);
+const showButtons = computed(() => logs.value.length > 0 && isConnected.value && (props.isExpanded || windowWidth.value <= 1024));
+
+const scrollToBottom = () => {
+    if (logContainer.value) {
+        logContainer.value.scrollTop = logContainer.value.scrollHeight;
+    }
+};
+
+const clearLogs = () => {
+    if (serialConnection && serialConnection.clearLogs) {
+        serialConnection.clearLogs();
+        emit("toggle");
+    }
+};
+
+const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+};
+
+const handleToggle = () => {
+    emit("toggle");
+};
+
+const copyLogs = async () => {
+    const logsString = logs.value.map(log => `${log.timestamp.toLocaleString()} ${log.message}`).join('\n');
+    try {
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(logsString);
+            copyState.trigger();
+        }
+    } catch (error) {
+        console.error('Failed to copy logs:', error);
+    }
+};
+
+watch(() => logs.value.length, () => {
+    if (autoScroll.value) {
+        nextTick(() => {
+            scrollToBottom();
+        });
+    }
+});
+
+watch(() => props.isExpanded, (newValue) => {
+    if (newValue) {
+        nextTick(() => {
+            scrollToBottom();
+        });
+    }
+});
+
+</script>
+
+<template>
+    <div class="border border-vp-divider rounded-lg bg-vp-dark dark:bg-neutral-950 overflow-hidden group">
+        <div class="flex flex-col">
+            <div class="w-full flex items-center justify-between text-left px-4 sm:pl-5 min-h-14 transition-all duration-200 bg-vp-dark dropdown-button"
+                :class="{
+                    'is-active': isExpanded,
+                }">
+                <div class="flex items-center">
+                    <h2 class="text-[13px] leading-3 uppercase font-semibold text-vp-1">{{ tr("updater_logs") }}</h2>
+                    <span v-if="logs.length > 0"
+                        class="text-xs font-medium py-1 rounded-full text-vp-2 min-w-12 text-start pl-3">
+                        {{ logs.length }}
+                    </span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <Tooltip v-if="showButtons" :delay="0" :zIndex="9999">
+                        <button
+                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer hover:bg-vp-soft/50 icon-button-opacity group-hover:opacity-100"
+                            :class="{
+                                'scale-95': copyState.isPressed.value,
+                                'opacity-0': windowWidth > 1024,
+                            }" :aria-label="tr('updater_clear_logs')" @click="clearLogs">
+                            <v-icon name="pr-refresh" scale="0.9" />
+                        </button>
+                        <template #content>{{ tr('updater_clear_logs') }}</template>
+                    </Tooltip>
+                    <Tooltip v-if="showButtons" :delay="0" :zIndex="9999">
+                        <button
+                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer hover:bg-vp-soft/50 icon-button-opacity group-hover:opacity-100"
+                            :class="{
+                                'scale-95': copyState.isPressed.value,
+                                'opacity-0': windowWidth > 1024,
+                            }" :aria-label="copyState.currentText.value" @click.stop="copyLogs"
+                            @mousedown="copyState.handleMouseDown" @mouseup="copyState.handleMouseUp"
+                            @mouseleave="copyState.handleMouseLeave">
+                            <v-icon :name="copyState.currentIcon.value" scale="0.85" />
+                        </button>
+                        <template #content>{{ copyState.currentText.value }}</template>
+                    </Tooltip>
+                    <button @click="handleToggle"
+                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5">
+                        <div class="flex flex-col items-center gap-1">
+                            <v-icon name="oi-chevron-up" scale="0.90"
+                                class="-mb-1 transition-transform duration-300 ease-in-out chevron-flip"
+                                :class="{ 'flipped': isExpanded }" />
+                            <v-icon name="oi-chevron-down" scale="0.90"
+                                class="-mt-1 transition-transform duration-300 ease-in-out chevron-flip"
+                                :class="{ 'flipped': isExpanded }" />
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <Transition name="logs-expand" mode="in-out">
+                <div v-if="isExpanded" class="">
+                    <div class="relative border-t border-vp-divider/60">
+                        <div ref="logContainer"
+                            class="pr-1 py-2 my-1 mr-1 h-64 overflow-y-auto overflow-x-auto relative items-start justify-start flex">
+                            <div v-if="logs.length === 0" class="text-center py-8 m-auto">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="text-gray-500">
+                                        <p class="text-vp-2 font-medium">{{ tr("updater_no_logs_yet") }}</p>
+                                        <p class="text-vp-3 text-sm mt-0.5 max-w-sm mx-auto mb-3">{{
+                                            tr("updater_flash_logs_appear") }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-else class="flex flex-col space-y-px text-sm font-mono w-full">
+                                <div v-for="(log, index) in logs" :key="index"
+                                    class="flex items-center gap-1 text-xs px-2 py-0.5 justify-start relative" :class="{
+                                        'bg-[#FEF6D5] dark:bg-yellow-400/10': log.level === 'warning',
+                                        'bg-[#FCEBEB] dark:bg-red-400/10': log.level === 'error',
+                                        'bg-[#d5fedc] dark:bg-green-700/20': log.level === 'success',
+                                    }">
+                                    <div class="absolute left-0 top-0 h-full w-0.5" :class="{
+                                        'bg-yellow-300 dark:bg-yellow-600/50': log.level === 'warning',
+                                        'bg-red-300 dark:bg-red-600/50': log.level === 'error',
+                                        'bg-green-300 dark:bg-green-600/50': log.level === 'success'
+                                    }"></div>
+                                    <span class="text-vp-3 flex-shrink-0 w-[62px] text-left h-min mb-auto" :class="{
+                                        'text-neutral-900 dark:text-yellow-400/60': log.level === 'warning',
+                                        'text-neutral-900 dark:text-red-500/70': log.level === 'error',
+                                        'text-neutral-900 dark:text-green-500/70': log.level === 'success'
+                                    }">
+                                        {{ formatTime(log.timestamp) }}
+                                    </span>
+                                    <span class="text-vp-1 flex-1 min-w-0 text-left message-text" :class="{
+                                        'text-neutral-950 dark:text-yellow-400/80': log.level === 'warning',
+                                        'text-neutral-950 dark:text-red-500/95': log.level === 'error',
+                                        'text-neutral-950 dark:text-green-500/95': log.level === 'success'
+                                    }">
+                                        <span v-html="log.message"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Transition>
+        </div>
+    </div>
+</template>
+
+<style scoped>
+.logs-expand-enter-active,
+.logs-expand-leave-active {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.logs-expand-enter-from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+}
+
+.logs-expand-enter-to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+}
+
+.logs-expand-leave-from {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+}
+
+.logs-expand-leave-to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+}
+
+.message-text :deep(a) {
+    @apply text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100;
+}
+
+.chevron-flip.flipped {
+    transform: scaleY(-1) !important;
+}
+
+.dropdown-button.is-active .select-icon .chevron-flip {
+    transform: none !important;
+}
+
+.dropdown-button.is-active .select-icon .chevron-flip.flipped {
+    transform: scaleY(-1) !important;
+}
+
+.icon-button-opacity {
+    transition: opacity 150ms ease-out, transform 100ms ease-out, background-color 100ms ease-out, color 100ms ease-out !important;
+}
+</style>
