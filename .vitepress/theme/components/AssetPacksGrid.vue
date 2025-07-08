@@ -296,7 +296,7 @@ const filteredAssetPacks = computed(() => {
 
 <template>
     <div class="relative w-full pb-1 pt-8 lg:pt-16 lg:pb-8 px-0 items-center justify-center">
-        <div class="text-center z-[5] pb-5 lg:pb-9" v-if="title || description">
+        <div v-if="title || description" class="text-center z-[5] pb-5 lg:pb-9">
             <h1
                 v-if="title"
                 class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight"
@@ -323,9 +323,9 @@ const filteredAssetPacks = computed(() => {
         >
             <div class="w-full max-w-[800px] mx-auto">
                 <AssetPacksControls
-                    :initialSortField="sortField"
-                    :initialSortDirection="sortDirection"
-                    :initialFilter="activeFilters"
+                    :initial-sort-field="sortField"
+                    :initial-sort-direction="sortDirection"
+                    :initial-filter="activeFilters"
                     @search="handleSearch"
                     @sort="handleSort"
                     @filter="handleFilter"
@@ -366,17 +366,17 @@ const filteredAssetPacks = computed(() => {
                             :name="pack.name"
                             :author="pack.author"
                             :description="pack.description"
-                            :imageUrl="pack.imageUrl"
-                            :previewUrls="pack.previewUrls"
-                            :downloadUrl="pack.downloadUrl"
-                            :githubUrl="pack.githubUrl"
-                            :updatedDate="pack.updatedDate"
-                            :addedDate="pack.addedDate"
+                            :image-url="pack.imageUrl"
+                            :preview-urls="pack.previewUrls"
+                            :download-url="pack.downloadUrl"
+                            :github-url="pack.githubUrl"
+                            :updated-date="pack.updatedDate"
+                            :added-date="pack.addedDate"
                             :stats="pack.stats"
                             :installed="pack.installed"
-                            :installedSha256="pack.installedSha256"
-                            :hasUpdate="pack.hasUpdate"
-                            :tarFile="pack.tarFile"
+                            :installed-sha256="pack.installedSha256"
+                            :has-update="pack.hasUpdate"
+                            :tar-file="pack.tarFile"
                         />
                     </motion.div>
                 </div>
@@ -386,8 +386,8 @@ const filteredAssetPacks = computed(() => {
         <div v-if="filteredAssetPacks.length === 0" class="text-center text-vp-2 py-12 px-0">
             <p>{{ tr("no_packs_found") }}</p>
             <button
-                @click="resetFilters"
                 class="reset-button mt-3 bg-vp-brand-2 p-4 py-2 rounded-md text-[14px] cursor-pointer transition-colors duration-100 text-neutral-50"
+                @click="resetFilters"
             >
                 {{ tr("reset_filters") }}
             </button>
@@ -398,8 +398,8 @@ const filteredAssetPacks = computed(() => {
             class="hidden sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-6 max-w-[1200px] mx-auto pt-3"
         >
             <button
-                @click="scrollToTop('smooth')"
                 class="bg-vp-brand-2 text-neutral-100 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
+                @click="scrollToTop('smooth')"
             >
                 {{ tr("return_to_top") }}
             </button>

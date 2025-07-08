@@ -46,7 +46,7 @@ interface Props {
     updatedDate?: string;
     addedDate?: string;
     stats?: AssetPackStats & { folders?: string[] };
-    installed: boolean;
+    installed?: boolean;
     installedSha256?: string;
     hasUpdate?: boolean;
     tarFile?: {
@@ -208,6 +208,8 @@ const handlePackAction = async (action: "install" | "remove" | "download") => {
                 ...props.stats,
                 folders: props.stats?.folders || [],
             },
+            imageUrl: props.imageUrl,
+            installed: props.installed,
         };
 
         try {
@@ -328,21 +330,21 @@ onUnmounted(() => {
                 <img
                     v-for="(url, index) in allPreviewUrls"
                     :key="`${props.id}-${index}-${url}`"
-                    :alt="`${name} - preview ${index + 1}`"
-                    @load="handleImageLoad($event, index)"
-                    @error="handleImageError(index)"
                     :ref="
                         (el) => {
                             imageRefs[index] = el as HTMLImageElement;
                         }
                     "
+                    :alt="`${name} - preview ${index + 1}`"
                     :class="[
-                        'cell-image absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-200 dark:saturate-100 dark:contrast-100 dark:brightness-100',
+                        'cell-image absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100',
                         {
                             'opacity-100 visible':
                                 index === currentImageIndex && loadedImages.has(index),
                         },
                     ]"
+                    @load="handleImageLoad($event, index)"
+                    @error="handleImageError(index)"
                 />
                 <div
                     v-if="!loadedImages.has(currentImageIndex) && !imageError"
@@ -367,16 +369,16 @@ onUnmounted(() => {
                     <button
                         v-show="currentImageIndex > 0"
                         class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/70 backdrop-blur transition-all duration-200 pointer-events-auto flex items-center justify-center left-[6px] hover:bg-black/80 cursor-pointer text-neutral-200 hover:text-neutral-50"
-                        @click="prevImage"
                         aria-label="Previous image"
+                        @click="prevImage"
                     >
                         <v-icon name="oi-chevron-left" scale="1" />
                     </button>
                     <button
                         v-show="currentImageIndex < allPreviewUrls.length - 1"
                         class="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-none bg-black/70 backdrop-blur transition-all duration-200 pointer-events-auto flex items-center justify-center right-[6px] hover:bg-black/80 cursor-pointer text-neutral-200 hover:text-neutral-50"
-                        @click="nextImage"
                         aria-label="Next image"
+                        @click="nextImage"
                     >
                         <v-icon name="oi-chevron-right" scale="1" />
                     </button>
@@ -515,12 +517,12 @@ onUnmounted(() => {
                                 ) || isBeingDeleted,
                         }"
                         :aria-label="getActionLabel"
+                        download
                         @click="
                             handlePackAction(
                                 serialConnection.flags.ableToExtract ? 'install' : 'download',
                             )
                         "
-                        download
                         >{{ getActionLabel }}</a
                     >
                 </div>
@@ -538,15 +540,15 @@ onUnmounted(() => {
                     >
                         <div class="action w-10 z-[5]">
                             <button
+                                :aria-label="downloadState.currentText.value"
+                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-vp-2 hover:text-vp-brand-1 select-none pointer-events-auto !z-[999]"
+                                :class="{ 'scale-95': downloadState.isPressed.value }"
                                 @click="
                                     () => {
                                         downloadState.trigger();
                                         handlePackAction('download');
                                     }
                                 "
-                                :aria-label="downloadState.currentText.value"
-                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-vp-2 hover:text-vp-brand-1 select-none pointer-events-auto !z-[999]"
-                                :class="{ 'scale-95': downloadState.isPressed.value }"
                                 @mousedown="downloadState.handleMouseDown"
                                 @mouseup="downloadState.handleMouseUp"
                             >
@@ -603,7 +605,9 @@ onUnmounted(() => {
 }
 
 .delete-button:hover {
-    @apply bg-red-600 text-neutral-100 border-red-600;
+    background-color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+    border-color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+    color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 
 .cell-image {
@@ -670,6 +674,7 @@ onUnmounted(() => {
 .two-line-description {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

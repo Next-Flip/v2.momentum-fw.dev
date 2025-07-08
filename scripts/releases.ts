@@ -392,7 +392,7 @@ export async function getReleaseAndDevbuilds() {
 
         console.log(`  Successfully processed ${mainlineReleases.length} mainline releases`);
 
-        let devbuildItems: ReleaseItem[] = [];
+        const devbuildItems: ReleaseItem[] = [];
         const seenCommits = new Set<string>();
 
         if (hasDevBuilds) {
@@ -545,7 +545,7 @@ export const getReleaseByCommit = (commit: string) => {
     }
 }
 
-export async function generateReleases() {
+export async function fetchReleases() {
     const { mainlineItems, devbuildItems } = await getReleaseAndDevbuilds();
 
     if (!mainlineItems || !Array.isArray(mainlineItems) || mainlineItems.length === 0) {

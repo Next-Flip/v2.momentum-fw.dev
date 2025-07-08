@@ -73,6 +73,7 @@ export default defineConfig({
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
             "process.env.NODE_ENV": JSON.stringify("production"),
+            global: "globalThis",
         },
         css: {
             preprocessorOptions: {
@@ -93,7 +94,7 @@ export default defineConfig({
             exclude: ["mark.js/src/vanilla.js", "oh-vue-icons/icons"],
         },
         ssr: {
-            noExternal: ["mark.js", "oh-vue-icons", /^oh-vue-icons\/.*/],
+            noExternal: ["mark.js", "oh-vue-icons", /^oh-vue-icons\/.*/, "protobufjs"],
         },
         server: {
             cors: true,
@@ -111,8 +112,15 @@ export default defineConfig({
             },
         },
         build: {
-            chunkSizeWarningLimit: 1000,
+            chunkSizeWarningLimit: 2000,
             rollupOptions: {
+                onwarn: (warning, warn) => {
+                    // Suppress eval warnings from protobufjs
+                    if (warning.code === "EVAL" && warning.id?.includes("protobufjs")) {
+                        return;
+                    }
+                    warn(warning);
+                },
                 output: {
                     manualChunks: (id) => {
                         if (id.includes("protobufjs")) {

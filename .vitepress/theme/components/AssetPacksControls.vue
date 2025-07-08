@@ -176,49 +176,75 @@ watch(
                 <div class="absolute left-3 text-vp-3 flex items-center justify-center">
                     <span class="vp-icon DocSearch-Search-Icon"></span>
                 </div>
-                <input type="text" name="search-input" :placeholder="tr('search_placeholder')"
+                <input
+                    v-model="searchQuery"
+                    type="text"
+                    name="search-input"
+                    :placeholder="tr('search_placeholder')"
                     class="search-input w-full py-2 pr-4 pl-9 rounded-lg border bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] text-vp-1 text-sm transition-all duration-100 ease-in-out leading-6 min-h-[38px]"
-                    v-model="searchQuery" @input="emitSearch" :aria-label="tr('search_placeholder')" />
-                <button v-if="searchQuery"
+                    :aria-label="tr('search_placeholder')"
+                    @input="emitSearch"
+                />
+                <button
+                    v-if="searchQuery"
                     class="absolute right-3 bg-vp-soft border-none cursor-pointer text-vp-3 flex items-center justify-center p-[2px] rounded-full transition-all duration-100 hover:text-vp-2"
-                    @click="clearSearch" :aria-label="tr('clear_search')" :title="tr('clear_search')">
+                    :aria-label="tr('clear_search')"
+                    :title="tr('clear_search')"
+                    @click="clearSearch"
+                >
                     <v-icon name="md-close-round" scale="0.8" />
                 </button>
             </div>
         </div>
 
         <div class="grid grid-cols-[40px_1fr_1fr] gap-2.5 md:flex items-center justify-center">
-            <button @click="toggleSortDirection"
+            <button
                 class="sort-direction-toggle w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] transition-all duration-100 hover:border-vp-brand-1 hover:text-vp-2 text-vp-3 cursor-pointer backdrop-blur"
                 :aria-label="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
-                :title="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')">
+                :title="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
+                @click="toggleSortDirection"
+            >
                 <v-icon name="md-sort-round" :class="{ flip: sortDirection === 'desc' }" />
             </button>
 
-            <div class="relative w-full min-w-0 md:max-w-[167.5px] md:min-w-[167.5px] backdrop-blur"
-                ref="sortDropdownRef">
-                <button class="dropdown-button" @click="toggleSortDropdown"
-                    :class="{ 'is-active': isSortDropdownOpen }">
+            <div
+                ref="sortDropdownRef"
+                class="relative w-full min-w-0 md:max-w-[167.5px] md:min-w-[167.5px] backdrop-blur"
+            >
+                <button
+                    class="dropdown-button"
+                    :class="{ 'is-active': isSortDropdownOpen }"
+                    @click="toggleSortDropdown"
+                >
                     <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">{{
                         getSortLabel()
-                        }}</span>
-                    <div class="select-icon flex items-center text-vp-3 transition-transform duration-200">
+                    }}</span>
+                    <div
+                        class="select-icon flex items-center text-vp-3 transition-transform duration-200"
+                    >
                         <v-icon name="oi-chevron-down" />
                     </div>
                 </button>
 
                 <Transition name="fade-dropdown">
-                    <div class="dropdown-menu-container" v-if="isSortDropdownOpen">
+                    <div v-if="isSortDropdownOpen" class="dropdown-menu-container">
                         <div class="dropdown-menu" :class="{ 'is-visible': isSortDropdownOpen }">
                             <div
-                                class="flex flex-col overflow-hidden max-h-[200px] transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute">
-                                <span v-for="option in sortOptions" :key="option.value"
+                                class="flex flex-col overflow-hidden max-h-[200px] transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
+                            >
+                                <span
+                                    v-for="option in sortOptions"
+                                    :key="option.value"
                                     class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                     :class="{
                                         'is-selected': sortField === option.value,
-                                    }" @click="selectSortOption(option.value as SortField)">
-                                    <span class="whitespace-nowrap overflow-hidden text-ellipsis flex-1">{{ option.label
-                                        }}</span>
+                                    }"
+                                    @click="selectSortOption(option.value as SortField)"
+                                >
+                                    <span
+                                        class="whitespace-nowrap overflow-hidden text-ellipsis flex-1"
+                                        >{{ option.label }}</span
+                                    >
                                 </span>
                             </div>
                         </div>
@@ -226,45 +252,66 @@ watch(
                 </Transition>
             </div>
 
-            <div class="relative w-full min-w-0 md:max-w-[167.5px] md:min-w-[167.5px] backdrop-blur"
-                ref="filterDropdownRef">
-                <button class="dropdown-button" @click="toggleFilterDropdown"
-                    :class="{ 'is-active': isFilterDropdownOpen }">
+            <div
+                ref="filterDropdownRef"
+                class="relative w-full min-w-0 md:max-w-[167.5px] md:min-w-[167.5px] backdrop-blur"
+            >
+                <button
+                    class="dropdown-button"
+                    :class="{ 'is-active': isFilterDropdownOpen }"
+                    @click="toggleFilterDropdown"
+                >
                     <div class="flex-1 overflow-hidden relative w-full">
                         <div v-if="shouldScroll" class="marquee relative w-full overflow-hidden">
                             <div class="inline-block whitespace-nowrap pr-0 marquee-content">
                                 {{ getFilterLabel() }}
                             </div>
                         </div>
-                        <span v-else
-                            class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5] w-full text-left">
+                        <span
+                            v-else
+                            class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5] w-full text-left"
+                        >
                             {{ getFilterLabel() }}
                         </span>
                     </div>
-                    <div class="select-icon flex items-center text-vp-3 transition-transform duration-200">
+                    <div
+                        class="select-icon flex items-center text-vp-3 transition-transform duration-200"
+                    >
                         <v-icon name="oi-chevron-down" />
                     </div>
                 </button>
                 <Transition name="fade-dropdown">
-                    <div class="dropdown-menu-container" v-if="isFilterDropdownOpen">
+                    <div v-if="isFilterDropdownOpen" class="dropdown-menu-container">
                         <div class="dropdown-menu" :class="{ 'is-visible': isFilterDropdownOpen }">
                             <div
-                                class="flex flex-col overflow-hidden max-h-[200px] w-full transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute">
-                                <span v-for="option in filterOptions" :key="option.value"
+                                class="flex flex-col overflow-hidden max-h-[200px] w-full transition-all duration-100 overflow-y-hidden rounded-[4px] bg-vp-soft-mute"
+                            >
+                                <span
+                                    v-for="option in filterOptions"
+                                    :key="option.value"
                                     class="dropdown-item items-center justify-start gap-2 px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                     :class="{
                                         'is-selected': activeFilters.includes(
                                             option.value as FilterOption,
                                         ),
-                                    }" @click="toggleFilterOption(option.value as FilterOption)">
+                                    }"
+                                    @click="toggleFilterOption(option.value as FilterOption)"
+                                >
                                     <span
-                                        class="inline-flex items-center justify-center w-4 h-4 rounded-[4px] transition-all duration-100 checkbox flex-shrink-0">
-                                        <v-icon v-if="
-                                            activeFilters.includes(option.value as FilterOption)
-                                        " name="bi-check" scale="1.1" />
+                                        class="inline-flex items-center justify-center w-4 h-4 rounded-[4px] transition-all duration-100 checkbox flex-shrink-0"
+                                    >
+                                        <v-icon
+                                            v-if="
+                                                activeFilters.includes(option.value as FilterOption)
+                                            "
+                                            name="bi-check"
+                                            scale="1.1"
+                                        />
                                     </span>
-                                    <span class="whitespace-nowrap overflow-hidden text-ellipsis flex-1">{{ option.label
-                                        }}</span>
+                                    <span
+                                        class="whitespace-nowrap overflow-hidden text-ellipsis flex-1"
+                                        >{{ option.label }}</span
+                                    >
                                 </span>
                             </div>
                         </div>
@@ -320,7 +367,6 @@ watch(
 }
 
 @keyframes marquee {
-
     0%,
     10% {
         transform: translateX(0);

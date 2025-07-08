@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Vue.volar",
+        "Vue.vscode-typescript-vue-plugin",
+        "bradlc.vscode-tailwindcss",
+        "wk-j.save-and-run"
+    ]
+}

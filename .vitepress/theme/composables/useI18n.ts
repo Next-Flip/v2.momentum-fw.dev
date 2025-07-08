@@ -1,24 +1,24 @@
-import { useData, useRoute } from "vitepress";
+import { PageData, type Route, SiteData, useData, useRoute } from "vitepress";
 import { computed } from "vue";
 import messages, { type MessageSchema, type SupportedLocales, isSupportedLocale } from "../../i18n";
 
 export function useI18n() {
-    let route: any;
-    let site: any;
+    let route: Route;
+    let site: SiteData;
 
     try {
         route = useRoute();
         const data = useData();
-        site = data.site;
-    } catch (error) {
-        route = { path: "/" };
-        site = { value: { lang: "en-US" } };
+        site = data.site.value;
+    } catch {
+        route = { path: "/", data: {} as PageData, component: null };
+        site = { lang: "en-US" } as SiteData;
     }
 
     const currentLocale = computed((): SupportedLocales => {
         if (typeof window === "undefined") {
             try {
-                const siteLocale = site?.value?.lang?.split("-")[0] || "en";
+                const siteLocale = site?.lang?.split("-")[0] || "en";
                 return isSupportedLocale(siteLocale) ? siteLocale : "en";
             } catch {
                 return "en";
@@ -32,7 +32,9 @@ export function useI18n() {
             if (potentialLocale && isSupportedLocale(potentialLocale)) {
                 return potentialLocale;
             }
-        } catch {}
+        } catch {
+            return "en";
+        }
 
         return "en";
     });

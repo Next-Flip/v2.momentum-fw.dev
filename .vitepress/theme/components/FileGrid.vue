@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
 import { ref } from "vue";
+import { downloadFile } from "../util";
+import type { DevbuildFile, MainlineFile } from "../../../_data/releases";
+
+type FirmwareFile = DevbuildFile | MainlineFile;
 
 interface Props {
-    files: any[];
+    files: FirmwareFile[];
     branch: string;
 }
 
 defineProps<Props>();
 const { width } = useWindowSize();
 
-const getFilename = (file: any) => {
-    return "filename" in file ? file.filename : file.url.split("/").pop() || "";
-};
-
-const getFileKey = (file: any) => {
+const getFileKey = (file: FirmwareFile) => {
     return "url" in file ? file.url : file.filename;
 };
 
@@ -29,7 +29,7 @@ const buttonStates = ref<
     >
 >({});
 
-const handleMouse = (file: any, action: "down" | "up" | "leave") => {
+const handleMouse = (file: FirmwareFile, action: "down" | "up" | "leave") => {
     const key = getFileKey(file);
     if (!buttonStates.value[key]) {
         buttonStates.value[key] = { isPressed: false, isSuccess: false };
@@ -42,14 +42,13 @@ const handleMouse = (file: any, action: "down" | "up" | "leave") => {
     }
 };
 
-const getDownloadUrl = (file: any, branch: string) => {
-    if (branch.includes("dev")) {
-        return `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
-    }
-    return file.url;
+const getDownloadUrl = (file: FirmwareFile) => {
+    return "url" in file
+        ? file.url
+        : `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
 };
 
-const handleDownload = (file: any, branch: string) => {
+const handleDownload = (file: FirmwareFile) => {
     const key = getFileKey(file);
     if (!buttonStates.value[key]) {
         buttonStates.value[key] = { isPressed: false, isSuccess: false };
@@ -67,17 +66,15 @@ const handleDownload = (file: any, branch: string) => {
         }
     }, 3000);
 
-    import("../util").then(({ downloadFile }) => {
-        downloadFile(getDownloadUrl(file, branch));
-    });
+    downloadFile(getDownloadUrl(file));
 };
 
-const getButtonIcon = (file: any) => {
+const getButtonIcon = (file: FirmwareFile) => {
     const key = getFileKey(file);
     return buttonStates.value[key]?.isSuccess ? "bi-check2" : "la-download-solid";
 };
 
-const getButtonScale = (file: any) => {
+const getButtonScale = (file: FirmwareFile) => {
     const key = getFileKey(file);
     return buttonStates.value[key]?.isPressed ? "scale-[0.99]" : "scale-100";
 };
@@ -88,13 +85,13 @@ const getButtonScale = (file: any) => {
         <div
             v-for="file in files"
             :key="'url' in file ? file.url : file.filename"
-            @click="handleDownload(file, branch)"
+            :aria-label="file.filename"
+            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-all duration-100 group cursor-pointer"
+            :class="getButtonScale(file)"
+            @click="handleDownload(file)"
             @mousedown="handleMouse(file, 'down')"
             @mouseup="handleMouse(file, 'up')"
             @mouseleave="handleMouse(file, 'leave')"
-            :aria-label="getFilename(file)"
-            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-all duration-100 group cursor-pointer"
-            :class="getButtonScale(file)"
         >
             <div
                 :class="[
@@ -110,9 +107,9 @@ const getButtonScale = (file: any) => {
                         width <= 640 ? 'text-right' : 'text-left',
                     ]"
                     :dir="width <= 640 ? 'rtl' : 'ltr'"
-                    :title="getFilename(file)"
+                    :title="file.filename"
                 >
-                    {{ getFilename(file) }}
+                    {{ file.filename }}
                 </span>
                 <div
                     class="text-xs text-vp-brand-1/80 group-hover:text-vp-1 select-none font-mono whitespace-nowrap ml-auto"

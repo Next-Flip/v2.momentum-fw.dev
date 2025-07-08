@@ -2,20 +2,63 @@
     // "typescript.tsdk": "node_modules/.pnpm/typescript@4.9.4/node_modules/typescript/lib",
     // "typescript.enablePromptUseWorkspaceTsdk": true,
     "eslint.lintTask.enable": true,
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+        "vue"
+    ],
+    "eslint.workingDirectories": [
+        {
+            "mode": "auto"
+        }
+    ],
+    "eslint.probe": [
+        "javascript",
+        "typescript",
+        "vue"
+    ],
+    "eslint.run": "onType",
+    "eslint.options": {
+        "cache": false
+    },
+    "eslint.format.enable": true,
+    "eslint.codeActionsOnSave.mode": "all",
+    "eslint .useFlatConfig": true,
+    "saveAndRun": {
+        "commands": [
+            {
+                "match": ".*\\.(vue|ts|js|mts)$",
+                "command": "workbench.action.tasks.runTask",
+                "args": "ESLint: Lint on Save"
+            }
+        ]
+    },
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
     "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/**": true,
+        "**/.vitepress/dist/**": true,
+        "**/.vitepress/cache/**": true
+    },
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
+    "[vue]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        }
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[markdown]": {
         "editor.formatOnSave": false
     }

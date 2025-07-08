@@ -116,8 +116,8 @@ watch(
             <div class="flex flex-col gap-2.5 my-0.5">
                 <div
                     v-for="item in infoItems"
-                    :key="item.key"
                     v-show="item.condition"
+                    :key="item.key"
                     class="flex flex-col items-start gap-y-0.5"
                 >
                     <span class="text-vp-3 text-[11px] font-semibold uppercase">
@@ -179,8 +179,8 @@ watch(
                 <img
                     :src="imageSrc"
                     :alt="`mntm-${selectedRelease?.commit}`"
-                    @click="openImageInNewTab(selectedRelease?.commit || '')"
                     class="w-full h-auto rounded-lg border !my-0 border-vp-divider/30 cursor-pointer"
+                    @click="openImageInNewTab(selectedRelease?.commit || '')"
                 />
             </div>
         </div>

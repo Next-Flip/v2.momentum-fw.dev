@@ -18,7 +18,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("
 const { selectedRelease, selectRelease } = useReleaseNavigation({
     basePath: "/releases",
     useLocalStorage: false,
-    defaultFallback: () => mainlineReleases.length > 0 ? mainlineReleases[0] : null,
+    defaultFallback: () => (mainlineReleases.length > 0 ? mainlineReleases[0] : null),
 });
 
 const isCurrentVersion = computed(() => {
@@ -51,29 +51,45 @@ const isCurrentVersion = computed(() => {
     <div class="relative w-full py-12 pb-6 pt-0 px-0 items-center justify-center">
         <div class="text-center z-[5] pb-8 pt-8 sm:py-10 lg:py-16">
             <h1
-                class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight">
+                class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight"
+            >
                 {{ tr("releases_title") }}
             </h1>
             <p class="text-sm lg:text-base font-medium text-vp-2 pt-3 leading-5 my-0 mx-auto px-3">
-                {{ width < 640 ? tr("releases_description_mobile") : tr("releases_description") }} </p>
+                {{ width < 640 ? tr("releases_description_mobile") : tr("releases_description") }}
+            </p>
         </div>
 
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex flex-row justify-center">
-                <aside class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[26px] pt-5 pb-8">
+                <aside
+                    class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[26px] pt-5 pb-8"
+                >
                     <div class="sticky flex flex-col gap-8 top-20 lg:top-24 overflow-y-auto">
-                        <ReleaseItems :title="tr('releases_mainline')" :releases="mainlineReleases"
-                            :selectedRelease="selectedRelease" @selectRelease="selectRelease" :class="``" />
+                        <ReleaseItems
+                            :title="tr('releases_mainline')"
+                            :releases="mainlineReleases"
+                            :selected-release="selectedRelease"
+                            :class="``"
+                            @select-release="selectRelease"
+                        />
 
-                        <ReleaseItems :title="tr('releases_devbuilds')" :releases="devbuildReleases"
-                            :selectedRelease="selectedRelease" @selectRelease="selectRelease" />
+                        <ReleaseItems
+                            :title="tr('releases_devbuilds')"
+                            :releases="devbuildReleases"
+                            :selected-release="selectedRelease"
+                            @select-release="selectRelease"
+                        />
                     </div>
                 </aside>
 
-                <ReleaseContent :selectedRelease="selectedRelease" :isCurrentVersion="isCurrentVersion"
-                    @selectRelease="selectRelease" />
+                <ReleaseContent
+                    :selected-release="selectedRelease"
+                    :is-current-version="isCurrentVersion"
+                    @select-release="selectRelease"
+                />
 
-                <ReleasesAside :selectedRelease="selectedRelease" />
+                <ReleasesAside :selected-release="selectedRelease" />
             </div>
         </div>
     </div>

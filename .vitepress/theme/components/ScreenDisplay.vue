@@ -11,32 +11,29 @@ const canvasRef = ref<HTMLCanvasElement | null>(null);
 let retryTimeout: NodeJS.Timeout | null = null;
 
 const tryStartStream = async () => {
+    if (typeof window === "undefined") return;
+
     await nextTick();
 
-    if (!serialConnection || !canvasRef.value || !isConnected.value || !flags.value.rpcActive || flags.value.screenStreamPaused) {
-        console.log('[ScreenDisplay] Stream start conditions not met:', {
-            hasSerialConnection: !!serialConnection,
-            hasCanvas: !!canvasRef.value,
-            isConnected: isConnected.value,
-            rpcActive: flags.value.rpcActive,
-            screenStreamPaused: flags.value.screenStreamPaused
-        });
+    if (
+        !serialConnection ||
+        !canvasRef.value ||
+        !isConnected.value ||
+        !flags.value.rpcActive ||
+        flags.value.screenStreamPaused
+    ) {
         return;
     }
 
     if (flags.value.screenStream) {
-        console.log('[ScreenDisplay] Screen stream already active');
         return;
     }
 
     try {
-        console.log('[ScreenDisplay] Attempting to start screen stream...');
         if (serialConnection.startScreenStream) {
             await serialConnection.startScreenStream(canvasRef.value);
-            console.log('[ScreenDisplay] Screen stream started successfully');
         }
-    } catch (error) {
-        console.warn('[ScreenDisplay] Failed to start screen stream:', error);
+    } catch {
         if (retryTimeout) clearTimeout(retryTimeout);
         retryTimeout = setTimeout(() => {
             tryStartStream();
@@ -45,6 +42,8 @@ const tryStartStream = async () => {
 };
 
 const stopStream = async () => {
+    if (typeof window === "undefined") return;
+
     if (retryTimeout) {
         clearTimeout(retryTimeout);
         retryTimeout = null;
@@ -58,47 +57,58 @@ const stopStream = async () => {
         if (serialConnection.stopScreenStream) {
             await serialConnection.stopScreenStream();
         }
-    } catch (error) {
+    } catch {
+        /* empty */
     }
 };
 
 onMounted(() => {
-    console.log('[ScreenDisplay] Component mounted, attempting to start stream');
+    if (typeof window === "undefined") return;
+
     setTimeout(() => {
         tryStartStream();
     }, 100);
 });
 
-watch([isConnected, () => flags.value.rpcActive], ([connected, rpcActive]) => {
-    console.log('[ScreenDisplay] Connection state changed:', { connected, rpcActive });
-    if (connected && rpcActive && !flags.value.screenStreamPaused) {
-        setTimeout(() => {
-            tryStartStream();
-        }, 200);
-    } else {
-        stopStream();
-    }
-}, { immediate: true });
+watch(
+    [
+        isConnected,
+        () => flags.value.rpcActive,
+        () => flags.value.screenStream,
+        () => flags.value.screenStreamPaused,
+    ],
+    ([connected, rpcActive, isStreaming, isPaused], [prevStreaming, prevPaused]) => {
+        if (typeof window === "undefined") return;
 
-watch(() => flags.value.screenStream, (isStreaming, wasStreaming) => {
-    if (wasStreaming && !isStreaming && isConnected.value && flags.value.rpcActive && !flags.value.screenStreamPaused) {
-        console.warn('[ScreenDisplay] Screen stream stopped unexpectedly, attempting restart in 3 seconds');
-        if (retryTimeout) clearTimeout(retryTimeout);
-        retryTimeout = setTimeout(() => {
-            tryStartStream();
-        }, 3000);
-    }
-});
+        if (retryTimeout) {
+            clearTimeout(retryTimeout);
+            retryTimeout = null;
+        }
 
-watch(() => flags.value.screenStreamPaused, (isPaused, wasPaused) => {
-    if (wasPaused && !isPaused && isConnected.value && flags.value.rpcActive && !flags.value.screenStream) {
-        console.log('[ScreenDisplay] Screen stream unpaused, attempting restart in 1 second');
-        if (retryTimeout) clearTimeout(retryTimeout);
-        retryTimeout = setTimeout(() => {
-            tryStartStream();
-        }, 1000);
-    }
-});
+        if (connected && rpcActive && !isPaused) {
+            if (!isStreaming) {
+                retryTimeout = setTimeout(() => {
+                    tryStartStream();
+                }, 200);
+            }
+        } else {
+            stopStream();
+        }
+
+        if (prevStreaming && !isStreaming && connected && rpcActive && !isPaused) {
+            retryTimeout = setTimeout(() => {
+                tryStartStream();
+            }, 3000);
+        }
+
+        if (prevPaused && !isPaused && connected && rpcActive && !isStreaming) {
+            retryTimeout = setTimeout(() => {
+                tryStartStream();
+            }, 1000);
+        }
+    },
+    { immediate: true },
+);
 
 onBeforeUnmount(() => {
     if (retryTimeout) {
@@ -111,17 +121,27 @@ onBeforeUnmount(() => {
 
 <template>
     <Transition name="slide-down" mode="out-in">
-        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg border-b border-vp-divider pb-7 mb-7">
+        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg pb-[30px]">
             <div
-                class="relative flex justify-center items-center min-h-[140px] bg-vp-c-bg-soft border border-vp-divider rounded-lg overflow-hidden p-2">
-                <canvas ref="canvasRef" :width="128 * ((serialConnection?.screenScale?.value) || 2)"
-                    :height="64 * ((serialConnection?.screenScale?.value) || 2)"
-                    class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-200 dark:saturate-100 dark:contrast-100 dark:brightness-100"
-                    :class="{ 'opacity-30': !flags.screenStream }" />
+                class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill border border-black/10 dark:border-white/10 rounded-lg overflow-hidden p-3"
+            >
+                <canvas
+                    ref="canvasRef"
+                    :width="128 * (serialConnection?.screenScale?.value || 2)"
+                    :height="64 * (serialConnection?.screenScale?.value || 2)"
+                    class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100"
+                    :class="{ 'opacity-30': !flags.screenStream }"
+                />
 
-                <div v-if="!flags.screenStream" class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin">
-                    </div>
+                <div
+                    v-if="!flags.screenStream"
+                    class="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200 rounded-lg"
+                    title="Click to retry screen stream"
+                    @click="tryStartStream"
+                >
+                    <div
+                        class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"
+                    ></div>
                 </div>
             </div>
         </div>

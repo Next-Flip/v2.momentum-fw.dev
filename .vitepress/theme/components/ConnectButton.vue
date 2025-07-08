@@ -118,61 +118,91 @@ whenever(cmd_c, () => handleConnect());
 </script>
 
 <template>
-    <div :class="['VPFlyout connect-container ml-8']" @mouseenter="handleMouse(true)" @mouseleave="handleMouse(false)">
+    <div
+        :class="['VPFlyout connect-container ml-8']"
+        @mouseenter="handleMouse(true)"
+        @mouseleave="handleMouse(false)"
+    >
         <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
-            <button @click="handleConnect" :class="[
-                `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
-            ]" type="button" :aria-expanded="flyoutOpen">
-                <div v-if="flags.updateInProgress"
-                    class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2">
+            <button
+                :class="[
+                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
+                ]"
+                type="button"
+                :aria-expanded="flyoutOpen"
+                @click="handleConnect"
+            >
+                <div
+                    v-if="flags.updateInProgress"
+                    class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2"
+                >
                     <div
-                        class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin">
-                    </div>
+                        class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                    ></div>
                 </div>
                 <span v-else class="relative flex size-2 mr-2">
-                    <span v-if="isConnected"
-                        :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"></span>
                     <span
-                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"></span>
+                        v-if="isConnected"
+                        :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
+                    ></span>
+                    <span
+                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"
+                    ></span>
                 </span>
 
-                <span :class="[
-                    `connect-button-text text-sm font-medium min-h-5 ${isConnected && !flags.updateInProgress ? 'mr-3' : ''
-                    }`,
-                ]">
-                    {{ flags.updateInProgress ? tr(updateStage as any) || tr("update_stage_updating_short") :
-                        getConnectionDisplay.text }}
+                <span
+                    :class="[
+                        `connect-button-text text-sm font-medium min-h-5 ${
+                            isConnected && !flags.updateInProgress ? 'mr-3' : ''
+                        }`,
+                    ]"
+                >
+                    {{
+                        flags.updateInProgress
+                            ? tr(updateStage as any) || tr("update_stage_updating_short")
+                            : getConnectionDisplay.text
+                    }}
                 </span>
-                <span v-if="isConnected && !flags.updateInProgress" :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${!deviceInfo?.hardware_name ? 'w-3' : ''
-                    }`">
+                <span
+                    v-if="isConnected && !flags.updateInProgress"
+                    :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${
+                        !deviceInfo?.hardware_name ? 'w-3' : ''
+                    }`"
+                >
                     {{ deviceInfo?.hardware_name || hardwareNameDots }}
                 </span>
-                <span v-if="dotsState" :class="[
-                    'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
-                    dotsState
-                        ? 'mr-2'
-                        : '',
-                ]">
+                <span
+                    v-if="dotsState"
+                    :class="[
+                        'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
+                        dotsState ? 'mr-2' : '',
+                    ]"
+                >
                     {{ connectingDots }}
                 </span>
 
-                <div class="DocSearch-Button" v-if="connectionState === 'disconnected'">
-                    <span class="DocSearch-Button-Keys"><kbd class="DocSearch-Button-Key"></kbd><kbd
-                            class="DocSearch-Button-Key">C</kbd></span>
+                <div v-if="connectionState === 'disconnected'" class="DocSearch-Button">
+                    <span class="DocSearch-Button-Keys"
+                        ><kbd class="DocSearch-Button-Key"></kbd
+                        ><kbd class="DocSearch-Button-Key">C</kbd></span
+                    >
                 </div>
             </button>
 
-            <div class="menu" v-if="isConnected">
+            <div v-if="isConnected" class="menu">
                 <div class="menu-content">
                     <div class="menu-item">
                         <span class="menu-label">{{ tr("connection_firmware") }}</span>
-                        <a class="menu-value vp-external-link-icon hover:underline"
+                        <a
+                            class="menu-value vp-external-link-icon hover:underline"
                             :title="deviceInfo?.firmware_branch || ''"
-                            :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`">{{
+                            :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`"
+                            >{{
                                 deviceInfo?.firmware_version?.includes("dev")
                                     ? `dev (${deviceInfo.firmware_commit})`
                                     : deviceInfo?.firmware_version
-                            }}</a>
+                            }}</a
+                        >
                     </div>
 
                     <div class="menu-item">
@@ -201,35 +231,48 @@ whenever(cmd_c, () => handleConnect());
 
                     <div class="menu-actions">
                         <div class="action-buttons">
-                            <Tooltip v-if="deviceInfo" :delay="0" :zIndex="9999">
+                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
                                 <button
                                     class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :class="{
                                         'scale-95': copyState.isPressed.value,
-                                    }" :aria-label="copyState.currentText.value"
-                                    @click="() => exportDeviceInfo('copy')" @mousedown="copyState.handleMouseDown"
-                                    @mouseup="copyState.handleMouseUp" @mouseleave="copyState.handleMouseLeave">
+                                    }"
+                                    :aria-label="copyState.currentText.value"
+                                    @click="() => exportDeviceInfo('copy')"
+                                    @mousedown="copyState.handleMouseDown"
+                                    @mouseup="copyState.handleMouseUp"
+                                    @mouseleave="copyState.handleMouseLeave"
+                                >
                                     <v-icon :name="copyState.currentIcon.value" scale="0.8" />
                                 </button>
                                 <template #content>{{ copyState.currentText.value }}</template>
                             </Tooltip>
-                            <Tooltip v-if="deviceInfo" :delay="0" :zIndex="9999">
+                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
                                 <button
                                     class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :class="{
                                         'scale-95': saveState.isPressed.value,
-                                    }" :aria-label="saveState.currentText.value"
-                                    @click="() => exportDeviceInfo('save')" @mousedown="saveState.handleMouseDown"
-                                    @mouseup="saveState.handleMouseUp" @mouseleave="saveState.handleMouseLeave">
+                                    }"
+                                    :aria-label="saveState.currentText.value"
+                                    @click="() => exportDeviceInfo('save')"
+                                    @mousedown="saveState.handleMouseDown"
+                                    @mouseup="saveState.handleMouseUp"
+                                    @mouseleave="saveState.handleMouseLeave"
+                                >
                                     <v-icon :name="saveState.currentIcon.value" scale="0.8" />
                                 </button>
                                 <template #content>{{ saveState.currentText.value }}</template>
                             </Tooltip>
-                            <button @click="handleDisconnect" :disabled="flags.updateInProgress" :class="[
-                                'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
-                                flags.updateInProgress && 'opacity-50 !cursor-not-allowed',
-                                !flags.updateInProgress && 'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600'
-                            ]">
+                            <button
+                                :disabled="flags.updateInProgress"
+                                :class="[
+                                    'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
+                                    flags.updateInProgress && 'opacity-50 !cursor-not-allowed',
+                                    !flags.updateInProgress &&
+                                        'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
+                                ]"
+                                @click="handleDisconnect"
+                            >
                                 {{ tr("connection_disconnect") }}
                             </button>
                         </div>
@@ -307,26 +350,26 @@ body[data-route*="/wiki"] {
     transition: color 0.25s;
 }
 
-.connect-button[aria-expanded="false"]+.menu {
+.connect-button[aria-expanded="false"] + .menu {
     opacity: 0;
     visibility: hidden;
     transform: translateY(0) translateX(calc(-50%));
 }
 
 .VPFlyout:hover .menu,
-.connect-button[aria-expanded="true"]+.menu {
+.connect-button[aria-expanded="true"] + .menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) translateX(calc(-50%));
 }
 
 @media (min-width: 1024px) {
-    .connect-button[aria-expanded="false"]+.menu {
+    .connect-button[aria-expanded="false"] + .menu {
         transform: translateY(0) translateX(calc(-50%));
     }
 
     .VPFlyout:hover .menu,
-    .connect-button[aria-expanded="true"]+.menu {
+    .connect-button[aria-expanded="true"] + .menu {
         transform: translateY(0) translateX(calc(-50%));
     }
 }

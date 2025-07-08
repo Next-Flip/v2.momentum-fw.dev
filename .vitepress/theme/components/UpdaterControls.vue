@@ -18,11 +18,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const {
-    isConnected: connectionIsConnected,
-    connectionState,
-    deviceInfo
-} = useConnectionInfo();
+const { isConnected: connectionIsConnected, connectionState, deviceInfo } = useConnectionInfo();
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 
@@ -34,7 +30,7 @@ const emit = defineEmits<{
 
 const isConnected = computed(() => connectionIsConnected.value);
 const canFlash = computed(() => {
-    const hasReleaseOrFile = (props.selectedRelease || props.uploadedFile);
+    const hasReleaseOrFile = props.selectedRelease || props.uploadedFile;
     const notUpdating = !serialConnection?.flags.updateInProgress;
 
     if (props.testMode) {
@@ -50,13 +46,21 @@ const isChannelDropdownOpen = ref(false);
 const isReleaseDropdownOpen = ref(false);
 
 const channelOptions = computed(() => [
-    { value: "mainline", label: tr("updater_mainline_label"), description: tr("updater_mainline_description") },
-    { value: "devbuild", label: tr("updater_development_label"), description: tr("updater_development_description") }
+    {
+        value: "mainline",
+        label: tr("updater_mainline_label"),
+        description: tr("updater_mainline_description"),
+    },
+    {
+        value: "devbuild",
+        label: tr("updater_development_label"),
+        description: tr("updater_development_description"),
+    },
 ]);
 
 const getChannelLabel = () => {
     if (!props.selectedChannel) return tr("updater_select_channel");
-    const option = channelOptions.value.find(opt => opt.value === props.selectedChannel);
+    const option = channelOptions.value.find((opt) => opt.value === props.selectedChannel);
     return option ? option.label : tr("updater_select_channel");
 };
 
@@ -134,38 +138,64 @@ onBeforeUnmount(() => {
     <div class="rounded-xl">
         <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
             <div class="md:col-span-3" :class="{ 'opacity-50': uploadedFile }">
-                <label class="block text-sm font-medium text-vp-2 mb-3">{{ tr("updater_channel_label") }}</label>
-                <div class="relative backdrop-blur" ref="channelDropdownRef">
-                    <button class="dropdown-button w-full" @click="toggleChannelDropdown" :class="{
-                        'is-active': isChannelDropdownOpen,
-                        'cursor-not-allowed': uploadedFile
-                    }">
+                <label class="block text-sm font-medium text-vp-2 mb-3">{{
+                    tr("updater_channel_label")
+                }}</label>
+                <div ref="channelDropdownRef" class="relative backdrop-blur">
+                    <button
+                        class="dropdown-button w-full"
+                        :class="{
+                            'is-active': isChannelDropdownOpen,
+                            'cursor-not-allowed': uploadedFile,
+                        }"
+                        @click="toggleChannelDropdown"
+                    >
                         <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
                             {{ getChannelLabel() }}
                         </span>
-                        <div class="select-icon flex items-center text-vp-3 transition-transform duration-200">
+                        <div
+                            class="select-icon flex items-center text-vp-3 transition-transform duration-200"
+                        >
                             <v-icon name="oi-chevron-down" />
                         </div>
                     </button>
 
                     <Transition name="fade-dropdown">
-                        <div class="dropdown-menu-container" v-if="isChannelDropdownOpen">
-                            <div class="dropdown-menu" :class="{ 'is-visible': isChannelDropdownOpen }">
+                        <div v-if="isChannelDropdownOpen" class="dropdown-menu-container">
+                            <div
+                                class="dropdown-menu"
+                                :class="{ 'is-visible': isChannelDropdownOpen }"
+                            >
                                 <div
-                                    class="flex flex-col overflow-hidden max-h-60 overflow-y-auto rounded-[4px] bg-vp-soft-mute">
-                                    <span v-for="channel in channelOptions" :key="channel.value"
+                                    class="flex flex-col overflow-hidden max-h-60 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                >
+                                    <span
+                                        v-for="channel in channelOptions"
+                                        :key="channel.value"
                                         class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
-                                        :class="{ 'is-selected': selectedChannel === channel.value }"
-                                        @click="selectChannel(channel.value as 'mainline' | 'devbuild')">
-                                        <div class="flex flex-row items-center gap-3 min-w-0 flex-1">
+                                        :class="{
+                                            'is-selected': selectedChannel === channel.value,
+                                        }"
+                                        @click="
+                                            selectChannel(channel.value as 'mainline' | 'devbuild')
+                                        "
+                                    >
+                                        <div
+                                            class="flex flex-row items-center gap-3 min-w-0 flex-1"
+                                        >
                                             <div class="flex flex-col min-w-0 flex-1">
                                                 <span
-                                                    class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                                                    class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis"
+                                                >
                                                     {{ channel.label }}
                                                 </span>
                                                 <span
                                                     class="text-xs text-vp-3 whitespace-nowrap overflow-hidden text-ellipsis"
-                                                    :class="{ 'text-vp-brand-1/60': selectedChannel === channel.value }">
+                                                    :class="{
+                                                        'text-vp-brand-1/60':
+                                                            selectedChannel === channel.value,
+                                                    }"
+                                                >
                                                     {{ channel.description }}
                                                 </span>
                                             </div>
@@ -179,51 +209,106 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="md:col-span-5" :class="{ 'opacity-50': uploadedFile }">
-                <label class="block text-sm font-medium text-vp-2 mb-3">{{ tr("updater_version_dropdown_label")
-                    }}</label>
-                <div class="relative backdrop-blur" :class="{ 'opacity-50': !selectedChannel && !uploadedFile }"
-                    ref="releaseDropdownRef">
-                    <button class="dropdown-button w-full" @click="toggleReleaseDropdown" :class="{
-                        'is-active': isReleaseDropdownOpen,
-                        'cursor-not-allowed': uploadedFile || (!selectedChannel && !uploadedFile)
-                    }">
+                <label class="block text-sm font-medium text-vp-2 mb-3">{{
+                    tr("updater_version_dropdown_label")
+                }}</label>
+                <div
+                    ref="releaseDropdownRef"
+                    class="relative backdrop-blur"
+                    :class="{ 'opacity-50': !selectedChannel && !uploadedFile }"
+                >
+                    <button
+                        class="dropdown-button w-full"
+                        :class="{
+                            'is-active': isReleaseDropdownOpen,
+                            'cursor-not-allowed':
+                                uploadedFile || (!selectedChannel && !uploadedFile),
+                        }"
+                        @click="toggleReleaseDropdown"
+                    >
                         <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
                             {{ getReleaseLabel() }}
                         </span>
-                        <div class="select-icon flex items-center text-vp-3 transition-transform duration-200">
+                        <div
+                            class="select-icon flex items-center text-vp-3 transition-transform duration-200"
+                        >
                             <v-icon name="oi-chevron-down" />
                         </div>
                     </button>
 
                     <Transition name="fade-dropdown">
-                        <div class="dropdown-menu-container" v-if="isReleaseDropdownOpen">
-                            <div class="dropdown-menu" :class="{ 'is-visible': isReleaseDropdownOpen }">
+                        <div v-if="isReleaseDropdownOpen" class="dropdown-menu-container">
+                            <div
+                                class="dropdown-menu"
+                                :class="{ 'is-visible': isReleaseDropdownOpen }"
+                            >
                                 <div
-                                    class="flex flex-col overflow-hidden max-h-[275px] pr-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute">
-                                    <div v-for="(release, index) in channelReleases" :key="release.commit"
+                                    class="flex flex-col overflow-hidden max-h-[224px] pr-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                >
+                                    <div
+                                        v-for="(release, index) in channelReleases"
+                                        :key="release.commit"
                                         class="dropdown-item flex flex-row min-h-7 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                         :class="{
-                                            'is-selected': selectedRelease?.commit === release.commit,
+                                            'is-selected':
+                                                selectedRelease?.commit === release.commit,
                                             'rounded-t-[4px]': index === 0,
                                             'rounded-b-[4px]': index === channelReleases.length - 1,
-                                        }" @click="selectRelease(release)">
+                                        }"
+                                        @click="selectRelease(release)"
+                                    >
                                         <div class="flex flex-row items-center gap-3 min-w-0">
-                                            <span class="font-medium text-vp-1 font-mono flex-shrink-0"
-                                                :class="{ 'text-vp-brand-1': selectedRelease?.commit === release.commit }">
-                                                {{ release.version && release.version.startsWith("mntm-")
-                                                    ? release.version
-                                                    : release.commit.substring(0, 7) }}
+                                            <span
+                                                class="font-medium text-vp-1 font-mono flex-shrink-0"
+                                                :class="{
+                                                    'text-vp-brand-1':
+                                                        selectedRelease?.commit ===
+                                                            release.commit ||
+                                                        deviceInfo?.firmware_version ===
+                                                            release.version,
+                                                }"
+                                            >
+                                                {{
+                                                    release.version &&
+                                                    release.version.startsWith("mntm-")
+                                                        ? release.version
+                                                        : release.commit.substring(0, 7)
+                                                }}
                                             </span>
-                                            <span v-if="deviceInfo?.firmware_commit === release.commit"
+                                            <span
+                                                v-if="
+                                                    deviceInfo?.firmware_commit ===
+                                                        release.commit ||
+                                                    deviceInfo?.firmware_version === release.version
+                                                "
                                                 class="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis uppercase text-vp-brand-1"
-                                                :class="{ 'text-vp-brand-1/60': selectedRelease?.commit === release.commit }">
+                                                :class="{
+                                                    'text-vp-brand-1/60':
+                                                        selectedRelease?.commit ===
+                                                            release.commit ||
+                                                        deviceInfo?.firmware_version ===
+                                                            release.version,
+                                                }"
+                                            >
                                                 {{ tr("installed") }}
                                             </span>
                                         </div>
-                                        <span class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
-                                            :class="{ 'text-vp-brand-1/60': selectedRelease?.commit === release.commit }">
-                                            {{ release.timestamp ? new Date(release.timestamp *
-                                                1000).toLocaleDateString() : tr("updater_unknown_date") }}
+                                        <span
+                                            class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
+                                            :class="{
+                                                'text-vp-brand-1/60':
+                                                    selectedRelease?.commit === release.commit ||
+                                                    deviceInfo?.firmware_version ===
+                                                        release.version,
+                                            }"
+                                        >
+                                            {{
+                                                release.timestamp
+                                                    ? new Date(
+                                                          release.timestamp * 1000,
+                                                      ).toLocaleDateString()
+                                                    : tr("updater_unknown_date")
+                                            }}
                                         </span>
                                     </div>
                                 </div>
@@ -233,15 +318,30 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <div class="md:col-span-3 rounded-full transition-all duration-100 border mt-3 select-none"
-                :class="canFlash ? 'border-vp-brand-1 hover:border-vp-brand-2' : 'border-vp-divider'">
-                <button @click="handleFlashFirmware" :disabled="!canFlash"
+            <div
+                class="md:col-span-3 rounded-full transition-all duration-100 border mt-3 select-none"
+                :class="
+                    canFlash ? 'border-vp-brand-1 hover:border-vp-brand-2' : 'border-vp-divider'
+                "
+            >
+                <button
+                    :disabled="!canFlash"
                     class="w-full px-4 py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase"
-                    :class="canFlash ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50' : 'text-vp-3 cursor-not-allowed opacity-50'">
-                    <v-icon v-if="connectionState !== 'connecting' && connectionState !== 'disconnecting'"
-                        name="pr-download" class="opacity-90" />
-                    {{ connectionState === 'connecting' ? dots :
-                        tr("updater_flash_button") }}
+                    :class="
+                        canFlash
+                            ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50'
+                            : 'text-vp-3 cursor-not-allowed opacity-50'
+                    "
+                    @click="handleFlashFirmware"
+                >
+                    <v-icon
+                        v-if="
+                            connectionState !== 'connecting' && connectionState !== 'disconnecting'
+                        "
+                        name="pr-download"
+                        class="opacity-90"
+                    />
+                    {{ connectionState === "connecting" ? dots : tr("updater_flash_button") }}
                 </button>
             </div>
         </div>

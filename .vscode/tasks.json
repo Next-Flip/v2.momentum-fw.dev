@@ -1,0 +1,91 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "ESLint: Lint Project Files",
+            "type": "shell",
+            "command": "bun",
+            "args": [
+                "run",
+                "lint"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [
+                {
+                    "owner": "eslint",
+                    "source": "eslint",
+                    "fileLocation": "absolute",
+                    "pattern": [
+                        {
+                            "regexp": "^([^\\s].*)$",
+                            "file": 1
+                        },
+                        {
+                            "regexp": "^\\s+(\\d+):(\\d+)\\s+(warning|error|info)\\s+(.*)\\s\\s+(.*)$",
+                            "line": 1,
+                            "column": 2,
+                            "severity": 3,
+                            "message": 4,
+                            "code": 5,
+                            "loop": true
+                        }
+                    ]
+                }
+            ],
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "ESLint: Lint on Save",
+            "type": "shell",
+            "command": "bun",
+            "args": [
+                "run",
+                "lint"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": [
+                {
+                    "owner": "eslint-save",
+                    "source": "eslint",
+                    "fileLocation": "absolute",
+                    "pattern": [
+                        {
+                            "regexp": "^([^\\s].*)$",
+                            "file": 1
+                        },
+                        {
+                            "regexp": "^\\s+(\\d+):(\\d+)\\s+(warning|error|info)\\s+(.*)\\s\\s+(.*)$",
+                            "line": 1,
+                            "column": 2,
+                            "severity": 3,
+                            "message": 4,
+                            "code": 5,
+                            "loop": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

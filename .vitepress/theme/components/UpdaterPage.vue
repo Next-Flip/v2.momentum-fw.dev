@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDropZone, useWindowSize } from "@vueuse/core";
-import { computed, inject, onBeforeUnmount, ref, watch } from "vue";
+import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
+import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
@@ -18,10 +18,7 @@ import UpdaterLogs from "./UpdaterLogs.vue";
 
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
-const {
-    flags,
-    isConnected: connectionIsConnected,
-} = useConnectionInfo();
+const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<"mainline" | "devbuild" | null>(null);
@@ -44,10 +41,17 @@ const uploadedFile = ref<File | null>(null);
 const uploadedFileRelease = ref<ReleaseItem | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const dropZoneRef = ref<HTMLDivElement | null>(null);
-const isChangelogExpanded = ref(false);
-const wasLogsExpandedBeforeChangelog = ref(false);
-const isLogsExpanded = ref<boolean>(false);
+
+const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
+const isLogsExpanded = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
 const testMode = ref(false);
+
+const logsScrollTrigger = ref(0);
+const triggerLogsScroll = () => {
+    logsScrollTrigger.value++;
+};
+
+provide("logsScrollTrigger", logsScrollTrigger);
 
 const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false);
 const updateStage = computed(() => serialConnection?.firmwareState.updateStage || "");
@@ -56,16 +60,29 @@ const isConnected = computed(() => connectionIsConnected.value);
 const isMatchingRelease = computed(() => {
     const deviceCommit = serialConnection?.connectionData.deviceInfo?.firmware_commit;
     if (!deviceCommit) return false;
+    const deviceVersion = serialConnection?.connectionData.deviceInfo?.firmware_version;
+    if (!deviceVersion) return false;
 
-    if (uploadedFileRelease.value?.commit === deviceCommit ||
-        uploadedFile.value?.name.toLowerCase().includes(deviceCommit.toLowerCase())) return true;
+    if (
+        uploadedFileRelease.value?.commit === deviceCommit ||
+        uploadedFile.value?.name.toLowerCase().includes(deviceCommit.toLowerCase()) ||
+        uploadedFileRelease.value?.version === deviceVersion ||
+        uploadedFile.value?.name.toLowerCase().includes(deviceVersion.toLowerCase())
+    )
+        return true;
 
     if (selectedRelease.value) {
         if (uploadedFile.value || uploadedFileRelease.value) return false;
 
         const selectedCommit = selectedRelease.value.commit;
-        if (selectedCommit === deviceCommit ||
-            selectedCommit.substring(0, 7).toLowerCase() === deviceCommit.substring(0, 7).toLowerCase()) {
+        const selectedVersion = selectedRelease.value.version;
+        if (
+            selectedCommit === deviceCommit ||
+            selectedCommit.substring(0, 7).toLowerCase() ===
+                deviceCommit.substring(0, 7).toLowerCase() ||
+            (selectedVersion && selectedVersion === deviceVersion) ||
+            (selectedVersion && selectedVersion.toLowerCase().includes(deviceVersion.toLowerCase()))
+        ) {
             return true;
         }
     }
@@ -82,32 +99,49 @@ const currentChangelogRelease = computed(() => {
     return selectedRelease.value;
 });
 
-watch(() => selectedChannel.value, (newChannel) => {
-    if (typeof window !== "undefined") {
-        if (newChannel) {
-            localStorage.setItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL, newChannel);
-        } else {
-            localStorage.removeItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL);
+watch(
+    [() => selectedChannel.value, () => isMatchingRelease.value],
+    ([newChannel, newIsMatching], [oldChannel, oldIsMatching]) => {
+        if (typeof window !== "undefined") {
+            if (newChannel !== oldChannel) {
+                if (newChannel) {
+                    localStorage.setItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL, newChannel);
+                } else {
+                    localStorage.removeItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL);
+                }
+
+                if (newChannel && selectedRelease.value) {
+                    const currentChannelReleases =
+                        newChannel === "mainline" ? mainlineReleases : devbuildReleases;
+                    const releaseExists = currentChannelReleases.some(
+                        (release) => release.commit === selectedRelease.value?.commit,
+                    );
+
+                    if (!releaseExists) {
+                        selectedRelease.value = null;
+                    }
+                }
+            }
+
+            if (newIsMatching && !oldIsMatching) {
+                const deviceCommit = serialConnection?.connectionData.deviceInfo?.firmware_commit;
+                const deviceVersion = serialConnection?.connectionData.deviceInfo?.firmware_version;
+                if (deviceCommit || deviceVersion) {
+                    let inner = "Selected firmware";
+                    if (uploadedFile.value || uploadedFileRelease.value) {
+                        inner = "Uploaded file";
+                    } else if (selectedRelease.value) {
+                        inner = "Selected firmware";
+                    }
+                    logToSerial(
+                        "warning",
+                        `[Upload] ${inner} matches current device firmware (<a href="${getLocalizedPath("/releases")}/${deviceVersion?.replace("mntm-", "")}" target="_blank">${deviceVersion}</a>${deviceCommit && deviceCommit !== deviceVersion ? ", " + `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>` : ""})`,
+                    );
+                }
+            }
         }
-    }
-
-    if (newChannel && selectedRelease.value) {
-        const currentChannelReleases = newChannel === "mainline" ? mainlineReleases : devbuildReleases;
-        const releaseExists = currentChannelReleases.some(release =>
-            release.commit === selectedRelease.value?.commit
-        );
-
-        if (!releaseExists) {
-            selectedRelease.value = null;
-        }
-    }
-});
-
-watch(() => isLogsExpanded.value, (newValue) => {
-    if (typeof window !== "undefined") {
-        localStorage.setItem(STORAGE_KEYS.UPDATER_LOGS_OPEN, String(newValue));
-    }
-});
+    },
+);
 
 const logToSerial = (level: "info" | "warning" | "error", message: string) => {
     if (serialConnection && serialConnection.addLog) {
@@ -116,8 +150,11 @@ const logToSerial = (level: "info" | "warning" | "error", message: string) => {
 };
 
 const processFile = (file: File, source: "uploaded" | "selected") => {
-    if (!file.name.endsWith('.tgz')) {
-        logToSerial("error", `[Upload] Invalid file type: ${file.name} (only .tgz files are supported)`);
+    if (!file.name.endsWith(".tgz")) {
+        logToSerial(
+            "error",
+            `[Upload] Invalid file type: ${file.name} (only .tgz files are supported)`,
+        );
         return;
     }
 
@@ -130,13 +167,22 @@ const processFile = (file: File, source: "uploaded" | "selected") => {
         uploadedFileRelease.value = foundRelease || null;
 
         if (foundRelease) {
-            logToSerial("info", `[Upload] File ${action}: ${file.name} (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.commit}" target="_blank">${foundRelease.version || foundRelease.commit}</a>)`);
+            logToSerial(
+                "info",
+                `[Upload] File ${action}: ${file.name} (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.commit}" target="_blank">${foundRelease.version || foundRelease.commit}</a>)`,
+            );
         } else {
-            logToSerial("warning", `[Upload] File ${action}: ${file.name} (no matching release found)`);
+            logToSerial(
+                "warning",
+                `[Upload] File ${action}: ${file.name} (no matching release found)`,
+            );
         }
     } else {
         uploadedFileRelease.value = null;
-        logToSerial("warning", `[Upload] File ${action}: ${file.name} (could not parse version/commit)`);
+        logToSerial(
+            "warning",
+            `[Upload] File ${action}: ${file.name} (could not parse version/commit)`,
+        );
     }
 };
 
@@ -152,7 +198,12 @@ const { isOverDropZone: rawIsOverDropZone } = useDropZone(dropZoneRef, {
             processFile(file, "uploaded");
         }
     },
-    dataTypes: ['application/gzip', 'application/x-gzip', 'application/x-tar', 'application/x-compressed-tar'],
+    dataTypes: [
+        "application/gzip",
+        "application/x-gzip",
+        "application/x-tar",
+        "application/x-compressed-tar",
+    ],
 });
 
 const isOverDropZone = computed(() => rawIsOverDropZone.value && !flags.value.updateInProgress);
@@ -167,8 +218,11 @@ const handleReleaseChange = (release: ReleaseItem) => {
 };
 
 const handleFlashFirmware = async () => {
-    const releaseToFlash = uploadedFileRelease.value || selectedRelease.value;
-    if (!releaseToFlash || !serialConnection) return;
+    const releaseToFlash = uploadedFile.value || uploadedFileRelease.value || selectedRelease.value;
+    if (!releaseToFlash || !serialConnection) {
+        logToSerial("error", "[Upload] No release to flash or serial connection");
+        return;
+    }
 
     try {
         const updateMethod = testMode.value
@@ -178,12 +232,12 @@ const handleFlashFirmware = async () => {
         if (!testMode.value && !isConnected.value) return;
 
         if (uploadedFile.value) {
-            await updateMethod?.(releaseToFlash, uploadedFile.value);
+            await updateMethod?.(releaseToFlash as ReleaseItem, uploadedFile.value);
         } else {
-            await updateMethod?.(releaseToFlash);
+            await updateMethod?.(releaseToFlash as ReleaseItem);
         }
-    } catch (error) {
-        logToSerial("error", `[Upload] Firmware flash failed: ${error}`);
+    } catch {
+        /* ignore */
     }
 };
 
@@ -202,7 +256,7 @@ const clearUploadedFile = () => {
     uploadedFile.value = null;
     uploadedFileRelease.value = null;
     if (fileInputRef.value) {
-        fileInputRef.value.value = '';
+        fileInputRef.value.value = "";
     }
 
     if (fileName) {
@@ -212,41 +266,53 @@ const clearUploadedFile = () => {
 
 const displayFileSize = computed(() => {
     if (uploadedFileRelease.value?.files && uploadedFile.value) {
-        const matchingFile = uploadedFileRelease.value.files.find((file: any) =>
-            'filename' in file && file.filename === uploadedFile.value?.name
+        const matchingFile = uploadedFileRelease.value.files.find(
+            (file) => "filename" in file && file.filename === uploadedFile.value?.name,
         );
-        if (matchingFile && 'size' in matchingFile && matchingFile.size) {
+        if (matchingFile && "size" in matchingFile && matchingFile.size) {
             return matchingFile.size;
         }
     }
-    return uploadedFile.value ? bytesToSize(uploadedFile.value.size, true) : '';
+    return uploadedFile.value ? bytesToSize(uploadedFile.value.size, true) : "";
 });
 
 const displayFileDate = computed(() => {
     if (uploadedFileRelease.value?.timestamp) {
         return formatFileDate(uploadedFileRelease.value.timestamp * 1000);
     }
-    return uploadedFile.value ? formatFileDate(uploadedFile.value.lastModified) : '';
+    return uploadedFile.value ? formatFileDate(uploadedFile.value.lastModified) : "";
 });
 
 const toggleLogs = () => {
     isLogsExpanded.value = !isLogsExpanded.value;
 };
 
-const toggleChangelog = () => {
-    if (!isChangelogExpanded.value) {
-        if (isLogsExpanded.value) {
-            wasLogsExpandedBeforeChangelog.value = true;
-            isLogsExpanded.value = false;
-        }
-        isChangelogExpanded.value = true;
+const isChangelogOpen = computed(() => changelogState.value === "open");
+const isChangelogExpanded = computed(() => changelogState.value === "expanded");
+const isChangelogClosed = computed(() => changelogState.value === "closed");
+const toggleChangelogOpenClose = () => {
+    if (changelogState.value === "closed") {
+        changelogState.value = "open";
     } else {
-        isChangelogExpanded.value = false;
-        if (wasLogsExpandedBeforeChangelog.value) {
-            isLogsExpanded.value = true;
-            wasLogsExpandedBeforeChangelog.value = false;
-        }
+        changelogState.value = "closed";
     }
+
+    // Trigger logs scroll after layout change
+    nextTick(() => {
+        triggerLogsScroll();
+    });
+};
+const toggleChangelogExpand = () => {
+    if (changelogState.value === "open") {
+        changelogState.value = "expanded";
+    } else if (changelogState.value === "expanded") {
+        changelogState.value = "open";
+    }
+
+    // Trigger logs scroll after layout change
+    nextTick(() => {
+        triggerLogsScroll();
+    });
 };
 
 onBeforeUnmount(() => {
@@ -258,16 +324,24 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="relative w-full flex flex-col items-center"
-        :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''">
+    <div
+        class="relative w-full flex flex-col items-center"
+        :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
+    >
         <div class="max-w-7xl mx-auto px-6 lg:px-8 flex-1 flex flex-col w-full min-h-0">
             <div
-                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-[var(--vp-nav-height)] border-t border-vp-divider">
+                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-[var(--vp-nav-height)] border-t border-vp-divider"
+            >
                 <div class="flex flex-col lg:flex-row gap-x-6 flex-1 w-full min-h-0 h-full">
-                    <div class="flex flex-col w-full lg:w-[31%] min-w-0 lg:min-w-80 sticky self-start pb-3 mb-1 lg:mb-0 lg:pb-0"
+                    <div
+                        class="flex flex-col w-full lg:w-[31%] min-w-0 lg:min-w-80 sticky self-start pb-3 mb-1 lg:mb-0 lg:pb-0"
                         :class="{
-                            'border-b border-vp-divider lg:border-b-0 pb-7': !isMatchingRelease
-                        }" :style="windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''">
+                            'border-b border-vp-divider lg:border-b-0 pb-7': !isMatchingRelease,
+                        }"
+                        :style="
+                            windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''
+                        "
+                    >
                         <div class="flex-shrink-0 hidden lg:block">
                             <ScreenDisplay />
                         </div>
@@ -276,47 +350,81 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
 
-                    <div class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full" ref="dropZoneRef"
+                    <div
+                        ref="dropZoneRef"
+                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full"
                         :class="{
-                            'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone
-                        }">
-                        <div v-if="isOverDropZone"
-                            class="absolute inset-0 bg-vp-dark/10 rounded-xl flex items-center justify-center">
-                        </div>
+                            'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
+                        }"
+                    >
+                        <div
+                            v-if="isOverDropZone"
+                            class="absolute inset-0 bg-vp-dark/10 rounded-xl flex items-center justify-center"
+                        ></div>
 
-                        <div class="relative flex flex-col" :class="{
-                            'min-h-[175px]': flags.updateInProgress
-                        }">
+                        <div
+                            class="relative flex flex-col"
+                            :class="{
+                                'min-h-[197.5px]': flags.updateInProgress,
+                            }"
+                        >
                             <Transition name="overlay-fade">
-                                <div v-if="showUpdateOverlay"
-                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-lg flex items-center justify-center z-50 min-h-0 border border-vp-divider mb-7">
-                                    <div v-if="updateStage !== 'update_stage_done'" class="w-full"
-                                        :class="isChangelogExpanded ? 'py-6 px-28 min-h-[175px] flex items-center justify-center' : 'py-28 px-28'">
+                                <div
+                                    v-if="showUpdateOverlay"
+                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-lg flex items-center justify-center z-50 min-h-0 border border-vp-divider"
+                                >
+                                    <div
+                                        v-if="updateStage !== 'update_stage_done'"
+                                        class="w-full"
+                                        :class="
+                                            isChangelogExpanded
+                                                ? 'py-6 px-28 min-h-[175px] flex items-center justify-center'
+                                                : 'py-28 px-28'
+                                        "
+                                    >
                                         <div class="flex flex-row items-start gap-5 w-full">
                                             <div
-                                                class="relative w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0">
+                                                class="relative w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                                            >
                                                 <div
-                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin">
-                                                </div>
-                                                <v-icon name="pr-download" :scale="1.30" class="text-vp-3" />
+                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                                                ></div>
+                                                <v-icon
+                                                    name="pr-download"
+                                                    :scale="1.3"
+                                                    class="text-vp-3"
+                                                />
                                             </div>
                                             <div class="flex flex-col gap-3.5 flex-1 min-w-0">
                                                 <p
-                                                    class="text-lg font-medium text-vp-1 whitespace-nowrap overflow-hidden text-ellipsis">
-                                                    {{ tr(updateStage as any) ||
+                                                    class="text-lg font-medium text-vp-1 whitespace-nowrap overflow-hidden text-ellipsis"
+                                                >
+                                                    {{
+                                                        tr(updateStage as any) ||
                                                         tr("update_stage_updating")
-                                                    }}</p>
+                                                    }}
+                                                </p>
                                                 <div class="w-full bg-vp-soft/80 rounded-full h-2">
-                                                    <div class="bg-vp-brand-2 h-1.5 rounded-full transition-all duration-300"
-                                                        :style="{ width: `${updateProgress * 100}%` }"></div>
+                                                    <div
+                                                        class="bg-vp-brand-2 h-1.5 rounded-full transition-all duration-300"
+                                                        :style="{
+                                                            width: `${updateProgress * 100}%`,
+                                                        }"
+                                                    ></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div v-else class="flex flex-row items-center">
-                                        <div class="w-14 h-14 rounded-full flex items-center justify-center">
-                                            <v-icon name="oi-check" :scale="1.85" class="text-green-500" />
+                                        <div
+                                            class="w-14 h-14 rounded-full flex items-center justify-center"
+                                        >
+                                            <v-icon
+                                                name="oi-check"
+                                                :scale="1.85"
+                                                class="text-green-500"
+                                            />
                                         </div>
                                         <p class="text-lg font-medium text-vp-1 text-center">
                                             {{ tr("update_stage_done") }}
@@ -326,23 +434,32 @@ onBeforeUnmount(() => {
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div class="flex flex-col">
+                                <div v-if="!showUpdateOverlay" class="flex flex-col">
                                     <Transition name="fade-drop" mode="out-in">
-                                        <div v-if="isMatchingRelease"
-                                            class="flex flex-row items-center justify-center gap-3 w-full mt-5 mb-3 lg:mt-0 lg:mb-0">
+                                        <div
+                                            v-if="isMatchingRelease"
+                                            class="flex flex-row items-center justify-center gap-3 w-full mt-5 mb-3 lg:mt-0 lg:mb-0"
+                                        >
                                             <div class="flex-shrink-0">
-                                                <v-icon name="ri-error-warning-line" scale="1.2"
-                                                    class="text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5" />
+                                                <v-icon
+                                                    name="ri-error-warning-line"
+                                                    scale="1.2"
+                                                    class="text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5"
+                                                />
                                             </div>
                                             <span class="text-xs text-vp-3 flex flex-row gap-2">
                                                 {{ tr("updater_matching_release_warning") }}
                                                 <div class="flex flex-row gap-px">
                                                     <span class="text-vp-3/60 mr-px">(</span>
-                                                    <a class="text-vp-2 hover:underline vp-external-link-icon"
+                                                    <a
+                                                        class="text-vp-2 hover:underline vp-external-link-icon"
                                                         :href="`${getLocalizedPath('/releases')}/${serialConnection?.connectionData.deviceInfo?.firmware_commit}`"
-                                                        target="_blank" rel="noopener noreferrer">
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
                                                         {{
-                                                            serialConnection?.connectionData.deviceInfo?.firmware_commit
+                                                            serialConnection?.connectionData
+                                                                .deviceInfo?.firmware_commit
                                                         }}
                                                     </a>
                                                     <span class="text-vp-3/60">)</span>
@@ -350,66 +467,106 @@ onBeforeUnmount(() => {
                                             </span>
                                         </div>
                                     </Transition>
-                                    <div v-if="!isChangelogExpanded"
-                                        class="flex-shrink-0 pt-6 !z-10 transition-all duration-300" :class="{
+                                    <div
+                                        v-if="!isChangelogExpanded"
+                                        class="flex-shrink-0 pt-7 !z-10 transition-all duration-300"
+                                        :class="{
                                             'opacity-0': showUpdateOverlay,
-                                            'h-0 overflow-hidden': showUpdateOverlay && isChangelogExpanded,
+                                            'h-0 overflow-hidden':
+                                                showUpdateOverlay && isChangelogExpanded,
                                             'opacity-30': isOverDropZone && !uploadedFile,
-                                            'opacity-30 pointer-events-none': showUpdateOverlay && !isChangelogExpanded
-                                        }">
-                                        <h3 class="text-[13px] leading-3 uppercase font-semibold text-vp-1">{{
-                                            tr("updater_select_firmware") }}</h3>
-                                        <div class="transition-opacity duration-300 !z-20 mt-6" :class="{
-                                            'opacity-30': isOverDropZone,
-                                            'opacity-30 pointer-events-none': showUpdateOverlay
-                                        }">
-                                            <UpdaterControls :selectedChannel="selectedChannel"
-                                                :selectedRelease="selectedRelease" :channelReleases="channelReleases"
-                                                :uploadedFile="uploadedFile" :testMode="testMode"
+                                            'opacity-30 pointer-events-none':
+                                                showUpdateOverlay && !isChangelogExpanded,
+                                        }"
+                                    >
+                                        <h3
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1"
+                                        >
+                                            {{ tr("updater_select_firmware") }}
+                                        </h3>
+                                        <div
+                                            class="transition-opacity duration-300 !z-20 mt-6"
+                                            :class="{
+                                                'opacity-30': isOverDropZone,
+                                                'opacity-30 pointer-events-none': showUpdateOverlay,
+                                            }"
+                                        >
+                                            <UpdaterControls
+                                                :selected-channel="selectedChannel"
+                                                :selected-release="selectedRelease"
+                                                :channel-releases="channelReleases"
+                                                :uploaded-file="uploadedFile"
+                                                :test-mode="testMode"
                                                 @channel-change="handleChannelChange"
                                                 @release-change="handleReleaseChange"
-                                                @flash-firmware="handleFlashFirmware" />
+                                                @flash-firmware="handleFlashFirmware"
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div v-if="!isChangelogExpanded"
-                                    class="w-full border-b border-vp-divider pb-[30px] mb-[30px] relative flex-shrink-0 z-[1] transition-all duration-300 mt-6"
+                                <div
+                                    v-if="!isChangelogExpanded"
+                                    class="w-full border-b border-vp-divider pb-[30px] relative flex-shrink-0 z-[1] transition-all duration-300 mt-6"
                                     :class="{
                                         'opacity-0': showUpdateOverlay,
-                                        'h-0 overflow-hidden': showUpdateOverlay && isChangelogExpanded,
+                                        'h-0 overflow-hidden':
+                                            showUpdateOverlay && isChangelogExpanded,
                                         'opacity-90': isOverDropZone && !showUpdateOverlay,
-                                        'opacity-30 pointer-events-none': showUpdateOverlay && !isChangelogExpanded,
-                                    }">
+                                        'opacity-30 pointer-events-none':
+                                            showUpdateOverlay && !isChangelogExpanded,
+                                    }"
+                                >
                                     <div class="flex items-center justify-center gap-4 mb-6">
-                                        <h3 class="text-[13px] leading-3 uppercase font-semibold text-vp-1">
-                                            {{ tr("updater_or_install_from_file") }}</h3>
+                                        <h3
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1"
+                                        >
+                                            {{ tr("updater_or_install_from_file") }}
+                                        </h3>
                                         <div class="flex-1 h-px bg-vp-divider w-full"></div>
                                     </div>
 
                                     <div v-if="uploadedFile" class="w-full">
-                                        <div class="flex items-center justify-between p-4 bg-vp-bg/75 border border-vp-divider rounded-lg border-dashed"
-                                            :class="{ 'border-vp-3/65': isOverDropZone }">
+                                        <div
+                                            class="flex items-center justify-between p-4 bg-vp-bg/75 border border-vp-divider rounded-lg border-dashed"
+                                            :class="{ 'border-vp-3/65': isOverDropZone }"
+                                        >
                                             <div class="flex items-center gap-4">
-                                                <div class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
-                                                    :class="uploadedFileRelease && !isMatchingRelease ?
-                                                        'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/25' :
-                                                        'text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/25'"
-                                                    :aria-label="tr('releases_current_version')">
-                                                    <v-icon name="bi-file-earmark-zip" scale="0.85" />
+                                                <div
+                                                    class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
+                                                    :class="
+                                                        uploadedFileRelease && !isMatchingRelease
+                                                            ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/25'
+                                                            : 'text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/25'
+                                                    "
+                                                    :aria-label="tr('releases_current_version')"
+                                                >
+                                                    <v-icon
+                                                        name="bi-file-earmark-zip"
+                                                        scale="0.85"
+                                                    />
                                                 </div>
                                                 <div class="flex items-center gap-2">
                                                     <div class="flex flex-col gap-0.5">
                                                         <span class="text-sm font-medium text-vp-1">
                                                             {{ uploadedFile.name }}
                                                         </span>
-                                                        <div class="flex items-center gap-3 text-xs text-vp-3">
-                                                            <span v-if="uploadedFileRelease?.branch ||
-                                                                uploadedFileRelease?.commit">
-                                                                {{ uploadedFileRelease?.branch ||
-                                                                    uploadedFileRelease?.commit }}</span>
+                                                        <div
+                                                            class="flex items-center gap-3 text-xs text-vp-3"
+                                                        >
+                                                            <span
+                                                                v-if="
+                                                                    uploadedFileRelease?.branch ||
+                                                                    uploadedFileRelease?.commit
+                                                                "
+                                                            >
+                                                                {{
+                                                                    uploadedFileRelease?.branch ||
+                                                                    uploadedFileRelease?.commit
+                                                                }}</span
+                                                            >
                                                             <span>{{ displayFileSize }}</span>
                                                             <span>{{ displayFileDate }}</span>
                                                         </div>
@@ -417,54 +574,91 @@ onBeforeUnmount(() => {
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-3">
-                                                <button @click="handleFileUpload"
-                                                    class="px-3 py-[7px] text-xs font-medium !text-vp-2 hover:!text-vp-1 !bg-vp-3/10 hover:!bg-vp-3/25 dark:!bg-vp-3/10 dark:hover:!bg-vp-3/25 rounded-md transition-colors whitespace-nowrap">
+                                                <button
+                                                    class="px-3 py-[7px] text-xs font-medium !text-vp-2 hover:!text-vp-1 !bg-vp-3/10 hover:!bg-vp-3/25 dark:!bg-vp-3/10 dark:hover:!bg-vp-3/25 rounded-md transition-colors whitespace-nowrap"
+                                                    @click="handleFileUpload"
+                                                >
                                                     {{ tr("updater_change_button") }}
                                                 </button>
-                                                <button @click="clearUploadedFile"
-                                                    class="px-3 py-[7px] text-xs font-medium !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-600/10 dark:hover:!bg-red-500/15 rounded-md transition-colors whitespace-nowrap">
+                                                <button
+                                                    class="px-3 py-[7px] text-xs font-medium !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-600/10 dark:hover:!bg-red-500/15 rounded-md transition-colors whitespace-nowrap"
+                                                    @click="clearUploadedFile"
+                                                >
                                                     {{ tr("updater_remove_button") }}
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div v-else @click="handleFileUpload"
+                                    <div
+                                        v-else
                                         class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-soft/40 cursor-pointer pt-6 pb-7 backdrop-blur-md relative z-10"
                                         :class="{
                                             'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
-                                            'opacity-50 !cursor-not-allowed': flags.updateInProgress,
+                                            'opacity-50 !cursor-not-allowed':
+                                                flags.updateInProgress,
                                             'hover:bg-vp-soft/80': !flags.updateInProgress,
-                                        }">
-                                        <div class="flex flex-col items-center gap-1 text-center select-none">
+                                        }"
+                                        @click="handleFileUpload"
+                                    >
+                                        <div
+                                            class="flex flex-col items-center gap-1 text-center select-none"
+                                        >
                                             <p class="text-sm text-vp-2">
-                                                {{ isOverDropZone
-                                                    ? tr("updater_drop_file_here")
-                                                    : tr("updater_drop_file_browse") }}
+                                                {{
+                                                    isOverDropZone
+                                                        ? tr("updater_drop_file_here")
+                                                        : tr("updater_drop_file_browse")
+                                                }}
                                             </p>
-                                            <p class="text-xs text-vp-3">{{ tr("updater_file_example") }}</p>
+                                            <p class="text-xs text-vp-3">
+                                                {{ tr("updater_file_example") }}
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <input ref="fileInputRef" type="file" accept=".tgz" @change="handleFileChange"
-                                        class="hidden" />
+                                    <input
+                                        ref="fileInputRef"
+                                        type="file"
+                                        accept=".tgz"
+                                        class="hidden"
+                                        @change="handleFileChange"
+                                    />
                                 </div>
                             </Transition>
                         </div>
 
-                        <div v-if="windowWidth >= 1024 || (selectedRelease || uploadedFileRelease)"
-                            class="flex-1 min-h-0 mb-7" :class="{
+                        <div
+                            v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
+                            :class="{
                                 'opacity-30': isOverDropZone,
-                            }">
-                            <UpdaterChangelog :selectedRelease="currentChangelogRelease" :uploadedFile="uploadedFile"
-                                :uploadedFileRelease="uploadedFileRelease" :isExpanded="isChangelogExpanded"
-                                @toggle="toggleChangelog" />
+                                'flex-1 min-h-0 mb-7': !isChangelogClosed,
+                                'flex-shrink-0 mb-7': isChangelogClosed,
+                                'mt-[30px]': !isChangelogExpanded,
+                            }"
+                        >
+                            <UpdaterChangelog
+                                :selected-release="currentChangelogRelease"
+                                :uploaded-file="uploadedFile"
+                                :uploaded-file-release="uploadedFileRelease"
+                                :changelog-state="changelogState"
+                                @toggle-open-close="toggleChangelogOpenClose"
+                                @toggle-expand="toggleChangelogExpand"
+                            />
                         </div>
 
-                        <div class="flex-shrink-0" :class="{
-                            'opacity-30': isOverDropZone,
-                        }">
-                            <UpdaterLogs :isExpanded="isLogsExpanded" @toggle="toggleLogs" />
+                        <div
+                            :class="{
+                                'opacity-30': isOverDropZone,
+                                'flex-shrink-0': !isChangelogClosed,
+                                'flex-1 min-h-0': isChangelogClosed,
+                            }"
+                        >
+                            <UpdaterLogs
+                                :is-expanded="isLogsExpanded"
+                                :changelog-is-open="isChangelogOpen"
+                                @toggle="toggleLogs"
+                            />
                         </div>
                     </div>
                 </div>

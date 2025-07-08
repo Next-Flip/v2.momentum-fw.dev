@@ -3,10 +3,11 @@ import type { ReleaseItem } from "../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../_data/releases";
 import messages, { SupportedLocales } from "../i18n/index.js";
 import { useI18n } from "./composables/useI18n";
-// @ts-ignore - pako is a global library
+import type { RegionsData } from "./types";
+// @ts-expect-error - pako is a global library
 import pako from "pako";
-// @ts-ignore - untar is a global library
-import { untar } from "./untar/untar.js";
+// @ts-expect-error - untar is a global library
+import { untar } from "./flipper/untar/untar.js";
 
 
 export function devMode() {
@@ -16,6 +17,7 @@ export function devMode() {
 }
 
 export const scrollToTop = (behavior: ScrollBehavior = "instant") => {
+    if (typeof window === "undefined") return;
     window.scrollTo({ top: 0, left: 0, behavior });
 };
 
@@ -88,7 +90,7 @@ export const formatMonthDay = (dateInput: number) => {
 export const bytesToSize = (bytes: number, useStandardUnits = false) => {
     const sizes = useStandardUnits ? ["Bytes", "KB", "MB", "GB", "TB"] : ["Bytes", "KiB", "MiB", "GiB", "TiB"];
     const base = useStandardUnits ? 1000 : 1024;
-    
+
     if (bytes === 0) return "n/a";
     const i = Math.floor(Math.log(bytes) / Math.log(base));
     if (i === 0) return `${bytes} ${sizes[i]}`;
@@ -222,6 +224,7 @@ export const shortenTimeString = (timeString: string): string => {
 };
 
 export const downloadFile = (url: string) => {
+    if (typeof document === "undefined") return;
     const link = document.createElement("a");
     link.href = url;
     link.download = "";
@@ -232,29 +235,37 @@ export const downloadFile = (url: string) => {
 };
 
 export async function fetchFirmware(url: string) {
+    if (typeof window === "undefined") {
+        throw new Error("fetchFirmware is not available during SSR");
+    }
+
     const buffer = await fetch(url)
         .then(async response => {
             if (response.status >= 400) {
                 throw new Error('Failed to fetch resources (' + response.status + ')');
             }
-            
+
             const contentType = response.headers.get('content-type');
             if (contentType?.includes('text/html')) {
                 if (url.startsWith('/')) {
                     throw new Error();
                 }
             }
-            
+
             const buffer = await response.arrayBuffer();
             log.debug(`[Firmware] Downloaded ${buffer.byteLength} bytes`);
-            
+
             return unpack(buffer);
         });
 
     return buffer;
 }
 
-export async function fetchRegions() {
+export async function fetchRegions(): Promise<RegionsData> {
+    if (typeof window === "undefined") {
+        throw new Error("fetchRegions is not available during SSR");
+    }
+
     return fetch('https://update.flipperzero.one/regions/api/v0/bundle')
         .then((response) => {
             if (response.status >= 400) {
@@ -271,13 +282,15 @@ export async function fetchRegions() {
         });
 }
 
-export function unpack(buffer: ArrayBuffer) {
+export async function unpack(buffer: ArrayBuffer) {
+    if (typeof window === "undefined") {
+        throw new Error("unpack is not available during SSR");
+    }
+
     try {
         log.debug(`[Firmware] Unpacking ${buffer.byteLength} byte archive`);
-        // @ts-ignore - pako is a global library
         const ungzipped = pako.ungzip(new Uint8Array(buffer));
-        // @ts-ignore - untar is a global library
-        const result = untar(ungzipped.buffer);
+        const result = await untar(ungzipped.buffer);
         log.debug(`[Firmware] Extracted ${result.length} files`);
         return result;
     } catch (error) {

@@ -73,16 +73,16 @@ function handleConfirm() {
                         <div class="flex flex-col gap-6">
                             <label class="flex items-center gap-2 text-sm text-vp-2 cursor-pointer">
                                 <input
+                                    id="dont-show-again"
                                     v-model="dontShowAgain"
                                     type="checkbox"
-                                    id="dont-show-again"
                                     class="rounded border-vp-divider text-sm text-vp-brand-2 focus:ring-vp-brand-1 bg-vp-bg"
                                 />
                                 <span>{{ tr("warning_popup_dont_show_again") }}</span>
                             </label>
                             <button
-                                @click="handleConfirm"
                                 class="w-full px-4 py-2 bg-vp-brand-2 hover:bg-vp-brand-3 focus:bg-vp-brand-3 text-white font-medium rounded-lg transition-colors duration-100 focus:outline-none focus:ring-2 focus:ring-vp-brand-1 focus:ring-offset-2 focus:ring-offset-vp-bg min-h-[38px]"
+                                @click="handleConfirm"
                             >
                                 {{ tr("warning_popup_continue") }}
                             </button>

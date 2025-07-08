@@ -53,8 +53,14 @@ function parseResponse (data) {
         command.resolved = true
         return command
       } else if (res.commandId === 0) {
-        command.data = res.guiScreenFrame.data
-        return command
+        if (res.guiScreenFrame && res.guiScreenFrame.data) {
+          command.data = res.guiScreenFrame.data
+          return command
+        } else {
+          console.warn('[Screen] Screen frame data is null or missing, restarting session')
+          emitter.emit('restart session')
+          return null
+        }
       }
 
       const payload = res[Object.keys(res).find(k => k === command.requestType.replace('Request', 'Response'))]

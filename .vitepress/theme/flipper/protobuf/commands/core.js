@@ -42,10 +42,14 @@ async function sendRpcRequest () {
             } else {
               emitter.emit('response', res)
             }
+          } else if (res === null) {
+            // parseResponse returned null due to screen frame error
+            buffer = new Uint8Array(0)
+            unbind()
           }
         } catch (error) {
           if (!(error.toString().includes('index out of range'))) {
-            if (error.toString().includes('invalid wire type')) {
+            if (error.toString().includes('invalid wire type') || error.toString().includes('Cannot read properties of null')) {
               emitter.emit('restart session')
               unbind()
             } else {

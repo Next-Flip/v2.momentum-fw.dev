@@ -4,18 +4,22 @@ import { reactive, ref } from "vue";
 import {
     ConnectionState,
     InstallStatus,
+    type AssetPack,
     type ConnectionFlags,
+    type DeviceInfo,
     type FirmwareState,
+    type FlipperModule,
     type InstalledPackManifest,
     type InstalledPacks,
     type QueueState,
     type SerialConnectionData,
+    type SerialPort,
 } from "../types";
-import { fetchFirmware, fetchRegions, getCurrentLocale } from "../util";
+import { fetchFirmware, fetchRegions, getCurrentLocale, unpack } from "../util";
 import { useI18n } from "./useI18n";
 import { useProxiedUrl } from "./useProxiedUrl";
-// @ts-ignore - PB is from flipper protobuf
-import { PB } from "../flipper/protobuf/proto-compiled.js";
+
+import type { ReleaseItem } from "../../../_data/releases";
 
 const asyncSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -29,11 +33,11 @@ declare global {
         serial: {
             getPorts(options?: {
                 filters?: Array<{ usbVendorId: number; usbProductId: number }>;
-            }): Promise<any[]>;
+            }): Promise<SerialPort[]>;
             requestPort(options?: {
                 filters?: Array<{ usbVendorId: number; usbProductId: number }>;
-            }): Promise<any>;
-            addEventListener(event: string, callback: (event: any) => void): void;
+            }): Promise<SerialPort>;
+            addEventListener(event: string, callback: (event: unknown) => void): void;
         };
     }
 }
@@ -70,15 +74,16 @@ const mapErrorToUserFriendly = (error: Error): string => {
     return error.message;
 };
 
-const getFirmwareDownloadUrl = (release: any): string | null => {
+const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
     if (!release.files) return null;
 
     for (const file of release.files) {
         if (
             "url" in file &&
             file.url &&
+            "filename" in file &&
             file.filename?.includes("update-mntm-") &&
-            file.filename.endsWith(".tgz")
+            file.filename?.endsWith(".tgz")
         ) {
             return file.url;
         }
@@ -182,16 +187,30 @@ export const useSerialConnection = () => {
                 Promise.reject(new Error("Serial not available in SSR")),
             updateFirmware: () => Promise.reject(new Error("Serial not available in SSR")),
             restartRpc: () => Promise.reject(new Error("Serial not available in SSR")),
+            startRpc: () => Promise.reject(new Error("Serial not available in SSR")),
+            stopRpc: () => Promise.reject(new Error("Serial not available in SSR")),
+            readBasicInfo: () => Promise.reject(new Error("Serial not available in SSR")),
+            findKnownDevices: () => Promise.reject(new Error("Serial not available in SSR")),
+            requestPort: () => Promise.reject(new Error("Serial not available in SSR")),
+            loadInstalledPacks: () => Promise.reject(new Error("Serial not available in SSR")),
+            logs: reactive<LogEntry[]>([]),
+            addLog: () => {},
+            clearLogs: () => {},
+            testConnecting: () => Promise.reject(new Error("Serial not available in SSR")),
+            testUpdateFirmware: () => Promise.reject(new Error("Serial not available in SSR")),
+            startScreenStream: () => Promise.reject(new Error("Serial not available in SSR")),
+            stopScreenStream: () => Promise.reject(new Error("Serial not available in SSR")),
+            screenScale: { value: 2 },
         };
     }
 
-    let flipper: any = null;
-    const getFlipperModule = async () => {
+    let flipper: FlipperModule | null = null;
+    const getFlipperModule = async (): Promise<FlipperModule> => {
         if (!flipper) {
-            // @ts-ignore - dynamic import of js module
+            // @ts-expect-error - dynamic import of js module
             flipper = await import("../flipper/core");
         }
-        return flipper;
+        return flipper!;
     };
 
     const connectionData = reactive<SerialConnectionData>({
@@ -267,7 +286,7 @@ export const useSerialConnection = () => {
             if (flipper) {
                 const flipperModule = await Promise.race([
                     getFlipperModule(),
-                    new Promise((_, reject) =>
+                    new Promise<FlipperModule>((_, reject) =>
                         setTimeout(() => reject(new Error("timeout")), 2000),
                     ),
                 ]);
@@ -307,12 +326,12 @@ export const useSerialConnection = () => {
 
                 try {
                     const rpcModule = (await Promise.race([
-                        // @ts-ignore - flipper module is JavaScript
+                        // @ts-expect-error - flipper module is JavaScript
                         import("../flipper/protobuf/rpc"),
                         new Promise((_, reject) =>
                             setTimeout(() => reject(new Error("timeout")), 2000),
                         ),
-                    ])) as any;
+                    ])) as { flushCommandQueue: () => void };
                     rpcModule.flushCommandQueue();
                 } catch (error) {
                     addLog("warning", `[Serial] flush command queue failed: ${error}`);
@@ -404,8 +423,8 @@ export const useSerialConnection = () => {
         }
     };
 
-    const readBasicInfo = async () => {
-        const info: Record<string, any> = {};
+    const readBasicInfo = async (): Promise<DeviceInfo> => {
+        const info: DeviceInfo = {};
 
         try {
             const flipperModule = await getFlipperModule();
@@ -452,7 +471,7 @@ export const useSerialConnection = () => {
     };
 
     const readStorageInfo = async () => {
-        if (!connectionData.deviceInfo) return;
+        if (!connectionData.deviceInfo || !flipper) return;
         const updatedInfo = { ...connectionData.deviceInfo };
 
         try {
@@ -510,13 +529,13 @@ export const useSerialConnection = () => {
             try {
                 flipper.emitter.events = {};
 
-                // @ts-ignore - flipper module is JavaScript
+                // @ts-expect-error - flipper module is JavaScript
                 const rpcModule = await import("../flipper/protobuf/rpc");
                 rpcModule.flushCommandQueue();
 
                 try {
                     await flipper.closeReader();
-                } catch (error) {
+                } catch {
                     addLog("debug", "[Serial] No existing reader to close");
                 }
             } catch (error) {
@@ -619,7 +638,7 @@ export const useSerialConnection = () => {
     };
 
     const installAssetPack = async (packUrl: string) => {
-        if (!flags.connected) {
+        if (!flags.connected || !flipper) {
             addLog("error", "[Serial] Cannot install: device not connected");
             throw new Error("Device not connected");
         }
@@ -668,6 +687,8 @@ export const useSerialConnection = () => {
     };
 
     const mkdirParents = async (path: string): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         if (path.endsWith("/")) {
             path = path.slice(0, -1);
         }
@@ -689,7 +710,9 @@ export const useSerialConnection = () => {
         }
     };
 
-    const removeOldPacks = async (pack: any): Promise<void> => {
+    const removeOldPacks = async (pack: AssetPack): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         const installed = connectionData.installedPacks[pack.id];
         if (!installed) return;
 
@@ -713,11 +736,11 @@ export const useSerialConnection = () => {
     };
 
     const downloadPackWithProgress = async (
-        pack: any,
+        pack: AssetPack,
         setProgress: (progress: number) => void,
     ): Promise<Uint8Array> => {
         const packFile = pack.tarFile;
-        const packUrl = `${packFile.url}?sha256=${packFile.sha256}`;
+        const packUrl = `${packFile?.url}?sha256=${packFile?.sha256}`;
         const proxiedUrl = useProxiedUrl(packUrl);
         const response = await fetch(proxiedUrl);
 
@@ -754,9 +777,14 @@ export const useSerialConnection = () => {
         packTar: Uint8Array,
         setProgress: (progress: number) => void,
     ): Promise<void> => {
-        const unbind = flipper.emitter.on("storageWriteRequest/progress", (e: any) => {
-            setProgress(e.progress / e.total);
-        });
+        if (!flipper) throw new Error("Flipper not connected");
+
+        const unbind = flipper.emitter.on<{ progress: number; total: number }>(
+            "storageWriteRequest/progress",
+            (e) => {
+                setProgress(e.progress / e.total);
+            },
+        );
 
         const start = performance.now();
         try {
@@ -772,6 +800,8 @@ export const useSerialConnection = () => {
         tempFile: string,
         setProgress: (progress: number) => void,
     ): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         const start = performance.now();
         let took = 0;
 
@@ -798,11 +828,13 @@ export const useSerialConnection = () => {
         }
     };
 
-    const createManifest = async (pack: any): Promise<void> => {
+    const createManifest = async (pack: AssetPack): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         const manifestPath = `${ASSET_PACKS_MANIFESTS_DIR}/${pack.id}${ASSET_PACKS_MANIFESTS_EXT}`;
         const manifest = {
-            sha256: pack.tarFile.sha256,
-            folders: pack.stats.folders,
+            sha256: pack.tarFile?.sha256 || "",
+            folders: pack.stats?.folders || [],
         };
         const manifestData = new TextEncoder().encode(JSON.stringify(manifest));
 
@@ -817,6 +849,8 @@ export const useSerialConnection = () => {
     };
 
     const loadPackManifest = async (path: string): Promise<InstalledPackManifest | null> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         try {
             const raw = await flipper.commands.storage.read(path);
             const text = new TextDecoder().decode(raw);
@@ -838,14 +872,16 @@ export const useSerialConnection = () => {
                 sha256: json.sha256,
                 folders: json.folders,
             };
-        } catch (error) {
-            addLog("warning", `[Serial] Failed to load pack manifest ${path}: ${error}`);
+        } catch {
+            addLog("warning", `[Serial] Failed to load pack manifest: ${path}`);
             return null;
         }
     };
 
     let loadingInstalledPacks = false;
     const loadInstalledPacks = async (): Promise<InstalledPacks> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         if (!flags.connected || !flags.rpcActive) {
             return {};
         }
@@ -877,8 +913,6 @@ export const useSerialConnection = () => {
                 );
                 if (manifestData) {
                     installed[packId] = manifestData;
-                } else {
-                    addLog("warning", `[Serial] Failed to load manifest data for pack: ${packId}`);
                 }
             }
 
@@ -903,7 +937,9 @@ export const useSerialConnection = () => {
         return installed;
     };
 
-    const processInstallPack = async (pack: any): Promise<void> => {
+    const processInstallPack = async (pack: AssetPack): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         const stepCount = 3;
         let step = -1;
 
@@ -951,7 +987,7 @@ export const useSerialConnection = () => {
         addLog("info", `[AssetPacks] Successfully installed pack: ${pack.id}`);
     };
 
-    const processRemovePack = async (pack: any): Promise<void> => {
+    const processRemovePack = async (pack: AssetPack): Promise<void> => {
         addLog("info", `[AssetPacks] Removing pack: ${pack.id}`);
         flags.installStatus = InstallStatus.DELETING;
         await removeOldPacks(pack);
@@ -959,14 +995,14 @@ export const useSerialConnection = () => {
         addLog("info", `[AssetPacks] Successfully removed pack: ${pack.id}`);
     };
 
-    const enqueue = async (pack: any, action: "install" | "remove"): Promise<void> => {
+    const enqueue = async (pack: AssetPack, action: "install" | "remove"): Promise<void> => {
         if (!flags.serialSupported) return;
 
         if (!flags.connected || !connectionData.deviceInfo || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
 
-        queueState.queue.push(pack);
+        queueState.queue.push({ id: pack.id });
         queueState.queueActions.push(action);
 
         if (queueState.queue.length > 1) {
@@ -979,9 +1015,9 @@ export const useSerialConnection = () => {
                 const currentAction = queueState.queueActions[0];
 
                 if (currentAction === "remove") {
-                    await processRemovePack(currentPack);
+                    await processRemovePack(currentPack as unknown as AssetPack);
                 } else if (currentAction === "install") {
-                    await processInstallPack(currentPack);
+                    await processInstallPack(currentPack as unknown as AssetPack);
                 }
             } catch (error) {
                 addLog("error", `[AssetPacks] Queue processing error: ${error}`);
@@ -1007,7 +1043,10 @@ export const useSerialConnection = () => {
             flags.ableToExtract =
                 !semver.lt(version, "0.23.0") ||
                 connectionData.deviceInfo.firmware_origin_fork !== "Momentum" ||
-                !connectionData.deviceInfo.firmware_version.includes("mntm");
+                !(
+                    typeof connectionData.deviceInfo.firmware_version === "string" &&
+                    connectionData.deviceInfo.firmware_version.includes("mntm")
+                );
 
             addLog(
                 "debug",
@@ -1051,10 +1090,6 @@ export const useSerialConnection = () => {
         }
 
         if (flags.screenStream) {
-            addLog(
-                "warning",
-                "[Screen] Screen stream already active - ignoring duplicate start request",
-            );
             return;
         }
 
@@ -1063,7 +1098,6 @@ export const useSerialConnection = () => {
             await flipperModule.commands.gui.startScreenStreamRequest();
 
             flags.screenStream = true;
-            addLog("debug", "[Screen] gui.startScreenStreamRequest: OK");
 
             const ctx = canvasRef.getContext("2d");
             if (!ctx) {
@@ -1078,15 +1112,9 @@ export const useSerialConnection = () => {
             ctx.fillStyle = "black";
 
             let lastFrameTime = Date.now();
-            let frameCount = 0;
 
             screenStreamUnbind = flipperModule.emitter.on("screen frame", (data: Uint8Array) => {
-                frameCount++;
                 lastFrameTime = Date.now();
-
-                if (frameCount === 1) {
-                    addLog("debug", "[Screen] Received first screen frame - streaming active");
-                }
 
                 for (let x = 0; x < 128; x++) {
                     for (let y = 0; y < 64; y++) {
@@ -1115,19 +1143,11 @@ export const useSerialConnection = () => {
 
             const frameTimeout = setInterval(() => {
                 if (flags.screenStream && Date.now() - lastFrameTime > 5000) {
-                    addLog(
-                        "warning",
-                        `[Screen] No frames received for 5 seconds (${frameCount} frames total) - stream may have stopped`,
-                    );
                     clearInterval(frameTimeout);
                 }
             }, 5000);
 
             screenStreamStopUnbind = flipperModule.emitter.on("stop screen streaming", () => {
-                addLog(
-                    "warning",
-                    "[Screen] Device sent 'stop screen streaming' event - stopping stream",
-                );
                 flags.screenStream = false;
                 clearInterval(frameTimeout);
                 if (screenStreamUnbind) screenStreamUnbind();
@@ -1137,7 +1157,6 @@ export const useSerialConnection = () => {
             });
 
             screenStreamRestartUnbind = flipperModule.emitter.on("restart session", () => {
-                addLog("warning", "[Screen] Device sent 'restart session' event - stopping stream");
                 flags.screenStream = false;
                 clearInterval(frameTimeout);
                 if (screenStreamUnbind) screenStreamUnbind();
@@ -1147,169 +1166,156 @@ export const useSerialConnection = () => {
                 screenStreamStopUnbind = null;
                 screenStreamRestartUnbind = null;
             });
-
-            addLog("success", "[Screen] Screen stream started successfully");
         } catch (error) {
             flags.screenStream = false;
-            addLog("error", `[Screen] Screen stream start failed: ${error}`);
             throw error;
         }
     };
 
     const stopScreenStream = async () => {
         if (!flags.connected || !flags.rpcActive) {
-            addLog("warning", "[Screen] Cannot stop screen stream: device not connected");
             return;
         }
 
-        try {
-            const flipperModule = await getFlipperModule();
-            await flipperModule.commands.gui.stopScreenStreamRequest();
+        const flipperModule = await getFlipperModule();
+        await flipperModule.commands.gui.stopScreenStreamRequest();
 
-            flags.screenStream = false;
-            addLog("debug", "[Screen] gui.stopScreenStreamRequest: OK");
+        flags.screenStream = false;
 
-            if (screenStreamUnbind) screenStreamUnbind();
-            if (screenStreamStopUnbind) screenStreamStopUnbind();
-            if (screenStreamRestartUnbind) screenStreamRestartUnbind();
-            screenStreamUnbind = null;
-            screenStreamStopUnbind = null;
-            screenStreamRestartUnbind = null;
-
-            addLog("success", "[Screen] Screen stream stopped successfully");
-        } catch (error) {
-            addLog("error", `[Screen] Screen stream stop failed: ${error}`);
-            throw error;
-        }
+        if (screenStreamUnbind) screenStreamUnbind();
+        if (screenStreamStopUnbind) screenStreamStopUnbind();
+        if (screenStreamRestartUnbind) screenStreamRestartUnbind();
+        screenStreamUnbind = null;
+        screenStreamStopUnbind = null;
+        screenStreamRestartUnbind = null;
     };
 
-    const loadFirmware = async (release: any, uploadedFile?: File): Promise<void> => {
+    const loadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
 
         const flipperModule = await getFlipperModule();
 
-        try {
-            if (connectionData.deviceInfo?.hardware_region !== "0") {
-                firmwareState.updateStage = "update_stage_loading_region_data";
-                await provisionRegion(flipperModule);
-            }
-
-            firmwareState.updateStage = "update_stage_loading_firmware_bundle";
-
-            let files;
-
-            if (uploadedFile) {
-                addLog("info", `[Firmware] Loading firmware from file: ${uploadedFile.name}`);
-                const arrayBuffer = await uploadedFile.arrayBuffer();
-                addLog("debug", `[Firmware] File size: ${arrayBuffer.byteLength} bytes`);
-
-                const { unpack } = await import("../util");
-                files = await unpack(arrayBuffer);
-                addLog("debug", `[Firmware] Extracted ${files.length} files from uploaded file`);
-                console.log("uploaded files:", files);
-            } else {
-                const firmwareUrl = getFirmwareDownloadUrl(release);
-
-                if (!firmwareUrl) {
-                    throw new Error(
-                        `No firmware URL found for release: ${release.version || release.commit}`,
-                    );
-                }
-
-                addLog(
-                    "info",
-                    `[Firmware] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
-                );
-                const proxiedUrl = useProxiedUrl(firmwareUrl);
-                addLog("debug", `[Firmware] Using proxied URL: ${proxiedUrl}`);
-
-                try {
-                    files = await fetchFirmware(proxiedUrl);
-                } catch (error) {
-                    addLog("warning", `[Firmware] Proxied URL failed, trying original URL`);
-                    files = await fetchFirmware(firmwareUrl);
-                }
-
-                addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
-            }
-
-            // return; // TODO: remove this (for testing)
-
-            firmwareState.updateStage = "update_stage_loading_firmware_files";
-            await createUpdateDirectory(flipperModule);
-
-            let path = "/ext/update/";
-            for (const file of files) {
-                if (file.size === 0) {
-                    path = "/ext/update/" + file.name;
-                    if (file.name.endsWith("/")) {
-                        path = path.slice(0, -1);
-                    }
-                    await flipperModule.commands.storage.mkdir(path);
-                    addLog("debug", `[Firmware] Created directory: ${path}`);
-                } else {
-                    firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
-
-                    const unbind = flipperModule.emitter.on(
-                        "storageWriteRequest/progress",
-                        (e: any) => {
-                            firmwareState.writeProgress.progress = e.progress / e.total;
-                            flags.progress = e.progress / e.total;
-                        },
-                    );
-
-                    await flipperModule.commands.storage.write(
-                        "/ext/update/" + file.name,
-                        file.buffer,
-                    );
-                    unbind();
-                    addLog("debug", `[Firmware] Uploaded file: ${file.name}`);
-                }
-                await asyncSleep(300);
-            }
-
-            firmwareState.writeProgress.filename = "";
-            firmwareState.writeProgress.progress = 0;
-            flags.progress = 0;
-
-            firmwareState.updateStage = "update_stage_loading_manifest";
-            await flipperModule.commands.system.update(path + "/update.fuf");
-            addLog("debug", "[Firmware] Loaded update manifest");
-
-            firmwareState.updateStage = "update_stage_pay_attention";
-
-            addLog("info", "[Firmware] Rebooting Flipper for update");
-            firmwareState.updateStage = "update_stage_rebooting";
-            await asyncSleep(1000);
-            firmwareState.updateStage = "update_stage_done";
-            await asyncSleep(2000);
-
-            flags.updateInProgress = false;
-
-            await flipperModule.commands.system.reboot(2);
-        } catch (error) {
-            throw error;
+        if (connectionData.deviceInfo?.hardware_region !== "0") {
+            firmwareState.updateStage = "update_stage_loading_region_data";
+            await provisionRegion(flipperModule);
         }
+
+        firmwareState.updateStage = "update_stage_loading_firmware_bundle";
+
+        let files;
+
+        if (uploadedFile) {
+            addLog("info", `[Firmware] Loading firmware from file: ${uploadedFile.name}`);
+            const arrayBuffer = await uploadedFile.arrayBuffer();
+            addLog("debug", `[Firmware] File size: ${arrayBuffer.byteLength} bytes`);
+
+            files = await unpack(arrayBuffer);
+            addLog("debug", `[Firmware] Extracted ${files.length} files from uploaded file`);
+            console.log("uploaded files:", files);
+        } else {
+            const firmwareUrl = getFirmwareDownloadUrl(release);
+
+            if (!firmwareUrl) {
+                throw new Error(
+                    `No firmware URL found for release: ${release.version || release.commit}`,
+                );
+            }
+
+            addLog(
+                "info",
+                `[Firmware] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
+            );
+            const proxiedUrl = useProxiedUrl(firmwareUrl);
+            addLog("debug", `[Firmware] Using proxied URL: ${proxiedUrl}`);
+
+            try {
+                files = await fetchFirmware(proxiedUrl);
+            } catch {
+                addLog("warning", `[Firmware] Proxied URL failed, trying original URL`);
+                files = await fetchFirmware(firmwareUrl);
+            }
+
+            addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
+        }
+
+        firmwareState.updateStage = "update_stage_loading_firmware_files";
+        await createUpdateDirectory(flipperModule);
+
+        let path = "/ext/update/";
+        for (const file of files) {
+            if (file.size === 0) {
+                path = "/ext/update/" + file.name;
+                if (file.name.endsWith("/")) {
+                    path = path.slice(0, -1);
+                }
+                await flipperModule.commands.storage.mkdir(path);
+                addLog("debug", `[Firmware] Created directory: ${path}`);
+            } else {
+                firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
+
+                const unbind = flipperModule.emitter.on(
+                    "storageWriteRequest/progress",
+                    (e: { progress: number; total: number }) => {
+                        firmwareState.writeProgress.progress = e.progress / e.total;
+                        flags.progress = e.progress / e.total;
+                    },
+                );
+
+                await flipperModule.commands.storage.write("/ext/update/" + file.name, file.buffer);
+                unbind();
+                addLog("debug", `[Firmware] Uploaded file: ${file.name}`);
+            }
+            await asyncSleep(300);
+        }
+
+        firmwareState.writeProgress.filename = "";
+        firmwareState.writeProgress.progress = 0;
+        flags.progress = 0;
+
+        firmwareState.updateStage = "update_stage_loading_manifest";
+        await flipperModule.commands.system.update(path + "/update.fuf");
+        addLog("debug", "[Firmware] Loaded update manifest");
+
+        firmwareState.updateStage = "update_stage_pay_attention";
+
+        addLog("success", "[Firmware] Update completed successfully. Rebooting...");
+        firmwareState.updateStage = "update_stage_rebooting";
+        await asyncSleep(1000);
+        firmwareState.updateStage = "update_stage_done";
+        await asyncSleep(2000);
+
+        flags.updateInProgress = false;
+
+        await flipperModule.commands.system.reboot(2);
     };
 
-    const provisionRegion = async (flipperModule: any): Promise<void> => {
+    const provisionRegion = async (flipperModule: FlipperModule): Promise<void> => {
         try {
             const regions = await fetchRegions();
+            console.log("regions:", regions);
             let bands;
 
             if (regions.countries[regions.country]) {
-                bands = regions.countries[regions.country].map((e: any) => regions.bands[e]);
+                bands = regions.countries[regions.country].map(
+                    (bandKey: string) => regions.bands[bandKey],
+                );
             } else {
-                bands = regions.default.map((e: any) => regions.bands[e]);
+                bands = regions.default.map((bandKey: string) => regions.bands[bandKey]);
                 regions.country = "JP";
             }
 
-            const options = {
+            const options: {
+                countryCode: string | Uint8Array;
+                bands: unknown[];
+            } = {
                 countryCode: regions.country,
-                bands: [] as any[],
+                bands: [],
             };
+
+            // @ts-expect-error - PB is from flipper protobuf
+            const { PB } = await import("../flipper/protobuf/proto-compiled.js");
 
             for (const band of bands) {
                 const bandOptions = {
@@ -1335,7 +1341,7 @@ export const useSerialConnection = () => {
         }
     };
 
-    const createUpdateDirectory = async (flipperModule: any): Promise<void> => {
+    const createUpdateDirectory = async (flipperModule: FlipperModule): Promise<void> => {
         try {
             await flipperModule.commands.storage.stat("/ext/update");
         } catch (error) {
@@ -1348,7 +1354,7 @@ export const useSerialConnection = () => {
         }
     };
 
-    const updateFirmware = async (release: any, uploadedFile?: File): Promise<void> => {
+    const updateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
@@ -1385,6 +1391,8 @@ export const useSerialConnection = () => {
     };
 
     const restartRpc = async (force: boolean = false): Promise<void> => {
+        if (!flipper) throw new Error("Flipper not connected");
+
         if ((flags.connected && flags.rpcActive && !flags.restarting) || force) {
             flags.restarting = true;
             await flipper.closeReader();
@@ -1402,7 +1410,7 @@ export const useSerialConnection = () => {
         connectionData.state = ConnectionState.CONNECTING;
     };
 
-    const testUpdateFirmware = async (release: any, uploadedFile?: File): Promise<void> => {
+    const testUpdateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
             addLog("warning", "[Test] Simulating firmware update without device connection");
         }
@@ -1444,7 +1452,7 @@ export const useSerialConnection = () => {
         }
     };
 
-    const testLoadFirmware = async (release: any, uploadedFile?: File): Promise<void> => {
+    const testLoadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         try {
             if (connectionData.deviceInfo?.hardware_region !== "0") {
                 firmwareState.updateStage = "update_stage_loading_region_data";
@@ -1457,7 +1465,7 @@ export const useSerialConnection = () => {
             addLog("info", "[Test] Simulating firmware bundle loading");
             await asyncSleep(1500);
 
-            let files: any[] = [];
+            let files: { name: string; size: number }[] = [];
 
             if (uploadedFile) {
                 addLog(
@@ -1545,11 +1553,8 @@ export const useSerialConnection = () => {
 
             firmwareState.updateStage = "update_stage_rebooting";
             await asyncSleep(1000);
-
             firmwareState.updateStage = "update_stage_done";
             await asyncSleep(2000);
-            addLog("success", "[Test] Firmware update simulation completed");
-
             flags.updateInProgress = false;
 
             await disconnect();

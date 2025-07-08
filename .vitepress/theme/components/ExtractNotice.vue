@@ -36,7 +36,7 @@ const extractNoticeText = computed(() => {
     return tr("connection_unable_to_extract_desc", {
         version: `${connectionData.value.deviceInfo?.firmware_version} (${connectionData.value.deviceInfo?.firmware_commit})`,
         url: getLocalizedPath(
-            `/releases/${connectionData.value.deviceInfo?.firmware_version.includes("dev") ? recentReleases.devbuilds[0].commit : recentReleases.mainline[0].commit}`,
+            `/releases/${(connectionData.value.deviceInfo as { firmware_version: string }).firmware_version.includes("dev") ? recentReleases.devbuilds[0].commit : recentReleases.mainline[0].commit}`,
         ),
     });
 });
@@ -58,9 +58,10 @@ const extractNoticeText = computed(() => {
                 />
                 <div class="notice-details text-left cursor-default">
                     <p
-                        v-html="extractNoticeText"
                         class="text-left text-[12px] text-vp-2 leading-6 m-0 overflow-hidden w-max box-content"
-                    ></p>
+                    >
+                        <span v-html="extractNoticeText"></span>
+                    </p>
                 </div>
             </div>
         </div>

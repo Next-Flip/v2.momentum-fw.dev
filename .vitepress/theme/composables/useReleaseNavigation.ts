@@ -126,8 +126,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
         initializeSelectedRelease();
     };
 
-    if (config.useQueryParams) {
-    } else {
+    if (!config.useQueryParams) {
         watch(
             () => params.value?.version,
             (newVersion) => {

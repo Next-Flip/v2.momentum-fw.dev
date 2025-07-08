@@ -1,0 +1,106 @@
+import js from "@eslint/js";
+import prettier from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
+import vue from "eslint-plugin-vue";
+import typescript from "typescript-eslint";
+
+export default [
+    js.configs.recommended,
+    ...typescript.configs.recommended,
+    ...vue.configs["flat/recommended"],
+    prettier,
+    {
+        plugins: {
+            prettier: prettierPlugin,
+        },
+        files: [
+            ".vitepress/theme/components/**/*.{js,ts,mts,vue}",
+            ".vitepress/theme/composables/**/*.{js,ts,mts,vue}",
+            "scripts/**/*.{js,ts,mts}",
+        ],
+        languageOptions: {
+            globals: {
+                window: "readonly",
+                document: "readonly",
+                navigator: "readonly",
+                console: "readonly",
+                localStorage: "readonly",
+                sessionStorage: "readonly",
+                setTimeout: "readonly",
+                clearTimeout: "readonly",
+                setInterval: "readonly",
+                clearInterval: "readonly",
+                getComputedStyle: "readonly",
+                HTMLElement: "readonly",
+                HTMLCanvasElement: "readonly",
+                HTMLImageElement: "readonly",
+                HTMLInputElement: "readonly",
+                HTMLDivElement: "readonly",
+                Event: "readonly",
+                MouseEvent: "readonly",
+                KeyboardEvent: "readonly",
+                Node: "readonly",
+                Image: "readonly",
+                File: "readonly",
+                Blob: "readonly",
+                URL: "readonly",
+                URLSearchParams: "readonly",
+                history: "readonly",
+                fetch: "readonly",
+                performance: "readonly",
+                TextEncoder: "readonly",
+                TextDecoder: "readonly",
+                NodeJS: "readonly",
+                global: "readonly",
+                process: "readonly",
+                Buffer: "readonly",
+            },
+            parserOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                parser: typescript.parser,
+            },
+        },
+        rules: {
+            "prettier/prettier": "warn",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+            ],
+            "prefer-const": "warn",
+            "@typescript-eslint/no-explicit-any": "warn",
+            "vue/block-order": [
+                "error",
+                {
+                    order: ["script", "template", "style"],
+                },
+            ],
+            "vue/component-name-in-template-casing": ["error", "PascalCase"],
+            "vue/no-unused-vars": "warn",
+            "vue/multi-word-component-names": "off",
+            "vue/no-v-html": "off",
+            "vue/require-default-prop": "warn",
+            "vue/no-required-prop-with-default": "warn",
+            "vue/require-toggle-inside-transition": "warn",
+            "no-empty": "warn",
+            "no-self-assign": "warn",
+            "no-undef": "warn",
+            "no-useless-catch": "warn",
+            "@typescript-eslint/ban-ts-comment": "warn",
+        },
+    },
+    {
+        ignores: [
+            "node_modules/",
+            "public/",
+            "cache/",
+            "dist/",
+            "_data/",
+            ".vitepress/theme/flipper/",
+            ".vitepress/theme/untar/",
+            ".vitepress/i18n/",
+            ".vitepress/cache/",
+            ".vitepress/dist/",
+        ],
+    },
+];

@@ -1,15 +1,19 @@
 import { generateConfigs } from "./config";
-import { generateReleases } from "./releases";
+import { fetchReleases } from "./releases";
 import { fetchAssetPacks, patchVueIcons, updateBuildInfo } from "./utils";
 
 async function main(): Promise<void> {
     const startTime = Date.now();
 
     try {
-        console.log("Fetching asset packs...");
-        await fetchAssetPacks();
-        console.log("Fetching releases...");
-        await generateReleases();
+        if (process.env.SKIP_FETCH !== "true") {
+            console.log("Fetching asset packs...");
+            await fetchAssetPacks();
+            console.log("Fetching releases...");
+            await fetchReleases();
+        } else {
+            console.log("Skipping fetch operations (SKIP_FETCH=true)");
+        }
         console.log("Generating VitePress configs...");
         await generateConfigs();
         console.log("Patching oh-vue-icons...");

@@ -160,67 +160,63 @@ ${sidebarImport}${searchLocaleConfig}export const ${configName} = {
 }
 
 export async function generateConfigs() {
-    try {
-        console.log("  Loading internationalization messages...");
-        const locales = Object.keys(messages) as Array<SupportedLocales>;
+    console.log("  Loading internationalization messages...");
+    const locales = Object.keys(messages) as Array<SupportedLocales>;
 
-        if (!locales || locales.length === 0) {
-            throw new Error("❌ No locales found in messages");
-        }
-
-        console.log(`  Found ${locales.length} locales: ${locales.join(", ")}`);
-
-        const configDir = "./.vitepress/config";
-        try {
-            await fs.access(configDir);
-        } catch {
-            throw new Error(`❌ Config directory does not exist: ${configDir}`);
-        }
-
-        console.log("  Loading releases data...");
-        const releasesModule = await import("../_data/releases.ts");
-
-        if (!releasesModule.recentReleases) {
-            throw new Error("❌ No recentReleases found in releases module");
-        }
-
-        const { mainline: navMainlineItems, devbuilds: navDevbuildItems } =
-            releasesModule.recentReleases;
-
-        console.log(
-            `  Using ${navMainlineItems.length} mainline and ${navDevbuildItems?.length || 0} devbuilds for navigation`,
-        );
-
-        for (const locale of locales) {
-            console.log(`  Generating config for locale: ${locale}`);
-
-            try {
-                if (!messages[locale]) {
-                    throw new Error(`❌ No messages found for locale: ${locale}`);
-                }
-
-                const configContent = generateConfigContent(
-                    locale,
-                    messages[locale],
-                    navMainlineItems,
-                    navDevbuildItems || [],
-                );
-
-                if (!configContent || configContent.trim().length === 0) {
-                    throw new Error(`❌ Generated config content is empty for locale: ${locale}`);
-                }
-
-                const filePath = `./.vitepress/config/${locale}.ts`;
-                await fs.writeFile(filePath, configContent, "utf8");
-                console.log(`    Generated: ${filePath}`);
-            } catch (error) {
-                console.error(`❌    Failed to generate config for locale ${locale}:`, error);
-                throw error;
-            }
-        }
-
-        console.log("Successfully generated all configs.");
-    } catch (error) {
-        throw error;
+    if (!locales || locales.length === 0) {
+        throw new Error("❌ No locales found in messages");
     }
+
+    console.log(`  Found ${locales.length} locales: ${locales.join(", ")}`);
+
+    const configDir = "./.vitepress/config";
+    try {
+        await fs.access(configDir);
+    } catch {
+        throw new Error(`❌ Config directory does not exist: ${configDir}`);
+    }
+
+    console.log("  Loading releases data...");
+    const releasesModule = await import("../_data/releases.ts");
+
+    if (!releasesModule.recentReleases) {
+        throw new Error("❌ No recentReleases found in releases module");
+    }
+
+    const { mainline: navMainlineItems, devbuilds: navDevbuildItems } =
+        releasesModule.recentReleases;
+
+    console.log(
+        `  Using ${navMainlineItems.length} mainline and ${navDevbuildItems?.length || 0} devbuilds for navigation`,
+    );
+
+    for (const locale of locales) {
+        console.log(`  Generating config for locale: ${locale}`);
+
+        try {
+            if (!messages[locale]) {
+                throw new Error(`❌ No messages found for locale: ${locale}`);
+            }
+
+            const configContent = generateConfigContent(
+                locale,
+                messages[locale],
+                navMainlineItems,
+                navDevbuildItems || [],
+            );
+
+            if (!configContent || configContent.trim().length === 0) {
+                throw new Error(`❌ Generated config content is empty for locale: ${locale}`);
+            }
+
+            const filePath = `./.vitepress/config/${locale}.ts`;
+            await fs.writeFile(filePath, configContent, "utf8");
+            console.log(`    Generated: ${filePath}`);
+        } catch (error) {
+            console.error(`❌    Failed to generate config for locale ${locale}:`, error);
+            throw error;
+        }
+    }
+
+    console.log("Successfully generated all configs.");
 }

@@ -2,7 +2,7 @@
 import { computed, inject, onMounted, ref, watchEffect } from "vue";
 import { packs } from "../../../_data/packs.ts";
 import { useI18n } from "../composables/useI18n";
-import type { AssetPack } from "../types";
+import type { AssetPack, AssetPackFile } from "../types";
 import { AssetPackEntry } from "../types.ts";
 import { formatFullDate } from "../util.ts";
 
@@ -50,8 +50,14 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
     const { installedPacks } = connectionData.value;
 
     return assetPacks.value.map((pack: AssetPackEntry): AssetPack => {
-        const zipFile = pack.zipFile || pack.files?.find((file: any) => file.type === "pack_zip");
-        const tarFile = pack.tarFile || pack.files?.find((file: any) => file.type === "pack_targz");
+        const zipFile: AssetPackFile | undefined =
+            (pack.zipFile as AssetPackFile) ||
+            (pack.files?.find((file: AssetPackFile) => file.type === "pack_zip") as AssetPackFile);
+        const tarFile: AssetPackFile | undefined =
+            (pack.tarFile as AssetPackFile) ||
+            (pack.files?.find(
+                (file: AssetPackFile) => file.type === "pack_targz",
+            ) as AssetPackFile);
 
         let downloadUrl = "";
 
@@ -74,11 +80,12 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
 
         const installedManifest =
             installedPacks && typeof installedPacks === "object"
-                ? (installedPacks as Record<string, any>)[pack.id]
+                ? (installedPacks as Record<string, unknown>)[pack.id]
                 : undefined;
         const isInstalled = !!installedManifest;
         const currentSha256 = zipFile?.sha256 || pack.files?.[0]?.sha256;
-        const hasUpdate = isInstalled && installedManifest?.sha256 !== currentSha256;
+        const hasUpdate =
+            isInstalled && (installedManifest as { sha256?: string })?.sha256 !== currentSha256;
 
         return {
             id: String(pack.id || pack.name?.toLowerCase().replace(/\s+/g, "-") || "unknown"),
@@ -96,13 +103,13 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
                 folders: pack.stats?.folders || [],
             },
             installed: isInstalled,
-            installedSha256: installedManifest?.sha256,
+            installedSha256: (installedManifest as { sha256?: string })?.sha256,
             hasUpdate: hasUpdate,
             tarFile: tarFile
                 ? {
-                    url: useProxiedUrl(tarFile.url || tarFile.path || ""),
-                    sha256: tarFile.sha256 || "",
-                }
+                      url: useProxiedUrl(tarFile.url || tarFile.path || ""),
+                      sha256: tarFile.sha256 || "",
+                  }
                 : undefined,
         };
     });
@@ -132,7 +139,6 @@ onMounted(async () => {
             return hasZip || hasTar;
         });
         if (hasFiles) {
-            assetPacks.value = assetPacks.value;
             await loadInstalledIfConnected();
         }
     }
@@ -142,13 +148,13 @@ onMounted(async () => {
 <template>
     <div>
         <div class="relative my-0 asset-packs-container mx-auto">
-            <AssetPacksGrid :title="tr('asset_packs')" :assetPacks="mappedAssetPacks" />
+            <AssetPacksGrid :title="tr('asset_packs')" :asset-packs="mappedAssetPacks" />
         </div>
     </div>
 </template>
 
 <style scoped>
-.asset-packs-container>* {
+.asset-packs-container > * {
     position: relative;
     z-index: 2;
 }
