@@ -262,10 +262,7 @@ onBeforeUnmount(() => {
                                                 class="font-medium text-vp-1 font-mono flex-shrink-0"
                                                 :class="{
                                                     'text-vp-brand-1':
-                                                        selectedRelease?.commit ===
-                                                            release.commit ||
-                                                        deviceInfo?.firmware_version ===
-                                                            release.version,
+                                                        selectedRelease?.commit === release.commit,
                                                 }"
                                             >
                                                 {{
@@ -277,14 +274,16 @@ onBeforeUnmount(() => {
                                             </span>
                                             <span
                                                 v-if="
-                                                    deviceInfo?.firmware_commit ===
+                                                    isConnected &&
+                                                    (deviceInfo?.firmware_commit ===
                                                         release.commit ||
-                                                    deviceInfo?.firmware_version === release.version
+                                                        deviceInfo?.firmware_version ===
+                                                            release.version)
                                                 "
                                                 class="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis uppercase text-vp-brand-1"
                                                 :class="{
                                                     'text-vp-brand-1/60':
-                                                        selectedRelease?.commit ===
+                                                        deviceInfo?.firmware_commit ===
                                                             release.commit ||
                                                         deviceInfo?.firmware_version ===
                                                             release.version,
@@ -297,9 +296,7 @@ onBeforeUnmount(() => {
                                             class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
                                             :class="{
                                                 'text-vp-brand-1/60':
-                                                    selectedRelease?.commit === release.commit ||
-                                                    deviceInfo?.firmware_version ===
-                                                        release.version,
+                                                    selectedRelease?.commit === release.commit,
                                             }"
                                         >
                                             {{

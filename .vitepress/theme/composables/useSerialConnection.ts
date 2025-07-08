@@ -1223,12 +1223,11 @@ export const useSerialConnection = () => {
                 );
             }
 
+            const proxiedUrl = useProxiedUrl(firmwareUrl);
             addLog(
                 "info",
-                `[Firmware] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
+                `[Firmware] Downloading firmware from: <a href="${proxiedUrl}" target="_blank">${proxiedUrl}</a>`,
             );
-            const proxiedUrl = useProxiedUrl(firmwareUrl);
-            addLog("debug", `[Firmware] Using proxied URL: ${proxiedUrl}`);
 
             try {
                 files = await fetchFirmware(proxiedUrl);
