@@ -110,13 +110,13 @@ const dynamicButtons = computed((): ActionButton[] => {
                 :key="button.href"
                 :href="button.isLatest ? '#' : button.href"
                 :class="[
-                    'px-7 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100',
+                    'px-7 text-sm leading-9 font-semibold rounded-full border-2 transition-all duration-100',
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest
-                            ? 'border-vp-brand-2 bg-vp-brand-2'
-                            : 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50'
-                        : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/20',
+                            ? 'border-vp-brand-2 bg-vp-brand-2 hover:bg-vp-brand-3 text-neutral-50 hover:text-white'
+                            : 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 hover:text-white'
+                        : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/20 text-vp-1 hover:text-white',
                 ]"
                 >{{ button.text }}</a
             >

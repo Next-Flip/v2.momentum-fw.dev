@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
 
 <template>
     <Transition name="slide-down" mode="out-in">
-        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg pb-[30px]">
+        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg pb-6">
             <div
                 class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill border border-black/10 dark:border-white/10 rounded-lg overflow-hidden p-3"
             >

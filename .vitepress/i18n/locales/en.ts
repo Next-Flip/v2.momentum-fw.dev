@@ -312,6 +312,12 @@ const messages: MessageSchema = {
         "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
     updater_matching_release_warning:
         "The selected/uploaded release matches the current version on your Flipper",
+    updater_download_release: "Download release",
+    updater_flash_button_disconnected: "Connect your Flipper!",
+    updater_flash_select_release: "Select a release",
+    updater_flash_select_release_or_file: "Select a release or upload a file",
+    updater_unavailable: "Unavailable",
+    updater_go_to_release: "Go to release",
 };
 
 export default messages;

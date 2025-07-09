@@ -3,6 +3,7 @@ import { useScroll, useStorage } from "@vueuse/core";
 import { computed, ref, useTemplateRef } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
+import { useSharedHover } from "../composables/useSharedHover";
 import type { DeviceInfo } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { bytesToSize } from "../util";
@@ -11,6 +12,8 @@ import Tooltip from "./Tooltip.vue";
 const el = useTemplateRef<HTMLElement>("el");
 const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
+
+const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const {
     flags,
@@ -293,9 +296,15 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="border border-vp-divider rounded-lg h-full flex flex-col max-h-[calc(50vh-var(--vp-nav-height)-24px)] w-full min-h-80 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out"
+        class="border rounded-lg h-full flex flex-col max-h-[calc(50vh-var(--vp-nav-height)-24px)] w-full min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out"
+        :class="{
+            'border-vp-divider': !isInstallButtonHovered,
+            'border-vp-brand-1': isInstallButtonHovered,
+        }"
     >
-        <div class="flex-1 flex flex-col min-h-0 bg-vp-dark/75 backdrop-blur-sm">
+        <div
+            class="flex-1 flex flex-col min-h-0 bg-vp-dark/75 backdrop-blur-sm transition-all duration-300"
+        >
             <Transition name="header-fade" mode="out-in">
                 <div
                     v-if="isConnected"
@@ -343,7 +352,7 @@ const deviceSections = computed(() => {
                             >
                                 <div
                                     v-if="getConnectionDisplay.showProgress"
-                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-mntm-yellow-1 animate-spin"
                                 ></div>
                                 <v-icon name="bi-usb-symbol" scale="1.75" class="text-vp-3" />
                             </div>
@@ -364,8 +373,9 @@ const deviceSections = computed(() => {
                                     >
                                         <a
                                             :class="[
-                                                'px-4 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100 cursor-pointer',
+                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100 cursor-pointer',
                                                 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50',
+                                                { 'wiggle-loop': isInstallButtonHovered },
                                             ]"
                                             @click="handleConnect"
                                             >{{ tr("updater_connect_button") }}</a
@@ -667,5 +677,38 @@ const deviceSections = computed(() => {
 
 .action-button:active {
     color: var(--vp-c-brand-1);
+}
+
+@keyframes wiggle {
+    0%,
+    7% {
+        transform: rotateZ(0);
+    }
+    15% {
+        transform: rotateZ(-8deg);
+    }
+    20% {
+        transform: rotateZ(6deg);
+    }
+    25% {
+        transform: rotateZ(-5deg);
+    }
+    30% {
+        transform: rotateZ(3deg);
+    }
+    35% {
+        transform: rotateZ(-2deg);
+    }
+    40%,
+    100% {
+        transform: rotateZ(0);
+    }
+}
+
+.wiggle-loop {
+    animation: wiggle 0.5s ease-in-out infinite;
+    animation-delay: 0s;
+    animation-iteration-count: infinite;
+    animation-duration: 2s;
 }
 </style>

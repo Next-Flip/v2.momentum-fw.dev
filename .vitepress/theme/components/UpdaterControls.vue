@@ -5,6 +5,8 @@ import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useSharedHover } from "../composables/useSharedHover";
+import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { dots } = useDots();
@@ -22,10 +24,17 @@ const { isConnected: connectionIsConnected, connectionState, deviceInfo } = useC
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 
+const {
+    hostExpand,
+    hostCollapse,
+    isHovered: isInstallButtonHovered,
+} = useSharedHover("disabled-install-button");
+
 const emit = defineEmits<{
     "channel-change": [channel: "mainline" | "devbuild"];
     "release-change": [release: ReleaseItem];
     "flash-firmware": [];
+    "download-release": [];
 }>();
 
 const isConnected = computed(() => connectionIsConnected.value);
@@ -33,11 +42,7 @@ const canFlash = computed(() => {
     const hasReleaseOrFile = props.selectedRelease || props.uploadedFile;
     const notUpdating = !serialConnection?.flags.updateInProgress;
 
-    if (props.testMode) {
-        return hasReleaseOrFile && notUpdating;
-    } else {
-        return isConnected.value && hasReleaseOrFile && notUpdating;
-    }
+    return isConnected.value && hasReleaseOrFile && notUpdating;
 });
 
 const channelDropdownRef = ref<HTMLElement | null>(null);
@@ -115,6 +120,10 @@ const handleFlashFirmware = () => {
     emit("flash-firmware");
 };
 
+const handleDownloadRelease = () => {
+    emit("download-release");
+};
+
 const clickOutside = (event: MouseEvent) => {
     const target = event.target as Node;
     if (channelDropdownRef.value && !channelDropdownRef.value.contains(target)) {
@@ -136,8 +145,14 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="rounded-xl">
-        <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-end">
-            <div class="md:col-span-3" :class="{ 'opacity-50': uploadedFile }">
+        <div class="flex flex-col md:flex-row gap-3 items-end">
+            <div
+                class="flex-1 md:max-w-[25%]"
+                :class="{
+                    'opacity-50 transition-opacity duration-200':
+                        uploadedFile || isInstallButtonHovered,
+                }"
+            >
                 <label class="block text-sm font-medium text-vp-2 mb-3">{{
                     tr("updater_channel_label")
                 }}</label>
@@ -208,13 +223,19 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <div class="md:col-span-5" :class="{ 'opacity-50': uploadedFile }">
+            <div
+                class="flex-1"
+                :class="{
+                    'opacity-50 transition-opacity duration-200':
+                        uploadedFile || isInstallButtonHovered,
+                }"
+            >
                 <label class="block text-sm font-medium text-vp-2 mb-3">{{
                     tr("updater_version_dropdown_label")
                 }}</label>
                 <div
                     ref="releaseDropdownRef"
-                    class="relative backdrop-blur"
+                    class="relative backdrop-blur mr-5"
                     :class="{ 'opacity-50': !selectedChannel && !uploadedFile }"
                 >
                     <button
@@ -315,37 +336,120 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
+            <div class="flex items-end">
+                <Tooltip
+                    :delay="uploadedFile ? 400 : 0"
+                    :offset="18"
+                    :disabled="
+                        !!uploadedFile || !selectedRelease || connectionState === 'connecting'
+                    "
+                    class="min-w-0 overflow-hidden"
+                    :class="{
+                        'opacity-60 transition-opacity duration-200':
+                            uploadedFile || isInstallButtonHovered,
+                    }"
+                >
+                    <div class="action w-10 z-[5]">
+                        <button
+                            :disabled="!!uploadedFile || !selectedRelease"
+                            :aria-label="tr('download')"
+                            class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
+                            :class="
+                                !uploadedFile && selectedRelease
+                                    ? 'text-vp-2 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
+                                    : 'text-vp-3 cursor-not-allowed opacity-50'
+                            "
+                            @click="handleDownloadRelease"
+                        >
+                            <v-icon name="la-download-solid" :scale="1.1" />
+                        </button>
+                    </div>
+                    <template #content>
+                        {{
+                            !uploadedFile && selectedRelease
+                                ? tr("updater_download_release")
+                                : tr("updater_flash_select_release")
+                        }}
+                    </template>
+                </Tooltip>
+            </div>
+
             <div
-                class="md:col-span-3 rounded-full transition-all duration-100 border mt-3 select-none"
+                class="rounded-full transition-all duration-100 border box-border mt-3 select-none min-w-36"
                 :class="
-                    canFlash ? 'border-vp-brand-1 hover:border-vp-brand-2' : 'border-vp-divider'
+                    canFlash
+                        ? 'border-vp-brand-1 hover:border-vp-brand-2'
+                        : isInstallButtonHovered
+                          ? 'border-vp-divider opacity-90 transition-opacity duration-200'
+                          : 'border-vp-divider opacity-70'
                 "
             >
-                <button
-                    :disabled="!canFlash"
-                    class="w-full px-4 py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase"
-                    :class="
-                        canFlash
-                            ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50'
-                            : 'text-vp-3 cursor-not-allowed opacity-50'
-                    "
-                    @click="handleFlashFirmware"
+                <Tooltip
+                    :disabled="!!canFlash || connectionState === 'connecting'"
+                    :delay="0"
+                    :offset="18"
+                    class="min-w-0 overflow-hidden"
                 >
-                    <v-icon
-                        v-if="
-                            connectionState !== 'connecting' && connectionState !== 'disconnecting'
+                    <button
+                        :disabled="!canFlash"
+                        class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase"
+                        :class="
+                            canFlash
+                                ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50 px-14'
+                                : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
                         "
-                        name="pr-download"
-                        class="opacity-90"
-                    />
-                    {{ connectionState === "connecting" ? dots : tr("updater_flash_button") }}
-                </button>
+                        @click="handleFlashFirmware"
+                        @mouseenter="!connectionIsConnected && hostExpand()"
+                        @mouseleave="!canFlash && hostCollapse()"
+                    >
+                        {{
+                            connectionState === "connecting"
+                                ? dots
+                                : canFlash
+                                  ? tr("updater_flash_button")
+                                  : tr("updater_unavailable")
+                        }}
+                    </button>
+                    <template #content>
+                        {{
+                            connectionState === "disconnected"
+                                ? tr("updater_flash_button_disconnected")
+                                : connectionIsConnected && !canFlash
+                                  ? tr("updater_flash_select_release_or_file")
+                                  : ""
+                        }}
+                    </template>
+                </Tooltip>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+.action {
+    padding: 0;
+}
+
+.action a {
+    width: 100%;
+    padding: 0;
+}
+
+.download-action {
+    flex: 1;
+    z-index: 5;
+}
+
+.action button {
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+}
+
 .dropdown-button {
     display: flex;
     align-items: center;
@@ -444,5 +548,9 @@ onBeforeUnmount(() => {
 .fade-dropdown-enter-from,
 .fade-dropdown-leave-to {
     opacity: 0;
+}
+
+.download-button-small {
+    border: 1px solid var(--vp-c-divider);
 }
 </style>

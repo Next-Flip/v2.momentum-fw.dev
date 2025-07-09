@@ -312,6 +312,13 @@ const messages: MessageSchema = {
         "Flipper を接続し、qFlipper と/または Flipper Lab が閉じていることを確認してください！",
     updater_matching_release_warning:
         "選択した/アップロードしたリリースは、現在のファームウェアと一致しています",
+    updater_download_release: "リリースをダウンロード",
+    updater_flash_button_disconnected: "Flipper を接続してください！",
+    updater_flash_select_release: "リリースを選択",
+    updater_flash_select_release_or_file:
+        "リリースを選択するか、ファイルをアップロードしてください",
+    updater_unavailable: "利用不可",
+    updater_go_to_release: "リリースページに移動",
 };
 
 export default messages;

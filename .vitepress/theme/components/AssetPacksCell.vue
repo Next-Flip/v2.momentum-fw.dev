@@ -565,7 +565,7 @@ onUnmounted(() => {
                         <div v-if="installed" class="action w-10 z-[5]">
                             <button
                                 :aria-label="tr('delete')"
-                                class="delete-button inline-flex text-center font-semibold whitespace-nowrap transition-colors duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-red-500 hover:text-red-600 select-none pointer-events-auto !z-[999]"
+                                class="delete-button inline-flex text-center font-semibold whitespace-nowrap transition-colors duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-red-500 hover:text-neutral-50 select-none pointer-events-auto !z-[999]"
                                 :class="{
                                     'opacity-50 cursor-not-allowed pointer-events-none':
                                         serialConnection.queueState.queue.some(
@@ -607,7 +607,6 @@ onUnmounted(() => {
 .delete-button:hover {
     background-color: rgb(239 68 68 / var(--tw-text-opacity, 1));
     border-color: rgb(239 68 68 / var(--tw-text-opacity, 1));
-    color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 
 .cell-image {

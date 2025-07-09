@@ -53,7 +53,7 @@ const navigationLinks = computed(() => [
         >
             <div
                 class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8"
-                :class="`${route.path.includes('/releases') ? 'max-w-7xl lg:px-8' : route.path.includes('/update') ? 'max-w-7xl' : 'max-w-6xl'}`"
+                :class="`${route.path.includes('/releases') ? 'max-w-7xl lg:px-8' : route.path.includes('/update') ? 'max-w-7xl' : 'max-w-7xl'}`"
             >
                 <div class="lg:max-w-md flex flex-col justify-start">
                     <div class="flex items-center space-x-3">

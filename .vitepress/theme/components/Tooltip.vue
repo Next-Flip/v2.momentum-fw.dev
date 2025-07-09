@@ -201,7 +201,9 @@ onBeforeUnmount(() => {
             </transition>
         </teleport>
     </div>
-    <slot v-else />
+    <div v-else>
+        <slot />
+    </div>
 </template>
 
 <style scoped>

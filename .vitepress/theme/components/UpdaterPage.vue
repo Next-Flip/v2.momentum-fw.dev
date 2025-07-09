@@ -7,8 +7,9 @@ import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useSharedHover } from "../composables/useSharedHover";
 import { STORAGE_KEYS } from "../types";
-import { bytesToSize, formatFileDate, parseUploadedFileName } from "../util";
+import { bytesToSize, downloadFile, formatFileDate, parseUploadedFileName } from "../util";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
@@ -19,6 +20,7 @@ import UpdaterLogs from "./UpdaterLogs.vue";
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
+const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<"mainline" | "devbuild" | null>(null);
@@ -44,7 +46,7 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsExpanded = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(false);
+const testMode = ref(true);
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
@@ -63,13 +65,13 @@ const isMatchingRelease = computed(() => {
     const deviceVersion = serialConnection?.connectionData.deviceInfo?.firmware_version;
     if (!deviceVersion) return false;
 
-    if (
-        uploadedFileRelease.value?.commit === deviceCommit ||
-        uploadedFile.value?.name.toLowerCase().includes(deviceCommit.toLowerCase()) ||
-        uploadedFileRelease.value?.version === deviceVersion ||
-        uploadedFile.value?.name.toLowerCase().includes(deviceVersion.toLowerCase())
-    )
-        return true;
+    const uploadFileName = uploadedFile.value?.name.toLowerCase();
+
+    if (uploadFileName?.includes("mntm-dev")) {
+        if (uploadFileName?.includes(deviceCommit.toLowerCase())) return true;
+    } else {
+        if (uploadFileName?.includes(deviceVersion.toLowerCase())) return true;
+    }
 
     if (selectedRelease.value) {
         if (uploadedFile.value || uploadedFileRelease.value) return false;
@@ -241,6 +243,50 @@ const handleFlashFirmware = async () => {
     }
 };
 
+const handleDownloadRelease = () => {
+    if (!selectedRelease.value) return;
+
+    // Find the firmware download URL
+    const firmwareUrl = getFirmwareDownloadUrl(selectedRelease.value);
+
+    if (firmwareUrl) {
+        downloadFile(firmwareUrl);
+        logToSerial(
+            "info",
+            `[Download] Downloading firmware: ${selectedRelease.value.version || selectedRelease.value.commit}`,
+        );
+    } else {
+        logToSerial("error", "[Download] No firmware download URL found for selected release");
+    }
+};
+
+// Helper function to get firmware download URL (same as in useSerialConnection)
+const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
+    if (!release.files) return null;
+
+    for (const file of release.files) {
+        if (
+            "url" in file &&
+            file.url &&
+            "filename" in file &&
+            file.filename?.includes("update-mntm-") &&
+            file.filename?.endsWith(".tgz")
+        ) {
+            return file.url;
+        }
+
+        if (
+            "filename" in file &&
+            file.filename?.includes("update-mntm-") &&
+            file.filename.endsWith(".tgz")
+        ) {
+            return `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
+        }
+    }
+
+    return null;
+};
+
 const handleFileUpload = () => {
     if (flags.value.updateInProgress) return;
     fileInputRef.value?.click();
@@ -297,7 +343,6 @@ const toggleChangelogOpenClose = () => {
         changelogState.value = "closed";
     }
 
-    // Trigger logs scroll after layout change
     nextTick(() => {
         triggerLogsScroll();
     });
@@ -309,7 +354,6 @@ const toggleChangelogExpand = () => {
         changelogState.value = "open";
     }
 
-    // Trigger logs scroll after layout change
     nextTick(() => {
         triggerLogsScroll();
     });
@@ -334,7 +378,7 @@ onBeforeUnmount(() => {
             >
                 <div class="flex flex-col lg:flex-row gap-x-6 flex-1 w-full min-h-0 h-full">
                     <div
-                        class="flex flex-col w-full lg:w-[31%] min-w-0 lg:min-w-80 sticky self-start pb-3 mb-1 lg:mb-0 lg:pb-0"
+                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start pb-3 mb-1 lg:mb-0 lg:pb-0"
                         :class="{
                             'border-b border-vp-divider lg:border-b-0 pb-7': !isMatchingRelease,
                         }"
@@ -352,7 +396,7 @@ onBeforeUnmount(() => {
 
                     <div
                         ref="dropZoneRef"
-                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full"
+                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
@@ -363,15 +407,16 @@ onBeforeUnmount(() => {
                         ></div>
 
                         <div
-                            class="relative flex flex-col"
+                            class="relative flex flex-col border border-vp-divider rounded-lg px-6 pb-6"
                             :class="{
-                                'min-h-[197.5px]': flags.updateInProgress,
+                                'min-h-[202px]': flags.updateInProgress,
+                                'border-vp-divider/50': isInstallButtonHovered,
                             }"
                         >
                             <Transition name="overlay-fade">
                                 <div
                                     v-if="showUpdateOverlay"
-                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-lg flex items-center justify-center z-50 min-h-0 border border-vp-divider"
+                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-lg flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
                                         v-if="updateStage !== 'update_stage_done'"
@@ -387,12 +432,12 @@ onBeforeUnmount(() => {
                                                 class="relative w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
                                             >
                                                 <div
-                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-mntm-yellow-1 animate-spin"
                                                 ></div>
                                                 <v-icon
                                                     name="pr-download"
                                                     :scale="1.3"
-                                                    class="text-vp-3"
+                                                    class="text-neutral-700"
                                                 />
                                             </div>
                                             <div class="flex flex-col gap-3.5 flex-1 min-w-0">
@@ -404,9 +449,9 @@ onBeforeUnmount(() => {
                                                         tr("update_stage_updating")
                                                     }}
                                                 </p>
-                                                <div class="w-full bg-vp-soft/80 rounded-full h-2">
+                                                <div class="w-full bg-vp-soft rounded-full h-1">
                                                     <div
-                                                        class="bg-vp-brand-2 h-1.5 rounded-full transition-all duration-300"
+                                                        class="bg-vp-brand-2 h-1 rounded-full transition-all duration-300"
                                                         :style="{
                                                             width: `${updateProgress * 100}%`,
                                                         }"
@@ -438,7 +483,7 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-center justify-center gap-3 w-full mt-5 mb-3 lg:mt-0 lg:mb-0"
+                                            class="flex flex-row items-center justify-start gap-3 w-full mt-5 mb-3 lg:mt-6 lg:mb-0"
                                         >
                                             <div class="flex-shrink-0">
                                                 <v-icon
@@ -469,7 +514,7 @@ onBeforeUnmount(() => {
                                     </Transition>
                                     <div
                                         v-if="!isChangelogExpanded"
-                                        class="flex-shrink-0 pt-7 !z-10 transition-all duration-300"
+                                        class="flex-shrink-0 !z-10 transition-all duration-300"
                                         :class="{
                                             'opacity-0': showUpdateOverlay,
                                             'h-0 overflow-hidden':
@@ -480,7 +525,11 @@ onBeforeUnmount(() => {
                                         }"
                                     >
                                         <h3
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1"
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-6"
+                                            :class="{
+                                                'opacity-50 transition-opacity duration-200':
+                                                    isInstallButtonHovered,
+                                            }"
                                         >
                                             {{ tr("updater_select_firmware") }}
                                         </h3>
@@ -500,6 +549,7 @@ onBeforeUnmount(() => {
                                                 @channel-change="handleChannelChange"
                                                 @release-change="handleReleaseChange"
                                                 @flash-firmware="handleFlashFirmware"
+                                                @download-release="handleDownloadRelease"
                                             />
                                         </div>
                                     </div>
@@ -509,8 +559,10 @@ onBeforeUnmount(() => {
                             <Transition name="slide-up" mode="out-in">
                                 <div
                                     v-if="!isChangelogExpanded"
-                                    class="w-full border-b border-vp-divider pb-[30px] relative flex-shrink-0 z-[1] transition-all duration-300 mt-6"
+                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300 mt-6"
                                     :class="{
+                                        'opacity-50 transition-opacity duration-200':
+                                            isInstallButtonHovered,
                                         'opacity-0': showUpdateOverlay,
                                         'h-0 overflow-hidden':
                                             showUpdateOverlay && isChangelogExpanded,
@@ -592,12 +644,13 @@ onBeforeUnmount(() => {
 
                                     <div
                                         v-else
-                                        class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-soft/40 cursor-pointer pt-6 pb-7 backdrop-blur-md relative z-10"
+                                        class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/90 cursor-pointer pt-6 pb-7 backdrop-blur-md relative z-10"
                                         :class="{
                                             'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
                                                 flags.updateInProgress,
-                                            'hover:bg-vp-soft/80': !flags.updateInProgress,
+                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/40':
+                                                !flags.updateInProgress,
                                         }"
                                         @click="handleFileUpload"
                                     >
@@ -630,11 +683,12 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
+                            class="min-h-14 transition-opacity duration-200 mt-6"
                             :class="{
+                                'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
-                                'flex-1 min-h-0 mb-7': !isChangelogClosed,
-                                'flex-shrink-0 mb-7': isChangelogClosed,
-                                'mt-[30px]': !isChangelogExpanded,
+                                'flex-1 min-h-0 mb-6': !isChangelogClosed,
+                                'flex-shrink-0 mb-6': isChangelogClosed,
                             }"
                         >
                             <UpdaterChangelog
@@ -648,7 +702,9 @@ onBeforeUnmount(() => {
                         </div>
 
                         <div
+                            class="min-h-14 transition-opacity duration-200"
                             :class="{
+                                'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
                                 'flex-shrink-0': !isChangelogClosed,
                                 'flex-1 min-h-0': isChangelogClosed,

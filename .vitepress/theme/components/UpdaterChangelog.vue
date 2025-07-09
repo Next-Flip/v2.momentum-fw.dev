@@ -6,6 +6,8 @@ import type { ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
 import { replaceIssuesAndMentions } from "../util";
 
+import Tooltip from "./Tooltip.vue";
+
 const el = useTemplateRef<HTMLElement>("el");
 const { arrivedState } = useScroll(el);
 const { tr, getLocalizedPath } = useI18n();
@@ -125,15 +127,20 @@ const releaseHref = computed(() => {
             >
                 <div class="flex items-center gap-4">
                     <div v-if="displayVersion" class="flex items-center gap-0">
-                        <a
-                            v-if="shouldShowExternalLink"
-                            :href="releaseHref"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline"
-                        >
-                            {{ displayVersion }}
-                        </a>
+                        <Tooltip :disabled="!shouldShowExternalLink" :delay="0" position="right">
+                            <a
+                                v-if="shouldShowExternalLink"
+                                :href="releaseHref"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline"
+                            >
+                                {{ displayVersion }}
+                            </a>
+                            <template #content>
+                                {{ tr("updater_go_to_release") }}
+                            </template>
+                        </Tooltip>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">

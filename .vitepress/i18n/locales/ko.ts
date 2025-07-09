@@ -311,6 +311,12 @@ const messages: MessageSchema = {
     updater_flipper_not_connected_subtitle:
         "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
     updater_matching_release_warning: "선택한/업로드한 릴리스가 현재 펌웨어와 일치합니다",
+    updater_download_release: "릴리스 다운로드",
+    updater_flash_button_disconnected: "Flipper를 연결하세요!",
+    updater_flash_select_release: "릴리스 선택",
+    updater_flash_select_release_or_file: "릴리스를 선택하거나 파일을 업로드하세요",
+    updater_unavailable: "사용 불가",
+    updater_go_to_release: "릴리스 페이지로 이동",
 };
 
 export default messages;

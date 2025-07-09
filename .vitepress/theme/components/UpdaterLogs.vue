@@ -50,7 +50,6 @@ const scrollToBottom = () => {
 const clearLogs = () => {
     if (serialConnection && serialConnection.clearLogs) {
         serialConnection.clearLogs();
-        emit("toggle");
     }
 };
 

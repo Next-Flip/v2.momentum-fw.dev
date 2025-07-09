@@ -305,6 +305,12 @@ export type MessageSchema = {
     updater_device_disconnected: string;
     updater_flipper_not_connected_subtitle: string;
     updater_matching_release_warning: string;
+    updater_download_release: string;
+    updater_flash_button_disconnected: string;
+    updater_flash_select_release: string;
+    updater_flash_select_release_or_file: string;
+    updater_unavailable: string;
+    updater_go_to_release: string;
 };
 
 export type SupportedLocales = keyof typeof messages;
