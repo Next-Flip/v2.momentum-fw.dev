@@ -137,7 +137,18 @@ export function useConnectionInfo() {
             connectionState.value !== "disconnecting" &&
             serialConnection
         ) {
-            await serialConnection.connect();
+            try {
+                await serialConnection.connect();
+            } catch (error) {
+                if (
+                    error instanceof Error &&
+                    error.message.includes("Serial not available in SSR")
+                ) {
+                    alert(
+                        "Your browser does not seem to be compatible. Please use a browser that supports serial connections.",
+                    ); // Ideally this would use WarningPopup :P
+                }
+            }
         }
     };
 
