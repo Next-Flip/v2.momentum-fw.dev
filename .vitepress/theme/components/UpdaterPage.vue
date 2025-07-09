@@ -218,7 +218,12 @@ const isOverDropZone = computed(() => rawIsOverDropZone.value && !flags.value.up
 
 const handleChannelChange = (channel: "mainline" | "devbuild") => {
     selectedChannel.value = channel;
-    selectedRelease.value = null;
+    const releases = channel === "mainline" ? mainlineReleases : devbuildReleases;
+    if (releases.length > 0) {
+        selectRelease(releases[0]);
+    } else {
+        selectedRelease.value = null;
+    }
 };
 
 const handleReleaseChange = (release: ReleaseItem) => {
