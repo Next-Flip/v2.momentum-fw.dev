@@ -231,7 +231,7 @@ const messages: MessageSchema = {
     updater_disconnect_subtitle: "Please wait while we disconnect...",
     updater_connection_error: "Connection Error",
     updater_connection_error_subtitle:
-        "Serial port is busy, qFlipper and/or Flipper Lab can not be running!",
+        "Serial port is busy, qFlipper and Flipper Lab can not be running!",
     updater_unknown_error: "Unknown error occurred",
     updater_connect_button: "Connect",
     updater_na: "N/A",
@@ -309,7 +309,7 @@ const messages: MessageSchema = {
     updater_device_connected: "Device connected successfully",
     updater_device_disconnected: "Device disconnected",
     updater_flipper_not_connected_subtitle:
-        "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
+        "Plug in your Flipper, and make sure qFlipper and Flipper Lab are closed!",
     updater_matching_release_warning:
         "The selected/uploaded release matches the current version on your Flipper",
     updater_download_release: "Download release",
