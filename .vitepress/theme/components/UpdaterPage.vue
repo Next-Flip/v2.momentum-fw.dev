@@ -46,7 +46,7 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsExpanded = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(true);
+const testMode = ref(false);
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
