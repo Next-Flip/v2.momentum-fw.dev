@@ -231,7 +231,7 @@ const messages: MessageSchema = {
     updater_disconnect_subtitle: "Please wait while we disconnect...",
     updater_connection_error: "Connection Error",
     updater_connection_error_subtitle:
-        "Serial port is busy, qFlipper and/or Flipper Lab can not be running!",
+        "Serial port is busy, qFlipper and Flipper Lab can not be running!",
     updater_unknown_error: "Unknown error occurred",
     updater_connect_button: "Connect",
     updater_na: "N/A",

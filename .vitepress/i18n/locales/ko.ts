@@ -309,8 +309,8 @@ const messages: MessageSchema = {
     updater_device_connected: "Device connected successfully",
     updater_device_disconnected: "Device disconnected",
     updater_flipper_not_connected_subtitle:
-        "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
-    updater_matching_release_warning: "{{type}} 가 현재 펌웨어와 일치합니다",
+        "Plug in your Flipper, and make sure qFlipper and Flipper Lab are closed!",
+    updater_matching_release_warning: "선택한/업로드한 릴리스가 현재 펌웨어와 일치합니다",
     updater_download_release: "릴리스 다운로드",
     updater_flash_button_disconnected: "Flipper를 연결하세요!",
     updater_flash_select_release: "릴리스 선택",
