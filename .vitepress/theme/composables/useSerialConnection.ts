@@ -11,6 +11,7 @@ import {
     type FlipperModule,
     type InstalledPackManifest,
     type InstalledPacks,
+    type QueueItem,
     type QueueState,
     type SerialConnectionData,
     type SerialPort,
@@ -740,7 +741,16 @@ export const useSerialConnection = () => {
         setProgress: (progress: number) => void,
     ): Promise<Uint8Array> => {
         const packFile = pack.tarFile;
-        const packUrl = `${packFile?.url}?sha256=${packFile?.sha256}`;
+
+        if (!packFile?.url || !packFile?.sha256) {
+            addLog(
+                "error",
+                `[AssetPacks] Missing tarFile data for pack ${pack.id}: ${JSON.stringify(packFile)}`,
+            );
+            throw new Error(`Pack ${pack.id} is missing required tarFile data`);
+        }
+
+        const packUrl = `${packFile.url}?sha256=${packFile.sha256}`;
         const proxiedUrl = useProxiedUrl(packUrl);
         const response = await fetch(proxiedUrl);
 
@@ -954,8 +964,8 @@ export const useSerialConnection = () => {
 
         let removeOldPacksTask: Promise<void> | null = null;
         const packTar = await downloadPackWithProgress(pack, setProgress).catch((error) => {
-            addLog("error", `[AssetPacks] Failed to fetch pack: ${error}`);
-            throw new Error("Failed to fetch pack: " + error.toString());
+            addLog("error", `[AssetPacks] ${error.toString()}`);
+            throw new Error(error.toString());
         });
 
         removeOldPacksTask = removeOldPacks(pack);
@@ -1002,7 +1012,7 @@ export const useSerialConnection = () => {
             throw new Error("Device not connected or RPC not active");
         }
 
-        queueState.queue.push({ id: pack.id });
+        queueState.queue.push(pack as unknown as QueueItem);
         queueState.queueActions.push(action);
 
         if (queueState.queue.length > 1) {
@@ -1011,17 +1021,14 @@ export const useSerialConnection = () => {
 
         while (queueState.queue.length > 0) {
             try {
-                const currentPack = queueState.queue[0];
+                const currentPack = queueState.queue[0] as unknown as AssetPack;
                 const currentAction = queueState.queueActions[0];
 
                 if (currentAction === "remove") {
-                    await processRemovePack(currentPack as unknown as AssetPack);
+                    await processRemovePack(currentPack);
                 } else if (currentAction === "install") {
-                    await processInstallPack(currentPack as unknown as AssetPack);
+                    await processInstallPack(currentPack);
                 }
-            } catch (error) {
-                addLog("error", `[AssetPacks] Queue processing error: ${error}`);
-                throw error;
             } finally {
                 queueState.queue.shift();
                 queueState.queueActions.shift();
@@ -1238,6 +1245,8 @@ export const useSerialConnection = () => {
 
             addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
         }
+
+        return;
 
         firmwareState.updateStage = "update_stage_loading_firmware_files";
         await createUpdateDirectory(flipperModule);

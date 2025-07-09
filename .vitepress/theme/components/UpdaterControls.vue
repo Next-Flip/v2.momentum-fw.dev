@@ -149,7 +149,7 @@ onBeforeUnmount(() => {
             <div
                 class="flex-1 md:max-w-[25%]"
                 :class="{
-                    'opacity-50 transition-opacity duration-200':
+                    'opacity-40 transition-opacity duration-200':
                         uploadedFile || isInstallButtonHovered,
                 }"
             >
@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
             <div
                 class="flex-1"
                 :class="{
-                    'opacity-50 transition-opacity duration-200':
+                    'opacity-40 transition-opacity duration-200':
                         uploadedFile || isInstallButtonHovered,
                 }"
             >
@@ -236,7 +236,7 @@ onBeforeUnmount(() => {
                 <div
                     ref="releaseDropdownRef"
                     class="relative backdrop-blur mr-5"
-                    :class="{ 'opacity-50': !selectedChannel && !uploadedFile }"
+                    :class="{ 'opacity-40': !selectedChannel && !uploadedFile }"
                 >
                     <button
                         class="dropdown-button w-full"

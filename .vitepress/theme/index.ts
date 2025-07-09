@@ -7,50 +7,7 @@ import { h } from "vue";
 import "./style.css";
 
 import { OhVueIcon, addIcons } from "oh-vue-icons";
-import {
-    BiCheck,
-    BiCheck2,
-    BiFileEarmarkZip,
-    BiGithub,
-    BiListUl,
-    BiUsbSymbol,
-    HiCode,
-    HiMinusSm,
-    HiPlusSm,
-    LaDownloadSolid,
-    LaInfoCircleSolid,
-    MdCloseRound,
-    MdFontdownloadOutlined,
-    MdSortRound,
-    OiCheck,
-    OiChevronDown,
-    OiChevronLeft,
-    OiChevronRight,
-    OiChevronUp,
-    OiCopy,
-    PrArrowUpRight,
-    PrDownload,
-    PrRefresh,
-    PrTrash,
-    RiAlertLine,
-    RiCheckLine,
-    RiClapperboardLine,
-    RiDeleteBinLine,
-    RiDownloadCloud2Line,
-    RiDownloadCloudLine,
-    RiErrorWarningLine,
-    RiExternalLinkLine,
-    RiFileListLine,
-    RiFileTextLine,
-    RiFullscreenExitLine,
-    RiFullscreenLine,
-    RiImageLine,
-    RiInformationLine,
-    RiPassportLine,
-    RiQuestionMark,
-    RiSaveLine,
-    RiUsbLine,
-} from "oh-vue-icons/icons";
+import * as icons from "./icons";
 
 import AssetPacksPage from "./components/AssetPacksPage.vue";
 import ConnectButton from "./components/ConnectButton.vue";
@@ -62,7 +19,6 @@ import SidebarSearch from "./components/SidebarSearch.vue";
 import UpdaterPage from "./components/UpdaterPage.vue";
 import WarningPopup from "./components/WarningPopup.vue";
 import { useSerialConnection } from "./composables/useSerialConnection";
-import { ConnectionState } from "./types";
 
 export default {
     extends: DefaultTheme,
@@ -95,125 +51,27 @@ export default {
             }
         };
 
+        const serialConnection = useSerialConnection();
         if (
             typeof window !== "undefined" &&
             typeof navigator !== "undefined" &&
             !import.meta.env.SSR
         ) {
-            const serialConnection = useSerialConnection();
             serialConnection.setupEventListeners();
-            app.provide("serialConnection", serialConnection);
-        } else {
-            const ssrStub = {
-                connectionData: {
-                    state: ConnectionState.DISCONNECTED,
-                    installedPacks: {},
-                },
-                flags: {
-                    serialSupported: false,
-                    portSelectRequired: false,
-                    connected: false,
-                    rpcActive: false,
-                    rpcToggling: false,
-                    updateInProgress: false,
-                    progress: 0,
-                    installStatus: null,
-                    ableToExtract: null,
-                    ableToUpdate: null,
-                    restarting: false,
-                    screenStream: false,
-                    screenStreamPaused: false,
-                },
-                queueState: {
-                    queue: [],
-                    queueActions: [],
-                    fakeExtractProgress: null,
-                },
-                firmwareState: {
-                    updateStage: "",
-                    writeProgress: { filename: "", progress: 0 },
-                },
-                connect: () => Promise.reject(new Error("SSR")),
-                disconnect: () => Promise.reject(new Error("SSR")),
-                startRpc: () => Promise.reject(new Error("SSR")),
-                stopRpc: () => Promise.reject(new Error("SSR")),
-                readBasicInfo: () => Promise.reject(new Error("SSR")),
-                findKnownDevices: () => Promise.reject(new Error("SSR")),
-                requestPort: () => Promise.reject(new Error("SSR")),
-                installAssetPack: () => Promise.reject(new Error("SSR")),
-                loadInstalledPacks: () => Promise.reject(new Error("SSR")),
-                setupEventListeners: () => {},
-                enqueue: () => Promise.reject(new Error("SSR")),
-                updateExtractCapability: () => Promise.reject(new Error("SSR")),
-                updateFirmwareCapability: () => Promise.reject(new Error("SSR")),
-                updateFirmware: () => Promise.reject(new Error("SSR")),
-                restartRpc: () => Promise.reject(new Error("SSR")),
-                logs: [],
-                addLog: () => {},
-                clearLogs: () => {},
-                testConnecting: () => Promise.reject(new Error("SSR")),
-                testUpdateFirmware: () => Promise.reject(new Error("SSR")),
-                startScreenStream: () => Promise.reject(new Error("SSR")),
-                stopScreenStream: () => Promise.reject(new Error("SSR")),
-                screenScale: { value: 2 },
-            };
-            app.provide("serialConnection", ssrStub);
         }
+        app.provide("serialConnection", serialConnection);
 
         try {
-            addIcons(
-                HiPlusSm,
-                HiMinusSm,
-                BiCheck,
-                BiCheck2,
-                PrDownload,
-                MdCloseRound,
-                MdFontdownloadOutlined,
-                MdSortRound,
-                OiCheck,
-                OiChevronDown,
-                OiChevronLeft,
-                OiChevronRight,
-                OiChevronUp,
-                OiCopy,
-                LaDownloadSolid,
-                PrTrash,
-                RiClapperboardLine,
-                RiErrorWarningLine,
-                RiExternalLinkLine,
-                RiFullscreenExitLine,
-                PrArrowUpRight,
-                RiFullscreenLine,
-                RiImageLine,
-                RiPassportLine,
-                RiSaveLine,
-                RiQuestionMark,
-                BiGithub,
-                LaInfoCircleSolid,
-                RiAlertLine,
-                RiCheckLine,
-                RiDeleteBinLine,
-                RiDownloadCloudLine,
-                RiFileListLine,
-                RiFileTextLine,
-                RiInformationLine,
-                RiUsbLine,
-                HiCode,
-                BiListUl,
-                RiDownloadCloud2Line,
-                BiUsbSymbol,
-                PrRefresh,
-                BiFileEarmarkZip,
-            );
+            addIcons(...Object.values(icons));
         } catch (error) {
             console.error("Failed to load icons:", error);
         }
 
-        app.component("AssetPacksPage", AssetPacksPage as any);
-        app.component("VIcon", OhVueIcon);
-        app.component("ExtractNotice", ExtractNotice as any);
-        app.component("UpdaterPage", UpdaterPage as any);
-        app.component("HomeActions", HomeActions as any);
-        app.component("ReleasesPage", ReleasesPage as any);
+        app.component("AssetPacksPage", AssetPacksPage as never);
+        app.component("VIcon", OhVueIcon as never);
+        app.component("ExtractNotice", ExtractNotice as never);
+        app.component("UpdaterPage", UpdaterPage as never);
+        app.component("HomeActions", HomeActions as never);
+        app.component("ReleasesPage", ReleasesPage as never);
     },
 } satisfies Theme;

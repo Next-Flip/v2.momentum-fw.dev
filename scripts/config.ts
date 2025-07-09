@@ -1,5 +1,3 @@
-#!/usr/bin/env tsx
-
 import { promises as fs } from "fs";
 import type { MessageSchema, SupportedLocales } from "../.vitepress/i18n/index.ts";
 import messages from "../.vitepress/i18n/index.ts";
@@ -28,11 +26,13 @@ function generateConfigContent(
 
     const navMainlineItems = mainlineItems.map((item) => ({
         text: item.commit + ` (${formatDate(item.date)})`,
-        link: `/update/${item.commit}`,
+        link: `/update?version=${item.commit}`,
+        activeMatch: `/update?version=${item.commit}`,
     }));
     const navDevbuildsItems = devbuildsItems.slice(0, 1).map((item) => ({
         text: item.commit + ` (${formatDate(item.date)})`,
-        link: `/update/${item.commit}`,
+        link: `/update?version=${item.commit}`,
+        activeMatch: `/update?version=${item.commit}`,
     }));
 
     const wikiOverrides = isRoot

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Releases
+title: 更新日志
 ---
 
 <ReleasesPage />

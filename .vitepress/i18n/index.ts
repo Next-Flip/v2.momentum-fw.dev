@@ -311,6 +311,8 @@ export type MessageSchema = {
     updater_flash_select_release_or_file: string;
     updater_unavailable: string;
     updater_go_to_release: string;
+    updater_upload_file: string;
+    updater_select_release: string;
 };
 
 export type SupportedLocales = keyof typeof messages;

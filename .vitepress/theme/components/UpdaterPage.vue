@@ -9,7 +9,7 @@ import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
 import { STORAGE_KEYS } from "../types";
-import { bytesToSize, downloadFile, formatFileDate, parseUploadedFileName } from "../util";
+import { bytesToSize, devMode, downloadFile, formatFileDate, parseUploadedFileName } from "../util";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
@@ -46,7 +46,7 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsExpanded = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(false);
+const testMode = ref(devMode() || false);
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
@@ -90,6 +90,12 @@ const isMatchingRelease = computed(() => {
     }
 
     return false;
+});
+
+const currentDeviceVersion = computed(() => {
+    return serialConnection?.connectionData.deviceInfo?.firmware_version === "mntm-dev"
+        ? serialConnection?.connectionData.deviceInfo?.firmware_commit
+        : serialConnection?.connectionData.deviceInfo?.firmware_version;
 });
 
 const channelReleases = computed(() => {
@@ -493,19 +499,24 @@ onBeforeUnmount(() => {
                                                 />
                                             </div>
                                             <span class="text-xs text-vp-3 flex flex-row gap-2">
-                                                {{ tr("updater_matching_release_warning") }}
+                                                {{
+                                                    uploadedFile
+                                                        ? tr("updater_matching_release_warning", {
+                                                              type: tr("updater_upload_file"),
+                                                          })
+                                                        : tr("updater_matching_release_warning", {
+                                                              type: tr("updater_select_release"),
+                                                          })
+                                                }}
                                                 <div class="flex flex-row gap-px">
                                                     <span class="text-vp-3/60 mr-px">(</span>
                                                     <a
                                                         class="text-vp-2 hover:underline vp-external-link-icon"
-                                                        :href="`${getLocalizedPath('/releases')}/${serialConnection?.connectionData.deviceInfo?.firmware_commit}`"
+                                                        :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion?.replace('mntm-', '')}`"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
-                                                        {{
-                                                            serialConnection?.connectionData
-                                                                .deviceInfo?.firmware_commit
-                                                        }}
+                                                        {{ currentDeviceVersion }}
                                                     </a>
                                                     <span class="text-vp-3/60">)</span>
                                                 </div>
@@ -527,8 +538,8 @@ onBeforeUnmount(() => {
                                         <h3
                                             class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-6"
                                             :class="{
-                                                'opacity-50 transition-opacity duration-200':
-                                                    isInstallButtonHovered,
+                                                'opacity-40 transition-opacity duration-200':
+                                                    isInstallButtonHovered || uploadedFile,
                                             }"
                                         >
                                             {{ tr("updater_select_firmware") }}

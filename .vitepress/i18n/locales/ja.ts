@@ -310,8 +310,7 @@ const messages: MessageSchema = {
     updater_device_disconnected: "デバイスが切断されました",
     updater_flipper_not_connected_subtitle:
         "Flipper を接続し、qFlipper と/または Flipper Lab が閉じていることを確認してください！",
-    updater_matching_release_warning:
-        "選択した/アップロードしたリリースは、現在のファームウェアと一致しています",
+    updater_matching_release_warning: "{{type}} は、現在のファームウェアと一致しています",
     updater_download_release: "リリースをダウンロード",
     updater_flash_button_disconnected: "Flipper を接続してください！",
     updater_flash_select_release: "リリースを選択",
@@ -319,6 +318,8 @@ const messages: MessageSchema = {
         "リリースを選択するか、ファイルをアップロードしてください",
     updater_unavailable: "利用不可",
     updater_go_to_release: "リリースページに移動",
+    updater_upload_file: "アップロードしたファイル",
+    updater_select_release: "選択したリリース",
 };
 
 export default messages;

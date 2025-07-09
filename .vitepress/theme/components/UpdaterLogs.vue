@@ -157,12 +157,13 @@ watch(
                     </span>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <Tooltip v-if="showButtons" :delay="0" :z-index="9999">
+                    <Tooltip :delay="0" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
                                 'scale-95': copyState.isPressed.value,
                                 'opacity-0': windowWidth > 1024,
+                                'group-hover:opacity-100': showButtons,
                             }"
                             :aria-label="tr('updater_clear_logs')"
                             @click="clearLogs"
@@ -171,12 +172,13 @@ watch(
                         </button>
                         <template #content>{{ tr("updater_clear_logs") }}</template>
                     </Tooltip>
-                    <Tooltip v-if="showButtons" :delay="0" :z-index="9999">
+                    <Tooltip :delay="0" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
                                 'scale-95': copyState.isPressed.value,
                                 'opacity-0': windowWidth > 1024,
+                                'group-hover:opacity-100': showButtons,
                             }"
                             :aria-label="copyState.currentText.value"
                             @click.stop="copyLogs"

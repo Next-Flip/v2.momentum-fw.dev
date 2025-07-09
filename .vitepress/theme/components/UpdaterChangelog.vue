@@ -145,10 +145,10 @@ const releaseHref = computed(() => {
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <button
-                        v-if="isAccessible && (isOpen || isExpanded)"
-                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 group-hover:opacity-100 icon-button-opacity"
+                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                         :class="{
                             'opacity-0': windowWidth > 1024,
+                            'group-hover:opacity-100': isAccessible && (isOpen || isExpanded),
                         }"
                         @click="handleToggleExpand"
                     >
