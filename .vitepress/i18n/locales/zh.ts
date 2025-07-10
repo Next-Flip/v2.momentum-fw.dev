@@ -309,13 +309,15 @@ const messages: MessageSchema = {
     updater_device_disconnected: "设备已断开",
     updater_flipper_not_connected_subtitle:
         "请连接您的 Flipper，并确保 qFlipper 和/或 Flipper Lab 已关闭！",
-    updater_matching_release_warning: "选择的/上传的版本与当前固件版本一致",
+    updater_matching_release_warning: "{{type}} 与当前固件版本一致",
     updater_download_release: "下载版本",
     updater_flash_button_disconnected: "连接您的 Flipper！",
     updater_flash_select_release: "选择一个版本",
     updater_flash_select_release_or_file: "选择一个版本或上传一个文件",
     updater_unavailable: "不可用",
     updater_go_to_release: "前往版本",
+    updater_upload_file: "上传的文件",
+    updater_select_release: "选择的版本",
 };
 
 export default messages;

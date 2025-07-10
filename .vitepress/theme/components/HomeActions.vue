@@ -110,7 +110,7 @@ const dynamicButtons = computed((): ActionButton[] => {
                 :key="button.href"
                 :href="button.isLatest ? '#' : button.href"
                 :class="[
-                    'px-7 text-sm leading-9 font-semibold rounded-full border-2 transition-all duration-100',
+                    'px-7 text-sm leading-9 font-semibold rounded-full border transition-all duration-100',
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest

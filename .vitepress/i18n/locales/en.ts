@@ -309,15 +309,26 @@ const messages: MessageSchema = {
     updater_device_connected: "Device connected successfully",
     updater_device_disconnected: "Device disconnected",
     updater_flipper_not_connected_subtitle:
+<<<<<<< HEAD
         "Plug in your Flipper, and make sure qFlipper and Flipper Lab are closed!",
     updater_matching_release_warning:
         "The selected/uploaded release matches the current version on your Flipper",
+||||||| c427132
+        "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
+    updater_matching_release_warning:
+        "The selected/uploaded release matches the current version on your Flipper",
+=======
+        "Plug in your Flipper, and make sure qFlipper and/or Flipper Lab are closed!",
+    updater_matching_release_warning: "The {{type}} matches the current version on your Flipper",
+>>>>>>> origin/dev
     updater_download_release: "Download release",
     updater_flash_button_disconnected: "Connect your Flipper!",
     updater_flash_select_release: "Select a release",
     updater_flash_select_release_or_file: "Select a release or upload a file",
     updater_unavailable: "Unavailable",
     updater_go_to_release: "Go to release",
+    updater_upload_file: "uploaded file",
+    updater_select_release: "selected release",
 };
 
 export default messages;

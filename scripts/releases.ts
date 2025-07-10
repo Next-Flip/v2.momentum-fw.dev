@@ -1,5 +1,3 @@
-#!/usr/bin/env tsx
-
 import { parse } from "node-html-parser";
 import { promises as fs } from "node:fs";
 import { ofetch } from "ofetch";
