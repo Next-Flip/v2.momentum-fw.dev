@@ -1,4 +1,5 @@
 import { generateConfigs } from "./config";
+import { updateLocaleLinks } from "./locales";
 import { fetchReleases } from "./releases";
 import { fetchAssetPacks, patchVueIcons, updateBuildInfo } from "./utils";
 
@@ -14,12 +15,14 @@ async function main(): Promise<void> {
         } else {
             console.log("Skipping fetch operations (SKIP_FETCH=true)");
         }
+        console.log("Updating locale links...");
+        await updateLocaleLinks();
         console.log("Generating VitePress configs...");
         await generateConfigs();
-        console.log("Patching oh-vue-icons...");
-        await patchVueIcons();
         console.log("Updating build info...");
         await updateBuildInfo();
+        console.log("Patching oh-vue-icons...");
+        await patchVueIcons();
         const endTime = Date.now();
         const duration = ((endTime - startTime) / 1000).toFixed(2);
 

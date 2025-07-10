@@ -10,7 +10,9 @@ next:
 
 이 위키는 일본어, 영어, 한국어, 중국어로 사용할 수 있습니다.
 
-[English](/wiki) · [日本語](/ja/wiki) · [한국어](/ko/wiki) · [简体中文](/zh/wiki)
+<!-- LOCALE_LINKS_START -->
+[English](/wiki) · [한국어](/ko/wiki) · [日本語](/ja/wiki) · [简体中文](/zh/wiki)
+<!-- LOCALE_LINKS_END -->
 
 </div>
 

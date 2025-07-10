@@ -315,8 +315,8 @@ export type MessageSchema = {
     updater_select_release: string;
 };
 
-export type SupportedLocales = keyof typeof messages;
 const messages = { en, ko, ja, zh } as const;
+export type SupportedLocales = keyof typeof messages;
 export type Messages = typeof messages;
 export default messages;
 

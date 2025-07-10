@@ -9,11 +9,13 @@
     "type": "module",
     "scripts": {
         "prebuild": "bun scripts/prebuild.ts",
+        "prebuild:skip": "SKIP_FETCH=true bun run prebuild",
         "build": "vitepress build",
         "predev": "bun run prebuild",
         "dev": "vitepress dev --host 0.0.0.0",
         "dev:skip": "SKIP_FETCH=true bun run dev",
         "preview": "vitepress preview --host 0.0.0.0",
+        "build:skip": "SKIP_FETCH=true bun run build",
         "build:preview": "bun run build && bun run preview",
         "preview:skip": "SKIP_FETCH=true bun run build:preview",
         "lint": "eslint --fix \".vitepress/theme/components/**/*.{js,ts,mts,vue}\" \".vitepress/theme/composables/**/*.{js,ts,mts,vue}\"",
@@ -23,7 +25,8 @@
         "clean": "rm -rf node_modules && rm -rf .vitepress/cache && rm -rf .vitepress/dist && bun install",
         "clean:build": "bun run clean && bun run build",
         "clean:preview": "bun run clean:build && bun run preview",
-        "check:meta": "bunx check-site-meta --no-analytics 4173"
+        "check:meta": "bunx check-site-meta --no-analytics 4173",
+        "add-locale": "bun scripts/add-locale.ts"
     },
     "dependencies": {
         "@types/markdown-it": "^14.1.2",

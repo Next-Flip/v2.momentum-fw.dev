@@ -1,8 +1,12 @@
+// This file is edited in the prebuild step, do not remove the "LOCALE_*" comments.
+
 import { defineConfig } from "vitepress";
+/* LOCALE_IMPORTS_START */
 import { rootConfig, rootSearchLocale } from "./config/en";
-import { jaConfig, jaSearchLocale } from "./config/ja";
 import { koConfig, koSearchLocale } from "./config/ko";
+import { jaConfig, jaSearchLocale } from "./config/ja";
 import { zhConfig, zhSearchLocale } from "./config/zh";
+/* LOCALE_IMPORTS_END */
 
 export default defineConfig({
     markdown: {
@@ -14,11 +18,13 @@ export default defineConfig({
     title: "Momentum Firmware",
     description: "Feature-rich, stable and customizable firmware for Flipper Zero",
     locales: {
+        /* LOCALE_CONFIGS_START */
         root: rootConfig,
         ko: koConfig,
         ja: jaConfig,
         zh: zhConfig,
-    } as any,
+        /* LOCALE_CONFIGS_END */
+    } as Parameters<typeof defineConfig>[0]["locales"],
     head: [
         ["link", { rel: "icon", href: "/logos/black_round.png" }],
         ["link", { rel: "icon", href: "/logos/black.ico" }],
@@ -151,10 +157,12 @@ export default defineConfig({
             provider: "local",
             options: {
                 locales: {
+                    /* SEARCH_LOCALES_START */
                     root: rootSearchLocale,
                     ko: koSearchLocale,
                     ja: jaSearchLocale,
                     zh: zhSearchLocale,
+                    /* SEARCH_LOCALES_END */
                 },
             },
         },

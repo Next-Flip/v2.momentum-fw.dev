@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import type { MessageSchema, SupportedLocales } from "../.vitepress/i18n/index.ts";
 import messages from "../.vitepress/i18n/index.ts";
 import type { ReleaseItem } from "./releases.ts";
-import { HEADER, jsonToTypeScript } from "./utils.ts";
+import { HEADER, jsonToTypeScript, replaceTemplateSection } from "./utils.ts";
 
 const formatDate = (dateString: string): string => {
     if (!dateString) return "";
@@ -26,12 +26,12 @@ function generateConfigContent(
 
     const navMainlineItems = mainlineItems.map((item) => ({
         text: item.commit + ` (${formatDate(item.date)})`,
-        link: `/update?version=${item.commit}`,
+        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
         activeMatch: `/update?version=${item.commit}`,
     }));
     const navDevbuildsItems = devbuildsItems.slice(0, 1).map((item) => ({
         text: item.commit + ` (${formatDate(item.date)})`,
-        link: `/update?version=${item.commit}`,
+        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
         activeMatch: `/update?version=${item.commit}`,
     }));
 
@@ -219,4 +219,52 @@ export async function generateConfigs() {
     }
 
     console.log("Successfully generated all configs.");
+    console.log("  Updating main config.mts...");
+    await updateMainConfigTemplate(locales);
+    console.log("    Updated: ./.vitepress/config.mts");
+}
+
+async function updateMainConfigTemplate(locales: Array<SupportedLocales>) {
+    const configPath = "./.vitepress/config.mts";
+    let content = await fs.readFile(configPath, "utf8");
+
+    const imports: string[] = [];
+    const localeEntries: string[] = [];
+    const searchEntries: string[] = [];
+
+    for (const locale of locales) {
+        const configName = locale === "en" ? "rootConfig" : `${locale}Config`;
+        const searchName = locale === "en" ? "rootSearchLocale" : `${locale}SearchLocale`;
+        const localeKey = locale === "en" ? "root" : locale;
+
+        imports.push(`import { ${configName}, ${searchName} } from "./config/${locale}";`);
+        localeEntries.push(`        ${localeKey}: ${configName},`);
+        searchEntries.push(`                    ${localeKey}: ${searchName},`);
+    }
+
+    content = replaceTemplateSection(
+        content,
+        "/* LOCALE_IMPORTS_START */",
+        "/* LOCALE_IMPORTS_END */",
+        imports.join("\n"),
+    );
+    console.log("Imports updated successfully.");
+    content = replaceTemplateSection(
+        content,
+        "/* LOCALE_CONFIGS_START */",
+        "/* LOCALE_CONFIGS_END */",
+        localeEntries.join("\n"),
+        "        ",
+    );
+    console.log("Locale configurations updated successfully.");
+    content = replaceTemplateSection(
+        content,
+        "/* SEARCH_LOCALES_START */",
+        "/* SEARCH_LOCALES_END */",
+        searchEntries.join("\n"),
+        "                    ",
+    );
+    console.log("Search locales updated successfully.");
+
+    await fs.writeFile(configPath, content, "utf8");
 }

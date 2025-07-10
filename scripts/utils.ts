@@ -19,6 +19,24 @@ export const jsonToTypeScript = (obj: unknown): string => {
     return JSON.stringify(obj, null, 4).replace(/"([^"]+)":/g, "$1:");
 };
 
+export function validateLocaleCode(localeCode: string): boolean {
+    return /^[a-z]{2}$/.test(localeCode);
+}
+
+export function replaceTemplateSection(
+    content: string,
+    startComment: string,
+    endComment: string,
+    replacement: string,
+    indent: string = "",
+): string {
+    const regex = new RegExp(
+        `(${startComment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})[\\s\\S]*?(${endComment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+        "g",
+    );
+    return content.replace(regex, `$1\n${replacement}\n${indent}$2`);
+}
+
 export async function updateBuildInfo(): Promise<void> {
     const now = new Date();
     const timestamp = now.getTime();

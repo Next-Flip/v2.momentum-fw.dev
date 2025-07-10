@@ -9,9 +9,11 @@ next:
 
 <div class="mntm custom-block">
 
-您可以在下方找到不同语言版本的维基。如果您想帮助我们进行本地化工作：[Next-Flip/Momentum-Website](https://github.com/Next-Flip/Momentum-Website)。
+您可以在下方找到不同语言版本的维基。如果您想帮助我们进行本地化工作：[Next-Flip/v2.momentum-fw.dev](https://github.com/Next-Flip/v2.momentum-fw.dev/tree/dev/.vitepress/i18n)。
 
-[English](/wiki) · [日本語](/ja/wiki) · [한국어](/ko/wiki) · [简体中文](/zh/wiki)
+<!-- LOCALE_LINKS_START -->
+[English](/wiki) · [한국어](/ko/wiki) · [日本語](/ja/wiki) · [简体中文](/zh/wiki)
+<!-- LOCALE_LINKS_END -->
 
 </div>
 

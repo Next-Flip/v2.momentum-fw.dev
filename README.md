@@ -1,0 +1,104 @@
+# v2.momentum-fw.dev
+
+This repository contains the source for the Momentum Firmware website (v2) at [v2.momentum-fw.dev](https://v2.momentum-fw.dev). The site is built using VitePress with Vue 3 components and provides multilingual documentation, firmware update capabilities, release changelogs, and asset packs.
+
+## Project Structure
+
+```
+v2.momentum-fw/
+├── .vitepress/           # VitePress configuration and theme
+│   ├── theme/           # Vue components and composables
+│   ├── config/          # Generated locale-specific configs
+│   └── i18n/            # Internationalization messages
+├── scripts/             # Build and utility scripts
+│   ├── config.ts        # VitePress config generation
+│   ├── locales.ts       # Locale links updating in wiki
+│   ├── add-locale.ts    # Add new locale (see .vitepress/i18n/README.md)
+│   ├── prebuild.ts      # Pre-build automation
+│   ├── releases.ts      # Release data fetching
+│   └── utils.ts         # Build utilities
+├── wiki/                # Documentation content (`locale/` have their own `wiki/` directory)
+├── [locale]/            # Localized pages and wiki content (ja, ko, zh, etc.)
+├── public/              # Static assets
+└── _data/               # Generated data files created during the build process
+```
+
+## Development Setup
+
+##### Prerequisites
+
+- Node.js (v18 or higher)
+- [Bun](https://bun.sh/docs/installation) (package manager) (v1.2.2 or higher)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Next-Flip/v2.momentum-fw.dev.git
+   cd v2.momentum-fw.dev
+   ```
+
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+
+3. Start the development server:
+   ```bash
+   bun run dev
+   ```
+
+The development server will be available at `http://localhost:5173`.
+
+> **Note**: Data fetching (releases and asset packs) is required at least once for certain pages to function. After the initial fetch, you can use `bun run dev:skip` without re-fetching external data.
+
+### Available Commands
+
+```bash
+# Development
+bun run dev              # Start development server with data fetching
+bun run dev:skip         # Start development server without fetching external data (fetch needs to be run at least once before dev or preview)
+
+# Production
+bun run build            # Build for production
+bun run preview          # Preview production build
+bun run build:skip       # Build without fetching external data (fetch needs to be run at least once before dev or preview)
+bun run build:preview    # Build and preview
+bun run preview:skip     # Preview production build without fetching external data (fetch needs to be run at least once)
+
+# Maintenance
+bun run lint            # Lint components and composables
+bun run lint:all        # Lint all project files
+bun run pretty          # Format code with Prettier
+bun run clean:build     # Clean install and build
+```
+
+### Pre-build Process
+
+1. **Pre-build** ([`scripts/prebuild.ts`](scripts/)):
+   - **Asset Packs**: Fetches asset pack directory from `https://up.momentum-fw.dev/asset-packs/directory.json`
+   - **Releases**: Scrapes firmware build pages from `https://up.momentum-fw.dev/builds/firmware/` to get mainline releases and devbuilds
+   - **Changelogs**: Downloads changelog files from GitHub raw content for each release
+   - **Locale Links**: Updates locale links in all wiki index files ([`scripts/locales.ts`](scripts/locales.ts))
+   - **Config Generation**: Creates VitePress configuration files for all locales ([`scripts/config.ts`](scripts/config.ts))
+   - **Dependencies**: Patches oh-vue-icons imports and updates build metadata ([`scripts/utils.ts`](scripts/utils.ts))
+
+## Localization
+
+Explanation of the localization and instructions for adding a new language can be found in [`.vitepress/i18n`](.vitepress/i18n). The `add-locale` script can also be used to add a new locale to the project.
+
+## Credits
+
+- [flipperzero-protobuf](https://github.com/flipperdevices/flipperzero-protobuf)
+- [labs.flipper.net](https://github.com/flipperdevices/lab.flipper.net)
+- [Momentum-Website](https://github.com/Next-Flip/v2.momentum-fw.dev/tree/dev/.vitepress/i18n)
+
+## Support
+
+If you enjoy the firmware please __**spread the word!**__ And if you really love it, maybe consider donating to the team? :D
+
+- **[Ko-fi](https://ko-fi.com/willyjl)**: One-off or Recurring, No signup required
+- **[PayPal](https://paypal.me/willyjl1)**: One-off, Signup required
+- **BTC**: `1EnCi1HF8Jw6m2dWSUwHLbCRbVBCQSyDKm`
+
+**Thank you <3**
