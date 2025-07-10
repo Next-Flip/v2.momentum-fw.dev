@@ -319,6 +319,10 @@ const messages: MessageSchema = {
     updater_go_to_release: "Go to release",
     updater_upload_file: "uploaded file",
     updater_select_release: "selected release",
+    updater_flashing_unavailable: "Flashing unavailable",
+    updater_serial_unsupported: "Unsupported Browser",
+    updater_serial_unsupported_subtitle:
+        "Your browser does not support serial communication. Please use a Chromium-based browser like <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, or <a href='https://www.opera.com/download' target='_blank' rel='noopener'>Opera</a>.",
 };
 
 export default messages;

@@ -313,6 +313,9 @@ export type MessageSchema = {
     updater_go_to_release: string;
     updater_upload_file: string;
     updater_select_release: string;
+    updater_flashing_unavailable: string;
+    updater_serial_unsupported: string;
+    updater_serial_unsupported_subtitle: string;
 };
 
 const messages = { en, ko, ja, zh } as const;

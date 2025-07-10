@@ -227,7 +227,10 @@ watch(
                                 'flex-1 min-h-0': !props.changelogIsOpen,
                             }"
                         >
-                            <div v-if="logs.length === 0" class="text-center py-8 m-auto">
+                            <div
+                                v-if="logs.length === 0"
+                                class="text-center py-[var(--vp-nav-height)] m-auto"
+                            >
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="text-gray-500">
                                         <p class="text-vp-2 font-medium">

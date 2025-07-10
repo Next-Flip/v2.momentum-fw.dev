@@ -6,6 +6,8 @@ import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
+import { supportsSerialPort } from "../util";
+
 import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
@@ -39,6 +41,7 @@ const emit = defineEmits<{
 
 const isConnected = computed(() => connectionIsConnected.value);
 const canFlash = computed(() => {
+    if (!supportsSerialPort()) return false;
     const hasReleaseOrFile = props.selectedRelease || props.uploadedFile;
     const notUpdating = !serialConnection?.flags.updateInProgress;
 
@@ -235,7 +238,7 @@ onBeforeUnmount(() => {
                 }}</label>
                 <div
                     ref="releaseDropdownRef"
-                    class="relative backdrop-blur mr-5"
+                    class="relative backdrop-blur"
                     :class="{ 'opacity-40': !selectedChannel && !uploadedFile }"
                 >
                     <button
@@ -314,7 +317,7 @@ onBeforeUnmount(() => {
                                             </span>
                                         </div>
                                         <span
-                                            class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
+                                            class="text-xs text-vp-3 ml-12 flex-shrink-0 font-mono"
                                             :class="{
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.commit === release.commit,
@@ -335,6 +338,11 @@ onBeforeUnmount(() => {
                     </Transition>
                 </div>
             </div>
+
+            <div
+                class="h-6 mb-2 mx-2 w-px bg-vp-divider transition-opacity duration-200"
+                :class="{ 'opacity-60': isInstallButtonHovered }"
+            />
 
             <div class="flex items-end">
                 <Tooltip
@@ -413,7 +421,9 @@ onBeforeUnmount(() => {
                     <template #content>
                         {{
                             connectionState === "disconnected"
-                                ? tr("updater_flash_button_disconnected")
+                                ? supportsSerialPort()
+                                    ? tr("updater_flash_button_disconnected")
+                                    : tr("updater_serial_unsupported")
                                 : connectionIsConnected && !canFlash
                                   ? tr("updater_flash_select_release_or_file")
                                   : ""
@@ -457,7 +467,7 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     width: 100%;
     max-width: 100%;
-    min-width: 0;
+    min-width: 160px;
     background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent);
     backface-visibility: hidden;
     border-radius: 8px;
@@ -496,8 +506,8 @@ onBeforeUnmount(() => {
     position: absolute;
     top: calc(100% + 5px);
     left: 0;
-    min-width: 140px;
-    width: 100%;
+    min-width: 100%;
+    width: max-content;
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     padding: 7px;
@@ -514,7 +524,6 @@ onBeforeUnmount(() => {
     max-height: 250px;
     display: flex;
     flex-direction: column;
-    width: 100%;
     min-width: 100%;
 }
 

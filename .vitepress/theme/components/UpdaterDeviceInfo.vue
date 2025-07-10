@@ -6,7 +6,7 @@ import { useI18n } from "../composables/useI18n";
 import { useSharedHover } from "../composables/useSharedHover";
 import type { DeviceInfo } from "../types";
 import { STORAGE_KEYS } from "../types";
-import { bytesToSize } from "../util";
+import { bytesToSize, supportsSerialPort } from "../util";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
@@ -50,6 +50,14 @@ const handleTabChange = (newTab: "parsed" | "raw") => {
 };
 
 const getConnectionDisplay = computed(() => {
+    if (!supportsSerialPort()) {
+        return {
+            title: tr("updater_serial_unsupported"),
+            subtitle: tr("updater_serial_unsupported_subtitle"),
+            showConnectButton: false,
+            showProgress: false,
+        };
+    }
     switch (connectionState.value) {
         case "connecting":
             return {
@@ -296,7 +304,7 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="border rounded-lg h-full flex flex-col max-h-[calc(50vh-var(--vp-nav-height)-24px)] w-full min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out"
+        class="border rounded-lg h-full flex flex-col max-h-[calc(30vh-var(--vp-nav-height)-24px)] lg:max-h-[calc(50vh-var(--vp-nav-height)-24px)] w-full min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out"
         :class="{
             'border-vp-divider': !isInstallButtonHovered,
             'border-vp-brand-1': isInstallButtonHovered,
@@ -362,9 +370,9 @@ const deviceSections = computed(() => {
                                 </p>
                                 <p
                                     v-if="getConnectionDisplay.subtitle"
-                                    class="text-sm text-vp-3 mb-5"
+                                    class="text-sm text-vp-3 mb-5 max-w-lg"
                                 >
-                                    {{ getConnectionDisplay.subtitle }}
+                                    <span class="subtitle" v-html="getConnectionDisplay.subtitle" />
                                 </p>
                                 <Transition name="button-height">
                                     <div
@@ -498,6 +506,10 @@ const deviceSections = computed(() => {
 </template>
 
 <style scoped>
+.subtitle :deep(a) {
+    @apply text-vp-brand-1 hover:text-vp-brand-2 hover:underline transition-colors duration-100 font-medium;
+}
+
 .export-button {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
 }

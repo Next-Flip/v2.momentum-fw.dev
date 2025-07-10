@@ -1246,8 +1246,6 @@ export const useSerialConnection = () => {
             addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
         }
 
-        return;
-
         firmwareState.updateStage = "update_stage_loading_firmware_files";
         await createUpdateDirectory(flipperModule);
 

@@ -9,6 +9,9 @@ import pako from "pako";
 // @ts-expect-error - untar is a global library
 import { untar } from "./flipper/untar/untar.js";
 
+export function supportsSerialPort(): boolean {
+    return typeof window !== "undefined" && typeof navigator !== "undefined" && "serial" in navigator;
+}
 
 export function devMode() {
     if (typeof window === "undefined") return false;

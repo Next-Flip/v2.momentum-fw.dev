@@ -320,6 +320,10 @@ const messages: MessageSchema = {
     updater_go_to_release: "リリースページに移動",
     updater_upload_file: "アップロードしたファイル",
     updater_select_release: "選択したリリース",
+    updater_flashing_unavailable: "フラッシュ不可",
+    updater_serial_unsupported: "サポートされていないブラウザ",
+    updater_serial_unsupported_subtitle:
+        "あなたのブラウザはシリアル通信をサポートしていません。<a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>、<a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>、または<a href='https://www.opera.com/' target='_blank' rel='noopener'>Opera</a>などのChromiumベースのブラウザを使用してください。",
 };
 
 export default messages;

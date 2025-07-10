@@ -318,6 +318,10 @@ const messages: MessageSchema = {
     updater_go_to_release: "前往版本",
     updater_upload_file: "上传的文件",
     updater_select_release: "选择的版本",
+    updater_flashing_unavailable: "闪存不可用",
+    updater_serial_unsupported: "不支持的浏览器",
+    updater_serial_unsupported_subtitle:
+        "您的浏览器不支持串口通信。请使用 <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>、<a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a> 或 <a href='https://www.opera.com/' target='_blank' rel='noopener'>Opera</a> 等 Chromium 浏览器。",
 };
 
 export default messages;

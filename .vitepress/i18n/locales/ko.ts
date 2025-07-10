@@ -306,10 +306,10 @@ const messages: MessageSchema = {
     updater_flash_button: "플래시",
     updater_logger_initialized: "로거가 초기화되었습니다",
     updater_waiting_flash_command: "펌웨어 플래시 명령을 기다리는 중...",
-    updater_device_connected: "Device connected successfully",
-    updater_device_disconnected: "Device disconnected",
+    updater_device_connected: "장치 연결 완료",
+    updater_device_disconnected: "장치 연결 끊김",
     updater_flipper_not_connected_subtitle:
-        "Plug in your Flipper, and make sure qFlipper and Flipper Lab are closed!",
+        "Flipper를 연결하고 qFlipper와 Flipper Lab가 닫혀있는지 확인하세요!",
     updater_matching_release_warning: "선택한/업로드한 릴리스가 현재 펌웨어와 일치합니다",
     updater_download_release: "릴리스 다운로드",
     updater_flash_button_disconnected: "Flipper를 연결하세요!",
@@ -319,6 +319,10 @@ const messages: MessageSchema = {
     updater_go_to_release: "릴리스 페이지로 이동",
     updater_upload_file: "업로드한 파일",
     updater_select_release: "선택한 릴리스",
+    updater_flashing_unavailable: "플래시 불가",
+    updater_serial_unsupported: "지원되지 않는 브라우저",
+    updater_serial_unsupported_subtitle:
+        "브라우저가 시리얼 통신을 지원하지 않습니다. <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, 또는 <a href='https://www.opera.com/' target='_blank' rel='noopener'>Opera</a> 등의 Chromium 기반 브라우저를 사용하세요.",
 };
 
 export default messages;

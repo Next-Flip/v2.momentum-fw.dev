@@ -118,7 +118,7 @@ const releaseHref = computed(() => {
             }"
         >
             <div
-                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 sm:pl-5 backdrop-blur-md dropdown-button"
+                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 sm:pl-5 dropdown-button"
                 :class="{
                     'is-active': isExpanded,
                     'border-b border-vp-divider':

@@ -9,7 +9,14 @@ import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
 import { STORAGE_KEYS } from "../types";
-import { bytesToSize, devMode, downloadFile, formatFileDate, parseUploadedFileName } from "../util";
+import {
+    bytesToSize,
+    devMode,
+    downloadFile,
+    formatFileDate,
+    parseUploadedFileName,
+    supportsSerialPort,
+} from "../util";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
@@ -257,7 +264,6 @@ const handleFlashFirmware = async () => {
 const handleDownloadRelease = () => {
     if (!selectedRelease.value) return;
 
-    // Find the firmware download URL
     const firmwareUrl = getFirmwareDownloadUrl(selectedRelease.value);
 
     if (firmwareUrl) {
@@ -271,7 +277,6 @@ const handleDownloadRelease = () => {
     }
 };
 
-// Helper function to get firmware download URL (same as in useSerialConnection)
 const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
     if (!release.files) return null;
 
@@ -389,9 +394,9 @@ onBeforeUnmount(() => {
             >
                 <div class="flex flex-col lg:flex-row gap-x-6 flex-1 w-full min-h-0 h-full">
                     <div
-                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start pb-3 mb-1 lg:mb-0 lg:pb-0"
+                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start pb-3 mb-6 lg:mb-0 lg:pb-0"
                         :class="{
-                            'border-b border-vp-divider lg:border-b-0 pb-7': !isMatchingRelease,
+                            'border-b border-vp-divider lg:border-b-0 pb-6': !isMatchingRelease,
                         }"
                         :style="
                             windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''
@@ -418,7 +423,8 @@ onBeforeUnmount(() => {
                         ></div>
 
                         <div
-                            class="relative flex flex-col border border-vp-divider rounded-lg px-6 pb-6"
+                            v-if="!isChangelogExpanded"
+                            class="relative flex flex-col border border-vp-divider rounded-lg px-6"
                             :class="{
                                 'min-h-[202px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
@@ -490,7 +496,7 @@ onBeforeUnmount(() => {
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div v-if="!showUpdateOverlay" class="flex flex-col">
+                                <div v-if="!showUpdateOverlay" class="flex flex-col mb-6">
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
@@ -575,7 +581,7 @@ onBeforeUnmount(() => {
                             <Transition name="slide-up" mode="out-in">
                                 <div
                                     v-if="!isChangelogExpanded"
-                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300 mt-6"
+                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300"
                                     :class="{
                                         'opacity-50 transition-opacity duration-200':
                                             isInstallButtonHovered,
@@ -585,9 +591,13 @@ onBeforeUnmount(() => {
                                         'opacity-90': isOverDropZone && !showUpdateOverlay,
                                         'opacity-30 pointer-events-none':
                                             showUpdateOverlay && !isChangelogExpanded,
+                                        'mb-6': supportsSerialPort(),
                                     }"
                                 >
-                                    <div class="flex items-center justify-center gap-4 mb-6">
+                                    <div
+                                        v-if="supportsSerialPort()"
+                                        class="flex items-center justify-center gap-4 mb-6"
+                                    >
                                         <h3
                                             class="text-[13px] leading-3 uppercase font-semibold text-vp-1"
                                         >
@@ -596,7 +606,7 @@ onBeforeUnmount(() => {
                                         <div class="flex-1 h-px bg-vp-divider w-full"></div>
                                     </div>
 
-                                    <div v-if="uploadedFile" class="w-full">
+                                    <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
                                         <div
                                             class="flex items-center justify-between p-4 bg-vp-bg/75 border border-vp-divider rounded-lg border-dashed"
                                             :class="{ 'border-vp-3/65': isOverDropZone }"
@@ -659,7 +669,7 @@ onBeforeUnmount(() => {
                                     </div>
 
                                     <div
-                                        v-else
+                                        v-else-if="supportsSerialPort()"
                                         class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/90 cursor-pointer pt-6 pb-7 backdrop-blur-md relative z-10"
                                         :class="{
                                             'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
@@ -699,12 +709,13 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
-                            class="min-h-14 transition-opacity duration-200 mt-6"
+                            class="min-h-14 transition-opacity duration-200"
                             :class="{
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
-                                'flex-1 min-h-0 mb-6': !isChangelogClosed,
-                                'flex-shrink-0 mb-6': isChangelogClosed,
+                                'flex-1 min-h-0': !isChangelogClosed,
+                                'flex-shrink-0': isChangelogClosed,
+                                'mt-6': !isChangelogExpanded,
                             }"
                         >
                             <UpdaterChangelog
@@ -718,12 +729,14 @@ onBeforeUnmount(() => {
                         </div>
 
                         <div
+                            v-if="supportsSerialPort()"
                             class="min-h-14 transition-opacity duration-200"
                             :class="{
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
                                 'flex-shrink-0': !isChangelogClosed,
                                 'flex-1 min-h-0': isChangelogClosed,
+                                'mt-6': !isChangelogExpanded,
                             }"
                         >
                             <UpdaterLogs
