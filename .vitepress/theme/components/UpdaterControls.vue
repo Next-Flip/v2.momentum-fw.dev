@@ -148,23 +148,17 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="rounded-xl">
-        <div class="flex flex-col md:flex-row gap-3 items-end">
-            <div
-                class="flex-1 md:max-w-[25%]"
-                :class="{
-                    'opacity-40 transition-opacity duration-200':
-                        uploadedFile || isInstallButtonHovered,
-                }"
-            >
-                <label class="block text-sm font-medium text-vp-2 mb-3">{{
-                    tr("updater_channel_label")
-                }}</label>
-                <div ref="channelDropdownRef" class="relative backdrop-blur">
+        <div class="flex flex-col xl:flex-row gap-3 items-end">
+            <div class="flex flex-row gap-3 items-end w-full">
+                <div ref="channelDropdownRef" class="relative flex-shrink-0">
+                    <label class="block text-sm font-medium text-vp-2 mb-3">
+                        {{ tr("updater_channel_label") }}
+                    </label>
                     <button
-                        class="dropdown-button w-full"
+                        class="dropdown-button min-w-[160px] w-auto"
                         :class="{
                             'is-active': isChannelDropdownOpen,
-                            'cursor-not-allowed': uploadedFile,
+                            'opacity-50 cursor-not-allowed': uploadedFile || isInstallButtonHovered,
                         }"
                         @click="toggleChannelDropdown"
                     >
@@ -177,9 +171,12 @@ onBeforeUnmount(() => {
                             <v-icon name="oi-chevron-down" />
                         </div>
                     </button>
-
                     <Transition name="fade-dropdown">
-                        <div v-if="isChannelDropdownOpen" class="dropdown-menu-container">
+                        <div
+                            v-if="isChannelDropdownOpen"
+                            class="dropdown-menu-container left-0"
+                            style="min-width: 100%; left: 0; right: auto"
+                        >
                             <div
                                 class="dropdown-menu"
                                 :class="{ 'is-visible': isChannelDropdownOpen }"
@@ -224,29 +221,19 @@ onBeforeUnmount(() => {
                         </div>
                     </Transition>
                 </div>
-            </div>
 
-            <div
-                class="flex-1"
-                :class="{
-                    'opacity-40 transition-opacity duration-200':
-                        uploadedFile || isInstallButtonHovered,
-                }"
-            >
-                <label class="block text-sm font-medium text-vp-2 mb-3">{{
-                    tr("updater_version_dropdown_label")
-                }}</label>
-                <div
-                    ref="releaseDropdownRef"
-                    class="relative backdrop-blur"
-                    :class="{ 'opacity-40': !selectedChannel && !uploadedFile }"
-                >
+                <div ref="releaseDropdownRef" class="relative flex-1 min-w-0">
+                    <label class="block text-sm font-medium text-vp-2 mb-3">
+                        {{ tr("updater_version_dropdown_label") }}
+                    </label>
                     <button
                         class="dropdown-button w-full"
                         :class="{
                             'is-active': isReleaseDropdownOpen,
-                            'cursor-not-allowed':
-                                uploadedFile || (!selectedChannel && !uploadedFile),
+                            'opacity-50 cursor-not-allowed':
+                                uploadedFile ||
+                                (!selectedChannel && !uploadedFile) ||
+                                isInstallButtonHovered,
                         }"
                         @click="toggleReleaseDropdown"
                     >
@@ -259,9 +246,12 @@ onBeforeUnmount(() => {
                             <v-icon name="oi-chevron-down" />
                         </div>
                     </button>
-
                     <Transition name="fade-dropdown">
-                        <div v-if="isReleaseDropdownOpen" class="dropdown-menu-container">
+                        <div
+                            v-if="isReleaseDropdownOpen"
+                            class="dropdown-menu-container right-0"
+                            style="min-width: 100%; right: 0; left: auto"
+                        >
                             <div
                                 class="dropdown-menu"
                                 :class="{ 'is-visible': isReleaseDropdownOpen }"
@@ -317,7 +307,7 @@ onBeforeUnmount(() => {
                                             </span>
                                         </div>
                                         <span
-                                            class="text-xs text-vp-3 ml-12 flex-shrink-0 font-mono"
+                                            class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono"
                                             :class="{
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.commit === release.commit,
@@ -339,97 +329,99 @@ onBeforeUnmount(() => {
                 </div>
             </div>
 
-            <div
-                class="h-6 mb-2 mx-2 w-px bg-vp-divider transition-opacity duration-200"
-                :class="{ 'opacity-60': isInstallButtonHovered }"
-            />
+            <div class="flex flex-row gap-3 items-end w-full md:w-auto">
+                <div
+                    class="hidden xl:block h-6 mb-2 mx-2 w-px bg-vp-divider transition-opacity duration-200"
+                    :class="{ 'opacity-60': isInstallButtonHovered }"
+                />
 
-            <div class="flex items-end">
-                <Tooltip
-                    :delay="uploadedFile ? 400 : 0"
-                    :offset="18"
-                    :disabled="
-                        !!uploadedFile || !selectedRelease || connectionState === 'connecting'
-                    "
-                    class="min-w-0 overflow-hidden"
-                    :class="{
-                        'opacity-60 transition-opacity duration-200':
-                            uploadedFile || isInstallButtonHovered,
-                    }"
-                >
-                    <div class="action w-10 z-[5]">
-                        <button
-                            :disabled="!!uploadedFile || !selectedRelease"
-                            :aria-label="tr('download')"
-                            class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
-                            :class="
-                                !uploadedFile && selectedRelease
-                                    ? 'text-vp-2 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
-                                    : 'text-vp-3 cursor-not-allowed opacity-50'
-                            "
-                            @click="handleDownloadRelease"
-                        >
-                            <v-icon name="la-download-solid" :scale="1.1" />
-                        </button>
-                    </div>
-                    <template #content>
-                        {{
-                            !uploadedFile && selectedRelease
-                                ? tr("updater_download_release")
-                                : tr("updater_flash_select_release")
-                        }}
-                    </template>
-                </Tooltip>
-            </div>
-
-            <div
-                class="rounded-full transition-all duration-100 border box-border mt-3 select-none min-w-36"
-                :class="
-                    canFlash
-                        ? 'border-vp-brand-1 hover:border-vp-brand-2'
-                        : isInstallButtonHovered
-                          ? 'border-vp-divider opacity-90 transition-opacity duration-200'
-                          : 'border-vp-divider opacity-70'
-                "
-            >
-                <Tooltip
-                    :disabled="!!canFlash || connectionState === 'connecting'"
-                    :delay="0"
-                    :offset="18"
-                    class="min-w-0 overflow-hidden"
-                >
-                    <button
-                        :disabled="!canFlash"
-                        class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase"
-                        :class="
-                            canFlash
-                                ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50 px-14'
-                                : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
+                <div class="flex items-end">
+                    <Tooltip
+                        :delay="uploadedFile ? 400 : 0"
+                        :offset="18"
+                        :disabled="
+                            !!uploadedFile || !selectedRelease || connectionState === 'connecting'
                         "
-                        @click="handleFlashFirmware"
-                        @mouseenter="!connectionIsConnected && hostExpand()"
-                        @mouseleave="!canFlash && hostCollapse()"
+                        class="min-w-0 overflow-hidden"
+                        :class="{
+                            'opacity-60 transition-opacity duration-200':
+                                uploadedFile || isInstallButtonHovered,
+                        }"
                     >
-                        {{
-                            connectionState === "connecting"
-                                ? dots
-                                : canFlash
-                                  ? tr("updater_flash_button")
-                                  : tr("updater_unavailable")
-                        }}
-                    </button>
-                    <template #content>
-                        {{
-                            connectionState === "disconnected"
-                                ? supportsSerialPort()
-                                    ? tr("updater_flash_button_disconnected")
-                                    : tr("updater_serial_unsupported")
-                                : connectionIsConnected && !canFlash
-                                  ? tr("updater_flash_select_release_or_file")
-                                  : ""
-                        }}
-                    </template>
-                </Tooltip>
+                        <div class="action w-10 z-[5]">
+                            <button
+                                :disabled="!!uploadedFile || !selectedRelease"
+                                :aria-label="tr('download')"
+                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
+                                :class="
+                                    !uploadedFile && selectedRelease
+                                        ? 'text-vp-2 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
+                                        : 'text-vp-3 cursor-not-allowed opacity-50'
+                                "
+                                @click="handleDownloadRelease"
+                            >
+                                <v-icon name="la-download-solid" :scale="1.1" />
+                            </button>
+                        </div>
+                        <template #content>
+                            {{
+                                !uploadedFile && selectedRelease
+                                    ? tr("updater_download_release")
+                                    : tr("updater_flash_select_release")
+                            }}
+                        </template>
+                    </Tooltip>
+                </div>
+
+                <div
+                    class="rounded-full transition-all duration-100 border box-border mt-3 select-none min-w-36 flex-1 w-full"
+                    :class="
+                        canFlash
+                            ? 'border-vp-brand-1 hover:border-vp-brand-2'
+                            : isInstallButtonHovered
+                              ? 'border-vp-divider opacity-90 transition-opacity duration-200'
+                              : 'border-vp-divider opacity-70'
+                    "
+                >
+                    <Tooltip
+                        :disabled="!!canFlash || connectionState === 'connecting'"
+                        :delay="0"
+                        :offset="18"
+                        class="min-w-0 overflow-hidden"
+                    >
+                        <button
+                            :disabled="!canFlash"
+                            class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase whitespace-nowrap"
+                            :class="
+                                canFlash
+                                    ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50 px-14'
+                                    : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
+                            "
+                            @click="handleFlashFirmware"
+                            @mouseenter="!connectionIsConnected && hostExpand()"
+                            @mouseleave="!canFlash && hostCollapse()"
+                        >
+                            {{
+                                connectionState === "connecting"
+                                    ? dots
+                                    : canFlash
+                                      ? tr("updater_flash_button")
+                                      : tr("updater_unavailable")
+                            }}
+                        </button>
+                        <template #content>
+                            {{
+                                connectionState === "disconnected"
+                                    ? supportsSerialPort()
+                                        ? tr("updater_flash_button_disconnected")
+                                        : tr("updater_serial_unsupported")
+                                    : connectionIsConnected && !canFlash
+                                      ? tr("updater_flash_select_release_or_file")
+                                      : ""
+                            }}
+                        </template>
+                    </Tooltip>
+                </div>
             </div>
         </div>
     </div>
@@ -467,7 +459,7 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     width: 100%;
     max-width: 100%;
-    min-width: 160px;
+    /* min-width: 120px; */
     background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent);
     backface-visibility: hidden;
     border-radius: 8px;
@@ -505,15 +497,25 @@ onBeforeUnmount(() => {
 .dropdown-menu-container {
     position: absolute;
     top: calc(100% + 5px);
-    left: 0;
-    min-width: 100%;
+    z-index: 10;
     width: max-content;
+    min-width: 100%;
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     padding: 7px;
     background-color: var(--vp-c-bg);
     box-shadow: var(--vp-shadow-3);
     backdrop-filter: blur(12px);
+}
+
+.dropdown-menu-container.left-0 {
+    left: 0;
+    right: auto;
+}
+
+.dropdown-menu-container.right-0 {
+    right: 0;
+    left: auto;
 }
 
 .dropdown-menu {
@@ -524,7 +526,7 @@ onBeforeUnmount(() => {
     max-height: 250px;
     display: flex;
     flex-direction: column;
-    min-width: 100%;
+    /* min-width: 160px; */
 }
 
 .dropdown-menu.is-visible {

@@ -392,12 +392,9 @@ onBeforeUnmount(() => {
             <div
                 class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-[var(--vp-nav-height)] border-t border-vp-divider"
             >
-                <div class="flex flex-col lg:flex-row gap-x-6 flex-1 w-full min-h-0 h-full">
+                <div class="flex flex-col lg:flex-row gap-6 flex-1 w-full min-h-0 h-full">
                     <div
-                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start pb-3 mb-6 lg:mb-0 lg:pb-0"
-                        :class="{
-                            'border-b border-vp-divider lg:border-b-0 pb-6': !isMatchingRelease,
-                        }"
+                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start border-b border-vp-divider lg:border-b-0 pb-6"
                         :style="
                             windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''
                         "
@@ -412,7 +409,7 @@ onBeforeUnmount(() => {
 
                     <div
                         ref="dropZoneRef"
-                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300"
+                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 gap-y-6"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
@@ -500,7 +497,7 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-center justify-start gap-3 w-full mt-5 mb-3 lg:mt-6 lg:mb-0"
+                                            class="flex flex-row items-start md:items-center justify-start gap-3 w-full mt-5 mb-3 lg:mt-6 lg:mb-0"
                                         >
                                             <div class="flex-shrink-0">
                                                 <v-icon
@@ -509,7 +506,9 @@ onBeforeUnmount(() => {
                                                     class="text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5"
                                                 />
                                             </div>
-                                            <span class="text-xs text-vp-3 flex flex-row gap-2">
+                                            <span
+                                                class="text-xs text-vp-3 flex flex-col-reverse md:flex-row gap-2"
+                                            >
                                                 {{
                                                     uploadedFile
                                                         ? tr("updater_matching_release_warning", {
@@ -518,9 +517,8 @@ onBeforeUnmount(() => {
                                                         : tr("updater_matching_release_warning", {
                                                               type: tr("updater_select_release"),
                                                           })
-                                                }}
+                                                }}.
                                                 <div class="flex flex-row gap-px">
-                                                    <span class="text-vp-3/60 mr-px">(</span>
                                                     <a
                                                         class="text-vp-2 hover:underline vp-external-link-icon"
                                                         :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion?.replace('mntm-', '')}`"
@@ -529,7 +527,6 @@ onBeforeUnmount(() => {
                                                     >
                                                         {{ currentDeviceVersion }}
                                                     </a>
-                                                    <span class="text-vp-3/60">)</span>
                                                 </div>
                                             </span>
                                         </div>
@@ -670,7 +667,7 @@ onBeforeUnmount(() => {
 
                                     <div
                                         v-else-if="supportsSerialPort()"
-                                        class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/90 cursor-pointer pt-6 pb-7 backdrop-blur-md relative z-10"
+                                        class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/90 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
                                         :class="{
                                             'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
@@ -715,7 +712,6 @@ onBeforeUnmount(() => {
                                 'opacity-30': isOverDropZone,
                                 'flex-1 min-h-0': !isChangelogClosed,
                                 'flex-shrink-0': isChangelogClosed,
-                                'mt-6': !isChangelogExpanded,
                             }"
                         >
                             <UpdaterChangelog
@@ -736,7 +732,6 @@ onBeforeUnmount(() => {
                                 'opacity-30': isOverDropZone,
                                 'flex-shrink-0': !isChangelogClosed,
                                 'flex-1 min-h-0': isChangelogClosed,
-                                'mt-6': !isChangelogExpanded,
                             }"
                         >
                             <UpdaterLogs

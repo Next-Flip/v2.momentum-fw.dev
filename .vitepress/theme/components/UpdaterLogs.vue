@@ -157,7 +157,7 @@ watch(
                     </span>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <Tooltip :delay="0" :z-index="9999">
+                    <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
@@ -172,7 +172,7 @@ watch(
                         </button>
                         <template #content>{{ tr("updater_clear_logs") }}</template>
                     </Tooltip>
-                    <Tooltip :delay="0" :z-index="9999">
+                    <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
@@ -229,7 +229,7 @@ watch(
                         >
                             <div
                                 v-if="logs.length === 0"
-                                class="text-center py-[var(--vp-nav-height)] m-auto"
+                                class="text-center py-[var(--vp-nav-height)] pl-8 pr-5 m-auto"
                             >
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="text-gray-500">

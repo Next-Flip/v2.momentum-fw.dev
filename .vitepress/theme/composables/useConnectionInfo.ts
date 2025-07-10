@@ -85,7 +85,7 @@ export function useConnectionInfo() {
         if (present === "loading") return "...";
         if (!totalSpace || freeSpace === undefined) return null;
 
-        const usedSpace = totalSpace - freeSpace;
+        const usedSpace = totalSpace - (freeSpace || 0);
         return `${bytesToSize(usedSpace)} / ${bytesToSize(totalSpace)}`;
     });
 
@@ -101,7 +101,7 @@ export function useConnectionInfo() {
     });
 
     const radioStackType = computed(() => {
-        return getRadioStackType(deviceInfo.value?.radio_stack_type);
+        return getRadioStackType(deviceInfo.value?.radio_stack_type as string);
     });
 
     const getRadioVersion = computed(() => {
@@ -144,6 +144,7 @@ export function useConnectionInfo() {
                     error instanceof Error &&
                     error.message.includes("Serial not available in SSR")
                 ) {
+                    // eslint-disable-next-line no-undef
                     alert(
                         "Your browser does not seem to be compatible. Please use a browser that supports serial connections.",
                     ); // Ideally this would use WarningPopup :P

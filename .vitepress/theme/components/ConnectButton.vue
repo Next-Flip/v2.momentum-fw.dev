@@ -5,26 +5,13 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { ConnectionState } from "../types";
+import { supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
 import Tooltip from "./Tooltip.vue";
 
 const width = ref(1024);
 const route = useRoute();
-
-onMounted(() => {
-    if (typeof window !== "undefined") {
-        const { width: windowWidth } = useWindowSize();
-        width.value = windowWidth.value;
-
-        watch(
-            () => windowWidth.value,
-            (newWidth) => {
-                width.value = newWidth;
-            },
-        );
-    }
-});
 
 const {
     connectionData,
@@ -56,6 +43,63 @@ const dotsState = computed(() => {
 const isUpdatePage = computed(() => route.path.includes("/update"));
 const updateStage = computed(() => firmwareState.value.updateStage || "");
 
+const getConnectionDisplay = computed(() => {
+    if (!supportsSerialPort()) {
+        return {
+            text: tr("connection_serial_not_supported"),
+            indicatorClass: "bg-red-500 animate-pulse border border-red-600",
+        };
+    }
+
+    switch (connectionState.value) {
+        case "connecting":
+            return {
+                text: width.value < 1024 ? "" : tr("connection_connecting"),
+                indicatorClass: "bg-yellow-500 animate-pulse border border-yellow-600",
+            };
+        case "connected":
+            return {
+                text: tr("connection_connected"),
+                indicatorClass: "bg-green-500 border border-green-600",
+            };
+        case "disconnecting":
+            return {
+                text: width.value < 1024 ? "" : tr("connection_disconnecting"),
+                indicatorClass: "bg-yellow-500 animate-pulse border border-yellow-600",
+            };
+        case "error":
+            return {
+                text: `${tr("connection_error")}: ${tr(connectionData.value.error as keyof MessageSchema)}`,
+                indicatorClass: "bg-red-500 animate-pulse border border-red-600",
+            };
+        default:
+            return {
+                text: tr("connection_connect"),
+                indicatorClass: "bg-vp-3/30 group-hover:bg-vp-3/80",
+            };
+    }
+});
+
+const checkConnect = () => {
+    if (supportsSerialPort()) {
+        handleConnect();
+    }
+};
+
+const handleMouse = (v: boolean) => {
+    if (!isAutoOpen.value && !isUpdatePage.value) {
+        flyoutOpen.value = v;
+    }
+};
+
+const { cmd_c } = useMagicKeys({
+    passive: false,
+    onEventFired(e) {
+        if (e.metaKey && e.key === "c" && e.type === "keyup") e.preventDefault();
+    },
+});
+whenever(cmd_c, () => checkConnect());
+
 watch(connectionState, (newState, oldState) => {
     if (newState === "connected" && oldState !== "connected") {
         if (autoOpenTimeout.value) {
@@ -72,49 +116,19 @@ watch(connectionState, (newState, oldState) => {
     }
 });
 
-const getConnectionDisplay = computed(() => {
-    switch (connectionState.value) {
-        case "connecting":
-            return {
-                text: width.value < 1024 ? "" : tr("connection_connecting"),
-                indicatorClass: "bg-yellow-500 animate-pulse border border-yellow-600",
-            };
-        case "connected":
-            return {
-                text: tr("connection_connected"),
-                indicatorClass: "bg-green-500 border border-green-600",
-            };
-        case "disconnecting":
-            return {
-                text: width.value < 1024 ? "" : tr("connection_disconnecting"),
-                indicatorClass: "bg-red-500 animate-pulse border border-red-600",
-            };
-        case "error":
-            return {
-                text: `${tr("connection_error")}: ${tr(connectionData.value.error as keyof MessageSchema)}`,
-                indicatorClass: "bg-red-500 animate-pulse border border-red-600",
-            };
-        default:
-            return {
-                text: tr("connection_connect"),
-                indicatorClass: "bg-vp-3/30 group-hover:bg-vp-3/80",
-            };
+onMounted(() => {
+    if (typeof window !== "undefined") {
+        const { width: windowWidth } = useWindowSize();
+        width.value = windowWidth.value;
+
+        watch(
+            () => windowWidth.value,
+            (newWidth) => {
+                width.value = newWidth;
+            },
+        );
     }
 });
-
-const handleMouse = (v: boolean) => {
-    if (!isAutoOpen.value && !isUpdatePage.value) {
-        flyoutOpen.value = v;
-    }
-};
-
-const { cmd_c } = useMagicKeys({
-    passive: false,
-    onEventFired(e) {
-        if (e.metaKey && e.key === "c" && e.type === "keyup") e.preventDefault();
-    },
-});
-whenever(cmd_c, () => handleConnect());
 </script>
 
 <template>
@@ -124,70 +138,88 @@ whenever(cmd_c, () => handleConnect());
         @mouseleave="handleMouse(false)"
     >
         <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
-            <button
-                :class="[
-                    `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR ? 'cursor-pointer' : '!cursor-default'}`,
-                ]"
-                type="button"
-                :aria-expanded="flyoutOpen"
-                @click="handleConnect"
+            <Tooltip
+                :disabled="supportsSerialPort()"
+                :delay="0"
+                :hide-delay="100"
+                :z-index="9999"
+                :offset="4"
+                position="bottom"
             >
-                <div
-                    v-if="flags.updateInProgress"
-                    class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2"
+                <button
+                    :class="[
+                        `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                    ]"
+                    type="button"
+                    :aria-expanded="flyoutOpen"
+                    @click="checkConnect"
                 >
                     <div
-                        class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
-                    ></div>
-                </div>
-                <span v-else class="relative flex size-2 mr-2">
-                    <span
-                        v-if="isConnected"
-                        :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
-                    ></span>
-                    <span
-                        :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"
-                    ></span>
-                </span>
-
-                <span
-                    :class="[
-                        `connect-button-text text-sm font-medium min-h-5 ${
-                            isConnected && !flags.updateInProgress ? 'mr-3' : ''
-                        }`,
-                    ]"
-                >
-                    {{
-                        flags.updateInProgress
-                            ? tr(updateStage as any) || tr("update_stage_updating_short")
-                            : getConnectionDisplay.text
-                    }}
-                </span>
-                <span
-                    v-if="isConnected && !flags.updateInProgress"
-                    :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${
-                        !deviceInfo?.hardware_name ? 'w-3' : ''
-                    }`"
-                >
-                    {{ deviceInfo?.hardware_name || hardwareNameDots }}
-                </span>
-                <span
-                    v-if="dotsState"
-                    :class="[
-                        'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
-                        dotsState ? 'mr-2' : '',
-                    ]"
-                >
-                    {{ connectingDots }}
-                </span>
-
-                <div v-if="connectionState === 'disconnected'" class="DocSearch-Button">
-                    <span class="DocSearch-Button-Keys"
-                        ><kbd class="DocSearch-Button-Key"></kbd
-                        ><kbd class="DocSearch-Button-Key">C</kbd></span
+                        v-if="flags.updateInProgress"
+                        class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2"
                     >
-                </div>
-            </button>
+                        <div
+                            class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                        ></div>
+                    </div>
+                    <span v-else class="relative flex size-2 mr-2">
+                        <span
+                            v-if="isConnected"
+                            :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
+                        ></span>
+                        <span
+                            :class="`relative inline-flex size-2 rounded-full transition-all duration-100 ease-in-out ${getConnectionDisplay.indicatorClass}`"
+                        ></span>
+                    </span>
+
+                    <span
+                        :class="[
+                            `connect-button-text text-sm font-medium min-h-5 ${
+                                isConnected && !flags.updateInProgress ? 'mr-3' : ''
+                            }`,
+                        ]"
+                    >
+                        {{
+                            flags.updateInProgress
+                                ? tr(updateStage as any) || tr("update_stage_updating_short")
+                                : getConnectionDisplay.text
+                        }}
+                    </span>
+                    <span
+                        v-if="isConnected && !flags.updateInProgress"
+                        :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${
+                            !deviceInfo?.hardware_name ? 'w-3' : ''
+                        }`"
+                    >
+                        {{ deviceInfo?.hardware_name || hardwareNameDots }}
+                    </span>
+                    <span
+                        v-if="dotsState"
+                        :class="[
+                            'text-sm font-medium w-3 text-left ml-px min-h-[1.25rem] flex items-center',
+                            dotsState ? 'mr-2' : '',
+                        ]"
+                    >
+                        {{ connectingDots }}
+                    </span>
+
+                    <div
+                        v-if="supportsSerialPort() && connectionState === 'disconnected'"
+                        class="DocSearch-Button"
+                    >
+                        <span class="DocSearch-Button-Keys"
+                            ><kbd class="DocSearch-Button-Key"></kbd
+                            ><kbd class="DocSearch-Button-Key">C</kbd></span
+                        >
+                    </div>
+                </button>
+                <template #content>
+                    <p
+                        class="text-xs text-vp-2 subtitle"
+                        v-html="tr('updater_serial_unsupported_subtitle')"
+                    />
+                </template>
+            </Tooltip>
 
             <div v-if="isConnected" class="menu">
                 <div class="menu-content">
@@ -284,6 +316,10 @@ whenever(cmd_c, () => handleConnect());
 </template>
 
 <style scoped>
+.subtitle :deep(a) {
+    @apply text-vp-brand-1 hover:text-vp-brand-2 hover:underline transition-colors duration-100 font-medium;
+}
+
 @media (max-width: 956px) {
     .connect-nav-bar {
         display: none !important;

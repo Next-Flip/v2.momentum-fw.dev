@@ -1,7 +1,5 @@
 This directory contains the internationalization system for the Momentum Firmware website. `i18n` provides UI translations for navigation, buttons, search, and other interface elements across multiple languages.
 
-> **💡 Quick Start**: Use `bun run newLocale <locale-code>` to automatically create a new locale with all required files, then run `bun run prebuild` to generate the VitePress configuration. See [Adding a New Language](#adding-a-new-language) for details.
-
 ## Directory Structure
 
 ```
@@ -183,5 +181,4 @@ When contributing translations:
 1. Fork the repository [here](https://github.com/Next-Flip/v2.momentum-fw.dev/fork)
 2. Create a new branch for your translation
 3. Follow the steps above to add your language
-4. Test thoroughly
-5. Submit a pull request with your changes
+4. Submit a pull request with your changes
