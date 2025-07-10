@@ -151,7 +151,10 @@ onBeforeUnmount(() => {
         <div class="flex flex-col xl:flex-row gap-3 items-end">
             <div class="flex flex-row gap-3 items-end w-full">
                 <div ref="channelDropdownRef" class="relative flex-shrink-0">
-                    <label class="block text-sm font-medium text-vp-2 mb-3">
+                    <label
+                        class="block text-sm font-medium text-vp-2 mb-3"
+                        :class="{ 'opacity-50': isInstallButtonHovered }"
+                    >
                         {{ tr("updater_channel_label") }}
                     </label>
                     <button
@@ -223,7 +226,10 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div ref="releaseDropdownRef" class="relative flex-1 min-w-0">
-                    <label class="block text-sm font-medium text-vp-2 mb-3">
+                    <label
+                        class="block text-sm font-medium text-vp-2 mb-3"
+                        :class="{ 'opacity-50': isInstallButtonHovered }"
+                    >
                         {{ tr("updater_version_dropdown_label") }}
                     </label>
                     <button
