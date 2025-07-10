@@ -39,7 +39,7 @@ function handleConfirm() {
         >
             <div
                 v-if="shouldShowPopup"
-                class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm"
             >
                 <div
                     class="relative flex flex-col max-w-sm w-full bg-vp-bg dark:bg-vp-bg rounded-xl shadow-2xl border border-vp-divider overflow-hidden backdrop-blur p-5 gap-y-4"

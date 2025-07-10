@@ -4,7 +4,8 @@ next:
     link: Installation.md
 ---
 
-![Banner](https://github.com/user-attachments/assets/c9957bc7-3cc8-45aa-b0a7-33d654f2c284)
+<img src="../../public/banners/banner_light.png" alt="Banner" class="dark:hidden" />
+<img src="../../public/banners/banner_dark.png" alt="Banner" class="hidden dark:block" />
 
 <div class="mntm custom-block">
 
