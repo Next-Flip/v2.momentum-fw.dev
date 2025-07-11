@@ -17,7 +17,6 @@ import {
     type SerialPort,
 } from "../types";
 import { fetchFirmware, fetchRegions, getCurrentLocale, unpack } from "../util";
-import { useI18n } from "./useI18n";
 import { useProxiedUrl } from "./useProxiedUrl";
 
 import type { ReleaseItem } from "../../../_data/releases";
@@ -103,8 +102,6 @@ const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
 
 export const useSerialConnection = () => {
     log.setLevel("debug");
-
-    const { tr } = useI18n();
 
     interface LogEntry {
         timestamp: Date;
@@ -621,9 +618,7 @@ export const useSerialConnection = () => {
             }
 
             const userFriendlyError =
-                error instanceof Error
-                    ? mapErrorToUserFriendly(error)
-                    : tr("connection_connection_failed");
+                error instanceof Error ? mapErrorToUserFriendly(error) : "Connection failed";
 
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = userFriendlyError;
