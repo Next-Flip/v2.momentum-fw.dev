@@ -390,7 +390,7 @@ onBeforeUnmount(() => {
     >
         <div class="max-w-7xl mx-auto px-6 lg:px-8 flex-1 flex flex-col w-full min-h-0">
             <div
-                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-[var(--vp-nav-height)] border-t border-vp-divider"
+                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-6 border-t border-vp-divider"
             >
                 <div class="flex flex-col lg:flex-row gap-6 flex-1 w-full min-h-0 h-full">
                     <div
@@ -421,7 +421,7 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="!isChangelogExpanded"
-                            class="relative flex flex-col border border-vp-divider rounded-lg px-6"
+                            class="relative flex flex-col border border-vp-divider rounded-lg px-6 bg-vp-dark/55 backdrop-blur-sm z-10"
                             :class="{
                                 'min-h-[202px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
@@ -605,7 +605,7 @@ onBeforeUnmount(() => {
 
                                     <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
                                         <div
-                                            class="flex items-center justify-between p-4 bg-vp-bg/75 border border-vp-divider rounded-lg border-dashed"
+                                            class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-divider rounded-lg border-dashed"
                                             :class="{ 'border-vp-3/65': isOverDropZone }"
                                         >
                                             <div class="flex items-center gap-4">

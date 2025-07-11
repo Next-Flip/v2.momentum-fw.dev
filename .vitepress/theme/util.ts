@@ -51,7 +51,7 @@ export const formatFullDate = (dateInput: number) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}/${month}/${day}`;
+    return `${month}/${day}/${year}`;
 };
 
 export const formatDisplayDate = (dateInput: number) => {
@@ -196,10 +196,10 @@ export const shortenTimeString = (timeString: string): string => {
         { pat: /^an?\s*second\s*ago$/i, rep: `1${tr("time_second_short")}${tr("time_ago")}` },
         { pat: /^an?\s*minute\s*ago$/i, rep: `1${tr("time_minute_short")}${tr("time_ago")}` },
         { pat: /^an?\s*hour\s*ago$/i, rep: `1${tr("time_hour_short")}${tr("time_ago")}` },
-        { pat: /^yesterday$/i, rep: tr("time_yesterday") },
-        { pat: /^last week$/i, rep: tr("time_last_week") },
-        { pat: /^last month$/i, rep: tr("time_last_month") },
-        { pat: /^last year$/i, rep: tr("time_last_year") },
+        { pat: /^yesterday$/i, rep: `1${tr("time_day_short")}${tr("time_ago")}` },
+        { pat: /^last week$/i, rep: `1${tr("time_week_short")}${tr("time_ago")}` },
+        { pat: /^last month$/i, rep: `1${tr("time_month_short")}${tr("time_ago")}` },
+        { pat: /^last year$/i, rep: `1${tr("time_year_short")}${tr("time_ago")}` },
         { pat: /(\d+)\s*seconds?\s*ago/i, rep: `$1${tr("time_second_short")}${tr("time_ago")}` },
         { pat: /(\d+)\s*minutes?\s*ago/i, rep: `$1${tr("time_minute_short")}${tr("time_ago")}` },
         { pat: /(\d+)\s*hours?\s*ago/i, rep: `$1${tr("time_hour_short")}${tr("time_ago")}` },

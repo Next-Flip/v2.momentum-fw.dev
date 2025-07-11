@@ -153,7 +153,7 @@ onBeforeUnmount(() => {
                 <div ref="channelDropdownRef" class="relative flex-shrink-0">
                     <label
                         class="block text-sm font-medium text-vp-2 mb-3"
-                        :class="{ 'opacity-50': isInstallButtonHovered }"
+                        :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_channel_label") }}
                     </label>
@@ -228,7 +228,7 @@ onBeforeUnmount(() => {
                 <div ref="releaseDropdownRef" class="relative flex-1 min-w-0">
                     <label
                         class="block text-sm font-medium text-vp-2 mb-3"
-                        :class="{ 'opacity-50': isInstallButtonHovered }"
+                        :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_version_dropdown_label") }}
                     </label>

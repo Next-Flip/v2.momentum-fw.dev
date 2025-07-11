@@ -5,8 +5,8 @@ next:
     link: Installation.md
 ---
 
-<img src="../../public/banners/banner_light.png" alt="Banner" class="dark:hidden" />
-<img src="../../public/banners/banner_dark.png" alt="Banner" class="hidden dark:block" />
+<img src="/banners/banner_light.png" alt="Banner" class="dark:hidden" />
+<img src="/banners/banner_dark.png" alt="Banner" class="hidden dark:block" />
 
 <div class="mntm custom-block">
 

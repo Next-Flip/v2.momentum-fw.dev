@@ -63,7 +63,7 @@ const isCurrentVersion = computed(() => {
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex flex-row justify-center">
                 <aside
-                    class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[26px] pt-5 pb-8"
+                    class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[20px] pt-5 pb-8"
                 >
                     <div class="sticky flex flex-col gap-8 top-20 lg:top-24 overflow-y-auto">
                         <ReleaseItems

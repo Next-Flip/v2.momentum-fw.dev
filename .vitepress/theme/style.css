@@ -644,15 +644,15 @@ body[data-route*="/wiki"] {
 
 .dark .outline-marker,
 .dark .VPSidebarItem.level-2.is-link.is-active.has-active .indicator {
-    background-color: var(--mntm-yellow-1);
+    background-color: var(--vp-c-brand-2);
 }
 
 .dark .VPSidebarItem.level-3.is-link.is-active.has-active .indicator {
-    background-color: var(--mntm-yellow-1) !important;
+    background-color: var(--vp-c-brand-2) !important;
 }
 
 .dark .VPSidebarItem.level-3.is-link .indicator {
-    background-color: var(--mntm-yellow-1) !important;
+    background-color: var(--vp-c-brand-2) !important;
 }
 
 .dark .VPSidebarItem.level-3.is-link .indicator {

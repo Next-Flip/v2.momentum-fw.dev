@@ -92,13 +92,13 @@ onMounted(() => {
         <div ref="containerRef" class="overflow-y-auto flex flex-col pr-1 pl-0 relative">
             <div
                 v-if="backgroundPosition.show"
-                class="absolute left-0 rounded-[4px] z-[1] transition-all duration-300 ease-out"
+                class="absolute left-0 z-[1] transition-all duration-300 ease-out bg-vp-brand-1/5"
                 :style="{
                     top: `${backgroundPosition.top}px`,
                     height: `${backgroundPosition.height}px`,
                     width: 'calc(100% - 4px)',
-                    backgroundImage:
-                        'linear-gradient(to left, var(--vp-c-brand-soft), transparent)',
+                    // backgroundImage:
+                    //     'linear-gradient(to left, var(--vp-c-brand-soft), transparent)',
                 }"
             ></div>
 
@@ -121,15 +121,15 @@ onMounted(() => {
                 v-for="release in releases"
                 :key="release.commit"
                 :class="[
-                    'relative flex flex-row w-full justify-between items-center rounded-[4px] text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
-                    isSelected(release) ? 'text-vp-brand-1 pl-6 gap-x-2.5' : 'pl-4 gap-x-[18px]',
+                    'relative flex flex-row w-full justify-between items-center text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
+                    isSelected(release) ? 'text-vp-brand-1 pl-3.5 gap-x-2.5' : 'pl-6 gap-x-3',
                     !isSelected(release) && 'release-item-bg',
                 ]"
                 @click="selectRelease(release)"
             >
                 <span
                     :class="[
-                        'text-sm font-medium truncate text-left font-mono pointer-events-none',
+                        'text-sm font-medium truncate text-left font-mono pointer-events-none whitespace-nowrap uppercase',
                         isSelected(release)
                             ? 'text-vp-brand-1'
                             : 'text-vp-2 group-hover:text-vp-brand-1',
@@ -138,7 +138,7 @@ onMounted(() => {
                     {{ release.commit }}
                 </span>
                 <span
-                    class="text-[11px] text-right font-mono pointer-events-none"
+                    class="text-[11px] text-right font-mono pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap"
                     :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
                 >
                     {{
@@ -146,6 +146,7 @@ onMounted(() => {
                             useTimeAgo(new Date((release.timestamp || 0) * 1000)).value,
                         )
                     }}
+                    <!-- {{ formatFullDate(release.timestamp || 0) }} -->
                 </span>
             </button>
         </div>
@@ -164,7 +165,8 @@ onMounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: linear-gradient(to left, var(--vp-c-bg-soft), var(--vp-c-bg-dark));
+    /* background-image: linear-gradient(to left, var(--vp-c-bg-soft), var(--vp-c-bg-dark)); */
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent);
     opacity: 0;
     transition: opacity 100ms ease-out;
     border-radius: inherit;
@@ -180,6 +182,6 @@ onMounted(() => {
 }
 
 .dark .item-line {
-    background-color: var(--mntm-yellow-1);
+    background-color: var(--vp-c-brand-2);
 }
 </style>

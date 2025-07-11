@@ -311,7 +311,7 @@ const deviceSections = computed(() => {
         }"
     >
         <div
-            class="flex-1 flex flex-col min-h-0 bg-vp-dark/75 backdrop-blur-sm transition-all duration-300"
+            class="flex-1 flex flex-col min-h-0 bg-vp-dark/55 backdrop-blur-sm transition-all duration-300"
         >
             <Transition name="header-fade" mode="out-in">
                 <div

@@ -98,7 +98,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
     background-image: linear-gradient(
         to bottom,
         color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-brand-1) 2%, transparent) 100%
+        color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
     );
     backdrop-filter: blur(10px);
 }
@@ -106,7 +106,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .dark .release-content {
     background-image: linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--vp-c-brand-1) 1%, transparent) 0%,
+        color-mix(in srgb, var(--vp-c-text-1) 1%, transparent) 0%,
         color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
     );
 }
