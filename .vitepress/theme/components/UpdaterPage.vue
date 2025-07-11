@@ -388,9 +388,9 @@ onBeforeUnmount(() => {
         class="relative w-full flex flex-col items-center"
         :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
     >
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex-1 flex flex-col w-full min-h-0">
+        <div class="max-w-7xl mx-auto px-6 flex-1 flex flex-col w-full min-h-0">
             <div
-                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 lg:py-6 border-t border-vp-divider"
+                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 border-t border-vp-divider"
             >
                 <div class="flex flex-col lg:flex-row gap-6 flex-1 w-full min-h-0 h-full">
                     <div
