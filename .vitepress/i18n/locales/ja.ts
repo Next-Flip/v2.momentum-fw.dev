@@ -204,6 +204,8 @@ const messages: MessageSchema = {
     connection_serial_not_supported: "シリアル非対応",
     connection_connection_failed: "接続失敗",
     connection_connection_timeout: "接続超過",
+    connection_autoconnect_enabled: "オート接続：オン",
+    connection_autoconnect_disabled: "オート接続：オフ",
     missing: "不足",
     corrupt: "破損",
     installed: "インストール済み",

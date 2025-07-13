@@ -4,11 +4,57 @@ import { useConnectionInfo } from "../composables/useConnectionInfo";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 
 const { flags, isConnected } = useConnectionInfo();
-
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 let retryTimeout: NodeJS.Timeout | null = null;
+let autoRetryInterval: NodeJS.Timeout | null = null;
+
+const completeRestart = async () => {
+    await stopStream(true);
+
+    if (canvasRef.value) {
+        const ctx = canvasRef.value.getContext("2d");
+        if (ctx) {
+            ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+            ctx.fillStyle = "#fe8a2b";
+            ctx.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+        }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await tryStartStream();
+};
+
+const startAutoRetry = () => {
+    stopAutoRetry();
+
+    autoRetryInterval = setInterval(() => {
+        const shouldBeStreaming =
+            isConnected.value &&
+            flags.value.rpcActive &&
+            !flags.value.screenStreamPaused &&
+            serialConnection &&
+            canvasRef.value;
+
+        if (shouldBeStreaming && !flags.value.screenStream) {
+            completeRestart().catch((error) => {
+                console.warn("Auto-retry failed:", error);
+            });
+        }
+    }, 2000);
+};
+
+const stopAutoRetry = () => {
+    if (autoRetryInterval) {
+        clearInterval(autoRetryInterval);
+        autoRetryInterval = null;
+    }
+};
+
+const manualRestart = async () => {
+    await completeRestart();
+};
 
 const tryStartStream = async () => {
     if (typeof window === "undefined") return;
@@ -41,7 +87,7 @@ const tryStartStream = async () => {
     }
 };
 
-const stopStream = async () => {
+const stopStream = async (force = false) => {
     if (typeof window === "undefined") return;
 
     if (retryTimeout) {
@@ -49,16 +95,16 @@ const stopStream = async () => {
         retryTimeout = null;
     }
 
-    if (!serialConnection || !flags.value.screenStream) {
-        return;
-    }
+    if (!serialConnection || (!flags.value.screenStream && !force)) return;
 
     try {
         if (serialConnection.stopScreenStream) {
             await serialConnection.stopScreenStream();
         }
-    } catch {
-        /* empty */
+    } catch (error) {
+        if (force) {
+            console.warn("Error during forced stop:", error);
+        }
     }
 };
 
@@ -86,12 +132,14 @@ watch(
         }
 
         if (connected && rpcActive && !isPaused) {
+            startAutoRetry();
             if (!isStreaming) {
                 retryTimeout = setTimeout(() => {
                     tryStartStream();
                 }, 200);
             }
         } else {
+            stopAutoRetry();
             stopStream();
         }
 
@@ -115,6 +163,7 @@ onBeforeUnmount(() => {
         clearTimeout(retryTimeout);
         retryTimeout = null;
     }
+    stopAutoRetry();
     stopStream();
 });
 </script>
@@ -137,7 +186,7 @@ onBeforeUnmount(() => {
                     v-if="!flags.screenStream"
                     class="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200 rounded-lg"
                     title="Click to retry screen stream"
-                    @click="tryStartStream"
+                    @click="manualRestart"
                 >
                     <div
                         class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"

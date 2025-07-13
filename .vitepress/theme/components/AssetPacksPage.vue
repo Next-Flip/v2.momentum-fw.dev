@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref, watchEffect } from "vue";
 import { packs } from "../../../_data/packs.ts";
 import { useI18n } from "../composables/useI18n";
+import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import type { AssetPack, AssetPackFile } from "../types";
 import { AssetPackEntry } from "../types.ts";
 import { formatFullDate } from "../util.ts";
@@ -12,6 +13,7 @@ import { ConnectionState } from "../types";
 import AssetPacksGrid from "./AssetPacksGrid.vue";
 
 const { tr } = useI18n();
+const { isAutoconnectEnabled } = useAutoconnectSetting();
 
 const assetPacks = ref<AssetPackEntry[]>(packs);
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
@@ -127,6 +129,12 @@ watchEffect(() => {
 
     if (isConnected && !hasLoadedInstalledPacks.value && !loadingInstalledPacks.value) {
         loadInstalledIfConnected();
+    }
+});
+
+onMounted(async () => {
+    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
+        await serialConnection.autoConnect();
     }
 });
 

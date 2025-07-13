@@ -204,6 +204,8 @@ const messages: MessageSchema = {
     connection_serial_not_supported: "시리얼 미지원",
     connection_connection_failed: "연결 실패",
     connection_connection_timeout: "시간 초과",
+    connection_autoconnect_enabled: "자동 연결: 켜짐",
+    connection_autoconnect_disabled: "자동 연결: 꺼짐",
     missing: "누락",
     corrupt: "손상",
     installed: "설치됨",

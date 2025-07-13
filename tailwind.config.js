@@ -24,6 +24,8 @@ export default {
                 "vp-brand-2": "rgb(from var(--vp-c-brand-2) r g b / <alpha-value>)",
                 "vp-brand-3": "rgb(from var(--vp-c-brand-3) r g b / <alpha-value>)",
                 "vp-brand-soft": "rgb(from var(--vp-c-brand-soft) r g b / <alpha-value>)",
+                "vp-border-1": "rgb(from var(--vp-input-border-color) r g b / <alpha-value>)",
+                "vp-switch-1": "rgb(from var(--vp-input-switch-bg-color) r g b / <alpha-value>)",
                 "mntm-yellow-1": "rgb(from var(--mntm-yellow-1) r g b / <alpha-value>)",
                 "mntm-yellow-2": "rgb(from var(--mntm-yellow-2) r g b / <alpha-value>)",
                 "mntm-yellow-3": "rgb(from var(--mntm-yellow-3) r g b / <alpha-value>)",

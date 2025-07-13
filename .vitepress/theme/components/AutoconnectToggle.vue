@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
+import { useI18n } from "../composables/useI18n";
+
+const { tr } = useI18n();
+const { isAutoconnectEnabled, toggleAutoconnect } = useAutoconnectSetting();
+const { handleConnect, connectionState } = useConnectionInfo();
+
+const toggleConnect = async () => {
+    toggleAutoconnect();
+    if (isAutoconnectEnabled.value && connectionState.value === "disconnected") {
+        await handleConnect();
+    }
+};
+</script>
+
+<template>
+    <button
+        type="button"
+        role="switch"
+        :aria-checked="isAutoconnectEnabled"
+        :aria-label="
+            isAutoconnectEnabled
+                ? tr('connection_autoconnect_enabled')
+                : tr('connection_autoconnect_disabled')
+        "
+        class="VPSwitch"
+        @click="toggleConnect"
+    >
+        <span
+            class="check absolute top-px left-px w-[18px] h-[18px] rounded-full bg-[var(--vp-c-neutral-inverse)] shadow-[var(--vp-shadow-1)] transition-transform duration-[250ms] flex items-center justify-center"
+        >
+            <span class="icon relative block w-[18px] h-[18px]">
+                <v-icon
+                    name="ri-refresh-line"
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[250ms] text-vp-1"
+                    scale="0.65"
+                />
+            </span>
+        </span>
+    </button>
+</template>
+
+<style scoped>
+.VPSwitch {
+    position: relative;
+    border-radius: 11px;
+    display: block;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    border: 1px solid var(--vp-input-border-color);
+    background-color: var(--vp-input-switch-bg-color);
+    transition: border-color 0.25s !important;
+    cursor: pointer;
+}
+
+.VPSwitch:hover {
+    border-color: var(--vp-c-brand-1);
+}
+
+.VPSwitch[aria-checked="true"] .check {
+    transform: translateX(18px);
+}
+</style>

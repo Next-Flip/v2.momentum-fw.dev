@@ -105,10 +105,6 @@ const InstallItems = [
         text: "${m.nav_releases}",
         link: "${isRoot ? "/releases" : `/${locale}/releases`}",
     },
-    {
-        text: "${m.nav_contributing}",
-        link: "https://github.com/Next-Flip/Momentum-Firmware/blob/dev/CODING_STYLE.md",
-    }
 ];
 
 const SocialLinks = [
@@ -120,6 +116,10 @@ const SocialLinks = [
 
 const ResourcesItems = [
     { items: SocialLinks },
+    {
+        text: "${m.nav_contributing}",
+        link: "https://github.com/Next-Flip/Momentum-Firmware/blob/dev/CODING_STYLE.md",
+    },
     { text: "${m.nav_donate}", link: "https://ko-fi.com/willyjl" },
 ];
 

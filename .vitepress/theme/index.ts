@@ -25,11 +25,9 @@ export default {
     Layout: () => {
         const route = useRoute();
         const isWiki = route.path.includes("/wiki");
-        const isUpdater = route.path.includes("/update");
 
         return h(DefaultTheme.Layout, null, {
-            "nav-bar-content-before": () =>
-                isUpdater ? null : h(ConnectButton, { class: "connect-nav-bar" }),
+            "nav-bar-content-before": () => h(ConnectButton, { class: "connect-nav-bar" }),
             "sidebar-nav-before": () => h(SidebarSearch),
             "home-hero-info-after": () => h(HomeActions),
             ...(isWiki

@@ -508,6 +508,23 @@ export const useSerialConnection = () => {
         connectionData.deviceInfo = updatedInfo;
     };
 
+    const autoConnect = async (maxRetries = 5, delayMs = 1000): Promise<boolean> => {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                await connect();
+                if (flags.connected && flags.rpcActive) return true;
+            } catch (error) {
+                addLog(
+                    "warning",
+                    `[Serial] Auto-connect attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
+                );
+            }
+            await asyncSleep(delayMs);
+        }
+        addLog("error", `[Serial] Auto-connect failed after ${maxRetries} attempts`);
+        return false;
+    };
+
     const connect = async () => {
         if (!flags.serialSupported) {
             addLog("error", "[Serial] Web Serial API not supported in this browser");
@@ -515,6 +532,7 @@ export const useSerialConnection = () => {
             connectionData.error = "Serial not supported";
             return;
         }
+        if (flags.connected) return;
 
         connectionData.state = ConnectionState.CONNECTING;
         connectionData.error = undefined;
@@ -1570,10 +1588,14 @@ export const useSerialConnection = () => {
         flags,
         queueState,
         firmwareState,
+        logs,
+        screenScale,
+        autoConnect,
         connect,
         disconnect,
         startRpc,
         stopRpc,
+        restartRpc,
         readBasicInfo,
         findKnownDevices,
         requestPort,
@@ -1584,14 +1606,11 @@ export const useSerialConnection = () => {
         updateExtractCapability,
         updateFirmwareCapability,
         updateFirmware,
-        restartRpc,
-        logs,
+        startScreenStream,
+        stopScreenStream,
         addLog,
         clearLogs,
         testConnecting,
         testUpdateFirmware,
-        startScreenStream,
-        stopScreenStream,
-        screenScale,
     };
 };

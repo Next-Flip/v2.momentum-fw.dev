@@ -319,7 +319,7 @@ const deviceSections = computed(() => {
                     class="flex items-center justify-between flex-shrink-0 mb-[7px]"
                 >
                     <div
-                        class="flex rounded-md p-1.5 flex-shrink-0 min-w-0 absolute right-[13px] top-2 z-10 bg-vp-dark"
+                        class="flex rounded-md p-1.5 flex-shrink-0 min-w-0 absolute right-[13px] top-3 z-10 bg-vp-dark"
                     >
                         <button
                             :class="[

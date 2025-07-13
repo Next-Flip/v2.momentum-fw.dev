@@ -78,8 +78,8 @@ onMounted(() => {
 
 const responsiveConfig = computed(() => {
     if (width.value >= 1280) return { itemsPerRow: 4, cellHeight: 345 }; // xl
-    if (width.value >= 1024) return { itemsPerRow: 3, cellHeight: 380 }; // lg
-    if (width.value >= 768) return { itemsPerRow: 2, cellHeight: 400 }; // md
+    if (width.value >= 1024) return { itemsPerRow: 3, cellHeight: 400 }; // lg
+    if (width.value >= 768) return { itemsPerRow: 2, cellHeight: 440 }; // md
     return { itemsPerRow: 1, cellHeight: 400 }; // sm
 });
 

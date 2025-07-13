@@ -39,6 +39,7 @@ export {
     RiInformationLine,
     RiPassportLine,
     RiQuestionMark,
+    RiRefreshLine,
     RiSaveLine,
     RiUsbLine,
 } from "oh-vue-icons/icons";

@@ -204,6 +204,8 @@ const messages: MessageSchema = {
     connection_serial_not_supported: "Serial not supported",
     connection_connection_failed: "Connection failed",
     connection_connection_timeout: "Connection timeout",
+    connection_autoconnect_enabled: "Auto Connect: ON",
+    connection_autoconnect_disabled: "Auto Connect: OFF",
     missing: "Missing",
     corrupt: "Corrupt",
     installed: "Installed",

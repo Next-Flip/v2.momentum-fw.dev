@@ -204,6 +204,8 @@ const messages: MessageSchema = {
     connection_serial_not_supported: "串口不支持",
     connection_connection_failed: "连接失败",
     connection_connection_timeout: "连接超时",
+    connection_autoconnect_enabled: "自动连接：开",
+    connection_autoconnect_disabled: "自动连接：关",
     missing: "缺失",
     corrupt: "损坏",
     installed: "已安装",

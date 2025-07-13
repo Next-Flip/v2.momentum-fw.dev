@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed, inject, onMounted } from "vue";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
+import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { ConnectionState } from "../types";
@@ -11,6 +12,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialC
 const { connectionData } = serialConnection;
 const { tr, getLocalizedPath } = useI18n();
 const { dots } = useDots();
+const { isAutoconnectEnabled } = useAutoconnectSetting();
 
 const isConnected = computed(
     () => connectionData.state === ConnectionState.CONNECTED && connectionData.deviceInfo,
@@ -32,12 +34,12 @@ const dynamicButtons = computed((): ActionButton[] => {
         {
             theme: "brand",
             text: isConnecting ? dots.value : tr("install"),
-            href: "/update",
+            href: getLocalizedPath("/update"),
         },
         {
             theme: "alt",
             text: isConnecting ? dots.value : tr("nav_releases"),
-            href: "/releases",
+            href: getLocalizedPath("/releases"),
         },
     ];
 
@@ -65,7 +67,7 @@ const dynamicButtons = computed((): ActionButton[] => {
     if (isMainlineVersion) {
         if (isLatestMainline) {
             updateText = tr("home_up_to_date");
-            updateHref = `${getLocalizedPath("/update")}`;
+            updateHref = getLocalizedPath("/update");
             isLatest = true;
         } else {
             const latestMainlineVersion = `${latestMainline?.version?.replace("mntm-", "").toUpperCase() || tr("home_latest_mainline")}`;
@@ -75,7 +77,7 @@ const dynamicButtons = computed((): ActionButton[] => {
     } else {
         if (isLatestDevbuild) {
             updateText = tr("home_latest_devbuild");
-            updateHref = `${getLocalizedPath("/update")}`;
+            updateHref = getLocalizedPath("/update");
             isLatest = true;
         } else {
             const latestDevCommit = latestDevbuild?.commit?.substring(0, 8) || "latest";
@@ -99,6 +101,12 @@ const dynamicButtons = computed((): ActionButton[] => {
     ];
 
     return connectedButtons;
+});
+
+onMounted(async () => {
+    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
+        await serialConnection.autoConnect();
+    }
 });
 </script>
 
