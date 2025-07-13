@@ -17,6 +17,10 @@ This directory contains build automation scripts for the Momentum Firmware websi
 }
 ```
 
+## Environment Variables
+
+- `SKIP_FETCH=true` - Skip external data fetching (e.g. `bun run dev:skip`)
+
 ## Pre-build Process
 
 1. **Fetch Asset Packs** ([`utils.ts`](./utils.ts))
@@ -41,16 +45,3 @@ This directory contains build automation scripts for the Momentum Firmware websi
 
 6. **Patch Dependencies** ([`utils.ts`](./utils.ts))
    - Fixes oh-vue-icons import paths for compatibility
-
-## File Overview
-
-- [`prebuild.ts`](./prebuild.ts) - Main orchestrator script
-- [`releases.ts`](./releases.ts) - Firmware release data fetching and processing
-- [`config.ts`](./config.ts) - VitePress configuration generation for all locales
-- [`locales.ts`](./locales.ts) - Automatic locale link updates in wiki files
-- [`add-locale.ts`](./add-locale.ts) - Add a new locale (e.g. `bun run add-locale fi`, requires prebuild)
-- [`utils.ts`](./utils.ts) - Shared utilities and helper functions
-
-## Environment Variables
-
-- `SKIP_FETCH=true` - Skip external data fetching

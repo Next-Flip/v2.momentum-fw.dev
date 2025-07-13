@@ -4,9 +4,9 @@ This repository contains the source for the Momentum Firmware website (v2) at [v
 
 ## Project Structure
 
-```
+```ballerina
 v2.momentum-fw/
-├── .vitepress/           # VitePress configuration and theme
+├── .vitepress/          # VitePress configuration and theme
 │   ├── theme/           # Vue components and composables
 │   ├── config/          # Generated locale-specific configs
 │   └── i18n/            # Internationalization messages
@@ -33,28 +33,29 @@ v2.momentum-fw/
 ### Installation
 
 1. Clone the repository:
-   ```bash
+   ```matlab
    git clone https://github.com/Next-Flip/v2.momentum-fw.dev.git
    cd v2.momentum-fw.dev
    ```
 
 2. Install dependencies:
-   ```bash
+   ```elixir
    bun install
    ```
 
 3. Start the development server:
-   ```bash
+   ```elixir
    bun run dev
    ```
 
 The development server will be available at `http://localhost:5173`.
 
-> **Note**: Data fetching (releases and asset packs) is required at least once for certain pages to function. After the initial fetch, you can use `bun run dev:skip` without re-fetching external data.
+> [!NOTE]
+> Data fetching (releases and asset packs) is required at least once for certain pages to function. After the initial fetch, you can use `bun run dev:skip` without re-fetching external data.
 
 ### Available Commands
 
-```bash
+```elixir
 # Development
 bun run dev              # Start development server with data fetching
 bun run dev:skip         # Start development server without fetching external data (fetch needs to be run at least once before dev or preview)
@@ -76,8 +77,9 @@ bun run clean:build     # Clean install and build
 ### Pre-build Process
 
 1. **Pre-build** ([`scripts/prebuild.ts`](scripts/)):
-   - **Asset Packs**: Fetches asset pack directory from `https://up.momentum-fw.dev/asset-packs/directory.json`
-   - **Releases**: Scrapes firmware build pages from `https://up.momentum-fw.dev/builds/firmware/` to get mainline releases and devbuilds
+   - `SKIP_FETCH=true` These can be skipped if you're just developing the site and don't need to fetch the latest data.
+        - **Asset Packs**: Fetches asset pack directory from `https://up.momentum-fw.dev/asset-packs/directory.json`
+        - **Releases**: Scrapes firmware build pages from `https://up.momentum-fw.dev/builds/firmware/` to get mainline releases and devbuilds
    - **Changelogs**: Downloads changelog files from GitHub raw content for each release
    - **Locale Links**: Updates locale links in all wiki index files ([`scripts/locales.ts`](scripts/locales.ts))
    - **Config Generation**: Creates VitePress configuration files for all locales ([`scripts/config.ts`](scripts/config.ts))

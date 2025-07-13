@@ -2,7 +2,7 @@ This directory contains the internationalization system for the Momentum Firmwar
 
 ## Directory Structure
 
-```
+```ballerina
 .vitepress/i18n/
 ├── index.ts            # Main i18n export with MessageSchema type
 └── locales/
@@ -25,8 +25,8 @@ You can add a new language either using the automated script or manually:
 
 Use the automated script to create the initial locale structure:
 
-```bash
-# Create a new locale (e.g., Finnish)
+```elixir
+# Create a new locale (e.g., Finnish. Use only two letter language codes: fi, ja, ko, zh, etc.)
 bun run newLocale fi
 ```
 
@@ -49,7 +49,7 @@ Follow these steps to add a new language manually:
 #### Step 1: Create the Locale File
 
 1. Create a new file in [`/locales/`](./locales/) named `{locale-code}.ts`
-   - Use ISO 639-1 language codes (e.g., `fi.ts` for Finnish)
+   - Use [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) language codes (e.g., `fi.ts` for Finnish)
 
 2. Copy the structure from [`.vitepress/i18n/locales/en.ts`](./locales/en.ts):
 
@@ -108,7 +108,7 @@ Whether you used the automated script or manual setup, follow these guidelines f
 
 After adding UI translations, you need to generate the VitePress configuration:
 
-```bash
+```elixir
 bun run prebuild
 ```
 
@@ -117,16 +117,16 @@ This will automatically:
 - Update `.vitepress/config.mts` to include the new locale
 - Create the navigation, search, and other configuration for your locale
 
-### Step 5: Create Content Structure (Skip if using automated script)
+### Step 5: Copy Content Structure (Skip if using automated script)
 
-After generating the VitePress configuration, create the content structure:
+After generating the VitePress configuration, copy the content structure from the English content:
 
 > [!NOTE]
 > Without this, someone navigating to the `/fi/update` page for example will see a 404 message, because the markdown files inside the `fi/` directory which are required to load the page components are missing. The entire wiki will also be missing for that locale.
 
-1. Create a new directory `{locale}/` in the project root
+1. New directory `{locale}/` in the project root
 2. Copy the structure from the English content:
-   ```
+   ```ballerina
    {locale}/
    ├── index.md           # Homepage
    ├── releases.md        # Releases page
@@ -141,16 +141,13 @@ After generating the VitePress configuration, create the content structure:
 ### Step 6: Testing
 
 1. Run the development server:
-   ```bash
-   bun run dev # or bun run dev:skip
+   ```elixir
+   bun run dev # or bun run dev:skip if you have already fetched data
    ```
 
 2. Test your language by navigating to `localhost:5173/{locale}/`
-3. Verify all UI elements are translated
+3. Verify all UI elements are translated on each page
 4. Check for any missing translations (TypeScript will catch these)
-
-> [!IMPORTANT]
-> If you make changes to the i18n files, you need to run `bun run prebuild` again to regenerate the VitePress configuration files before testing.
 
 ## Translation Maintenance
 
