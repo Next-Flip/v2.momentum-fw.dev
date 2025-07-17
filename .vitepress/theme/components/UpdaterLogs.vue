@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
-import { computed, inject, nextTick, ref, watch, type Ref } from "vue";
+import { computed, inject, nextTick, onMounted, ref, watch, type Ref } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 
 import Tooltip from "./Tooltip.vue";
-
-const { tr } = useI18n();
 
 interface Props {
     isExpanded: boolean;
@@ -15,17 +13,48 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 const emit = defineEmits<{
     toggle: [];
 }>();
 
+const { tr } = useI18n();
 const { copyState } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const logsScrollTrigger = inject<Ref<number>>("logsScrollTrigger", ref(0));
 const { width: windowWidth } = useWindowSize();
 
 const logs = computed(() => serialConnection?.logs || []);
+const groupedLogs = computed(() => {
+    const grouped: Array<{
+        log: (typeof logs.value)[0];
+        count: number;
+    }> = [];
+
+    for (let i = 0; i < logs.value.length; i++) {
+        const currentLog = logs.value[i];
+
+        if (i > 0) {
+            const previousLog = logs.value[i - 1];
+            const previousGrouped = grouped[grouped.length - 1];
+
+            if (
+                currentLog.message === previousLog.message &&
+                currentLog.level === previousLog.level
+            ) {
+                previousGrouped.count++;
+                continue;
+            }
+        }
+
+        grouped.push({
+            log: currentLog,
+            count: 1,
+        });
+    }
+
+    return grouped;
+});
+
 const lastStatusLog = computed(() => {
     for (let i = logs.value.length - 1; i >= 0; i--) {
         const log = logs.value[i];
@@ -106,6 +135,12 @@ watch(
     },
     { deep: true },
 );
+
+onMounted(() => {
+    if (logs.value.length > 0) {
+        scrollToBottom();
+    }
+});
 </script>
 
 <template>
@@ -153,7 +188,7 @@ watch(
                         v-if="logs.length > 0"
                         class="text-xs font-medium font-mono py-1 rounded-full text-vp-2 text-start"
                     >
-                        {{ logs.length }}
+                        {{ groupedLogs.length }}
                     </span>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
@@ -221,14 +256,14 @@ watch(
                     >
                         <div
                             ref="logContainer"
-                            class="pr-[7px] py-2 my-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
+                            class="pr-[7px] my-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
                             :class="{
                                 'h-64': props.changelogIsOpen,
                                 'flex-1 min-h-0': !props.changelogIsOpen,
                             }"
                         >
                             <div
-                                v-if="logs.length === 0"
+                                v-if="groupedLogs.length === 0"
                                 class="text-center py-[var(--vp-nav-height)] pl-8 pr-5 m-auto"
                             >
                                 <div class="flex flex-col items-center gap-3">
@@ -245,52 +280,61 @@ watch(
 
                             <div v-else class="flex flex-col space-y-px text-sm font-mono w-full">
                                 <div
-                                    v-for="(log, index) in logs"
+                                    v-for="(group, index) in groupedLogs"
                                     :key="index"
                                     class="flex items-center gap-1 text-xs px-2 py-0.5 justify-start relative"
                                     :class="{
                                         'bg-[#FEF6D5] dark:bg-yellow-400/10':
-                                            log.level === 'warning',
-                                        'bg-[#FCEBEB] dark:bg-red-400/10': log.level === 'error',
+                                            group.log.level === 'warning',
+                                        'bg-[#FCEBEB] dark:bg-red-400/10':
+                                            group.log.level === 'error',
                                         'bg-[#d5fedc] dark:bg-green-700/20':
-                                            log.level === 'success',
+                                            group.log.level === 'success',
+                                        'bg-vp-divider/30': group.count > 1,
                                     }"
                                 >
                                     <div
                                         class="absolute left-0 top-0 h-full w-0.5"
                                         :class="{
                                             'bg-yellow-300 dark:bg-yellow-600/50':
-                                                log.level === 'warning',
-                                            'bg-red-300 dark:bg-red-600/50': log.level === 'error',
+                                                group.log.level === 'warning',
+                                            'bg-red-300 dark:bg-red-600/50':
+                                                group.log.level === 'error',
                                             'bg-green-300 dark:bg-green-600/50':
-                                                log.level === 'success',
+                                                group.log.level === 'success',
                                         }"
                                     ></div>
                                     <span
                                         class="text-vp-3 flex-shrink-0 w-[62px] text-left h-min mb-auto"
                                         :class="{
                                             'text-neutral-900 dark:text-yellow-400/60':
-                                                log.level === 'warning',
+                                                group.log.level === 'warning',
                                             'text-neutral-900 dark:text-red-500/70':
-                                                log.level === 'error',
+                                                group.log.level === 'error',
                                             'text-neutral-900 dark:text-green-500/70':
-                                                log.level === 'success',
+                                                group.log.level === 'success',
                                         }"
                                     >
-                                        {{ formatTime(log.timestamp) }}
+                                        {{ formatTime(group.log.timestamp) }}
                                     </span>
                                     <span
                                         class="text-vp-1 flex-1 min-w-0 text-left message-text"
                                         :class="{
                                             'text-neutral-950 dark:text-yellow-400/80':
-                                                log.level === 'warning',
+                                                group.log.level === 'warning',
                                             'text-neutral-950 dark:text-red-500/95':
-                                                log.level === 'error',
+                                                group.log.level === 'error',
                                             'text-neutral-950 dark:text-green-500/95':
-                                                log.level === 'success',
+                                                group.log.level === 'success',
                                         }"
                                     >
-                                        <span v-html="log.message"></span>
+                                        <span v-html="group.log.message"></span>
+                                    </span>
+                                    <span
+                                        v-if="group.count > 1"
+                                        class="text-vp-3 flex-shrink-0 text-xs font-medium ml-1"
+                                    >
+                                        {{ group.count }}
                                     </span>
                                 </div>
                             </div>

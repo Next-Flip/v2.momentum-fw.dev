@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, inject, onMounted } from "vue";
+import { computed, inject } from "vue";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
-import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { ConnectionState } from "../types";
@@ -12,7 +11,6 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialC
 const { connectionData } = serialConnection;
 const { tr, getLocalizedPath } = useI18n();
 const { dots } = useDots();
-const { isAutoconnectEnabled } = useAutoconnectSetting();
 
 const isConnected = computed(
     () => connectionData.state === ConnectionState.CONNECTED && connectionData.deviceInfo,
@@ -101,12 +99,6 @@ const dynamicButtons = computed((): ActionButton[] => {
     ];
 
     return connectedButtons;
-});
-
-onMounted(async () => {
-    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
-        await serialConnection.autoConnect();
-    }
 });
 </script>
 

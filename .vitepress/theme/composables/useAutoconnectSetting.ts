@@ -1,8 +1,9 @@
 import { useStorage } from "@vueuse/core";
 import { computed } from "vue";
+import { STORAGE_KEYS } from "../types";
 
 export function useAutoconnectSetting() {
-    const autoconnectEnabled = useStorage("momentum-autoconnect-enabled", true);
+    const autoconnectEnabled = useStorage(STORAGE_KEYS.AUTO_CONNECT, true);
 
     const isAutoconnectEnabled = computed({
         get: () => autoconnectEnabled.value,

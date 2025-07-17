@@ -50,13 +50,6 @@ export default {
         };
 
         const serialConnection = useSerialConnection();
-        if (
-            typeof window !== "undefined" &&
-            typeof navigator !== "undefined" &&
-            !import.meta.env.SSR
-        ) {
-            serialConnection.setupEventListeners();
-        }
         app.provide("serialConnection", serialConnection);
 
         try {

@@ -20,6 +20,7 @@ import { fetchFirmware, fetchRegions, getCurrentLocale, unpack } from "../util";
 import { useProxiedUrl } from "./useProxiedUrl";
 
 import type { ReleaseItem } from "../../../_data/releases";
+import { useAutoconnectSetting } from "./useAutoconnectSetting";
 
 const asyncSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -103,6 +104,7 @@ const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
 export const useSerialConnection = () => {
     log.setLevel("debug");
 
+    const { isAutoconnectEnabled } = useAutoconnectSetting();
     interface LogEntry {
         timestamp: Date;
         level: "info" | "warning" | "error" | "success" | "debug";
@@ -178,7 +180,6 @@ export const useSerialConnection = () => {
             connect: () => Promise.reject(new Error("Serial not available in SSR")),
             disconnect: () => Promise.reject(new Error("Serial not available in SSR")),
             installAssetPack: () => Promise.reject(new Error("Serial not available in SSR")),
-            setupEventListeners: () => {},
             enqueue: () => Promise.reject(new Error("Serial not available in SSR")),
             updateExtractCapability: () => Promise.reject(new Error("Serial not available in SSR")),
             updateFirmwareCapability: () =>
@@ -244,6 +245,27 @@ export const useSerialConnection = () => {
             filename: "",
             progress: 0,
         },
+    });
+
+    navigator.serial.addEventListener("disconnect", () => {
+        if (flags.connected) {
+            addLog("info", "[Serial] Physical disconnect detected - disconnected");
+            resetFlagsAndState();
+        }
+    });
+
+    navigator.serial.addEventListener("connect", () => {
+        if (flags.connected) {
+            addLog("info", "[Serial] Device is already connected, skipping connection");
+            return;
+        }
+
+        if (isAutoconnectEnabled.value) {
+            addLog("info", "[Serial] Autoconnect enabled, attempting auto-connect");
+            autoConnect(1, 500);
+        } else {
+            addLog("info", "[Serial] Autoconnect disabled, skipping auto-connect");
+        }
     });
 
     const resetFlagsAndState = () => {
@@ -509,6 +531,16 @@ export const useSerialConnection = () => {
     };
 
     const autoConnect = async (maxRetries = 5, delayMs = 1000): Promise<boolean> => {
+        try {
+            const ports = await findKnownDevices();
+            if (ports.length === 0) {
+                addLog("info", "[Serial] No known devices found, skipping auto-connect");
+                return false;
+            }
+        } catch {
+            return false;
+        }
+
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 await connect();
@@ -561,8 +593,7 @@ export const useSerialConnection = () => {
                 );
             }
 
-            await new Promise((resolve) => setTimeout(resolve, 500));
-
+            await asyncSleep(500);
             let ports = await findKnownDevices();
 
             if (ports.length === 0) {
@@ -619,7 +650,11 @@ export const useSerialConnection = () => {
             await updateExtractCapability();
             await updateFirmwareCapability();
 
-            setupEventListeners();
+            flipper.emitter.on("disconnect", () => {
+                addLog("info", "[Serial] Physical disconnect detected - disconnected");
+                resetFlagsAndState();
+            });
+
             connectionData.state = ConnectionState.CONNECTED;
             addLog(
                 "success",
@@ -674,30 +709,6 @@ export const useSerialConnection = () => {
                 `Installation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
             );
         }
-    };
-
-    const setupEventListeners = () => {
-        if (!flipper) {
-            return;
-        }
-
-        flipper.emitter.on("disconnect", () => {
-            addLog("info", "[Serial] Physical disconnect detected - disconnected");
-            if (queueState.fakeExtractProgress !== null) {
-                clearInterval(queueState.fakeExtractProgress);
-                queueState.fakeExtractProgress = null;
-            }
-            resetFlagsAndState();
-        });
-
-        navigator.serial.addEventListener("disconnect", () => {
-            addLog("info", "[Serial] Physical disconnect detected - disconnected");
-            if (queueState.fakeExtractProgress !== null) {
-                clearInterval(queueState.fakeExtractProgress);
-                queueState.fakeExtractProgress = null;
-            }
-            resetFlagsAndState();
-        });
     };
 
     const mkdirParents = async (path: string): Promise<void> => {
@@ -1601,7 +1612,6 @@ export const useSerialConnection = () => {
         requestPort,
         installAssetPack,
         loadInstalledPacks,
-        setupEventListeners,
         enqueue,
         updateExtractCapability,
         updateFirmwareCapability,

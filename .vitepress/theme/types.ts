@@ -243,4 +243,5 @@ export const STORAGE_KEYS = {
     UPDATER_SELECTED_CHANNEL: "momentum-updater_selected_channel",
     UPDATER_SELECTED_VERSION: "momentum-updater_selected_version",
     UPDATER_DEVICE_INFO_TAB: "momentum-updater_device-info-tab",
+    AUTO_CONNECT: "momentum-autoconnect-enabled",
 } as const;
