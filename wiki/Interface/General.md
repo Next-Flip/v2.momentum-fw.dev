@@ -15,3 +15,10 @@ Controls how the clock displays 12 AM. Different geographical regions use differ
 
 - `12:XX`<sup><em id="default"> Default </em></sup>: Displays midnight with a `12`. e.g. `12:41` or `12:42:05`
 - `00:XX`: Displays midnight with a `00`. e.g. `00:41` or `00:42:05`
+
+## [Popup Overlay](General#Popup-Overlay)
+
+Draws a checkerboard pattern behind popups (Archive Actions, Keypad/PIN lock modal, etc.)
+
+- `OFF`: Disable popup overlay
+- `ON`<sup><em id="default"> Default </em></sup>: Enable popup overlay

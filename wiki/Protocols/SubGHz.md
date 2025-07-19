@@ -47,7 +47,7 @@ Toggle region lock bypass for SubGHz transmission.
 
 ## [Extend Freq Bands](SubGHz#Extend-Freq-Bands)
 
-Enable extended frequency bands for SubGHz operation. Locked**: must bypass region lock first._ **Use at own risk, may damage Flipper.**
+Enable extended frequency bands for SubGHz operation. _**Locked**: must bypass region lock first._ **Use at own risk, may damage Flipper.**
 
 - `OFF`<sup><em id="default"> Default </em></sup>: Use standard frequency bands
 - `ON`: Extends [<sup>R</sup>] to 281-361, 378-481, 749-996228 MHz

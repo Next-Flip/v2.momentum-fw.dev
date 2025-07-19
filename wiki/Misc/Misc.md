@@ -46,4 +46,3 @@ Configure settings for the Video Game Module (requires installing RGB Firmware o
 ## [Momentum Intro](Misc.md#momentum-intro)
 
 Play the Momentum Firmware introduction screen that appears on initial setup.
-
