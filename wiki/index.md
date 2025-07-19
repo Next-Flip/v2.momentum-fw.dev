@@ -1,23 +1,24 @@
 ---
 title: Wiki
 next:
-    text: Installation
-    link: Installation.md
+    text: Frequently Asked Questions
+    link: /wiki/FAQ.md
 ---
 
 <img src="/banners/banner_light.png" alt="Banner" class="dark:hidden" />
 <img src="/banners/banner_dark.png" alt="Banner" class="hidden dark:block" />
 
-<div class="mntm custom-block">
+<!-- TODO: Commented out because we don't need the translations for now -->
+<!-- <div class="mntm custom-block"> -->
 
-You can find this wiki in different languages below. If you want to help us out with localization: [Next-Flip/v2.momentum-fw.dev](https://github.com/Next-Flip/v2.momentum-fw.dev/tree/dev/.vitepress/i18n).
+<!-- You can find this wiki in different languages below. If you want to help us out with localization: [Next-Flip/v2.momentum-fw.dev](https://github.com/Next-Flip/v2.momentum-fw.dev/tree/dev/.vitepress/i18n). -->
 
 <!-- LOCALE_LINKS_START -->
-[English](/wiki) · [한국어](/ko/wiki) · [日本語](/ja/wiki) · [简体中文](/zh/wiki)
 <!-- LOCALE_LINKS_END -->
 
-</div>
+<!-- </div> -->
 
+<br/>
 <br/>
 
 # Momentum Firmware Wiki
@@ -29,7 +30,7 @@ This is a comprehensive and explanatory guide to the features and settings speci
 - [`Installation Methods`](Installation.md): Different ways to install Momentum
 - [`Asset Packs Guide`](Assets/Asset-Packs.md): Guide on what asset packs are and how to install them
 - [`Community Asset Packs List`](Assets/Community-Asset-Packs.md): Full list of community made asset packs
-- [`Frequently Asked Questions`](Frequently-Asked-Questions.md): Most of the common issues and their solutions
+- [`Frequently Asked Questions`](FAQ.md): Most of the common issues and their solutions
 
 ### Momentum Settings
 
@@ -53,11 +54,13 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 |(Some) Rolling Code Support|&#10033;<sup>1</sup>|&#10003;|&#10003;|&#10003;|
 |FindMy Flipper|&#10033;<sup>2</sup>|&#10003;|&#10003;|&#10003;|
 |BLE Spam|&#10007;|&#10003;|&#10003;|&#10003;|
-|Bad Keyboard<br>(Extra Options)|&#10007;|&#10003;<sup>3</sup>|&#10003;<sup>2</sup>|&#10003;|
+|Bad Keyboard<br>(Extra Options)|&#10007;|&#10003;<sup>3</sup>|&#10003;<sup>3</sup>|&#10003;|
+|NFC Type 4<br>(NDEF on NTAG4xx/DESFire)|&#10007;|&#10007;|&#10003;|&#10003;|
+|NFC EMV<br>(Only basic card info)|&#10007;|&#10003;|&#10003;|&#10003;|
 |Subdriving<br>(Saving coordinates for subghz)|&#10007;|&#10003;|&#10007;|&#10003;|
 |Full Customization<br>(Layouts, Menus, Keybinds, etc.)|&#10007;|&#10007;|&#10007;|&#10003;|
 |Management App<br>(For easy configuration)|&#10007;|&#10033;<sup>4</sup>|&#10007;|&#10003;|
-|Enhanced RGB Backlight modes<br>(Full customization & Rainbow mode)|&#10007;|&#10003;|&#10007;|&#10003;|
+|Enhanced RGB Backlight modes<br>(Full customization & Rainbow mode)|&#10007;|&#10003;|&#10003;|&#10003;|
 |Spoofing<br>(Name, Mac, Serial)|&#10007;|&#10003;|&#10003;|&#10003;|
 |Improved Security<br>(Lock on Boot, reset on false pins, etc.)|&#10007;|&#10007;|&#10007;|&#10003;|
 |Asset Packs|&#10007;|&#10033;<sup>5</sup>|&#10007;|&#10003;|
@@ -72,7 +75,7 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <sup>2: Official Firmware can use FindMy Flipper by installing the app from the App Catalog, but it will not automatically enable at startup. Custom Firmwares can enable it automatically every time Flipper turns on, so it is always being tracked while turned on.</sup>
 
-<sup>3: These Firmwares include Bad KB as an additional external app, found in Apps > Tools > Bad KB, instead of replacing the default Bad USB app with Bad KB.</sup>
+<sup>3: These Firmwares include the extra Bad KB configuration options in the Bad USB app since they were proposed to OFW in PR 4136. Technically not Bad KB, but the functionality is there.</sup>
 
 <sup>4: Partional functionality, less options in the "CFW Settings" management app.</sup>
 

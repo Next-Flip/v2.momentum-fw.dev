@@ -36,7 +36,7 @@ const navigationLinks = computed(() => [
     { name: tr("nav_releases"), url: "/releases" },
     { name: tr("asset_packs"), url: "/asset-packs" },
     { name: tr("nav_wiki"), url: "/wiki" },
-    { name: tr("nav_team"), url: "/team" },
+    { name: tr("nav_faq"), url: "/wiki/FAQ" },
     {
         name: tr("nav_contributing"),
         url: "https://github.com/Next-Flip/Momentum-Firmware/blob/dev/CODING_STYLE.md",

@@ -1,15 +1,18 @@
 ---
 next:
     text: Installation
-    link: Installation.md
+    link: /wiki/Installation.md
 ---
 
 # Frequently Asked Questions
 
-> [!WARNING]
-> This documentation is still a work in progress and will contain many more answers to common questions and issues.
->
-> If a question you have is not here yet, you can check the [faq](https://discord.gg/juBGZ5fP7H), [general](https://discord.gg/CyZN9JSA4j), [flipper-noobs](https://discord.gg/xJx824rDd9), [help](https://discord.gg/68jcdsPnSx) or any other channels in the [Discord](https://discord.gg/momentum) for solutions.
+<br/>
+
+<div class="mntm custom-block">
+
+If a question you have is not here yet, you can check the [faq](https://discord.gg/juBGZ5fP7H), [general](https://discord.gg/CyZN9JSA4j), [flipper-noobs](https://discord.gg/xJx824rDd9), [help](https://discord.gg/68jcdsPnSx) or any other channels in the [Discord](https://discord.gg/momentum) for solutions.
+
+</div>
 
 ## Table of Contents
 
@@ -19,6 +22,7 @@ next:
 - [Flipper says "Update failed"?](#flipper-says-Update-failed)
 - [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
 - [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
+- [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
 
 ## [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
 
@@ -89,6 +93,11 @@ This error has multiple variations, and you should look closely at which error m
     This error indicates that the frequency is not supported at all by the Flipper Zero hardware itself. In this case, you cannot bypass it, as it is a hardware limitation.
 
 More info for all these possible errors and what to do can be found in the [SubGHzBypass&Extend documentaton](https://github.com/Next-Flip/Momentum-Firmware/blob/dev/documentation/SubGHzBypass%26Extend.md).
+
+## [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
+
+1. Hold `UP` + `BACK` together for 30 seconds
+2. Once your Flipper's screen says `PIN and Factory Reset`, follow the instructions on the screen!
 
 ---
 

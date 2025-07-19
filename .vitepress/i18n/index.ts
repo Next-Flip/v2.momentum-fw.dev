@@ -1,7 +1,4 @@
 import en from "./locales/en";
-import ja from "./locales/ja";
-import ko from "./locales/ko";
-import zh from "./locales/zh";
 
 export type MessageSchema = {
     site_description: string;
@@ -105,6 +102,7 @@ export type MessageSchema = {
     nav_changelog: string;
     nav_contributing: string;
     nav_releases: string;
+    nav_faq: string;
     nav_team: string;
     nav_donate: string;
     nav_wiki: string;
@@ -320,7 +318,7 @@ export type MessageSchema = {
     updater_serial_unsupported_subtitle: string;
 };
 
-const messages = { en, ko, ja, zh } as const;
+const messages = { en } as const;
 export type SupportedLocales = keyof typeof messages;
 export type Messages = typeof messages;
 export default messages;

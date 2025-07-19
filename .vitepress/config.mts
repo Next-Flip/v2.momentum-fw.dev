@@ -3,9 +3,6 @@
 import { defineConfig } from "vitepress";
 /* LOCALE_IMPORTS_START */
 import { rootConfig, rootSearchLocale } from "./config/en";
-import { koConfig, koSearchLocale } from "./config/ko";
-import { jaConfig, jaSearchLocale } from "./config/ja";
-import { zhConfig, zhSearchLocale } from "./config/zh";
 /* LOCALE_IMPORTS_END */
 
 export default defineConfig({
@@ -20,9 +17,6 @@ export default defineConfig({
     locales: {
         /* LOCALE_CONFIGS_START */
         root: rootConfig,
-        ko: koConfig,
-        ja: jaConfig,
-        zh: zhConfig,
         /* LOCALE_CONFIGS_END */
     } as Parameters<typeof defineConfig>[0]["locales"],
     head: [
@@ -159,9 +153,6 @@ export default defineConfig({
                 locales: {
                     /* SEARCH_LOCALES_START */
                     root: rootSearchLocale,
-                    ko: koSearchLocale,
-                    ja: jaSearchLocale,
-                    zh: zhSearchLocale,
                     /* SEARCH_LOCALES_END */
                 },
             },

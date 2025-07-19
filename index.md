@@ -45,11 +45,13 @@ features:
 |(Some) Rolling Code Support|&#10033;<sup>1</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |FindMy Flipper|&#10033;<sup>2</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |BLE Spam|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
-|Bad Keyboard (Extra Options)|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>2</sup>|<span class="check-last">&#10003;</span>|
+|Bad Keyboard (Extra Options)|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>3</sup>|<span class="check-last">&#10003;</span>|
+|NFC Type 4 (NDEF on NTAG4xx/DESFire)|&#10007;|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|NFC EMV (Only basic card info)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Subdriving (Saving coordinates for subghz)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
 |Full Customization (Layouts, Menus, Keybinds, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
 |Management App (For easy configuration)|&#10007;|&#10033;<sup>4</sup>|&#10007;|<span class="check-last">&#10003;</span>|
-|Enhanced RGB Backlight modes (Full customization & Rainbow mode)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|Enhanced RGB Backlight modes (Full customization & Rainbow mode)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Spoofing (Name, Mac, Serial)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Improved Security (Lock on Boot, reset on false pins, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
 |Asset Packs|&#10007;|&#10033;<sup>5</sup>|&#10007;|<span class="check-last">&#10003;</span>|
@@ -68,7 +70,7 @@ features:
 
 <sup>2: Official Firmware can use FindMy Flipper by installing the app from the App Catalog, but it will not automatically enable at startup. Custom Firmwares can enable it automatically every time Flipper turns on, so it is always being tracked while turned on.</sup>
 
-<sup>3: These Firmwares include Bad KB as an additional external app, found in Apps > Tools > Bad KB, instead of replacing the default Bad USB app with Bad KB.</sup>
+<sup>3: These Firmwares include the extra Bad KB configuration options in the Bad USB app since they were proposed to OFW in PR 4136. Technically not Bad KB, but the functionality is there.</sup>
 
 <sup>4: Partional functionality, less options in the "CFW Settings" management app.</sup>
 

@@ -4,23 +4,20 @@ This repository contains the source for the Momentum Firmware website (v2) at [v
 
 ## Project Structure
 
-```ballerina
+```zig
 v2.momentum-fw/
-├── .vitepress/          # VitePress configuration and theme
-│   ├── theme/           # Vue components and composables
-│   ├── config/          # Generated locale-specific configs
-│   └── i18n/            # Internationalization messages
-├── scripts/             # Build and utility scripts
-│   ├── config.ts        # VitePress config generation
-│   ├── locales.ts       # Locale links updating in wiki
-│   ├── add-locale.ts    # Add new locale (see .vitepress/i18n/README.md)
-│   ├── prebuild.ts      # Pre-build automation
-│   ├── releases.ts      # Release data fetching
-│   └── utils.ts         # Build utilities
-├── wiki/                # Documentation content (`locale/` have their own `wiki/` directory)
-├── [locale]/            # Localized pages and wiki content (ja, ko, zh, etc.)
-├── public/              # Static assets
-└── _data/               # Generated data files created during the build process
+├── .vitepress/          // VitePress configuration and theme
+│   ├── theme/           // Vue components and composables
+│   ├── config/          // Generated locale-specific configs
+│   └── i18n/            // Internationalization messages
+├── scripts/             // Build and utility scripts
+│   ├── config.ts        // VitePress config generation
+│   ├── prebuild.ts      // Pre-build automation
+│   ├── releases.ts      // Release data fetching
+│   └── utils.ts         // Build utilities
+├── wiki/                // Documentation content (`locale/` have their own `wiki/` directory)
+├── public/              // Static assets (png, svg, etc.)
+└── _data/               // Generated data files created during the build process
 ```
 
 ## Development Setup
@@ -81,13 +78,8 @@ bun run clean:build     # Clean install and build
         - **Asset Packs**: Fetches asset pack directory from `https://up.momentum-fw.dev/asset-packs/directory.json`
         - **Releases**: Scrapes firmware build pages from `https://up.momentum-fw.dev/builds/firmware/` to get mainline releases and devbuilds
    - **Changelogs**: Downloads changelog files from GitHub raw content for each release
-   - **Locale Links**: Updates locale links in all wiki index files ([`scripts/locales.ts`](scripts/locales.ts))
    - **Config Generation**: Creates VitePress configuration files for all locales ([`scripts/config.ts`](scripts/config.ts))
    - **Dependencies**: Patches oh-vue-icons imports and updates build metadata ([`scripts/utils.ts`](scripts/utils.ts))
-
-## Localization
-
-Explanation of the localization and instructions for adding a new language can be found in [`.vitepress/i18n`](.vitepress/i18n). The `add-locale` script can also be used to add a new locale to the project.
 
 ## Credits
 

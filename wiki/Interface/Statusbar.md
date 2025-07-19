@@ -2,8 +2,6 @@
 
 The Statusbar settings allow you to customize the appearance of your Flipper Zero's status bar (Desktop and Lockscreen). These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Statusbar`.
 
-<sup>Default Option: `*`</sup>
-
 ## [Battery Icon](Statusbar#Battery-Icon)
 
 Choose how battery level is displayed:
@@ -38,7 +36,7 @@ Choose how battery level is displayed:
     <td><img src="https://github.com/user-attachments/assets/9308cad3-5d1b-4640-8ef0-c3af69f0e11a" height="43"/></td>
 </tr>
 <tr>
-    <td><b>Bar %</b><sup>*</sup><br>Bar with percentage</td>
+    <td><b>Bar %</b><sup><em id="default"> Default </em></sup><br>Bar with percentage</td>
     <td><img src="https://github.com/user-attachments/assets/d0fc4e96-58d1-4464-94bd-cbd3e775b85c" height="43"/></td>
 </tr>
 </table>
@@ -47,7 +45,7 @@ Choose how battery level is displayed:
 
 Toggle time display in statusbar:
 
-- `OFF`<sup>*</sup>: Hide clock
+- `OFF`<sup><em id="default"> Default </em></sup>: Hide clock
 - `ON`: Show clock
 
 ## [Show Icons](Statusbar#Show-Icons)
@@ -55,7 +53,7 @@ Toggle time display in statusbar:
 Toggle visibility of status icons:
 
 - `OFF`: Hide all status icons
-- `ON`<sup>*</sup>: Show status icons
+- `ON`<sup><em id="default"> Default </em></sup>: Show status icons
 
 <table id="status-icons">
 <tr>
@@ -105,13 +103,13 @@ Toggle visibility of status icons:
 Toggle border around statusbar elements:
 
 - `OFF`: No borders
-- `ON`<sup>*</sup>: Show borders
+- `ON`<sup><em id="default"> Default </em></sup>: Show borders
 
 ## [Bar Background](Statusbar#Bar-Background)
 
 Toggle statusbar "ribbon cable" design background:
 
-- `OFF`<sup>*</sup>: Hide background
+- `OFF`<sup><em id="default"> Default </em></sup>: Hide background
 - `ON`: Show background
 
 <style scoped>

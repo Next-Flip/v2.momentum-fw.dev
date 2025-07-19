@@ -2,8 +2,6 @@
 
 The SubGHz settings allow you to configure various options for the SubGHz radio module in your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Protocols > SubGHz`.
 
-<sup>Default Option: `*`</sup>
-
 ## SubGHz Freqs
 
 ### [Use Defaults](SubGHz#Use-Defaults)
@@ -11,7 +9,7 @@ The SubGHz settings allow you to configure various options for the SubGHz radio 
 Toggle between default and custom frequency configuration.
 
 - `OFF`: Use custom frequency configuration
-- `ON`<sup>*</sup>: Use factory default frequencies
+- `ON`<sup><em id="default"> Default </em></sup>: Use factory default frequencies
 
 ### [Static Freqs](SubGHz#Static-Freqs)
 
@@ -39,7 +37,7 @@ Configure frequency hopping settings for SubGHz operation.
 
 Toggle region lock bypass for SubGHz transmission.
 
-- `OFF`<sup>*</sup>: Region lock enabled (default)
+- `OFF`<sup><em id="default"> Default </em></sup>: Region lock enabled (default)
 - `ON`: Unlocks [<sup>R</sup>] to 300-350, 378-467, 779-928 MHz
 
 > Enabling this option requires confirmation:
@@ -51,12 +49,12 @@ Toggle region lock bypass for SubGHz transmission.
 
 Enable extended frequency bands for SubGHz operation. Locked**: must bypass region lock first._ **Use at own risk, may damage Flipper.**
 
-- `OFF`<sup>*</sup>: Use standard frequency bands
+- `OFF`<sup><em id="default"> Default </em></sup>: Use standard frequency bands
 - `ON`: Extends [<sup>R</sup>] to 281-361, 378-481, 749-996228 MHz
 
 ## [File Naming Prefix](SubGHz#File-Naming-Prefix)
 
 Configure how file naming prefixes are applied to SubGHz captures.
 
-- `Before`<sup>*</sup>: Place prefix before the filename
+- `Before`<sup><em id="default"> Default </em></sup>: Place prefix before the filename
 - `After`: Place prefix after the filename

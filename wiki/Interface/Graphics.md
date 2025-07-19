@@ -1,8 +1,6 @@
-# Interface
+# Graphics
 
 The Graphics settings allow you to customize the visual appearance of your Flipper Zero through Asset Packs and animation behaviors. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Graphics`.
-
-<sup>Default Option: `*`</sup>
 
 ## [Asset Pack](Graphics#Asset-Pack)
 
@@ -29,7 +27,7 @@ Controls the playback speed of all animations:
 Determines how often desktop animations change:
 
 - `OFF`: Disable animation cycling
-- `Meta.txt`<sup>*</sup>: Use pack's defined timing (if available)
+- `Meta.txt`<sup><em id="default"> Default </em></sup>: Use pack's defined timing (if available)
 - Time intervals:
     - Short: 15S, 30S
     - Medium: 1M, 2M, 5M, 10M, 15M, 30M
@@ -39,7 +37,7 @@ Determines how often desktop animations change:
 
 Disable dolphin level and mood restrictions for desktop animations:
 
-- `OFF`<sup>*</sup>: Only show eligible animations based on current dolphin level and mood
+- `OFF`<sup><em id="default"> Default </em></sup>: Only show eligible animations based on current dolphin level and mood
 - `ON`: Show all animations available in current asset pack regardless of level/mood
 
 > This page is only a brief overview of the individual Graphics settings. For more detailed information about installing or creating your own Asset Packs, see our [Asset Pack Page](../Asset-Packs).

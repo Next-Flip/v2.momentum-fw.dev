@@ -2,22 +2,20 @@
 
 The Screen settings allow you to customize the visual properties of your Flipper Zero display. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > Screen`.
 
-<sup>Default Option: `*`</sup>
-
 ## Display Mode
 
 ### [Dark Mode](Screen#Dark-Mode)
 
 Toggle dark mode. Complete inversion of the UI colors.
 
-- `OFF`<sup>*</sup>: Light mode
+- `OFF`<sup><em id="default"> Default </em></sup>: Light mode
 - `ON`: Dark mode
 
 ### [Left Handed](Screen#Left-Handed)
 
 Toggle left handed mode. Flips the entire UI 180 degrees clockwise.
 
-- `OFF`<sup>*</sup>: Right handed
+- `OFF`<sup><em id="default"> Default </em></sup>: Right handed
 - `ON`: Left handed
 
 ## RGB Settings
@@ -31,7 +29,7 @@ Toggle left handed mode. Flips the entire UI 180 degrees clockwise.
 
 Toggle the RGB backlight on your Flipper Zero. Enabling it without an RGB backlight hardware mod installed will not damage Flipper, but it will cause confusion as the brightness control will not work and the screen will not be illuminated anymore until disabled; for this reason this setting is initially locked and a warning message will be shown when attempting to enable it:
 
-- `OFF`<sup>*</sup>: Disabled
+- `OFF`<sup><em id="default"> Default </em></sup>: Disabled
 - `ON`: Enabled
 
 ### [LCD LED 1](Screen#LCD-LED-1)

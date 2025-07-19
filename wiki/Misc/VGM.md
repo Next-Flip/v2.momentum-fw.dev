@@ -2,8 +2,6 @@
 
 The VGM settings change the BG and FG colors used by the Official Flipper Zero [Video Game Module](https://shop.flipperzero.one/products/video-game-module-for-flipper-zero), after the dedicated RGB Firmware bundled with Momentum is installed to it. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > VGM`.
 
-<sup>Default Option: `*`</sup>
-
 ## [Install RGB Firmware](VGM#Install-RGB-Firmware)
 
 The RGB Firmware is bundled with Momentum's version of the Video Game Module Tool app. Installing it to VGM is required for the Foreground and Background colors to apply.
@@ -30,7 +28,7 @@ Background: `Orange` (Default)
     <th>Preview</th>
 </tr>
 <tr>
-    <td>Default<sup>*</sup></td>
+    <td>Default<sup><em id="default"> Default </em></sup></td>
     <td><img src="https://github.com/user-attachments/assets/7f3935e6-9b8c-4a7d-967e-3e3e87eb59a2" width="85"/></td>
 </tr>
 <tr>

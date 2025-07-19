@@ -1,3 +1,5 @@
+# Interface
+
 The Interface settings allow you to customize the visual appearance and behavior of your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface`.
 
 ## [Graphics](Graphics.md)

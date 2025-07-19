@@ -1,13 +1,16 @@
+> [!WARNING]
+> Localization is currently `"paused"`. The project is small and it's not worth the effort right now to keep everything (wiki for example) up to date for all languages as things change. So please don't bother with the steps below _**for now**_.
+
 This directory contains the internationalization system for the Momentum Firmware website. `i18n` provides UI translations for navigation, buttons, search, and other interface elements across multiple languages.
 
 ## Directory Structure
 
-```ballerina
+```zig
 .vitepress/i18n/
-├── index.ts            # Main i18n export with MessageSchema type
+├── index.ts           // Main i18n export with MessageSchema type
 └── locales/
-    ├── en.ts          # English (primary locale)
-    └── {locale}.ts    # Other locales
+    ├── en.ts          // English (primary locale)
+    └── {locale}.ts    // Other locales
 ```
 
 The website uses a two-tier translation system:
@@ -126,14 +129,14 @@ After generating the VitePress configuration, copy the content structure from th
 
 1. New directory `{locale}/` in the project root
 2. Copy the structure from the English content:
-   ```ballerina
+   ```zig
    {locale}/
-   ├── index.md           # Homepage
-   ├── releases.md        # Releases page
-   ├── update.md          # Update page
-   ├── asset-packs.md     # Asset packs page
-   ├── releases/          # Release pages
-   └── wiki/              # Wiki content
+   ├── index.md           // Homepage
+   ├── releases.md        // Releases page
+   ├── update.md          // Update page
+   ├── asset-packs.md     // Asset packs page
+   ├── releases/          // Release pages
+   └── wiki/              // Wiki content
    ```
 
 3. Translate the Markdown content in each file. These files do not use the same keys as the UI strings, so they need to be translated all at once.

@@ -4,6 +4,13 @@ export interface KeyOverrides {
     [key: string]: string | undefined;
 }
 
+interface SidebarItemInput {
+    text: string;
+    page?: string;
+    collapsed?: boolean;
+    items?: SidebarItemInput[];
+}
+
 const override = (defaultText: string, overrides: KeyOverrides, key: string): string => {
     return overrides[key] ?? defaultText;
 };
@@ -20,7 +27,7 @@ const generateWikiSidebar = (
             items: [
                 { page: "", text: override("Home", o, "home") },
                 {
-                    page: "Frequently-Asked-Questions",
+                    page: "FAQ",
                     text: override("Frequently Asked Questions", o, "faq"),
                 },
             ],
@@ -167,6 +174,21 @@ const generateWikiSidebar = (
                                 },
                             ],
                         },
+                        {
+                            text: "General",
+                            page: "Interface/General",
+                            collapsed: true,
+                            items: [
+                                {
+                                    page: "Interface/General#text-scroll",
+                                    text: "Text Scroll",
+                                },
+                                {
+                                    page: "Interface/General#clock-midnight-format",
+                                    text: "Clock Midnight Format",
+                                },
+                            ],
+                        },
                     ],
                 },
                 {
@@ -294,9 +316,9 @@ const generateWikiSidebar = (
         },
     ];
 
-    const processItems = (items: any[]) => {
+    const processItems = (items: SidebarItemInput[]) => {
         return items.map((item) => {
-            const result: any = {
+            const result: DefaultTheme.SidebarItem = {
                 text: item.text,
             };
 

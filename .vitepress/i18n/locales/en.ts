@@ -103,6 +103,7 @@ const messages: MessageSchema = {
     nav_changelog: "Changelog",
     nav_contributing: "Contributing",
     nav_releases: "Releases",
+    nav_faq: "FAQ",
     nav_team: "Team & Contributors",
     nav_donate: "Donate",
     nav_wiki: "Wiki",

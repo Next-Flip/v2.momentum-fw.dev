@@ -133,7 +133,7 @@ html.dark ::selection {
     border-color: var(--vp-custom-block-tip-border);
     color: var(--vp-custom-block-tip-text);
     background-color: color-mix(in srgb, var(--vp-c-brand-2) 15%, transparent);
-    /* backdrop-filter: blur(5px); */
+    padding: 16px !important;
 }
 
 .custom-block.mntm a,
@@ -834,4 +834,8 @@ body[data-route*="/wiki"] {
 
 .dropdown-button.is-active .select-icon {
     transform: rotate(180deg);
+}
+
+#default {
+    opacity: 0.6;
 }

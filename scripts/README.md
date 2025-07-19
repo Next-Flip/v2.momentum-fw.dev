@@ -32,16 +32,12 @@ This directory contains build automation scripts for the Momentum Firmware websi
    - Downloads changelogs from GitHub for each release
    - Generates [`_data/releases.ts`](../_data/releases.ts) with mainline and devbuild data
 
-3. **Update Locale Links** ([`locales.ts`](./locales.ts))
-   - Automatically updates locale navigation links in all wiki index files
-   - Reads available locales from i18n config and generates appropriate links
-
-4. **Generate VitePress Configs** ([`config.ts`](./config.ts))
+3. **Generate VitePress Configs** ([`config.ts`](./config.ts))
    - Creates locale-specific VitePress configuration files in `.vitepress/config/`
    - Uses i18n messages to localize navigation, search, and UI elements
 
-5. **Update Build Info** ([`utils.ts`](./utils.ts))
+4. **Update Build Info** ([`utils.ts`](./utils.ts))
    - Generates [`_data/buildInfo.ts`](../_data/buildInfo.ts) with build timestamp
 
-6. **Patch Dependencies** ([`utils.ts`](./utils.ts))
+5. **Patch Dependencies** ([`utils.ts`](./utils.ts))
    - Fixes oh-vue-icons import paths for compatibility

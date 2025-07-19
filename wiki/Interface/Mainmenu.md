@@ -2,8 +2,6 @@
 
 The Main Menu settings allow you to customize the appearance and functionality of your Flipper Zero's main menu. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Mainmenu`.
 
-<sup>Default Option: `*`</sup>
-
 ## [Menu Style](Mainmenu#Menu-Style)
 
 Main menus are custom made interfaces that are used for launching apps or files, and potentially showing useful info like time, battery, or the flipper's device name.
@@ -30,7 +28,7 @@ Momentum Firmware comes with 9 different styles to choose from, but anyone can d
     <td><a href="https://github.com/Next-Flip/Momentum-Firmware/commit/f1ec78deb3c03a8ab1c27a7a8c6e9222241ab48d">Willy-JL</a></td>
 </tr>
 <tr>
-    <td><b>DSi<sup>*</sup></b><br>Nintendo DSi inspired grid layout</td>
+    <td><b>DSi <sup><em id="default"> Default </em></sup> </b><br>Nintendo DSi inspired grid layout</td>
     <td align="center">&#10007;</td>
     <td><img src="https://github.com/user-attachments/assets/86a2c6f4-3caf-4e59-b25a-814cb9131105" width="200"/></td>
     <td><a href="https://github.com/Next-Flip/Momentum-Firmware/commit/49e4f4f24697efb6f56da90b2d104636852aa05b">Willy-JL</a></td>
