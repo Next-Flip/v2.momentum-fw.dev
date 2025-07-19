@@ -61,3 +61,4 @@ Settings that apply generally to the flippers look and feel.
 
 - [`Text Scroll`](General.md#text-scroll): The scroll type for all overflow text (Archive, Main Menu, Settings, etc.).
 - [`Clock Midnight Format`](General.md#clock-midnight-format): How the clock displays 12 AM.
+- [`Popup Overlay`](General.md#popup-overlay): Toggle popup overlay
