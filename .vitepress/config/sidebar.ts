@@ -187,6 +187,10 @@ const generateWikiSidebar = (
                                     page: "Interface/General#clock-midnight-format",
                                     text: "Clock Midnight Format",
                                 },
+                                {
+                                    page: "Interface/General#popup-overlay",
+                                    text: "Popup Overlay",
+                                },
                             ],
                         },
                     ],
