@@ -279,6 +279,8 @@ const messages: MessageSchema = {
     updater_enclave_label: "Enclave",
     updater_select_firmware: "Select Firmware",
     updater_or_install_from_file: "Or install from file",
+    updater_install_from_file_tooltip:
+        "You can get release tgz files from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     updater_change_button: "Change",
     updater_remove_button: "Remove",
     updater_drop_file_here: "Drop .tgz here",

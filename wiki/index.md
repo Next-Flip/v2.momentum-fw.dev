@@ -2,11 +2,11 @@
 title: Wiki
 next:
     text: Frequently Asked Questions
-    link: /wiki/FAQ.md
+    link: /wiki/faq.md
 ---
 
-<img src="/banners/banner_light.png" alt="Banner" class="dark:hidden" />
-<img src="/banners/banner_dark.png" alt="Banner" class="hidden dark:block" />
+<img src="/banners/wiki_light.png" alt="banner" class="dark:hidden" />
+<img src="/banners/wiki_dark.png" alt="banner" class="hidden dark:block" />
 
 <!-- TODO: Commented out because we don't need the translations for now -->
 <!-- <div class="mntm custom-block"> -->
@@ -18,7 +18,6 @@ next:
 
 <!-- </div> -->
 
-<br/>
 <br/>
 
 # Momentum Firmware Wiki
@@ -48,28 +47,36 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 ### Compare to other Firmware
 
+<br/>
+
+<div class="full-width-table">
+
 |Feature|[&nearr;&nbsp;OFW](https://github.com/flipperdevices/flipperzero-firmware)|[&nearr;&nbsp;RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[&nearr;&nbsp;Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
 |-|:-:|:-:|:-:|:-:|
-|Stable Updates|&#10003;|&#10007;|&#10003;|&#10003;|
-|(Some) Rolling Code Support|&#10033;<sup>1</sup>|&#10003;|&#10003;|&#10003;|
-|FindMy Flipper|&#10033;<sup>2</sup>|&#10003;|&#10003;|&#10003;|
-|BLE Spam|&#10007;|&#10003;|&#10003;|&#10003;|
-|Bad Keyboard<br>(Extra Options)|&#10007;|&#10003;<sup>3</sup>|&#10003;<sup>3</sup>|&#10003;|
-|NFC Type 4<br>(NDEF on NTAG4xx/DESFire)|&#10007;|&#10007;|&#10003;|&#10003;|
-|NFC EMV<br>(Only basic card info)|&#10007;|&#10003;|&#10003;|&#10003;|
-|Subdriving<br>(Saving coordinates for subghz)|&#10007;|&#10003;|&#10007;|&#10003;|
-|Full Customization<br>(Layouts, Menus, Keybinds, etc.)|&#10007;|&#10007;|&#10007;|&#10003;|
-|Management App<br>(For easy configuration)|&#10007;|&#10033;<sup>4</sup>|&#10007;|&#10003;|
-|Enhanced RGB Backlight modes<br>(Full customization & Rainbow mode)|&#10007;|&#10003;|&#10003;|&#10003;|
-|Spoofing<br>(Name, Mac, Serial)|&#10007;|&#10003;|&#10003;|&#10003;|
-|Improved Security<br>(Lock on Boot, reset on false pins, etc.)|&#10007;|&#10007;|&#10007;|&#10003;|
-|Asset Packs|&#10007;|&#10033;<sup>5</sup>|&#10007;|&#10003;|
-|VGM Color Options|&#10007;|&#10003;|&#10007;|&#10003;|
-|Enhanced Level System|&#10007;|&#10003;|&#10007;|&#10003;|
-|File Search|&#10007;|&#10007;|&#10007;|&#10003;|
-|Disk Image Management|&#10007;|&#10003;|&#10007;|&#10003;|
-|Improved Error Messages<br>(Showing source path)|&#10007;|&#10007;|&#10007;|&#10003;|
-|Preinstalled External Apps<br>(As of 04.2025)|3|421|226 (with [e] pack)|183|
+|Stable Updates|<span class="check">&#10003;</span>|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|(Some) Rolling Code Support|&#10033;<sup>1</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|FindMy Flipper|&#10033;<sup>2</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|BLE Spam|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Bad Keyboard (Extra Options)|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>3</sup>|<span class="check-last">&#10003;</span>|
+|NFC Type 4 (NDEF on NTAG4xx/DESFire)|&#10007;|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|NFC EMV (Only basic card info)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Subdriving (Saving coordinates for subghz)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|Full Customization (Layouts, Menus, Keybinds, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|Management App (For easy configuration)|&#10007;|&#10033;<sup>4</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|Enhanced RGB Backlight modes (Full customization & Rainbow mode)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Spoofing (Name, Mac, Serial)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|Improved Security (Lock on Boot, reset on false pins, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|Asset Packs|&#10007;|&#10033;<sup>5</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|VGM Color Options|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|Enhanced Level System|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|File Search|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|Disk Image Management|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
+|Improved Error Messages (Showing source path)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
+|Preinstalled External Apps (As of 04.2025)|3|421|226 (with [e] pack)|183|
+
+</div>
+
+<div class="footnotes-container">
 
 <sup>1: Official Firmware can pair to some rolling code receivers (less than Custom Firmwares), and it does not allow sending rolling code signals captured in the wild (Custom Firmwares listed above allow it at your own risk of de-synchronizing the original remote).</sup>
 
@@ -80,3 +87,5 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 <sup>4: Partional functionality, less options in the "CFW Settings" management app.</sup>
 
 <sup>5: Different format (manifest_xyz.txt) that only supports animations, not icons and fonts</sup>
+
+</div>

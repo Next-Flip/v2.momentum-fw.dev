@@ -53,6 +53,7 @@
     --vp-custom-block-tip-text: var(--vp-c-text-1);
     --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
     --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
+    --vp-shadow-3: 0 3px 10px rgba(0, 0, 0, 0.05);
 
     --mntm-footer-height: 289px;
 }
@@ -201,17 +202,14 @@ body {
     border-style: solid solid none solid !important;
     backdrop-filter: blur(12px) !important;
     transition:
-        box-shadow 0.2s ease-in-out,
-        transform 0.2s ease-in-out !important;
+        box-shadow 0.1s ease-in-out,
+        transform 0.1s ease-in-out !important;
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 40%, transparent) !important;
     cursor: default !important;
 }
 
 .dark .VPFeature {
     border: 1px solid color-mix(in srgb, var(--vp-c-divider) 60%, transparent) !important;
-    transition:
-        box-shadow 0.2s ease-in-out,
-        transform 0.2s ease-in-out !important;
 }
 .VPFeature:hover {
     box-shadow: inset 0 0 0 1px var(--vp-c-brand-2) !important;
@@ -313,19 +311,22 @@ body {
     background-color: transparent;
 }
 
-.VPHome .full-width-table {
+.full-width-table {
     width: 100%;
     overflow-x: auto;
-    border-radius: 12px;
     backdrop-filter: blur(8px);
     margin-top: 0;
 }
 
-.VPHome .full-width-table .vp-doc th {
+.VPHome .full-width-table {
+    border-radius: 12px;
+}
+
+.full-width-table .vp-doc th {
     background-color: transparent !important;
 }
 
-.VPHome .full-width-table thead tr:first-child {
+.full-width-table thead tr:first-child {
     background-color: color-mix(in srgb, var(--vp-c-divider) 50%, transparent) !important;
 }
 
@@ -360,8 +361,8 @@ body:before {
     filter: saturate(0);
 }
 
-.VPHome .full-width-table .vp-doc table,
-.VPHome .full-width-table table {
+.full-width-table .vp-doc table,
+.full-width-table table {
     display: table;
     width: 100%;
     margin-bottom: 0;
@@ -381,20 +382,20 @@ body:before {
     border: none;
 }
 
-.VPHome .full-width-table .vp-doc td + td,
-.VPHome .full-width-table .vp-doc th + th,
-.VPHome .full-width-table td + td,
-.VPHome .full-width-table th + th {
+.full-width-table .vp-doc td + td,
+.full-width-table .vp-doc th + th,
+.full-width-table td + td,
+.full-width-table th + th {
     border-left: 1px solid var(--vp-c-divider);
 }
 
-.VPHome .full-width-table .vp-doc td + td,
-.VPHome .full-width-table td + td {
+.full-width-table .vp-doc td + td,
+.full-width-table td + td {
     line-height: 2 !important;
 }
 
-.VPHome .full-width-table .vp-doc tr,
-.VPHome .full-width-table tr {
+.full-width-table .vp-doc tr,
+.full-width-table tr {
     border-top: 1px solid var(--vp-c-divider);
 }
 
@@ -412,13 +413,13 @@ body:before {
     border-bottom: none;
 }
 
-.VPHome .full-width-table th {
+.full-width-table th {
     font-weight: 500;
     color: var(--vp-c-text-1);
     background-color: color-mix(in srgb, var(--vp-c-divider) 50%, transparent) !important;
 }
 
-.dark .VPHome .full-width-table th {
+.dark .full-width-table th {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 70%, transparent) !important;
 }
 
@@ -431,40 +432,49 @@ body:before {
     border-top-right-radius: 12px;
 }
 
-.VPHome .full-width-table td:first-child {
+.full-width-table td:first-child {
     font-weight: 500;
     color: var(--vp-c-text-1);
 }
 
-.VPHome .full-width-table td:not(:first-child) {
+.full-width-table td:not(:first-child) {
     text-align: center;
     color: var(--vp-c-text-2);
 }
 
-.VPHome .full-width-table a {
+.full-width-table a {
     color: var(--vp-c-brand-1);
     text-decoration: none;
     transition: color 0.2s;
 }
 
-.VPHome .full-width-table a:hover {
+.full-width-table a:hover {
     color: var(--vp-c-brand-2);
     text-decoration: underline;
 }
 
-.VPHome .full-width-table td:not(:first-child):not(:last-child) {
+.full-width-table td:not(:first-child):not(:last-child) {
     color: var(--vp-c-text-2);
 }
 
-.VPHome .full-width-table td:last-child {
+.full-width-table td:last-child {
     color: var(--vp-c-text-2);
 }
 
-.VPHome .full-width-table .check {
+.full-width-table .check {
+    color: color-mix(in srgb, var(--vp-c-brand-1) 70%, transparent);
+}
+
+.dark .full-width-table .check {
     color: var(--mntm-purp-1);
 }
 
-.VPHome .full-width-table .check-last {
+.full-width-table .check-last {
+    font-weight: 600;
+    color: var(--vp-c-brand-3);
+}
+
+.dark .full-width-table .check-last {
     font-weight: 600;
     color: var(--mntm-yellow-1);
 }
@@ -662,12 +672,6 @@ body[data-route*="/wiki"] {
 .outline-title,
 .VPSidebarItem.level-0 .text {
     font-size: 13px !important;
-}
-
-.VPLink {
-    transition:
-        background-color 0.1s,
-        color 0.1s !important;
 }
 
 .VPLink.link.link .text {

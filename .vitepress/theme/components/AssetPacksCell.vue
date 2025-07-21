@@ -503,7 +503,7 @@ onUnmounted(() => {
             <div class="asset-pack-actions flex gap-2 justify-end">
                 <div v-if="downloadUrl" class="action flex-1 z-[5] cursor-pointer">
                     <a
-                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 hover:!border-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
+                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 hover:!border-vp-brand-2 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
                         :class="{
                             'tracking-widest':
                                 serialConnection.connectionData.state ===

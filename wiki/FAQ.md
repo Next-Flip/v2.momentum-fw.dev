@@ -1,7 +1,7 @@
 ---
 next:
     text: Installation
-    link: /wiki/Installation.md
+    link: /wiki/installation.md
 ---
 
 # Frequently Asked Questions

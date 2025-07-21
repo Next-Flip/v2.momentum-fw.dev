@@ -50,7 +50,7 @@ const extractNoticeText = computed(() => {
         <div
             class="extract-notice backdrop-blur-sm rounded-full overflow-visible w-min transition-all duration-100 pointer-events-auto"
         >
-            <div class="flex items-center justify-center gap-2 px-2.5 py-1.5">
+            <div class="flex items-center justify-center gap-2 px-2 py-1.5">
                 <v-icon
                     name="ri-error-warning-line"
                     class="text-vp-warning-2 shrink-0"

@@ -273,6 +273,7 @@ export type MessageSchema = {
     updater_enclave_label: string;
     updater_select_firmware: string;
     updater_or_install_from_file: string;
+    updater_install_from_file_tooltip: string;
     updater_change_button: string;
     updater_remove_button: string;
     updater_drop_file_here: string;

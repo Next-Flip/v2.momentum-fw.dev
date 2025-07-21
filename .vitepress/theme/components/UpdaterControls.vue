@@ -18,12 +18,12 @@ interface Props {
     selectedRelease: ReleaseItem | null;
     channelReleases: ReleaseItem[];
     uploadedFile?: File | null;
+    isMatchingRelease?: boolean;
     testMode?: boolean;
 }
 
 const props = defineProps<Props>();
 const { isConnected: connectionIsConnected, connectionState, deviceInfo } = useConnectionInfo();
-
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 
 const {
@@ -243,7 +243,10 @@ onBeforeUnmount(() => {
                         }"
                         @click="toggleReleaseDropdown"
                     >
-                        <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
+                        <span
+                            class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]"
+                            :class="{ uppercase: selectedRelease }"
+                        >
                             {{ getReleaseLabel() }}
                         </span>
                         <div
@@ -279,7 +282,7 @@ onBeforeUnmount(() => {
                                     >
                                         <div class="flex flex-row items-center gap-3 min-w-0">
                                             <span
-                                                class="font-medium text-vp-1 font-mono flex-shrink-0"
+                                                class="font-medium text-vp-1 font-mono flex-shrink-0 uppercase"
                                                 :class="{
                                                     'text-vp-brand-1':
                                                         selectedRelease?.commit === release.commit,
@@ -380,14 +383,15 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-100 border box-border mt-3 select-none min-w-36 flex-1 w-full"
-                    :class="
-                        canFlash
-                            ? 'border-vp-brand-1 hover:border-vp-brand-2'
-                            : isInstallButtonHovered
-                              ? 'border-vp-divider opacity-90 transition-opacity duration-200'
-                              : 'border-vp-divider opacity-70'
-                    "
+                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
+                    :class="[
+                        canFlash &&
+                            !isMatchingRelease &&
+                            '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
+                        isMatchingRelease &&
+                            'border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
+                        isInstallButtonHovered && 'opacity-90 transition-all duration-200',
+                    ]"
                 >
                     <Tooltip
                         :disabled="!!canFlash || connectionState === 'connecting'"
@@ -400,7 +404,7 @@ onBeforeUnmount(() => {
                             class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase whitespace-nowrap"
                             :class="
                                 canFlash
-                                    ? 'hover:bg-vp-brand-3 cursor-pointer hover:text-neutral-50 px-14'
+                                    ? 'cursor-pointer hover:text-neutral-50 px-14'
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
                             "
                             @click="handleFlashFirmware"

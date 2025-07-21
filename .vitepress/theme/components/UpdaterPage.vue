@@ -3,8 +3,8 @@ import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
@@ -20,6 +20,7 @@ import {
 } from "../util";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
+import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
 import UpdaterControls from "./UpdaterControls.vue";
 import UpdaterDeviceInfo from "./UpdaterDeviceInfo.vue";
@@ -511,7 +512,7 @@ onMounted(async () => {
                                                 <v-icon
                                                     name="ri-error-warning-line"
                                                     scale="1.2"
-                                                    class="text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5"
+                                                    class="text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5"
                                                 />
                                             </div>
                                             <span
@@ -528,7 +529,7 @@ onMounted(async () => {
                                                 }}.
                                                 <div class="flex flex-row gap-px">
                                                     <a
-                                                        class="text-vp-2 hover:underline vp-external-link-icon"
+                                                        class="text-vp-2 hover:underline vp-external-link-icon uppercase"
                                                         :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion?.replace('mntm-', '')}`"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
@@ -573,6 +574,7 @@ onMounted(async () => {
                                                 :channel-releases="channelReleases"
                                                 :uploaded-file="uploadedFile"
                                                 :test-mode="testMode"
+                                                :is-matching-release="isMatchingRelease"
                                                 @channel-change="handleChannelChange"
                                                 @release-change="handleReleaseChange"
                                                 @flash-firmware="handleFlashFirmware"
@@ -601,10 +603,42 @@ onMounted(async () => {
                                 >
                                     <div
                                         v-if="supportsSerialPort()"
-                                        class="flex items-center justify-center gap-4 mb-6"
+                                        class="flex items-center justify-center gap-2 mb-6"
                                     >
+                                        <Tooltip
+                                            :aria-label="tr('releases_install')"
+                                            :delay="0"
+                                            :hide-delay="100"
+                                            :max-width="'315px'"
+                                            class="files-tooltip z-[1]"
+                                        >
+                                            <div
+                                                class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200"
+                                            >
+                                                <v-icon name="la-info-circle-solid" scale="0.9" />
+                                            </div>
+                                            <template #content>
+                                                <div
+                                                    class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-left justify-center"
+                                                >
+                                                    <span
+                                                        v-html="
+                                                            tr(
+                                                                'updater_install_from_file_tooltip',
+                                                                {
+                                                                    url: getLocalizedPath(
+                                                                        `/releases`,
+                                                                    ),
+                                                                    text: `here`,
+                                                                },
+                                                            )
+                                                        "
+                                                    ></span>
+                                                </div>
+                                            </template>
+                                        </Tooltip>
                                         <h3
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1"
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2"
                                         >
                                             {{ tr("updater_or_install_from_file") }}
                                         </h3>
@@ -622,7 +656,7 @@ onMounted(async () => {
                                                     :class="
                                                         uploadedFileRelease && !isMatchingRelease
                                                             ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/25'
-                                                            : 'text-yellow-700 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/25'
+                                                            : 'text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/25'
                                                     "
                                                     :aria-label="tr('releases_current_version')"
                                                 >
