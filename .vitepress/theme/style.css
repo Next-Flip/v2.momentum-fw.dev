@@ -549,6 +549,20 @@ body[data-route*="/wiki"] {
     border-top: 1px solid var(--vp-c-divider) !important;
 }
 
+.prev-next {
+    padding-bottom: 32px !important;
+}
+@media (min-width: 639px) {
+    .prev-next {
+        padding-bottom: 24px !important;
+    }
+}
+@media (min-width: 959px) {
+    .prev-next {
+        padding-bottom: 0 !important;
+    }
+}
+
 .VPSidebarItem.level-0 {
     padding-bottom: 10px !important;
 }
