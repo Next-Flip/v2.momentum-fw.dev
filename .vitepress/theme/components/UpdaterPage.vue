@@ -19,7 +19,6 @@ import {
     supportsSerialPort,
 } from "../util";
 
-import ScreenDisplay from "./ScreenDisplay.vue";
 import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
 import UpdaterControls from "./UpdaterControls.vue";
@@ -148,12 +147,10 @@ watch(
                     let inner = "Selected firmware";
                     if (uploadedFile.value || uploadedFileRelease.value) {
                         inner = "Uploaded file";
-                    } else if (selectedRelease.value) {
-                        inner = "Selected firmware";
                     }
                     logToSerial(
                         "warning",
-                        `[Upload] ${inner} matches current device firmware (<a href="${getLocalizedPath("/releases")}/${deviceVersion?.replace("mntm-", "")}" target="_blank">${deviceVersion}</a>${deviceCommit && deviceCommit !== deviceVersion ? ", " + `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>` : ""})`,
+                        `[${inner === "Selected firmware" ? "Release" : "Upload"}] ${inner} matches current device firmware (<a href="${getLocalizedPath("/releases")}/${deviceVersion?.includes("mntm-dev") ? "" : deviceVersion?.replace("mntm-", "")}" target="_blank">${deviceVersion}</a>${deviceCommit && deviceCommit !== deviceVersion ? ", " + `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>` : ""})`,
                     );
                 }
             }
@@ -187,7 +184,7 @@ const processFile = (file: File, source: "uploaded" | "selected") => {
         if (foundRelease) {
             logToSerial(
                 "info",
-                `[Upload] File ${action}: ${file.name} (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.commit}" target="_blank">${foundRelease.version || foundRelease.commit}</a>)`,
+                `[Upload] File ${action}: \`${file.name}\` (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.commit}" target="_blank">${foundRelease.version || foundRelease.commit}</a>)`,
             );
         } else {
             logToSerial(
@@ -403,14 +400,11 @@ onMounted(async () => {
             >
                 <div class="flex flex-col lg:flex-row gap-6 flex-1 w-full min-h-0 h-full">
                     <div
-                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start border-b border-vp-divider lg:border-b-0 pb-6"
+                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start"
                         :style="
                             windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''
                         "
                     >
-                        <div class="flex-shrink-0 hidden lg:block">
-                            <ScreenDisplay />
-                        </div>
                         <div class="flex-shrink-0">
                             <UpdaterDeviceInfo />
                         </div>
@@ -430,16 +424,16 @@ onMounted(async () => {
 
                         <div
                             v-if="!isChangelogExpanded"
-                            class="relative flex flex-col border border-vp-divider rounded-lg px-6 bg-vp-dark/55 backdrop-blur-sm z-10"
+                            class="relative flex flex-col border border-vp-divider rounded-xl px-6 bg-vp-dark/55 backdrop-blur-sm z-10"
                             :class="{
-                                'min-h-[202px]': flags.updateInProgress,
+                                'min-h-[214px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
                             }"
                         >
                             <Transition name="overlay-fade">
                                 <div
                                     v-if="showUpdateOverlay"
-                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-lg flex items-center justify-center z-50 min-h-0"
+                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-xl flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
                                         v-if="updateStage !== 'update_stage_done'"
@@ -455,7 +449,7 @@ onMounted(async () => {
                                                 class="relative w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
                                             >
                                                 <div
-                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-mntm-yellow-1 animate-spin"
+                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-vp-brand-1 animate-spin"
                                                 ></div>
                                                 <v-icon
                                                     name="pr-download"
@@ -507,6 +501,9 @@ onMounted(async () => {
                                         <div
                                             v-if="isMatchingRelease"
                                             class="flex flex-row items-start md:items-center justify-start gap-3 w-full mt-5 mb-3 lg:mt-6 lg:mb-0"
+                                            :class="{
+                                                'opacity-40': isOverDropZone,
+                                            }"
                                         >
                                             <div class="flex-shrink-0">
                                                 <v-icon
@@ -556,7 +553,9 @@ onMounted(async () => {
                                             class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-6"
                                             :class="{
                                                 'opacity-40 transition-opacity duration-200':
-                                                    isInstallButtonHovered || uploadedFile,
+                                                    isInstallButtonHovered ||
+                                                    uploadedFile ||
+                                                    isOverDropZone,
                                             }"
                                         >
                                             {{ tr("updater_select_firmware") }}
@@ -596,7 +595,7 @@ onMounted(async () => {
                                         'h-0 overflow-hidden':
                                             showUpdateOverlay && isChangelogExpanded,
                                         'opacity-90': isOverDropZone && !showUpdateOverlay,
-                                        'opacity-30 pointer-events-none':
+                                        'opacity-0 pointer-events-none':
                                             showUpdateOverlay && !isChangelogExpanded,
                                         'mb-6': supportsSerialPort(),
                                     }"
@@ -647,7 +646,7 @@ onMounted(async () => {
 
                                     <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
                                         <div
-                                            class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-divider rounded-lg border-dashed"
+                                            class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-divider rounded-xl border-dashed"
                                             :class="{ 'border-vp-3/65': isOverDropZone }"
                                         >
                                             <div class="flex items-center gap-4">
@@ -709,18 +708,19 @@ onMounted(async () => {
 
                                     <div
                                         v-else-if="supportsSerialPort()"
-                                        class="w-full border border-dashed border-vp-divider rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/90 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
+                                        class="w-full outline-dashed outline-vp-divider border-2 border-vp-dark rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/70 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
                                         :class="{
-                                            'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
+                                            'border-vp-brand-1 bg-vp-brand-soft outline-vp-border/80':
+                                                isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
                                                 flags.updateInProgress,
-                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/40':
+                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/90 hover:outline-vp-border/80':
                                                 !flags.updateInProgress,
                                         }"
                                         @click="handleFileUpload"
                                     >
                                         <div
-                                            class="flex flex-col items-center gap-1 text-center select-none"
+                                            class="flex flex-col items-center gap-0.5 text-center select-none"
                                         >
                                             <p class="text-sm text-vp-2">
                                                 {{
@@ -757,6 +757,7 @@ onMounted(async () => {
                             }"
                         >
                             <UpdaterChangelog
+                                :show-update-overlay="showUpdateOverlay"
                                 :selected-release="currentChangelogRelease"
                                 :uploaded-file="uploadedFile"
                                 :uploaded-file-release="uploadedFileRelease"

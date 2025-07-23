@@ -49,24 +49,24 @@ const mapErrorToUserFriendly = (error: Error): string => {
     if (
         message.includes("failed to open serial port") ||
         message.includes("failed to execute 'open' on 'serialport'") ||
-        message.includes("serial port is busy - please refresh the page")
+        message.includes("serial port is busy")
     ) {
-        return "connection_serial_busy";
+        return "Serial port is busy - please close other connections";
     }
     if (message.includes("could not start rpc session")) {
-        return "connection_rpc_failed";
+        return "Could not start RPC session";
     }
     if (message.includes("no flipper device found")) {
-        return "connection_device_not_found";
+        return "No Flipper device found";
     }
     if (message.includes("serial not supported")) {
-        return "connection_serial_not_supported";
+        return "Serial not supported in this browser";
     }
     if (message.includes("connection failed") || message.includes("networkerror")) {
-        return "connection_connection_failed";
+        return "Connection failed";
     }
     if (message.includes("timeout")) {
-        return "connection_connection_timeout";
+        return "Connection timeout";
     }
     if (error.message.length > 50) {
         return error.message.substring(0, 47) + "...";
@@ -263,8 +263,6 @@ export const useSerialConnection = () => {
         if (isAutoconnectEnabled.value) {
             addLog("info", "[Serial] Autoconnect enabled, attempting auto-connect");
             autoConnect(1, 500);
-        } else {
-            addLog("info", "[Serial] Autoconnect disabled, skipping auto-connect");
         }
     });
 
@@ -546,6 +544,20 @@ export const useSerialConnection = () => {
                 await connect();
                 if (flags.connected && flags.rpcActive) return true;
             } catch (error) {
+                const errorMessage =
+                    error instanceof Error
+                        ? error.message.toLowerCase()
+                        : String(error).toLowerCase();
+
+                if (
+                    errorMessage.includes("failed to open serial port") ||
+                    errorMessage.includes("failed to execute 'open' on 'serialport'") ||
+                    errorMessage.includes("serial port is busy")
+                ) {
+                    addLog("warning", `[Serial] Auto-connect stopped`);
+                    return false;
+                }
+
                 addLog(
                     "warning",
                     `[Serial] Auto-connect attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
@@ -635,15 +647,33 @@ export const useSerialConnection = () => {
                         addLog("info", "[Serial] Physical connection established after recovery");
                     } catch (retryError) {
                         addLog("error", `[Serial] Retry failed: ${retryError}`);
-                        throw new Error("Serial port is busy - please refresh the page");
+                        throw new Error("Serial port is busy - please close other connections");
                     }
                 } else {
-                    addLog("error", `[Serial] flipper.connect() failed: ${flipperError}`);
                     throw flipperError;
                 }
             }
 
-            await startRpc();
+            try {
+                const rpcTimeout = new Promise<never>((_, reject) => {
+                    setTimeout(() => {
+                        reject(new Error("RPC_TIMEOUT"));
+                    }, 5000);
+                });
+
+                await Promise.race([startRpc(), rpcTimeout]);
+            } catch (rpcError) {
+                if (rpcError instanceof Error && rpcError.message === "RPC_TIMEOUT") {
+                    addLog("warning", "[Serial] RPC timeout - device appears to be locked");
+                    resetFlagsAndState();
+                    connectionData.state = ConnectionState.LOCKED;
+                    connectionData.error =
+                        "Device appears to be locked - please unlock and try again";
+                    return;
+                } else {
+                    throw rpcError;
+                }
+            }
             await readBasicInfo();
             // small delay to not conflict the the storage info stuff before, causing either sdcard size not to load or installed packs not to load
             await asyncSleep(100);
@@ -675,10 +705,8 @@ export const useSerialConnection = () => {
 
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = userFriendlyError;
-            addLog(
-                "error",
-                `[Serial] Connection failed: ${error instanceof Error ? error.message : error}`,
-            );
+            addLog("error", `[Serial] Connection failed: ${userFriendlyError}`);
+            throw error;
         }
     };
 
@@ -1442,11 +1470,11 @@ export const useSerialConnection = () => {
 
     const testUpdateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
-            addLog("warning", "[Test] Simulating firmware update without device connection");
+            addLog("warning", "[Test] Firmware update without device connection");
         }
 
         if (!flags.ableToUpdate) {
-            addLog("warning", "[Test] Simulating firmware update on unsupported device");
+            addLog("warning", "[Test] Firmware update on unsupported device");
         }
 
         flags.updateInProgress = true;
@@ -1459,7 +1487,7 @@ export const useSerialConnection = () => {
         if (flags.screenStream) {
             try {
                 await stopScreenStream();
-                addLog("info", "[Test] Stopped screen stream for firmware update simulation");
+                addLog("info", "[Test] Stopped screen stream for firmware update");
                 await asyncSleep(500);
             } catch (error) {
                 addLog("warning", `[Test] Failed to stop screen stream: ${error}`);
@@ -1468,9 +1496,9 @@ export const useSerialConnection = () => {
 
         try {
             await testLoadFirmware(release, uploadedFile);
-            addLog("success", "[Test] Firmware update simulation completed successfully");
+            addLog("success", "[Test] Firmware update completed successfully");
         } catch (error) {
-            addLog("error", `[Test] Firmware update simulation failed: ${error}`);
+            addLog("error", `[Test] Firmware update failed: ${error}`);
             throw error;
         } finally {
             flags.updateInProgress = false;
@@ -1486,22 +1514,19 @@ export const useSerialConnection = () => {
         try {
             if (connectionData.deviceInfo?.hardware_region !== "0") {
                 firmwareState.updateStage = "update_stage_loading_region_data";
-                addLog("info", "[Test] Simulating region provisioning");
+                addLog("info", "[Test] Region provisioning");
                 await asyncSleep(1000);
                 addLog("info", "[Test] Set Sub-GHz region: US");
             }
 
             firmwareState.updateStage = "update_stage_loading_firmware_bundle";
-            addLog("info", "[Test] Simulating firmware bundle loading");
+            addLog("info", "[Test] Loading firmware bundle");
             await asyncSleep(1500);
 
             let files: { name: string; size: number }[] = [];
 
             if (uploadedFile) {
-                addLog(
-                    "info",
-                    `[Test] Simulating firmware loading from file: ${uploadedFile.name}`,
-                );
+                addLog("info", `[Test] Loading firmware from file: ${uploadedFile.name}`);
                 addLog("debug", `[Test] File size: ${uploadedFile.size} bytes`);
 
                 files = [
@@ -1520,7 +1545,10 @@ export const useSerialConnection = () => {
                     );
                 }
 
-                addLog("info", `[Test] Simulating firmware download from: ${firmwareUrl}`);
+                addLog(
+                    "info",
+                    `[Test] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
+                );
 
                 files = [
                     { name: "update.fuf", size: 1024 },
@@ -1533,7 +1561,7 @@ export const useSerialConnection = () => {
             }
 
             firmwareState.updateStage = "update_stage_loading_firmware_files";
-            addLog("info", "[Test] Simulating firmware file uploads");
+            addLog("info", "[Test] Loading firmware files");
             await asyncSleep(500);
 
             for (const file of files) {
@@ -1565,16 +1593,16 @@ export const useSerialConnection = () => {
             flags.progress = 0;
 
             firmwareState.updateStage = "update_stage_loading_manifest";
-            addLog("info", "[Test] Simulating update manifest loading");
+            addLog("info", "[Test] Loading update manifest");
             await asyncSleep(1000);
             addLog("debug", "[Test] Loaded update manifest");
 
             firmwareState.updateStage = "update_stage_pay_attention";
-            addLog("info", "[Test] Simulating Flipper reboot for update");
+            addLog("info", "[Test] Rebooting Flipper for update");
             await asyncSleep(2000);
 
             firmwareState.updateStage = "update_stage_flashing_firmware";
-            addLog("info", "[Test] Simulating firmware update process");
+            addLog("info", "[Test] Flashing firmware");
 
             for (let i = 0; i <= 100; i += 5) {
                 flags.progress = i / 100;
@@ -1589,7 +1617,7 @@ export const useSerialConnection = () => {
 
             await disconnect();
         } catch (error) {
-            addLog("error", `[Test] Firmware simulation error: ${error}`);
+            addLog("error", `[Test] Firmware error: ${error}`);
             throw error;
         }
     };

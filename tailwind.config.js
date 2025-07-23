@@ -39,6 +39,7 @@ export default {
                 "vp-soft-mute": "rgb(from var(--vp-c-bg-soft-mute) r g b / <alpha-value>)",
                 "vp-gray-soft": "rgb(from var(--vp-c-bg-gray-soft) r g b / <alpha-value>)",
                 "vp-neutral": "rgb(from var(--vp-c-neutral) r g b / <alpha-value>)",
+                "vp-neutral-inverse": "rgb(from var(--vp-c-neutral-inverse) r g b / <alpha-value>)",
                 "flipper-fill": "#fe8a2b",
             },
         },

@@ -108,14 +108,6 @@ const stopStream = async (force = false) => {
     }
 };
 
-onMounted(() => {
-    if (typeof window === "undefined") return;
-
-    setTimeout(() => {
-        tryStartStream();
-    }, 100);
-});
-
 watch(
     [
         isConnected,
@@ -123,7 +115,7 @@ watch(
         () => flags.value.screenStream,
         () => flags.value.screenStreamPaused,
     ],
-    ([connected, rpcActive, isStreaming, isPaused], [prevStreaming, prevPaused]) => {
+    ([connected, rpcActive, isStreaming, isPaused]) => {
         if (typeof window === "undefined") return;
 
         if (retryTimeout) {
@@ -142,21 +134,17 @@ watch(
             stopAutoRetry();
             stopStream();
         }
-
-        if (prevStreaming && !isStreaming && connected && rpcActive && !isPaused) {
-            retryTimeout = setTimeout(() => {
-                tryStartStream();
-            }, 3000);
-        }
-
-        if (prevPaused && !isPaused && connected && rpcActive && !isStreaming) {
-            retryTimeout = setTimeout(() => {
-                tryStartStream();
-            }, 1000);
-        }
     },
     { immediate: true },
 );
+
+onMounted(() => {
+    if (typeof window === "undefined") return;
+
+    setTimeout(() => {
+        tryStartStream();
+    }, 100);
+});
 
 onBeforeUnmount(() => {
     if (retryTimeout) {
@@ -170,30 +158,36 @@ onBeforeUnmount(() => {
 
 <template>
     <Transition name="slide-down" mode="out-in">
-        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg pb-6">
-            <div
-                class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill border border-black/10 dark:border-white/10 rounded-lg overflow-hidden p-3"
-            >
-                <canvas
-                    ref="canvasRef"
-                    :width="128 * (serialConnection?.screenScale?.value || 2)"
-                    :height="64 * (serialConnection?.screenScale?.value || 2)"
-                    class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100"
-                    :class="{ 'opacity-30': !flags.screenStream }"
-                />
-
+        <div v-if="isConnected" class="screen-display-container backdrop-blur-lg p-3 pb-0">
+            <div class="relative overflow-visible">
                 <div
-                    v-if="!flags.screenStream"
-                    class="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200 rounded-lg"
-                    title="Click to retry screen stream"
-                    @click="manualRestart"
+                    class="absolute top-[-16px] left-[-16px] w-[calc(100%+32px)] h-[calc(100%+48px)] z-0 p-0 pointer-events-none"
+                    aria-hidden="true"
+                ></div>
+                <div
+                    class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill rounded-md overflow-hidden p-3 z-4"
                 >
+                    <canvas
+                        ref="canvasRef"
+                        :width="128 * (serialConnection?.screenScale?.value || 2)"
+                        :height="64 * (serialConnection?.screenScale?.value || 2)"
+                        class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100"
+                        :class="{ 'opacity-30': !flags.screenStream }"
+                    />
+
                     <div
-                        class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
+                        v-if="!flags.screenStream"
+                        class="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200 rounded-lg"
+                        title="Click to retry screen stream"
+                        @click="manualRestart"
                     >
                         <div
-                            class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"
-                        ></div>
+                            class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
+                        >
+                            <div
+                                class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"
+                            ></div>
+                        </div>
                     </div>
                 </div>
             </div>

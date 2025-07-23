@@ -92,13 +92,13 @@ onMounted(() => {
         <div ref="containerRef" class="overflow-y-auto flex flex-col pr-1 pl-0 relative">
             <div
                 v-if="backgroundPosition.show"
-                class="absolute left-0 z-[1] transition-all duration-300 ease-out bg-vp-brand-1/5"
+                class="absolute left-0 z-[1] transition-all duration-300 ease-out rounded-tr-[4px] rounded-br-[4px]"
                 :style="{
                     top: `${backgroundPosition.top}px`,
                     height: `${backgroundPosition.height}px`,
                     width: 'calc(100% - 4px)',
-                    // backgroundImage:
-                    //     'linear-gradient(to left, var(--vp-c-brand-soft), transparent)',
+                    backgroundImage:
+                        'linear-gradient(to left, color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent), transparent)',
                 }"
             ></div>
 
@@ -146,7 +146,6 @@ onMounted(() => {
                             useTimeAgo(new Date((release.timestamp || 0) * 1000)).value,
                         )
                     }}
-                    <!-- {{ formatFullDate(release.timestamp || 0) }} -->
                 </span>
             </button>
         </div>
@@ -165,12 +164,11 @@ onMounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    /* background-image: linear-gradient(to left, var(--vp-c-bg-soft), var(--vp-c-bg-dark)); */
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent);
     opacity: 0;
     transition: opacity 100ms ease-out;
-    border-radius: inherit;
     z-index: -1;
+    border-radius: 0 4px 4px 0;
 }
 
 .release-item-bg:hover::before {

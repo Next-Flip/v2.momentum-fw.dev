@@ -4,6 +4,7 @@ export const ConnectionState = {
     CONNECTED: "connected",
     DISCONNECTING: "disconnecting",
     ERROR: "error",
+    LOCKED: "locked",
 } as const;
 
 export type ConnectionState = (typeof ConnectionState)[keyof typeof ConnectionState];

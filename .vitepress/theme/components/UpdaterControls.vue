@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
             <div class="flex flex-row gap-3 items-end w-full">
                 <div ref="channelDropdownRef" class="relative flex-shrink-0">
                     <label
-                        class="block text-sm font-medium text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_channel_label") }}
@@ -227,7 +227,7 @@ onBeforeUnmount(() => {
 
                 <div ref="releaseDropdownRef" class="relative flex-1 min-w-0">
                     <label
-                        class="block text-sm font-medium text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_version_dropdown_label") }}
@@ -280,7 +280,7 @@ onBeforeUnmount(() => {
                                         }"
                                         @click="selectRelease(release)"
                                     >
-                                        <div class="flex flex-row items-center gap-3 min-w-0">
+                                        <div class="flex flex-row items-center gap-2 min-w-0">
                                             <span
                                                 class="font-medium text-vp-1 font-mono flex-shrink-0 uppercase"
                                                 :class="{
@@ -295,7 +295,7 @@ onBeforeUnmount(() => {
                                                         : release.commit.substring(0, 7)
                                                 }}
                                             </span>
-                                            <span
+                                            <Tooltip
                                                 v-if="
                                                     isConnected &&
                                                     (deviceInfo?.firmware_commit ===
@@ -303,17 +303,23 @@ onBeforeUnmount(() => {
                                                         deviceInfo?.firmware_version ===
                                                             release.version)
                                                 "
-                                                class="font-medium text-xs whitespace-nowrap overflow-hidden text-ellipsis uppercase text-vp-brand-1"
-                                                :class="{
-                                                    'text-vp-brand-1/60':
-                                                        deviceInfo?.firmware_commit ===
-                                                            release.commit ||
-                                                        deviceInfo?.firmware_version ===
-                                                            release.version,
-                                                }"
+                                                :delay="0"
+                                                :position="'right'"
+                                                :z-index="9999"
                                             >
-                                                {{ tr("installed") }}
-                                            </span>
+                                                <div
+                                                    class="flex items-center text-sm text-vp-brand-1 dark:text-vp-brand-1 rounded-full bg-vp-brand-1/10 dark:bg-vp-brand-1/10 p-0.5 border border-vp-brand-1/20 hover:border-vp-brand-1/40 transition-all duration-100"
+                                                    :class="{
+                                                        'text-vp-neutral dark:text-vp-neutral/80 border-vp-neutral/20 dark:border-vp-neutral/30 hover:border-vp-neutral/60':
+                                                            selectedRelease?.commit ===
+                                                            release.commit,
+                                                    }"
+                                                    :aria-label="tr('releases_current_version')"
+                                                >
+                                                    <v-icon name="oi-check" scale="0.60" />
+                                                </div>
+                                                <template #content>{{ tr("installed") }}</template>
+                                            </Tooltip>
                                         </div>
                                         <span
                                             class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono"
@@ -340,10 +346,9 @@ onBeforeUnmount(() => {
 
             <div class="flex flex-row gap-3 items-end w-full md:w-auto">
                 <div
-                    class="hidden xl:block h-6 mb-2 mx-2 w-px bg-vp-divider transition-opacity duration-200"
+                    class="hidden xl:block h-6 mb-2 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                     :class="{ 'opacity-60': isInstallButtonHovered }"
                 />
-
                 <div class="flex items-end">
                     <Tooltip
                         :delay="uploadedFile ? 400 : 0"
@@ -469,7 +474,6 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     width: 100%;
     max-width: 100%;
-    /* min-width: 120px; */
     background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent);
     backface-visibility: hidden;
     border-radius: 8px;
@@ -513,7 +517,7 @@ onBeforeUnmount(() => {
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     padding: 7px;
-    background-color: var(--vp-c-bg);
+    background-color: var(--vp-c-bg-dark);
     box-shadow: var(--vp-shadow-3);
     backdrop-filter: blur(12px);
 }
@@ -536,7 +540,6 @@ onBeforeUnmount(() => {
     max-height: 250px;
     display: flex;
     flex-direction: column;
-    /* min-width: 160px; */
 }
 
 .dropdown-menu.is-visible {
@@ -553,7 +556,6 @@ onBeforeUnmount(() => {
 
 .dropdown-item.is-selected {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
-    /* background-image: linear-gradient(to right, var(--vp-c-brand-soft), transparent); */
     color: var(--vp-c-brand-1);
 }
 

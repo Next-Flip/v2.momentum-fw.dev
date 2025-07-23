@@ -74,36 +74,36 @@
     --vp-home-hero-image-filter: blur(44px);
 }
 
-/* ::selection {
+::selection {
     background-color: color-mix(in srgb, var(--vp-c-brand-3) 10%, transparent);
-    color: black;
+    /* color: black; */
 }
 
 html.dark ::selection {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
-    color: white;
-} */
+    /* color: white; */
+}
 
 .overflow-y-auto::-webkit-scrollbar {
     width: 5px;
-    /* z-index: 1000 !important; */
+    z-index: 1000 !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
     background: transparent;
     margin-right: 2px;
-    /* z-index: 1000 !important; */
+    z-index: 1000 !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
     background: var(--vp-c-divider);
     border-radius: 5px;
-    /* z-index: 1000 !important; */
+    z-index: 1000 !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: var(--vp-c-text-3);
-    /* z-index: 1000 !important; */
+    z-index: 1000 !important;
 }
 
 .overflow-x-auto::-webkit-scrollbar {

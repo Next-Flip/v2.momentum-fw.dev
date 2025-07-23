@@ -145,7 +145,7 @@ onMounted(() => {
 
 <template>
     <div
-        class="border border-vp-divider rounded-lg bg-vp-dark dark:bg-neutral-950 overflow-hidden group flex flex-col"
+        class="border border-vp-divider rounded-xl bg-vp-dark dark:bg-neutral-950 overflow-hidden group flex flex-col"
         :class="{
             'h-full': !props.changelogIsOpen && props.isExpanded,
         }"
@@ -157,13 +157,16 @@ onMounted(() => {
             }"
         >
             <div
-                class="w-full flex items-center justify-between text-left px-4 sm:pl-5 min-h-14 bg-vp-dark dropdown-button"
+                class="w-full flex items-center justify-between text-left px-4 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
                 :class="{
                     'is-active': isExpanded,
                 }"
             >
-                <div class="flex flex-row items-center gap-3">
-                    <span v-if="hasStatus" class="relative flex size-1.5">
+                <div class="flex flex-row items-center gap-2">
+                    <span
+                        v-if="hasStatus && logs.length > 0 && !isExpanded"
+                        class="relative flex size-1.5 mt-0.5 mr-1"
+                    >
                         <span
                             class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
                             :class="{
@@ -181,12 +184,12 @@ onMounted(() => {
                             }"
                         ></span>
                     </span>
-                    <h2 class="text-[13px] leading-3 uppercase font-semibold text-vp-1">
+                    <h2 class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5">
                         {{ tr("updater_logs") }}
                     </h2>
                     <span
                         v-if="logs.length > 0"
-                        class="text-xs font-medium font-mono py-1 rounded-full text-vp-2 text-start"
+                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/80"
                     >
                         {{ groupedLogs.length }}
                     </span>
@@ -282,7 +285,7 @@ onMounted(() => {
                                 <div
                                     v-for="(group, index) in groupedLogs"
                                     :key="index"
-                                    class="flex items-center gap-1 text-xs px-2 py-0.5 justify-start relative"
+                                    class="flex items-center gap-1 text-xs pl-2 min-h-5 justify-start relative"
                                     :class="{
                                         'bg-[#FEF6D5] dark:bg-yellow-400/10':
                                             group.log.level === 'warning',
@@ -305,7 +308,7 @@ onMounted(() => {
                                         }"
                                     ></div>
                                     <span
-                                        class="text-vp-3 flex-shrink-0 w-[62px] text-left h-min mb-auto"
+                                        class="text-vp-3 flex-shrink-0 w-[62px] text-left h-min"
                                         :class="{
                                             'text-neutral-900 dark:text-yellow-400/60':
                                                 group.log.level === 'warning',
@@ -318,7 +321,7 @@ onMounted(() => {
                                         {{ formatTime(group.log.timestamp) }}
                                     </span>
                                     <span
-                                        class="text-vp-1 flex-1 min-w-0 text-left message-text"
+                                        class="text-vp-1 flex-1 min-w-0 text-left message-text whitespace-nowrap overflow-hidden text-ellipsis"
                                         :class="{
                                             'text-neutral-950 dark:text-yellow-400/80':
                                                 group.log.level === 'warning',
@@ -332,7 +335,7 @@ onMounted(() => {
                                     </span>
                                     <span
                                         v-if="group.count > 1"
-                                        class="text-vp-3 flex-shrink-0 text-xs font-medium ml-1"
+                                        class="text-vp-3 flex-shrink-0 text-xs font-medium ml-1 px-1.5 py-0.5 bg-white/[4%]"
                                     >
                                         {{ group.count }}
                                     </span>
@@ -347,12 +350,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* .logs-expand-enter-active,
-.logs-expand-leave-active {
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-} */
-
 .logs-expand-enter-from {
     opacity: 0;
     max-height: 0;

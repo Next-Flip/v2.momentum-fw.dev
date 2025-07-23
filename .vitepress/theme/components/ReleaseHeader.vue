@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
                         :z-index="9999"
                     >
                         <div
-                            class="flex items-center text-sm text-green-700 dark:text-green-400 rounded-full bg-green-300/20 dark:bg-green-900/20 p-0.5 border border-green-800/45 hover:border-green-700/45 transition-all duration-100"
+                            class="flex items-center text-sm text-vp-brand-1 dark:text-vp-brand-1 rounded-full bg-vp-brand-1/10 dark:bg-vp-brand-1/10 p-0.5 border border-vp-brand-1/20 hover:border-vp-brand-1/40 transition-all duration-100"
                             :aria-label="tr('releases_current_version')"
                         >
                             <v-icon name="oi-check" scale="0.65" />
@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="flex flex-row items-center gap-2">
                     <div
-                        class="flex items-center gap-4 text-sm text-vp-brand-1 rounded-full release-date px-2.5 py-1 border border-vp-1/5"
+                        class="flex items-center gap-4 text-sm text-vp-2 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/80 backdrop-blur-sm"
                     >
                         <span>{{ selectedRelease?.date }}</span>
                     </div>
@@ -144,7 +144,7 @@ onBeforeUnmount(() => {
             <Transition name="fade-dropdown">
                 <div
                     v-if="isDropdownOpen"
-                    class="lg:hidden absolute top-full left-0 w-full -z-[1] p-[7px] bg-vp-bg shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
+                    class="lg:hidden absolute top-full left-0 w-full -z-[1] p-[7px] bg-vp-dark shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
                 >
                     <div
                         class="bg-transparent transition-all duration-200 overflow-hidden max-h-[275px] flex flex-col w-full min-w-full"
@@ -152,7 +152,7 @@ onBeforeUnmount(() => {
                     >
                         <div
                             ref="dropdownMenuRef"
-                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute pr-[7px]"
                         >
                             <template
                                 v-for="(section, sectionIndex) in releaseSections"
@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
                             >
                                 <div
                                     v-if="section.releases.length > 0"
-                                    class="px-3 py-2 mb-2 text-xs font-semibold text-vp-2 uppercase tracking-wide border-b border-vp-divider/40"
+                                    class="px-3 py-2 mb-[7px] text-xs font-semibold text-vp-2 uppercase tracking-wide border-b border-vp-divider/40"
                                     :class="{ 'mt-4': sectionIndex > 0 }"
                                 >
                                     {{ section.title }}
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
                                 <div
                                     v-for="release in section.releases"
                                     :key="`${section.title}-${release.commit}`"
-                                    class="dropdown-item flex flex-row min-h-7 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0 rounded-[4px]"
+                                    class="dropdown-item flex flex-row min-h-8 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0 rounded-[4px]"
                                     :class="{
                                         'is-selected': isSelected(release),
                                     }"
@@ -211,10 +211,6 @@ onBeforeUnmount(() => {
     backdrop-filter: blur(10px) !important;
 }
 
-.release-date {
-    background-color: color-mix(in srgb, var(--vp-c-brand-soft) 80%, transparent);
-}
-
 .dropdown-menu.is-visible {
     transform: translateY(0);
 }
@@ -228,7 +224,8 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-item.is-selected {
-    background-image: linear-gradient(to right, var(--vp-c-brand-soft), transparent);
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
+    /* background-image: linear-gradient(to right, var(--vp-c-brand-soft), transparent); */
     color: var(--vp-c-brand-1);
 }
 

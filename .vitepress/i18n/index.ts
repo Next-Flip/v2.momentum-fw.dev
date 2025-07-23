@@ -229,6 +229,8 @@ export type MessageSchema = {
     updater_disconnect_subtitle: string;
     updater_connection_error: string;
     updater_connection_error_subtitle: string;
+    updater_connection_locked: string;
+    updater_connection_locked_subtitle: string;
     updater_unknown_error: string;
     updater_connect_button: string;
     updater_na: string;

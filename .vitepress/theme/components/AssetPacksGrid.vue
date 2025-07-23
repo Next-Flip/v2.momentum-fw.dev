@@ -309,7 +309,7 @@ const filteredAssetPacks = computed(() => {
                     href="https://github.com/Next-Flip/Asset-Packs"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-vp-brand-1 no-underline hover:underline hover:text-vp-brand-2"
+                    class="text-vp-brand-1 no-underline hover:underline hover:text-vp-brand-2 vp-external-link-icon"
                     >Next-Flip/Asset-Packs</a
                 >
             </p>

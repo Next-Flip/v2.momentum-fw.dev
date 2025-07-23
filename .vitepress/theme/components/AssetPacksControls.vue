@@ -396,7 +396,7 @@ watch(
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     padding: 7px;
-    background-color: var(--vp-c-bg);
+    background-color: var(--vp-c-bg-dark);
     box-shadow: var(--vp-shadow-3);
     backdrop-filter: blur(12px);
 }

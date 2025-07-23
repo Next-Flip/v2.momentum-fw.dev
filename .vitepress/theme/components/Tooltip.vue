@@ -215,7 +215,6 @@ onBeforeUnmount(() => {
 
 .tooltip {
     box-shadow: var(--vp-shadow-3) !important;
-    /* background-color: color-mix(in srgb, var(--vp-c-bg-elv) 90%, transparent); */
     background-color: color-mix(in srgb, var(--vp-c-neutral-inverse) 90%, transparent);
 }
 

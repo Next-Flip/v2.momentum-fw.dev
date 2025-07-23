@@ -232,7 +232,7 @@ onMounted(() => {
                             <a
                                 class="menu-value vp-external-link-icon hover:underline"
                                 :title="deviceInfo?.firmware_branch || ''"
-                                :href="`${getLocalizedPath('/releases/')}/${commitInReleases?.commit || ''}`"
+                                :href="`${getLocalizedPath('/releases')}/${commitInReleases?.commit || ''}`"
                                 >{{
                                     deviceInfo?.firmware_version?.includes("dev")
                                         ? `dev (${deviceInfo.firmware_commit})`

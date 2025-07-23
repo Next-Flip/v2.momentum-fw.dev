@@ -20,6 +20,7 @@ const md = new MarkdownIt({
 });
 
 interface Props {
+    showUpdateOverlay?: boolean;
     selectedRelease?: ReleaseItem | null;
     uploadedFile?: File | null;
     uploadedFileRelease?: ReleaseItem | null;
@@ -27,6 +28,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    showUpdateOverlay: false,
     changelogState: "closed",
     uploadedFile: null,
     uploadedFileRelease: null,
@@ -102,7 +104,7 @@ const releaseHref = computed(() => {
 
 <template>
     <div
-        class="changelog-content rounded-lg group"
+        class="changelog-content rounded-xl group"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
             'h-auto': isClosed,
@@ -110,7 +112,7 @@ const releaseHref = computed(() => {
         }"
     >
         <div
-            class="border border-vp-divider rounded-lg flex flex-col overflow-hidden relative bg-vp-dark/90"
+            class="border border-vp-divider rounded-xl flex flex-col overflow-hidden relative bg-vp-dark/90"
             :class="{
                 'changelog-expanded': isExpanded,
                 'flex-1': !isClosed,
@@ -125,30 +127,43 @@ const releaseHref = computed(() => {
                         (selectedRelease || uploadedFileRelease) && !isClosed,
                 }"
             >
-                <div class="flex items-center gap-4">
-                    <div v-if="displayVersion" class="flex items-center gap-0">
-                        <Tooltip :disabled="!shouldShowExternalLink" :delay="0" position="right">
-                            <a
-                                v-if="shouldShowExternalLink"
-                                :href="releaseHref"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline"
-                            >
-                                {{ displayVersion }}
-                            </a>
-                            <template #content>
-                                {{ tr("updater_go_to_release") }}
-                            </template>
-                        </Tooltip>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <Tooltip
+                        v-if="displayVersion"
+                        :disabled="!shouldShowExternalLink"
+                        :delay="0"
+                        position="right"
+                    >
+                        <a
+                            v-if="shouldShowExternalLink"
+                            :href="releaseHref"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
+                        >
+                            {{ displayVersion }}
+                        </a>
+                        <template #content>
+                            {{ tr("updater_go_to_release") }}
+                        </template>
+                    </Tooltip>
+                    <template v-if="displayVersion">
+                        <div
+                            class="hidden xl:block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
+                        />
+                        <span class="text-[13px] font-normal text-vp-3 mt-px">
+                            {{ tr("updater_changelog") }}
+                        </span>
+                    </template>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                         :class="{
+                            'opacity-0 pointer-events-none': showUpdateOverlay,
                             'opacity-0': windowWidth > 1024,
-                            'group-hover:opacity-100': isAccessible && (isOpen || isExpanded),
+                            'group-hover:opacity-100':
+                                isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
                         }"
                         @click="handleToggleExpand"
                     >
@@ -175,12 +190,12 @@ const releaseHref = computed(() => {
             </div>
 
             <div
-                v-if="isAccessible && !arrivedState.bottom && !isClosed"
-                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-dark to-transparent pointer-events-none z-10"
+                v-if="isAccessible && !arrivedState.top && !isClosed"
+                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/70 to-transparent pointer-events-none z-10"
             ></div>
             <div
-                v-if="isAccessible && arrivedState.bottom && !isClosed"
-                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark to-transparent pointer-events-none z-10"
+                v-if="isAccessible && !arrivedState.bottom && !isClosed"
+                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/70 to-transparent pointer-events-none z-10"
             ></div>
 
             <div
@@ -325,13 +340,6 @@ const releaseHref = computed(() => {
         color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
     );
 }
-
-/* 
-.dark .changelog-content-warning {
-    background-image: linear-gradient(to bottom,
-            color-mix(in srgb, var(--vp-c-warning-1) 2%, transparent) 0%,
-            color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%);
-} */
 
 .rotate-180 {
     transform: rotate(180deg);

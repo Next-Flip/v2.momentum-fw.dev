@@ -126,13 +126,13 @@ watch(
                     name="oi-chevron-down"
                     scale="0.8"
                     class="transition-transform duration-200 text-vp-2"
-                    :class="{ 'rotate-180': isDevelopmentSectionExpanded }"
+                    :class="{ '-rotate-180': isDevelopmentSectionExpanded }"
                 />
                 <span
                     class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-100"
                     >{{ tr("releases_files_dev") }}</span
                 >
-                <span class="text-xs text-vp-3 mt-px mx-px">{{
+                <span class="text-xs text-vp-3 mt-px ml-px mr-0.5">{{
                     categorizedFiles.development.length
                 }}</span>
                 <div class="flex-1 bg-vp-divider w-full h-px"></div>

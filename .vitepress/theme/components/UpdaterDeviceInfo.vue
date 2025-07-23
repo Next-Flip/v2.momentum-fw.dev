@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { useScroll, useStorage } from "@vueuse/core";
-import { computed, ref, useTemplateRef } from "vue";
+import { useScroll } from "@vueuse/core";
+import { computed, useTemplateRef } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useSharedHover } from "../composables/useSharedHover";
 import type { DeviceInfo } from "../types";
-import { STORAGE_KEYS } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
+
+import ScreenDisplay from "./ScreenDisplay.vue";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
@@ -32,23 +33,6 @@ const {
 } = useConnectionInfo();
 
 const isConnected = computed(() => connectionIsConnected.value);
-const activeTab = useStorage<"parsed" | "raw">(STORAGE_KEYS.UPDATER_DEVICE_INFO_TAB, "parsed");
-const previousTab = ref<"parsed" | "raw">("parsed");
-
-const tabTransitionName = computed(() => {
-    if (previousTab.value === "parsed" && activeTab.value === "raw") {
-        return "tab-slide-right";
-    } else if (previousTab.value === "raw" && activeTab.value === "parsed") {
-        return "tab-slide-left";
-    }
-    return "tab-fade";
-});
-
-const handleTabChange = (newTab: "parsed" | "raw") => {
-    previousTab.value = activeTab.value;
-    activeTab.value = newTab;
-};
-
 const getConnectionDisplay = computed(() => {
     if (!supportsSerialPort()) {
         return {
@@ -84,6 +68,13 @@ const getConnectionDisplay = computed(() => {
             return {
                 title: tr("updater_connection_error"),
                 subtitle: tr("updater_connection_error_subtitle"),
+                showConnectButton: true,
+                showProgress: false,
+            };
+        case "locked":
+            return {
+                title: tr("updater_connection_locked"),
+                subtitle: tr("updater_connection_locked_subtitle"),
                 showConnectButton: true,
                 showProgress: false,
             };
@@ -123,11 +114,6 @@ const formatChargeState = (state: string) => {
     if (!state) return tr("updater_na");
     return state.charAt(0).toUpperCase() + state.slice(1);
 };
-
-const formatJsonDisplay = computed(() => {
-    if (!deviceInfo.value) return "{}";
-    return JSON.stringify(deviceInfo.value, null, 2);
-});
 
 const getBatteryCapacity = computed(() => {
     const remain = deviceInfo.value?.capacity_remain;
@@ -304,54 +290,22 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="border rounded-lg h-full flex flex-col max-h-[calc(30vh-var(--vp-nav-height)-24px)] lg:max-h-[calc(50vh-var(--vp-nav-height)-24px)] w-full min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out"
+        class="border rounded-xl h-full flex flex-col max-h-[calc(30vh-var(--vp-nav-height)-24px)] lg:max-h-[calc(60vh-var(--vp-nav-height)-24px)] w-full min-h-72 lg:min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out bg-vp-dark/55 backdrop-blur-md"
         :class="{
             'border-vp-divider': !isInstallButtonHovered,
             'border-vp-brand-1': isInstallButtonHovered,
         }"
     >
-        <div
-            class="flex-1 flex flex-col min-h-0 bg-vp-dark/55 backdrop-blur-sm transition-all duration-300"
-        >
-            <Transition name="header-fade" mode="out-in">
-                <div
-                    v-if="isConnected"
-                    class="flex items-center justify-between flex-shrink-0 mb-[7px]"
-                >
-                    <div
-                        class="flex rounded-md p-1.5 flex-shrink-0 min-w-0 absolute right-[13px] top-3 z-10 bg-vp-dark"
-                    >
-                        <button
-                            :class="[
-                                'px-3 py-1 text-xs font-medium rounded-md transition-all flex-1 whitespace-nowrap',
-                                activeTab === 'parsed'
-                                    ? 'bg-neutral-100 dark:bg-vp-soft text-vp-1 shadow-sm'
-                                    : 'text-vp-3 hover:text-vp-2',
-                            ]"
-                            @click="handleTabChange('parsed')"
-                        >
-                            {{ tr("updater_parsed_tab") }}
-                        </button>
-                        <button
-                            :class="[
-                                'px-3 py-1 text-xs font-medium rounded-md transition-all flex-1 whitespace-nowrap',
-                                activeTab === 'raw'
-                                    ? 'bg-neutral-100 dark:bg-vp-soft text-vp-1 shadow-sm'
-                                    : 'text-vp-3 hover:text-vp-2',
-                            ]"
-                            @click="handleTabChange('raw')"
-                        >
-                            {{ tr("updater_raw_tab") }}
-                        </button>
-                    </div>
-                </div>
-            </Transition>
+        <div class="flex-shrink-0 hidden lg:block relative z-0">
+            <ScreenDisplay />
+        </div>
 
+        <div class="flex-1 flex flex-col min-h-0 transition-all duration-300 relative z-10">
             <Transition name="content-fade" mode="out-in">
                 <div
                     v-if="!isConnected"
                     key="disconnected"
-                    class="flex-1 flex items-center justify-center py-20 px-6"
+                    class="flex-1 flex items-center justify-center lg:pt-16 lg:pb-20 px-6"
                 >
                     <div class="text-center">
                         <div class="flex flex-col items-center gap-2">
@@ -360,7 +314,7 @@ const deviceSections = computed(() => {
                             >
                                 <div
                                     v-if="getConnectionDisplay.showProgress"
-                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-mntm-yellow-1 animate-spin"
+                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-vp-brand-1 animate-spin"
                                 ></div>
                                 <v-icon name="bi-usb-symbol" scale="1.75" class="text-vp-3" />
                             </div>
@@ -395,59 +349,43 @@ const deviceSections = computed(() => {
                     </div>
                 </div>
 
-                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative">
+                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative pt-3">
+                    <!-- <div
+                        v-if="!arrivedState.top"
+                        class="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/70 to-transparent pointer-events-none mr-4"
+                    ></div> -->
                     <div
                         v-if="!arrivedState.bottom"
-                        class="absolute bottom-[57px] left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/60 to-transparent pointer-events-none z-10 mx-2"
+                        class="absolute bottom-[57px] left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/60 to-transparent pointer-events-none z-20 mx-2 mr-4"
                     ></div>
-                    <Transition :name="tabTransitionName" mode="out-in">
-                        <div
-                            v-if="activeTab === 'parsed'"
-                            key="parsed"
-                            ref="el"
-                            class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[18px] mb-1 mr-[7px] pt-[17px]"
-                        >
-                            <h2
-                                class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mb-5"
-                            >
-                                {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
-                            </h2>
-                            <div class="flex flex-col space-y-0 pb-3">
-                                <template v-for="section in deviceSections" :key="section.title">
-                                    <div class="section-header">{{ section.title }}</div>
-                                    <div
-                                        v-for="item in section.items"
-                                        :key="item.label"
-                                        class="menu-item"
-                                    >
-                                        <span class="menu-label">{{ item.label }}</span>
-                                        <a
-                                            v-if="item.isLink"
-                                            class="menu-value vp-external-link-icon hover:underline"
-                                            :href="item.href"
-                                        >
-                                            {{ item.value }}
-                                        </a>
-                                        <span v-else class="menu-value">{{ item.value }}</span>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <div
-                            v-else
-                            key="raw"
-                            ref="el"
-                            class="flex-1 min-h-0 overflow-y-auto mb-1 pl-2 mr-1"
-                        >
-                            <div class="rounded-lg p-3">
-                                <pre
-                                    class="text-xs text-vp-1 font-mono whitespace-pre-wrap break-all"
-                                    >{{ formatJsonDisplay }}</pre
+                    <div
+                        ref="el"
+                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[11px] mb-[7px] mr-[7px] pt-[12px] relative z-10"
+                    >
+                        <h2 class="text-base leading-3 uppercase font-semibold text-vp-1 mb-5">
+                            {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
+                        </h2>
+                        <div class="flex flex-col space-y-0 pb-[7px]">
+                            <template v-for="section in deviceSections" :key="section.title">
+                                <div class="section-header">{{ section.title }}</div>
+                                <div
+                                    v-for="item in section.items"
+                                    :key="item.label"
+                                    class="menu-item"
                                 >
-                            </div>
+                                    <span class="menu-label">{{ item.label }}</span>
+                                    <a
+                                        v-if="item.isLink"
+                                        class="menu-value vp-external-link-icon hover:underline"
+                                        :href="item.href"
+                                    >
+                                        {{ item.value }}
+                                    </a>
+                                    <span v-else class="menu-value">{{ item.value }}</span>
+                                </div>
+                            </template>
                         </div>
-                    </Transition>
+                    </div>
 
                     <div
                         class="py-3 border-t border-vp-divider flex-shrink-0 bg-vp-dark dark:bg-vp-dark"
@@ -489,7 +427,8 @@ const deviceSections = computed(() => {
                                 :disabled="flags.updateInProgress"
                                 :class="[
                                     'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
-                                    flags.updateInProgress && 'opacity-50 !cursor-not-allowed',
+                                    flags.updateInProgress &&
+                                        'opacity-40 !cursor-not-allowed dark:!bg-vp-soft dark:!text-vp-3/70',
                                     !flags.updateInProgress &&
                                         'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
                                 ]"

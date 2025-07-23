@@ -41,7 +41,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
 <template>
     <main
         v-if="selectedRelease"
-        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-lg border border-vp-divider overflow-clip"
+        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-xl border border-vp-divider overflow-clip"
     >
         <ReleaseHeader
             :selected-release="selectedRelease"
@@ -81,17 +81,6 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .dark .shadow {
     opacity: 0.25;
 }
-
-.dark-blur {
-    background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
-.dark .dark-blur {
-    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 95%, transparent) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
 .release-content {
     position: relative;
     background-color: transparent;
