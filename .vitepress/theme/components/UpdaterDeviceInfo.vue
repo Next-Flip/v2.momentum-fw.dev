@@ -290,12 +290,13 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out bg-vp-dark/55 backdrop-blur-md lg:py-0"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/55 backdrop-blur-md"
         :class="{
-            'border-none border-vp-divider': !isInstallButtonHovered,
-            '!border !border-vp-brand-1 box-border !bg-vp-brand-3/[1%]': isInstallButtonHovered,
+            '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
             'py-8 pb-12': !isConnected,
         }"
+        :data-connected="isConnected"
+        :data-hovered="isInstallButtonHovered"
     >
         <div class="flex-shrink-0 hidden lg:block relative z-0">
             <ScreenDisplay />
@@ -309,7 +310,7 @@ const deviceSections = computed(() => {
                     class="flex-1 flex items-center justify-center lg:pt-16 lg:pb-20 px-6"
                 >
                     <div class="text-center">
-                        <div class="flex flex-col items-center gap-2">
+                        <div class="flex flex-col items-center gap-1">
                             <div
                                 class="relative w-14 h-14 rounded-full flex items-center justify-center"
                             >
@@ -332,11 +333,11 @@ const deviceSections = computed(() => {
                                 <Transition name="button-height">
                                     <div
                                         v-if="getConnectionDisplay.showConnectButton"
-                                        class="button-container"
+                                        class="button-container mb-3"
                                     >
                                         <a
                                             :class="[
-                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100 cursor-pointer',
+                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55',
                                                 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50',
                                                 { 'wiggle-loop': isInstallButtonHovered },
                                             ]"
@@ -446,6 +447,59 @@ const deviceSections = computed(() => {
 </template>
 
 <style scoped>
+.device-info-container:before {
+    content: "";
+    position: absolute;
+    top: -25%;
+    left: -28%;
+    width: 150%;
+    height: 150%;
+    transform: rotate(-45deg);
+    background-image: url("/bg/flipper.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.085;
+    filter: saturate(0);
+    mix-blend-mode: lighten;
+    z-index: -1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.dark .device-info-container:before {
+    opacity: 0.045;
+    filter: saturate(0) invert(1);
+}
+
+.device-info-container[data-connected="true"]:before {
+    opacity: 0;
+}
+
+.device-info-container[data-hovered="true"]:before {
+    opacity: 0.15;
+}
+.dark .device-info-container[data-hovered="true"]:before {
+    opacity: 0.055;
+}
+
+.device-info-container:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--vp-c-brand-3);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.device-info-container[data-hovered="true"]:after {
+    opacity: 0.01;
+}
+
 .subtitle :deep(a) {
     @apply text-vp-brand-1 hover:text-vp-brand-2 hover:underline transition-colors duration-100 font-medium;
 }

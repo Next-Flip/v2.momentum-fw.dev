@@ -230,14 +230,14 @@ const messages: MessageSchema = {
     updater_raw_tab: "Raw",
     updater_connected: "Connected",
     updater_flipper_not_connected: "Not Connected",
-    updater_connection_subtitle: "Please wait while we establish connection...",
-    updater_disconnect_subtitle: "Please wait while we disconnect...",
+    updater_connection_subtitle: "Wait while we establish connection...",
+    updater_disconnect_subtitle: "Wait while we disconnect...",
     updater_connection_error: "Connection Error",
     updater_connection_error_subtitle:
         "Serial port is busy, qFlipper and Flipper Lab can not be running!",
     updater_connection_locked: "Flipper Locked",
     updater_connection_locked_subtitle:
-        "Please unlock your Flipper and try again. You may need to disconnect and reconnect it.",
+        "Unlock your Flipper and try again. You may need to disconnect and reconnect it.",
     updater_unknown_error: "Unknown error occurred",
     updater_connect_button: "Connect",
     updater_na: "N/A",
@@ -294,8 +294,7 @@ const messages: MessageSchema = {
     updater_changelog_unavailable:
         "A changelog is unavailable for the uploaded file. We recommend only flashing files from verified sources, but you can proceed at your own risk.",
     updater_no_release_selected: "No release selected",
-    updater_no_release_selected_description:
-        "Please select a release to view the changelog. You can also upload a tgz file.",
+    updater_no_release_selected_description: "Select/upload a release to view the changelog.",
     updater_collapse: "Collapse",
     updater_expand: "Expand",
     updater_logs: "Logs",
@@ -330,7 +329,7 @@ const messages: MessageSchema = {
     updater_flashing_unavailable: "Flashing unavailable",
     updater_serial_unsupported: "Unsupported Browser",
     updater_serial_unsupported_subtitle:
-        "Your browser does not support serial communication. Please use a Chromium-based browser like <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, or <a href='https://www.opera.com/download' target='_blank' rel='noopener'>Opera</a>.",
+        "Your browser does not support serial communication. Use a Chromium-based browser like <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, or <a href='https://www.opera.com/download' target='_blank' rel='noopener'>Opera</a>.",
 };
 
 export default messages;

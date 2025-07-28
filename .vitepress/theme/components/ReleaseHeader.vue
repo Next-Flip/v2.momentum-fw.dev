@@ -134,7 +134,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="flex flex-row items-center gap-2">
                     <div
-                        class="flex items-center gap-4 text-sm text-vp-2 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/80 backdrop-blur-sm"
+                        class="flex items-center gap-4 text-sm text-vp-2 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm"
                     >
                         <span>{{ selectedRelease?.date }}</span>
                     </div>

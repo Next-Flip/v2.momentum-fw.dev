@@ -190,7 +190,7 @@ onMounted(() => {
                     </h2>
                     <span
                         v-if="logs.length > 0"
-                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/80"
+                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/70"
                     >
                         {{ groupedLogs.length }}
                     </span>

@@ -74,15 +74,13 @@
     --vp-home-hero-image-filter: blur(44px);
 }
 
-::selection {
+/* ::selection {
     background-color: color-mix(in srgb, var(--vp-c-brand-3) 10%, transparent);
-    /* color: black; */
 }
 
 html.dark ::selection {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
-    /* color: white; */
-}
+} */
 
 .overflow-y-auto::-webkit-scrollbar {
     width: 5px;
