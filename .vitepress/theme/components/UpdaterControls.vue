@@ -394,7 +394,7 @@ onBeforeUnmount(() => {
                             !isMatchingRelease &&
                             '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
                         isMatchingRelease &&
-                            'border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
+                            'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3',
                         isInstallButtonHovered && 'opacity-90 transition-all duration-200',
                     ]"
                 >

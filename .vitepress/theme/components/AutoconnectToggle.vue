@@ -2,10 +2,14 @@
 import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
+import { useSharedHover } from "../composables/useSharedHover";
+
+import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { isAutoconnectEnabled, toggleAutoconnect } = useAutoconnectSetting();
 const { handleConnect, connectionState } = useConnectionInfo();
+const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const toggleConnect = async () => {
     toggleAutoconnect();
@@ -16,30 +20,46 @@ const toggleConnect = async () => {
 </script>
 
 <template>
-    <button
-        type="button"
-        role="switch"
-        :aria-checked="isAutoconnectEnabled"
-        :aria-label="
-            isAutoconnectEnabled
-                ? tr('connection_autoconnect_enabled')
-                : tr('connection_autoconnect_disabled')
-        "
-        class="VPSwitch"
-        @click="toggleConnect"
+    <Tooltip
+        :delay="400"
+        :z-index="9999"
+        :offset="13"
+        position="bottom"
+        :force-visible="isInstallButtonHovered && !isAutoconnectEnabled"
     >
-        <span
-            class="check absolute top-px left-px w-[18px] h-[18px] rounded-full bg-[var(--vp-c-neutral-inverse)] shadow-[var(--vp-shadow-1)] transition-transform duration-[250ms] flex items-center justify-center"
+        <button
+            type="button"
+            role="switch"
+            :aria-checked="isAutoconnectEnabled"
+            :aria-label="
+                isAutoconnectEnabled
+                    ? tr('connection_autoconnect_enabled')
+                    : tr('connection_autoconnect_disabled')
+            "
+            class="VPSwitch"
+            :class="{
+                '!border-vp-brand-1': isInstallButtonHovered && !isAutoconnectEnabled,
+            }"
+            @click="toggleConnect"
         >
-            <span class="icon relative block w-[18px] h-[18px]">
-                <v-icon
-                    name="ri-refresh-line"
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[250ms] text-vp-1"
-                    scale="0.65"
-                />
+            <span
+                class="check absolute top-px left-px w-[18px] h-[18px] rounded-full bg-[var(--vp-c-neutral-inverse)] shadow-[var(--vp-shadow-1)] transition-transform duration-[250ms] flex items-center justify-center"
+            >
+                <span class="icon relative block w-[18px] h-[18px]">
+                    <v-icon
+                        name="ri-refresh-line"
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-[250ms] text-vp-1"
+                        scale="0.65"
+                    />
+                </span>
             </span>
-        </span>
-    </button>
+        </button>
+        <template #content>{{
+            isAutoconnectEnabled
+                ? tr("connection_autoconnect_enabled")
+                : tr("connection_autoconnect_disabled")
+        }}</template>
+    </Tooltip>
 </template>
 
 <style scoped>

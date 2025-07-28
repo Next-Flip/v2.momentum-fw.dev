@@ -145,9 +145,10 @@ onMounted(() => {
 
 <template>
     <div
-        class="border border-vp-divider rounded-xl bg-vp-dark dark:bg-neutral-950 overflow-hidden group flex flex-col"
+        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-xl border border-vp-divider"
         :class="{
             'h-full': !props.changelogIsOpen && props.isExpanded,
+            'border-b border-vp-divider': !props.changelogIsOpen && !props.isExpanded,
         }"
     >
         <div
@@ -157,7 +158,7 @@ onMounted(() => {
             }"
         >
             <div
-                class="w-full flex items-center justify-between text-left px-4 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
+                class="w-full flex items-center justify-between text-left px-4 pr-2 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
                 :class="{
                     'is-active': isExpanded,
                 }"
@@ -194,8 +195,8 @@ onMounted(() => {
                         {{ groupedLogs.length }}
                     </span>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
+                <div class="flex items-center gap-1 flex-shrink-0">
+                    <Tooltip v-if="logs.length > 0" :delay="400" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
@@ -210,7 +211,7 @@ onMounted(() => {
                         </button>
                         <template #content>{{ tr("updater_clear_logs") }}</template>
                     </Tooltip>
-                    <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
+                    <Tooltip v-if="logs.length > 0" :delay="400" :z-index="9999">
                         <button
                             class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
                             :class="{
@@ -234,7 +235,7 @@ onMounted(() => {
                     >
                         <v-icon
                             :name="'oi-chevron-down'"
-                            scale="1.1"
+                            scale="1"
                             class="transition-all duration-200"
                             :class="{
                                 'rotate-180': isExpanded,
@@ -252,7 +253,7 @@ onMounted(() => {
                     }"
                 >
                     <div
-                        class="relative border-t border-vp-divider/60"
+                        class="relative border-t border-vp-divider"
                         :class="{
                             'flex-1 flex flex-col min-h-0': !props.changelogIsOpen,
                         }"
@@ -335,7 +336,7 @@ onMounted(() => {
                                     </span>
                                     <span
                                         v-if="group.count > 1"
-                                        class="text-vp-3 flex-shrink-0 text-xs font-medium ml-1 px-1.5 py-0.5 bg-white/[4%]"
+                                        class="text-vp-3/50 flex-shrink-0 text-xs font-medium ml-1 px-1.5 py-0.5"
                                     >
                                         {{ group.count }}
                                     </span>

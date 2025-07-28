@@ -391,28 +391,30 @@ onMounted(async () => {
 
 <template>
     <div
-        class="relative w-full flex flex-col items-center"
+        class="relative w-full flex flex-col items-center lg:py-20 lg:px-5"
         :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
     >
-        <div class="max-w-7xl mx-auto px-6 flex-1 flex flex-col w-full min-h-0">
-            <div
-                class="flex flex-col h-full space-y-6 w-full min-h-0 py-6 border-t border-vp-divider"
-            >
-                <div class="flex flex-col lg:flex-row gap-6 flex-1 w-full min-h-0 h-full">
+        <div
+            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider"
+        >
+            <div class="flex flex-col h-full space-y-6 w-full min-h-0">
+                <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
                     <div
-                        class="flex flex-col w-full lg:w-[31%] h-full min-w-0 lg:min-w-80 sticky self-start"
+                        class="flex flex-col w-full lg:w-[32%] h-full min-w-0 lg:min-w-80 sticky self-start"
                         :style="
                             windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height) + 24px);' : ''
                         "
                     >
-                        <div class="flex-shrink-0">
+                        <div class="flex-shrink-0 h-full">
                             <UpdaterDeviceInfo />
                         </div>
                     </div>
 
+                    <div class="h-full w-px bg-vp-divider"></div>
+
                     <div
                         ref="dropZoneRef"
-                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 gap-y-6"
+                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
@@ -424,7 +426,7 @@ onMounted(async () => {
 
                         <div
                             v-if="!isChangelogExpanded"
-                            class="relative flex flex-col border border-vp-divider rounded-xl px-6 bg-vp-dark/55 backdrop-blur-sm z-10"
+                            class="relative flex flex-col bg-vp-dark/55 backdrop-blur-sm z-10"
                             :class="{
                                 'min-h-[214px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
@@ -433,7 +435,7 @@ onMounted(async () => {
                             <Transition name="overlay-fade">
                                 <div
                                     v-if="showUpdateOverlay"
-                                    class="absolute inset-0 bg-vp-dark/75 backdrop-blur-lg rounded-xl flex items-center justify-center z-50 min-h-0"
+                                    class="absolute inset-0 backdrop-blur-lg rounded-xl flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
                                         v-if="updateStage !== 'update_stage_done'"
@@ -496,11 +498,11 @@ onMounted(async () => {
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div v-if="!showUpdateOverlay" class="flex flex-col mb-6">
+                                <div v-if="!showUpdateOverlay" class="flex flex-col mb-7">
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-start md:items-center justify-start gap-3 w-full mt-5 mb-3 lg:mt-6 lg:mb-0"
+                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[3%]"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"
@@ -508,8 +510,8 @@ onMounted(async () => {
                                             <div class="flex-shrink-0">
                                                 <v-icon
                                                     name="ri-error-warning-line"
-                                                    scale="1.2"
-                                                    class="text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5"
+                                                    scale="1.1"
+                                                    class="text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5 mt-0.5"
                                                 />
                                             </div>
                                             <span
@@ -539,7 +541,7 @@ onMounted(async () => {
                                     </Transition>
                                     <div
                                         v-if="!isChangelogExpanded"
-                                        class="flex-shrink-0 !z-10 transition-all duration-300"
+                                        class="flex-shrink-0 !z-10 transition-all duration-300 px-5"
                                         :class="{
                                             'opacity-0': showUpdateOverlay,
                                             'h-0 overflow-hidden':
@@ -550,7 +552,7 @@ onMounted(async () => {
                                         }"
                                     >
                                         <h3
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-6"
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-7"
                                             :class="{
                                                 'opacity-40 transition-opacity duration-200':
                                                     isInstallButtonHovered ||
@@ -561,7 +563,7 @@ onMounted(async () => {
                                             {{ tr("updater_select_firmware") }}
                                         </h3>
                                         <div
-                                            class="transition-opacity duration-300 !z-20 mt-6"
+                                            class="transition-opacity duration-300 !z-20 mt-4"
                                             :class="{
                                                 'opacity-30': isOverDropZone,
                                                 'opacity-30 pointer-events-none': showUpdateOverlay,
@@ -587,7 +589,7 @@ onMounted(async () => {
                             <Transition name="slide-up" mode="out-in">
                                 <div
                                     v-if="!isChangelogExpanded"
-                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300"
+                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300 px-5"
                                     :class="{
                                         'opacity-50 transition-opacity duration-200':
                                             isInstallButtonHovered,
@@ -597,51 +599,55 @@ onMounted(async () => {
                                         'opacity-90': isOverDropZone && !showUpdateOverlay,
                                         'opacity-0 pointer-events-none':
                                             showUpdateOverlay && !isChangelogExpanded,
-                                        'mb-6': supportsSerialPort(),
+                                        'mb-0': supportsSerialPort(),
                                     }"
                                 >
                                     <div
                                         v-if="supportsSerialPort()"
-                                        class="flex items-center justify-center gap-2 mb-6"
+                                        class="flex items-end justify-start gap-2 mb-5"
                                     >
-                                        <Tooltip
-                                            :aria-label="tr('releases_install')"
-                                            :delay="0"
-                                            :hide-delay="100"
-                                            :max-width="'315px'"
-                                            class="files-tooltip z-[1]"
-                                        >
-                                            <div
-                                                class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200"
+                                        <div class="flex items-center justify-start gap-2">
+                                            <Tooltip
+                                                :aria-label="tr('releases_install')"
+                                                :delay="0"
+                                                :hide-delay="100"
+                                                :max-width="'315px'"
+                                                class="files-tooltip z-[1]"
                                             >
-                                                <v-icon name="la-info-circle-solid" scale="0.9" />
-                                            </div>
-                                            <template #content>
                                                 <div
-                                                    class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-left justify-center"
+                                                    class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200"
                                                 >
-                                                    <span
-                                                        v-html="
-                                                            tr(
-                                                                'updater_install_from_file_tooltip',
-                                                                {
-                                                                    url: getLocalizedPath(
-                                                                        `/releases`,
-                                                                    ),
-                                                                    text: `here`,
-                                                                },
-                                                            )
-                                                        "
-                                                    ></span>
+                                                    <v-icon
+                                                        name="la-info-circle-solid"
+                                                        scale="0.9"
+                                                    />
                                                 </div>
-                                            </template>
-                                        </Tooltip>
-                                        <h3
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2"
-                                        >
-                                            {{ tr("updater_or_install_from_file") }}
-                                        </h3>
-                                        <div class="flex-1 h-px bg-vp-divider w-full"></div>
+                                                <template #content>
+                                                    <div
+                                                        class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-left justify-center"
+                                                    >
+                                                        <span
+                                                            v-html="
+                                                                tr(
+                                                                    'updater_install_from_file_tooltip',
+                                                                    {
+                                                                        url: getLocalizedPath(
+                                                                            `/releases`,
+                                                                        ),
+                                                                        text: `here`,
+                                                                    },
+                                                                )
+                                                            "
+                                                        ></span>
+                                                    </div>
+                                                </template>
+                                            </Tooltip>
+                                            <h3
+                                                class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2"
+                                            >
+                                                {{ tr("updater_or_install_from_file") }}
+                                            </h3>
+                                        </div>
                                     </div>
 
                                     <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
@@ -742,6 +748,10 @@ onMounted(async () => {
                                         class="hidden"
                                         @change="handleFileChange"
                                     />
+                                    <div
+                                        v-if="!showUpdateOverlay"
+                                        class="h-px bg-vp-divider w-auto mt-5 mb-5"
+                                    ></div>
                                 </div>
                             </Transition>
                         </div>

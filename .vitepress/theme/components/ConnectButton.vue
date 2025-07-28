@@ -2,7 +2,6 @@
 import { useMagicKeys, useWindowSize, whenever } from "@vueuse/core";
 import { useRoute } from "vitepress";
 import { computed, onMounted, ref, watch } from "vue";
-import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { ConnectionState } from "../types";
@@ -14,7 +13,6 @@ import Tooltip from "./Tooltip.vue";
 
 const width = ref(1024);
 const route = useRoute();
-const { isAutoconnectEnabled } = useAutoconnectSetting();
 
 const {
     connectionData,
@@ -320,14 +318,7 @@ onMounted(() => {
         </div>
 
         <div :class="isUpdatePage ? 'ml-8' : 'ml-3'">
-            <Tooltip :delay="400" :z-index="9999" :offset="13" position="bottom">
-                <AutoconnectToggle />
-                <template #content>{{
-                    isAutoconnectEnabled
-                        ? tr("connection_autoconnect_enabled")
-                        : tr("connection_autoconnect_disabled")
-                }}</template>
-            </Tooltip>
+            <AutoconnectToggle />
         </div>
     </div>
 </template>

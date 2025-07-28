@@ -104,7 +104,7 @@ const releaseHref = computed(() => {
 
 <template>
     <div
-        class="changelog-content rounded-xl group"
+        class="changelog-content rounded-xl group mx-5"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
             'h-auto': isClosed,
@@ -112,19 +112,20 @@ const releaseHref = computed(() => {
         }"
     >
         <div
-            class="border border-vp-divider rounded-xl flex flex-col overflow-hidden relative bg-vp-dark/90"
+            class="border rounded-xl border-vp-divider bg-vp-dark/90 flex flex-col overflow-hidden relative dark:bg-neutral-950/80 mb-5"
             :class="{
-                'changelog-expanded': isExpanded,
+                'changelog-expanded mt-5': isExpanded,
                 'flex-1': !isClosed,
                 'flex-shrink-0': isClosed,
             }"
         >
             <div
-                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 sm:pl-5 dropdown-button"
+                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-5 dropdown-button"
                 :class="{
                     'is-active': isExpanded,
                     'border-b border-vp-divider':
                         (selectedRelease || uploadedFileRelease) && !isClosed,
+                    'bg-vp-dark': selectedRelease || uploadedFileRelease,
                 }"
             >
                 <div class="flex items-center gap-2">
@@ -149,14 +150,14 @@ const releaseHref = computed(() => {
                     </Tooltip>
                     <template v-if="displayVersion">
                         <div
-                            class="hidden xl:block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
+                            class="block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                         />
                         <span class="text-[13px] font-normal text-vp-3 mt-px">
                             {{ tr("updater_changelog") }}
                         </span>
                     </template>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="flex items-center gap-1 flex-shrink-0">
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                         :class="{
@@ -179,7 +180,7 @@ const releaseHref = computed(() => {
                     >
                         <v-icon
                             :name="'oi-chevron-down'"
-                            scale="1.1"
+                            scale="1"
                             class="transition-all duration-200"
                             :class="{
                                 'rotate-180': !isClosed,
@@ -190,12 +191,12 @@ const releaseHref = computed(() => {
             </div>
 
             <div
-                v-if="isAccessible && !arrivedState.top && !isClosed"
-                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/70 to-transparent pointer-events-none z-10"
+                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark dark:from-neutral-950/80 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                :class="{ 'opacity-100': isAccessible && !arrivedState.top && !isClosed }"
             ></div>
             <div
-                v-if="isAccessible && !arrivedState.bottom && !isClosed"
-                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/70 to-transparent pointer-events-none z-10"
+                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-dark dark:from-neutral-950/80 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                :class="{ 'opacity-100': isAccessible && !arrivedState.bottom && !isClosed }"
             ></div>
 
             <div
@@ -324,13 +325,13 @@ const releaseHref = computed(() => {
 .changelog-content {
     position: relative;
     background-color: transparent;
-    background-image: linear-gradient(
+    /* background-image: linear-gradient(
         to bottom,
         color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
         color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
     );
     backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); */
 }
 
 .dark .changelog-content {

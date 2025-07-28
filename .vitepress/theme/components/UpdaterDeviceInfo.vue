@@ -290,10 +290,11 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="border rounded-xl h-full flex flex-col max-h-[calc(30vh-var(--vp-nav-height)-24px)] lg:max-h-[calc(60vh-var(--vp-nav-height)-24px)] w-full min-h-72 lg:min-h-96 min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-300 ease-in-out bg-vp-dark/55 backdrop-blur-md"
+        class="lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out bg-vp-dark/55 backdrop-blur-md lg:py-0"
         :class="{
-            'border-vp-divider': !isInstallButtonHovered,
-            'border-vp-brand-1': isInstallButtonHovered,
+            'border-none border-vp-divider': !isInstallButtonHovered,
+            '!border !border-vp-brand-1 box-border !bg-vp-brand-3/[1%]': isInstallButtonHovered,
+            'py-8 pb-12': !isConnected,
         }"
     >
         <div class="flex-shrink-0 hidden lg:block relative z-0">
@@ -350,17 +351,17 @@ const deviceSections = computed(() => {
                 </div>
 
                 <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative pt-3">
-                    <!-- <div
-                        v-if="!arrivedState.top"
-                        class="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/70 to-transparent pointer-events-none mr-4"
-                    ></div> -->
                     <div
-                        v-if="!arrivedState.bottom"
-                        class="absolute bottom-[57px] left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/60 to-transparent pointer-events-none z-20 mx-2 mr-4"
+                        class="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/60 to-transparent pointer-events-none mr-4 opacity-0 transition-opacity duration-300"
+                        :class="{ 'opacity-100': !arrivedState.top }"
+                    ></div>
+                    <div
+                        class="absolute bottom-[57px] left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/60 to-transparent pointer-events-none z-20 mx-2 mr-4 opacity-0 transition-opacity duration-300"
+                        :class="{ 'opacity-100': !arrivedState.bottom }"
                     ></div>
                     <div
                         ref="el"
-                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[11px] mb-[7px] mr-[7px] pt-[12px] relative z-10"
+                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[17px] mb-[7px] mr-[7px] pt-[12px] relative z-10"
                     >
                         <h2 class="text-base leading-3 uppercase font-semibold text-vp-1 mb-5">
                             {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
@@ -428,7 +429,7 @@ const deviceSections = computed(() => {
                                 :class="[
                                     'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
                                     flags.updateInProgress &&
-                                        'opacity-40 !cursor-not-allowed dark:!bg-vp-soft dark:!text-vp-3/70',
+                                        'opacity-40 !cursor-not-allowed !bg-vp-soft !text-vp-3/70 dark:!bg-vp-soft dark:!text-vp-3/70',
                                     !flags.updateInProgress &&
                                         'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
                                 ]"

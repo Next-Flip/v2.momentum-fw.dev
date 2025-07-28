@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 type TooltipPosition = "top" | "bottom" | "left" | "right";
 type TooltipTheme = "default" | "warning" | "error";
@@ -13,6 +13,7 @@ interface Props {
     offset?: number;
     zIndex?: number;
     disabled?: boolean;
+    forceVisible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     offset: 9,
     zIndex: 10,
     disabled: false,
+    forceVisible: false,
 });
 
 const isVisible = ref(false);
@@ -37,6 +39,7 @@ const tooltipStyle = computed(() => ({
 }));
 
 const themeClass = computed(() => (props.theme !== "default" ? `tooltip-${props.theme}` : ""));
+const shouldShowTooltip = computed(() => props.forceVisible || isVisible.value);
 
 const showTooltip = () => {
     if (timeoutId.value) clearTimeout(timeoutId.value);
@@ -155,10 +158,21 @@ const positionTooltip = () => {
 };
 
 const handlePositionUpdate = () => {
-    if (isVisible.value) {
+    if (shouldShowTooltip.value) {
         positionTooltip();
     }
 };
+
+watch(
+    () => props.forceVisible,
+    (newValue) => {
+        if (newValue) {
+            nextTick(() => {
+                positionTooltip();
+            });
+        }
+    },
+);
 
 onMounted(() => {
     if (typeof window !== "undefined") {
@@ -183,7 +197,7 @@ onBeforeUnmount(() => {
         <teleport to="body">
             <transition name="tooltip-fade">
                 <div
-                    v-if="isVisible"
+                    v-if="shouldShowTooltip"
                     ref="tooltip"
                     :class="[
                         'tooltip fixed z-10 backdrop-blur-md text-vp-1 border border-vp-divider rounded-md p-1.5 px-3 text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
