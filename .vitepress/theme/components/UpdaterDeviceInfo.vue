@@ -459,14 +459,14 @@ const deviceSections = computed(() => {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.065;
+    opacity: 0.035;
     filter: saturate(0);
-    mix-blend-mode: lighten;
     z-index: -1;
     transition: opacity 0.2s ease-in-out;
 }
 
 .dark .device-info-container:before {
+    mix-blend-mode: lighten;
     opacity: 0.03;
     filter: saturate(0) invert(1);
 }
@@ -476,7 +476,7 @@ const deviceSections = computed(() => {
 }
 
 .device-info-container[data-hovered="true"]:before {
-    opacity: 0.095;
+    opacity: 0.055;
 }
 .dark .device-info-container[data-hovered="true"]:before {
     opacity: 0.035;
