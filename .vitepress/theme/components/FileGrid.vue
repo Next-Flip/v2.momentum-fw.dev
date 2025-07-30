@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
 import { ref } from "vue";
-import { downloadFile } from "../util";
 import type { DevbuildFile, MainlineFile } from "../../../_data/releases";
+import { downloadFile } from "../util";
 
 type FirmwareFile = DevbuildFile | MainlineFile;
 
@@ -95,7 +95,7 @@ const getButtonScale = (file: FirmwareFile) => {
         >
             <div
                 :class="[
-                    'py-2 pr-2 text-vp-3 group-hover:text-vp-1 text-sm font-medium rounded-md transition-all duration-100 flex items-center justify-center flex-shrink-0 select-none',
+                    'py-2 pr-2 text-vp-brand-1/60 saturate-[70%] group-hover:text-vp-1 text-sm font-medium rounded-md transition-all duration-100 flex items-center justify-center flex-shrink-0 select-none',
                 ]"
             >
                 <v-icon :name="getButtonIcon(file)" scale="0.9" />

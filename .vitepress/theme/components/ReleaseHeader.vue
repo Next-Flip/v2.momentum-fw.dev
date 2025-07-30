@@ -96,10 +96,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="flex flex-col pt-0 pb-4 md:pb-8 z-[2] sticky top-[47px] sm:top-11 lg:top-[65px]">
+    <div
+        class="flex flex-col pt-0 z-[2] sticky top-[47px] sm:top-11 lg:top-[64px] bg-vp-dark lg:bg-vp-dark/85 lg:backdrop-blur-md rounded-t-[10px] border-b border-vp-divider"
+    >
         <div ref="dropdownRef" class="relative">
             <div
-                class="dark-blur flex flex-row justify-between items-center border-b border-solid sm:border-b border-vp-divider overflow-hidden px-3 py-2 transition-all duration-200 sm:shadow-sm z-[1000] cursor-pointer min-h-14"
+                class="flex flex-row justify-between items-center overflow-hidden px-3 py-2 transition-all duration-200 sm:shadow-sm z-[1000] cursor-pointer min-h-14"
                 :class="{
                     'md:cursor-pointer': !isDropdownOpen,
                     'sm:rounded-tl-lg sm:rounded-tr-lg': isDropdownOpen,
@@ -134,7 +136,7 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="flex flex-row items-center gap-2">
                     <div
-                        class="flex items-center gap-4 text-sm text-vp-2 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm"
+                        class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm"
                     >
                         <span>{{ selectedRelease?.date }}</span>
                     </div>
@@ -144,10 +146,10 @@ onBeforeUnmount(() => {
             <Transition name="fade-dropdown">
                 <div
                     v-if="isDropdownOpen"
-                    class="lg:hidden absolute top-full left-0 w-full -z-[1] p-[7px] bg-vp-dark shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
+                    class="lg:hidden absolute top-full left-0 w-full z-[1000] p-[7px] bg-vp-dark shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
                 >
                     <div
-                        class="bg-transparent transition-all duration-200 overflow-hidden max-h-[275px] flex flex-col w-full min-w-full"
+                        class="bg-transparent transition-all duration-200 overflow-hidden max-h-[276px] flex flex-col w-full min-w-full"
                         :class="{ 'is-visible': isDropdownOpen }"
                     >
                         <div
@@ -201,16 +203,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.dark-blur {
-    background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
-.dark .dark-blur {
-    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 95%, transparent) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
 .dropdown-menu.is-visible {
     transform: translateY(0);
 }

@@ -104,7 +104,7 @@ const releaseHref = computed(() => {
 
 <template>
     <div
-        class="changelog-content rounded-xl group mx-5"
+        class="changelog-content rounded-[10px] group mx-5"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
             'h-auto': isClosed,
@@ -112,7 +112,7 @@ const releaseHref = computed(() => {
         }"
     >
         <div
-            class="border rounded-xl border-vp-divider bg-vp-dark/90 flex flex-col overflow-hidden relative dark:bg-neutral-950/80 mb-5"
+            class="border rounded-[10px] border-vp-divider bg-vp-elv/95 flex flex-col overflow-hidden relative mb-5"
             :class="{
                 'changelog-expanded mt-5': isExpanded,
                 'flex-1': !isClosed,
@@ -191,11 +191,11 @@ const releaseHref = computed(() => {
             </div>
 
             <div
-                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark dark:from-neutral-950/80 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-elv/95 dark:from-vp-elv/95 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
                 :class="{ 'opacity-100': isAccessible && !arrivedState.top && !isClosed }"
             ></div>
             <div
-                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-dark dark:from-neutral-950/80 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-elv/95 dark:from-vp-elv/95 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
                 :class="{ 'opacity-100': isAccessible && !arrivedState.bottom && !isClosed }"
             ></div>
 

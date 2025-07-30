@@ -290,7 +290,7 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/55 backdrop-blur-md"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/95"
         :class="{
             '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
             'py-8 pb-12': !isConnected,
@@ -459,7 +459,7 @@ const deviceSections = computed(() => {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.085;
+    opacity: 0.065;
     filter: saturate(0);
     mix-blend-mode: lighten;
     z-index: -1;
@@ -467,7 +467,7 @@ const deviceSections = computed(() => {
 }
 
 .dark .device-info-container:before {
-    opacity: 0.045;
+    opacity: 0.03;
     filter: saturate(0) invert(1);
 }
 
@@ -476,10 +476,10 @@ const deviceSections = computed(() => {
 }
 
 .device-info-container[data-hovered="true"]:before {
-    opacity: 0.15;
+    opacity: 0.095;
 }
 .dark .device-info-container[data-hovered="true"]:before {
-    opacity: 0.055;
+    opacity: 0.035;
 }
 
 .device-info-container:after {

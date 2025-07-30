@@ -714,7 +714,7 @@ onMounted(async () => {
 
                                     <div
                                         v-else-if="supportsSerialPort()"
-                                        class="w-full outline-dashed outline-vp-divider border-2 border-vp-dark rounded-xl flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/70 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
+                                        class="w-full outline-dashed outline-vp-divider border-2 border-vp-dark rounded-[10px] flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/70 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
                                         :class="{
                                             'border-vp-brand-1 bg-vp-brand-soft outline-vp-border/80':
                                                 isOverDropZone,

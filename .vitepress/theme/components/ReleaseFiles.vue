@@ -103,7 +103,7 @@ watch(
 </script>
 
 <template>
-    <div v-if="selectedRelease?.files" class="md:mb-4 px-6 sm:px-10">
+    <div v-if="selectedRelease?.files" class="px-6 sm:px-8 pt-24 pb-3">
         <div
             class="flex flex-row justify-start items-end gap-1.5 pb-2 mb-3 border-b border-vp-divider"
         >
@@ -202,11 +202,11 @@ watch(
             >
                 <template v-for="method in installMethods" :key="method.name">
                     <a
-                        v-if="method.show"
                         :href="method.href"
                         target="_blank"
                         rel="noopener"
-                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-colors duration-100 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        class="install-method-btn text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        :class="{ 'install-method-btn-visible': method.show }"
                     >
                         {{ method.name }}
                     </a>
@@ -224,6 +224,21 @@ watch(
     align-items: center;
     justify-content: center;
     cursor: default !important;
+}
+
+.install-method-btn {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.install-method-btn-visible {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    pointer-events: auto;
 }
 
 .dev-files-enter-active,

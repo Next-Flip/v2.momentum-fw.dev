@@ -2,13 +2,10 @@
 import MarkdownIt from "markdown-it";
 import { computed } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
 import { replaceIssuesAndMentions } from "../util";
 
 import ReleaseFiles from "./ReleaseFiles.vue";
 import ReleaseHeader from "./ReleaseHeader.vue";
-
-const { tr } = useI18n();
 
 const md = new MarkdownIt({
     html: true,
@@ -41,33 +38,31 @@ const handleSelectRelease = (release: ReleaseItem) => {
 <template>
     <main
         v-if="selectedRelease"
-        class="release-content flex-1 col-span-5 lg:col-span-3 pb-2 rounded-xl border border-vp-divider overflow-clip"
+        class="relative flex-1 col-span-5 lg:col-span-3 lg:pb-16 rounded-[10px] overflow-clip"
     >
-        <ReleaseHeader
-            :selected-release="selectedRelease"
-            :is-current-version="props.isCurrentVersion"
-            @select-release="handleSelectRelease"
-        />
+        <div class="border border-vp-divider rounded-[10px] overflow-clip pb-3">
+            <ReleaseHeader
+                :selected-release="selectedRelease"
+                :is-current-version="props.isCurrentVersion"
+                @select-release="handleSelectRelease"
+            />
 
-        <ReleaseFiles
-            :selected-release="selectedRelease"
-            :is-current-version="props.isCurrentVersion"
-        />
-
-        <div
-            v-if="selectedRelease.changelog"
-            class="mb-8 px-6 sm:px-10 prose prose-gray dark:prose-invert max-w-none"
-        >
             <div
-                class="flex flex-row justify-between items-center pb-2 mb-3 border-b border-vp-divider"
+                v-if="selectedRelease.changelog"
+                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6"
             >
-                <span
-                    class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
-                    >{{ tr("releases_changelog") }}</span
-                >
+                <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6">
+                    <span v-html="parsedChangelog"></span>
+                </div>
             </div>
-            <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-none">
-                <span v-html="parsedChangelog"></span>
+
+            <div class="h-px border-b border-vp-border w-auto mx-6 sm:mx-8"></div>
+
+            <div class="max-w-none files-container lg:sticky lg:bottom-0 -mt-16">
+                <ReleaseFiles
+                    :selected-release="selectedRelease"
+                    :is-current-version="props.isCurrentVersion"
+                />
             </div>
         </div>
     </main>
@@ -81,6 +76,17 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .dark .shadow {
     opacity: 0.25;
 }
+
+.files-container {
+    background-image: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
+        /* color-mix(in srgb, var(--vp-c-bg-dark) 98%, transparent) 50%, */
+            color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 75%,
+        color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
+    );
+}
+
 .release-content {
     position: relative;
     background-color: transparent;
@@ -96,7 +102,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
     background-image: linear-gradient(
         to bottom,
         color-mix(in srgb, var(--vp-c-text-1) 1%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-bg-soft) 0%, transparent) 100%
+        color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
     );
 }
 
