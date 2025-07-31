@@ -297,6 +297,8 @@ const messages: MessageSchema = {
     updater_no_release_selected_description: "Select/upload a release to view the changelog.",
     updater_collapse: "Collapse",
     updater_expand: "Expand",
+    updater_open: "Open",
+    updater_close: "Close",
     updater_logs: "Logs",
     updater_no_logs_yet: "No logs yet",
     updater_clear_logs: "Clear",

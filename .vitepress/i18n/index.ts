@@ -288,6 +288,8 @@ export type MessageSchema = {
     updater_no_release_selected_description: string;
     updater_collapse: string;
     updater_expand: string;
+    updater_open: string;
+    updater_close: string;
     updater_logs: string;
     updater_no_logs_yet: string;
     updater_clear_logs: string;

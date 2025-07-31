@@ -1057,9 +1057,8 @@ export const useSerialConnection = () => {
         addLog("info", `[AssetPacks] Successfully removed pack: ${pack.id}`);
     };
 
-    const enqueue = async (pack: AssetPack, action: "install" | "remove"): Promise<void> => {
-        if (!flags.serialSupported) return;
-
+    const enqueue = async (pack: AssetPack, action: "install" | "remove"): Promise<boolean> => {
+        if (!flags.serialSupported) return false;
         if (!flags.connected || !connectionData.deviceInfo || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
@@ -1068,7 +1067,7 @@ export const useSerialConnection = () => {
         queueState.queueActions.push(action);
 
         if (queueState.queue.length > 1) {
-            return;
+            return false;
         }
 
         while (queueState.queue.length > 0) {
@@ -1088,6 +1087,8 @@ export const useSerialConnection = () => {
                 flags.progress = 0;
             }
         }
+
+        return true;
     };
 
     const updateExtractCapability = async (): Promise<void> => {
@@ -1412,7 +1413,7 @@ export const useSerialConnection = () => {
         }
     };
 
-    const updateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
+    const updateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<boolean> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
@@ -1438,6 +1439,7 @@ export const useSerialConnection = () => {
         try {
             await loadFirmware(release, uploadedFile);
             addLog("success", "[Firmware] Firmware update completed successfully");
+            return true;
         } catch (error) {
             addLog("error", `[Firmware] Firmware update failed: ${error}`);
             throw error;
@@ -1468,7 +1470,10 @@ export const useSerialConnection = () => {
         connectionData.state = ConnectionState.CONNECTING;
     };
 
-    const testUpdateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
+    const testUpdateFirmware = async (
+        release: ReleaseItem,
+        uploadedFile?: File,
+    ): Promise<boolean> => {
         if (!flags.connected || !flags.rpcActive) {
             addLog("warning", "[Test] Firmware update without device connection");
         }
@@ -1497,6 +1502,7 @@ export const useSerialConnection = () => {
         try {
             await testLoadFirmware(release, uploadedFile);
             addLog("success", "[Test] Firmware update completed successfully");
+            return true;
         } catch (error) {
             addLog("error", `[Test] Firmware update failed: ${error}`);
             throw error;
@@ -1615,7 +1621,7 @@ export const useSerialConnection = () => {
             await asyncSleep(2000);
             flags.updateInProgress = false;
 
-            await disconnect();
+            // await disconnect();
         } catch (error) {
             addLog("error", `[Test] Firmware error: ${error}`);
             throw error;

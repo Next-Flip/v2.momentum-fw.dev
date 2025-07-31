@@ -104,7 +104,7 @@ const releaseHref = computed(() => {
 
 <template>
     <div
-        class="changelog-content rounded-[10px] group mx-5"
+        class="changelog-content group mx-5"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
             'h-auto': isClosed,
@@ -158,28 +158,37 @@ const releaseHref = computed(() => {
                     </template>
                 </div>
                 <div class="flex items-center gap-1 flex-shrink-0">
+                    <Tooltip :delay="0" :z-index="9999">
+                        <button
+                            class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
+                            :class="{
+                                'opacity-0 pointer-events-none': showUpdateOverlay,
+                                'opacity-0': windowWidth > 1024,
+                                'opacity-100': isAccessible && isExpanded,
+                                'group-hover:opacity-100':
+                                    isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
+                            }"
+                            :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
+                            @click="handleToggleExpand"
+                        >
+                            <v-icon
+                                :name="isExpanded ? 'hi-minus-sm' : 'hi-plus-sm'"
+                                scale="1"
+                                class="transition-transform duration-200 ease-in-out"
+                            />
+                        </button>
+                        <template #content>{{
+                            isExpanded ? tr("updater_collapse") : tr("updater_expand")
+                        }}</template>
+                    </Tooltip>
                     <button
-                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
-                        :class="{
-                            'opacity-0 pointer-events-none': showUpdateOverlay,
-                            'opacity-0': windowWidth > 1024,
-                            'group-hover:opacity-100':
-                                isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
-                        }"
-                        @click="handleToggleExpand"
-                    >
-                        <v-icon
-                            :name="isExpanded ? 'hi-minus-sm' : 'hi-plus-sm'"
-                            scale="1.0"
-                            class="transition-transform duration-200 ease-in-out"
-                        />
-                    </button>
-                    <button
+                        v-if="isAccessible && !isExpanded"
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
                         @click="handleToggleOpenClose"
                     >
                         <v-icon
                             :name="'oi-chevron-down'"
+                            :aria-label="isClosed ? tr('updater_open') : tr('updater_close')"
                             scale="1"
                             class="transition-all duration-200"
                             :class="{

@@ -390,9 +390,9 @@ const deviceSections = computed(() => {
                     </div>
 
                     <div
-                        class="py-3 border-t border-vp-divider flex-shrink-0 bg-vp-dark dark:bg-vp-dark"
+                        class="py-3 lg:border-t border-vp-divider flex-shrink-0 bg-vp-dark dark:bg-vp-dark"
                     >
-                        <div class="action-buttons px-3">
+                        <div class="action-buttons px-5 lg:px-3">
                             <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
                                 <button
                                     class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
@@ -426,6 +426,7 @@ const deviceSections = computed(() => {
                                 <template #content>{{ saveState.currentText.value }}</template>
                             </Tooltip>
                             <button
+                                :aria-label="connectionTr('connection_disconnect')"
                                 :disabled="flags.updateInProgress"
                                 :class="[
                                     'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',

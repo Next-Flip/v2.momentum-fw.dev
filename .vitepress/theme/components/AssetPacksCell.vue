@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { track } from "@vercel/analytics";
 import { useTimeAgo } from "@vueuse/core";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 
@@ -195,6 +196,7 @@ const handlePackAction = async (action: "install" | "remove" | "download") => {
     }
 
     if (serialConnection.connectionData.state === ConnectionState.CONNECTED) {
+        let success = false;
         const pack = {
             id: props.id,
             name: props.name,
@@ -213,9 +215,13 @@ const handlePackAction = async (action: "install" | "remove" | "download") => {
         };
 
         try {
-            await serialConnection.enqueue(pack, action);
+            success = (await serialConnection.enqueue(pack, action)) || false;
         } catch (error) {
             console.error(`Failed to enqueue pack ${action}:`, error);
+        }
+
+        if (success && action === "install") {
+            track("asset_pack_install", { pack: props.id });
         }
     } else {
         handlePackAction("download");

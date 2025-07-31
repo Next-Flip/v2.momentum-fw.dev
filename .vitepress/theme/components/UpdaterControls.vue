@@ -148,7 +148,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="rounded-xl">
-        <div class="flex flex-col xl:flex-row gap-3 items-end">
+        <div class="flex flex-col lg:flex-row gap-3 items-end">
             <div class="flex flex-row gap-3 items-end w-full">
                 <div ref="channelDropdownRef" class="relative flex-shrink-0">
                     <label
@@ -243,10 +243,7 @@ onBeforeUnmount(() => {
                         }"
                         @click="toggleReleaseDropdown"
                     >
-                        <span
-                            class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]"
-                            :class="{ uppercase: selectedRelease }"
-                        >
+                        <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
                             {{ getReleaseLabel() }}
                         </span>
                         <div
@@ -282,7 +279,7 @@ onBeforeUnmount(() => {
                                     >
                                         <div class="flex flex-row items-center gap-2 min-w-0">
                                             <span
-                                                class="font-medium text-vp-1 font-mono flex-shrink-0 uppercase"
+                                                class="font-medium text-vp-1 font-mono flex-shrink-0"
                                                 :class="{
                                                     'text-vp-brand-1':
                                                         selectedRelease?.commit === release.commit,
@@ -372,6 +369,7 @@ onBeforeUnmount(() => {
                                         ? 'text-vp-2 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
                                         : 'text-vp-3 cursor-not-allowed opacity-50'
                                 "
+                                download
                                 @click="handleDownloadRelease"
                             >
                                 <v-icon name="la-download-solid" :scale="1.1" />

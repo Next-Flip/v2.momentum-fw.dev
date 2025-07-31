@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
@@ -251,13 +252,21 @@ const handleFlashFirmware = async () => {
 
         if (!testMode.value && !isConnected.value) return;
 
+        let success = false;
         if (uploadedFile.value) {
-            await updateMethod?.(releaseToFlash as ReleaseItem, uploadedFile.value);
+            success =
+                (await updateMethod?.(releaseToFlash as ReleaseItem, uploadedFile.value)) || false;
         } else {
-            await updateMethod?.(releaseToFlash as ReleaseItem);
+            success = (await updateMethod?.(releaseToFlash as ReleaseItem)) || false;
         }
-    } catch {
-        /* ignore */
+
+        if (success) {
+            track("firmware_flash", {
+                version: `${(releaseToFlash as ReleaseItem).version || (releaseToFlash as ReleaseItem).commit}`,
+            });
+        }
+    } catch (error) {
+        logToSerial("error", `[Upload] Flash failed: ${error}`);
     }
 };
 
@@ -528,7 +537,7 @@ onMounted(async () => {
                                                 }}.
                                                 <div class="flex flex-row gap-px">
                                                     <a
-                                                        class="text-vp-2 hover:underline vp-external-link-icon uppercase"
+                                                        class="text-vp-2 hover:underline vp-external-link-icon"
                                                         :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion?.replace('mntm-', '')}`"
                                                         target="_blank"
                                                         rel="noopener noreferrer"

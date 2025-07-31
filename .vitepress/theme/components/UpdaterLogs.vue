@@ -235,6 +235,7 @@ onMounted(() => {
                     >
                         <v-icon
                             :name="'oi-chevron-down'"
+                            :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
                             scale="1"
                             class="transition-all duration-200"
                             :class="{
