@@ -19,9 +19,6 @@ jobs:
       - name: Add Bun to PATH
         run: echo "$HOME/.bun/bin" >> $GITHUB_PATH
 
-      - name: Install Dependencies
-        run: bun install
-
       - name: Install Vercel CLI
         run: bun install -g vercel@latest
 
