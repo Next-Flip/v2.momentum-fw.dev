@@ -17,6 +17,7 @@ interface DevbuildFile {
 }
 
 export interface ReleaseItem {
+    type: "mainline" | "devbuild";
     branch: string;
     commit: string;
     date: string;
@@ -417,6 +418,7 @@ export async function getReleaseAndDevbuilds() {
                     const changelog = await fetchChangelogForCommit(commit);
 
                     devbuildItems.push({
+                        type: "devbuild",
                         branch: "mntm-dev",
                         commit: commit,
                         date: isoDate,
@@ -439,6 +441,7 @@ export async function getReleaseAndDevbuilds() {
                 seenCommits.add(shortVersion);
 
                 mainlineItems.push({
+                    type: "mainline",
                     branch: release.version,
                     commit: shortVersion,
                     date: release.date,

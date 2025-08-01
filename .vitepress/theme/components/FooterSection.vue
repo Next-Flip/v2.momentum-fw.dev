@@ -5,6 +5,7 @@ import { formatDate, isExternalLink } from "../util";
 const { getLocalizedPath } = useI18n();
 
 interface FooterItem {
+    type?: string;
     text?: string;
     name?: string;
     url?: string;
@@ -33,7 +34,8 @@ const getItemUrl = (item: FooterItem) => {
 };
 
 const getItemText = (item: FooterItem) => {
-    if (item.commit) return item.commit;
+    if (item.type === "mainline") return item.branch;
+    if (item.type === "devbuild") return item.commit;
     return item.text || item.name || "";
 };
 </script>
