@@ -144,7 +144,7 @@ export default defineConfig({
         outline: "deep",
         socialLinks: [
             { icon: "x", link: "https://x.com/FlipperMomentum" },
-            { icon: "discord", link: "https://discord.com/momentum" },
+            { icon: "discord", link: "https://discord.gg/momentum" },
             { icon: "github", link: "https://github.com/Next-Flip/Momentum-Firmware" },
         ],
         search: {

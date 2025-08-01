@@ -109,7 +109,7 @@ const InstallItems = [
 
 const SocialLinks = [
     { text: "Github", link: "https://github.com/Next-Flip/Momentum-Firmware" },
-    { text: "Discord", link: "https://discord.com/momentum" },
+    { text: "Discord", link: "https://discord.gg/momentum" },
     { text: "X/Twitter", link: "https://x.com/FlipperMomentum" },
     { text: "Reddit", link: "https://www.reddit.com/r/flippermomentum/" },
 ];

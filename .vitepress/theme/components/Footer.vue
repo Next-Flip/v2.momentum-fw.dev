@@ -26,7 +26,7 @@ const formattedLastUpdate = computed(() => {
 
 const socialLinks = computed(() => [
     { name: "Github", url: "https://github.com/Next-Flip/Momentum-Firmware" },
-    { name: "Discord", url: "https://discord.com/momentum" },
+    { name: "Discord", url: "https://discord.gg/momentum" },
     { name: "X/Twitter", url: "https://x.com/FlipperMomentum" },
     { name: "Reddit", url: "https://www.reddit.com/r/flippermomentum/" },
 ]);
