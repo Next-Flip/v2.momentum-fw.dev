@@ -117,8 +117,8 @@ const SocialLinks = [
 const ResourcesItems = [
     { items: SocialLinks },
     {
-        text: "${m.nav_contributing}",
-        link: "https://github.com/Next-Flip/Momentum-Firmware/blob/dev/CODING_STYLE.md",
+        text: "${m.nav_report_a_bug}",
+        link: "https://github.com/Next-Flip/Momentum-Firmware/issues",
     },
     { text: "${m.nav_donate}", link: "https://ko-fi.com/willyjl" },
 ];

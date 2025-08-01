@@ -101,7 +101,7 @@ const messages: MessageSchema = {
     nav_mainline: "Mainline",
     nav_devbuilds: "Devbuilds",
     nav_changelog: "Changelog",
-    nav_contributing: "Contributing",
+    nav_report_a_bug: "Report a Bug",
     nav_releases: "Releases",
     nav_faq: "FAQ",
     nav_team: "Team & Contributors",

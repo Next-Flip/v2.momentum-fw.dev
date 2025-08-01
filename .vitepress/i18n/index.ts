@@ -100,7 +100,7 @@ export type MessageSchema = {
     nav_mainline: string;
     nav_devbuilds: string;
     nav_changelog: string;
-    nav_contributing: string;
+    nav_report_a_bug: string;
     nav_releases: string;
     nav_faq: string;
     nav_team: string;

@@ -38,8 +38,8 @@ const navigationLinks = computed(() => [
     { name: tr("nav_wiki"), url: "/wiki" },
     { name: tr("nav_faq"), url: "/wiki/FAQ" },
     {
-        name: tr("nav_contributing"),
-        url: "https://github.com/Next-Flip/Momentum-Firmware/blob/dev/CODING_STYLE.md",
+        name: tr("nav_report_a_bug"),
+        url: "https://github.com/Next-Flip/Momentum-Firmware/issues",
     },
     { name: tr("nav_donate"), url: "https://ko-fi.com/willyjl" },
 ]);
