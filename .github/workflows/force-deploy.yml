@@ -5,6 +5,7 @@ env:
 on:
   repository_dispatch:
     types: [force-deploy]
+  workflow_dispatch:
 
 jobs:
   force-deploy:
@@ -21,11 +22,8 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      - name: Run Build Script
-        run: bun run build
-
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: bun install -g vercel@latest
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
