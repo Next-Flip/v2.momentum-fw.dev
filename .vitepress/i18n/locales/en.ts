@@ -136,9 +136,9 @@ const messages: MessageSchema = {
     releases_qflipper: "qFlipper",
     releases_files: "Files",
     releases_files_q: "...",
-    releases_files_dev: "Development Files",
+    releases_files_dev: "Development and Debug Files",
     releases_files_dev_description:
-        "These files include SDK packages, binaries, and scripts for users to build custom applications or modify firmware.",
+        "These files include SDK packages, binaries, and scripts for advanced users to build custom applications or modify firmware.",
     releases_changelog: "Changelog",
     releases_current_version: "Currently installed",
     releases_view_release_page: "Go to release page",
