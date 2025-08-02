@@ -20,10 +20,12 @@
     --vp-c-default-2: var(--vp-c-gray-2);
     --vp-c-default-3: var(--vp-c-gray-3);
     --vp-c-default-soft: var(--vp-c-gray-soft);
-    /* --vp-c-pink-soft: rgba(255, 100, 159, 0.14); */
     --vp-c-brand-1: var(--mntm-purp-1);
     --vp-c-brand-2: var(--mntm-purp-2);
     --vp-c-brand-3: var(--mntm-purp-3);
+    --vp-c-alternate-1: var(--mntm-yellow-1);
+    --vp-c-alternate-2: var(--mntm-yellow-2);
+    --vp-c-alternate-3: var(--mntm-yellow-3);
     --vp-c-brand-soft: var(--vp-c-indigo-soft);
     --vp-c-tip-1: var(--vp-c-brand-1);
     --vp-c-tip-2: var(--vp-c-brand-2);
@@ -54,7 +56,6 @@
     --vp-custom-block-tip-bg: var(--vp-c-brand-soft);
     --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
     --vp-shadow-3: 0 3px 10px rgba(0, 0, 0, 0.05);
-
     --mntm-footer-height: 289px;
 }
 
@@ -74,13 +75,59 @@
     --vp-home-hero-image-filter: blur(44px);
 }
 
-/* ::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-3) 10%, transparent);
+.theme-purp {
+    --vp-c-brand-1: var(--mntm-purp-1);
+    --vp-c-brand-2: var(--mntm-purp-2);
+    --vp-c-brand-3: var(--mntm-purp-3);
+    --vp-c-alternate-1: var(--mntm-yellow-1);
+    --vp-c-alternate-2: var(--mntm-yellow-2);
+    --vp-c-alternate-3: var(--mntm-yellow-3);
 }
 
-html.dark ::selection {
-    background-color: color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
-} */
+.theme-orange {
+    --vp-c-brand-1: var(--mntm-yellow-1);
+    --vp-c-brand-2: var(--mntm-yellow-2);
+    --vp-c-brand-3: var(--mntm-yellow-3);
+    --vp-c-alternate-1: var(--mntm-purp-1);
+    --vp-c-alternate-2: var(--mntm-purp-2);
+    --vp-c-alternate-3: var(--mntm-purp-3);
+}
+
+.theme-pink {
+    --vp-c-brand-1: var(--mntm-pink-1);
+    --vp-c-brand-2: var(--mntm-pink-2);
+    --vp-c-brand-3: var(--mntm-pink-3);
+    --vp-c-alternate-1: var(--mntm-purp-1);
+    --vp-c-alternate-2: var(--mntm-purp-2);
+    --vp-c-alternate-3: var(--mntm-purp-3);
+}
+
+.theme-purp ::selection {
+    background-color: color-mix(in srgb, var(--mntm-purp-1) 100%, transparent);
+    color: black;
+}
+
+.theme-purp html.dark ::selection {
+    background-color: color-mix(in srgb, var(--mntm-purp-1) 100%, transparent);
+}
+
+.theme-orange ::selection {
+    background-color: color-mix(in srgb, var(--mntm-yellow-1) 100%, transparent);
+    color: black;
+}
+
+.theme-orange html.dark ::selection {
+    background-color: color-mix(in srgb, var(--mntm-yellow-1) 100%, transparent);
+}
+
+.theme-pink ::selection {
+    background-color: color-mix(in srgb, var(--mntm-pink-1) 100%, transparent);
+    color: white;
+}
+
+.theme-pink html.dark ::selection {
+    background-color: color-mix(in srgb, var(--mntm-pink-1) 100%, transparent);
+}
 
 .overflow-y-auto::-webkit-scrollbar {
     width: 5px;
@@ -214,7 +261,7 @@ body {
     transform: translateY(-5px);
 }
 .dark .VPFeature:hover {
-    box-shadow: inset 0 0 0 1px var(--mntm-yellow-1) !important;
+    box-shadow: inset 0 0 0 1px var(--vp-c-alternate-1) !important;
 }
 
 .VPFeature .VPImage {
@@ -247,9 +294,10 @@ body {
     }
 }
 
-.VPContent {
-    position: relative !important;
-}
+/* .VPContent {
+    position: sticky !important;
+    top: 0 !important;
+} */
 
 .profile .org.link {
     display: none;
@@ -280,13 +328,19 @@ body {
 }
 
 .VPHero .image img {
-    width: 100%;
+    width: 140%;
     max-height: 200px;
     object-fit: contain;
     max-width: none;
     position: static;
     transform: none;
     height: auto;
+}
+
+@media (min-width: 1024px) {
+    .VPHero .image img {
+        width: 100%;
+    }
 }
 
 .VPHero .container .actions {
@@ -302,18 +356,32 @@ body {
 }
 
 .dark .pager-link:hover {
-    border-color: var(--mntm-yellow-1);
+    border-color: var(--vp-c-alternate-1);
 }
 
 .vp-doc tr {
     background-color: transparent;
 }
 
+#ref1,
+#ref2,
+#ref3,
+#ref3b,
+#ref4,
+#ref5 {
+    color: var(--vp-c-alternate-1);
+}
+
 .full-width-table {
     width: 100%;
     overflow-x: auto;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(1px);
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 70%, transparent);
     margin-top: 0;
+}
+
+.dark .full-width-table {
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 75%, transparent);
 }
 
 .VPHome .full-width-table {
@@ -336,28 +404,49 @@ body {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 70%, transparent) !important;
 }
 
+@media (min-width: 1024px) {
+    body[data-route="/"]:before {
+        opacity: 0.05;
+    }
+}
+
 body:before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
+    top: -135px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 1536px;
     height: 100%;
-    background-image: url("/bg/try-2.png");
+    background-image: url("/bg/009-line.png");
     background-size: contain;
     background-position: top;
     background-repeat: no-repeat;
-    opacity: 0.019;
-    filter: saturate(0) invert(1);
+    opacity: 0.04;
+    filter: saturate(0);
     mix-blend-mode: multiply;
     z-index: -1;
 }
 
 .dark body:before {
     mix-blend-mode: screen;
-    opacity: 0.007;
-    filter: saturate(0);
+    opacity: 0.037;
+    filter: saturate(0) invert(1);
 }
+
+@media (max-width: 1023px) {
+    body:before {
+        opacity: 0.08;
+        top: 0;
+    }
+}
+
+/* #VPSidebarNav,
+.VPDoc .content {
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 20%, transparent) !important;
+    backdrop-filter: blur(6px);
+} */
 
 .full-width-table .vp-doc table,
 .full-width-table table {
@@ -464,7 +553,7 @@ body:before {
 }
 
 .dark .full-width-table .check {
-    color: var(--mntm-purp-1);
+    color: var(--vp-c-brand-1);
 }
 
 .full-width-table .check-last {
@@ -474,7 +563,7 @@ body:before {
 
 .dark .full-width-table .check-last {
     font-weight: 600;
-    color: var(--mntm-yellow-1);
+    color: var(--vp-c-alternate-1);
 }
 
 .centered-content {
@@ -505,6 +594,7 @@ body:before {
     display: flex;
     flex-direction: column;
     text-align: start;
+    padding-left: 16px;
     margin-top: 20px;
     width: 100%;
     gap: 10px;
@@ -565,20 +655,45 @@ body[data-route*="/wiki"] {
     padding-bottom: 10px !important;
 }
 
+.VPNavBar.top {
+    background-color: transparent !important;
+    border-bottom: none !important;
+}
+
+.VPNavBar:not(.top) {
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
+    /* border-bottom: 1px solid var(--vp-c-divider) !important; */
+    backdrop-filter: blur(8px) !important;
+}
+
+.VPNavBar .content-body {
+    position: relative !important;
+    background-color: transparent !important;
+}
+
+/* .VPLocalNav {
+    background-color: transparent !important;
+    border-bottom: none !important;
+} */
+
 @media (min-width: 960px) {
-    .VPNavBar:not(.home) {
-        background-color: color-mix(in srgb, var(--vp-c-bg-dark) 99%, transparent) !important;
+    .VPNavBar.top {
+        background-color: transparent !important;
+        border-bottom: none !important;
     }
-    .VPNavBar:not(.home.top) .content-body {
+    .VPNavBar:not(.top) {
+        background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
+        /* border-bottom: 1px solid var(--vp-c-divider) !important; */
+        backdrop-filter: blur(8px) !important;
+    }
+    .VPNavBar .content-body {
         position: relative !important;
         background-color: transparent !important;
     }
-    .VPNavBar:not(.has-sidebar):not(.home.top) {
-        background-color: color-mix(in srgb, var(--vp-c-bg-dark) 99%, transparent) !important;
-    }
-    .VPLocalNav {
-        background-color: color-mix(in srgb, var(--vp-c-bg-dark) 99%, transparent) !important;
-    }
+    /* .VPLocalNav {
+        background-color: transparent !important;
+        border-bottom: none !important;
+    } */
 }
 
 .vp-doc._wiki_Assets_Community-Asset-Packs p {
@@ -617,8 +732,15 @@ body[data-route*="/wiki"] {
     }
     .VPSidebar {
         -ms-overflow-style: none;
+        /* position: sticky !important;
+        top: 0 !important; */
         scrollbar-width: none;
         background-color: transparent !important;
+        /* margin-bottom: 400px !important; */
+    }
+
+    .VPSidebar #VPSidebarNav {
+        padding-bottom: 400px !important;
     }
 }
 
@@ -686,12 +808,21 @@ body[data-route*="/wiki"] {
     font-size: 13px !important;
 }
 
+.VPMenuLink:hover .VPLink.link {
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent) !important;
+}
+.VPMenuLink .VPLink.link:hover {
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 5%, transparent) !important;
+}
+.VPLink.link.link .text:hover {
+    color: var(--vp-c-brand-2) !important;
+}
 .VPLink.link.link .text {
     font-size: 14px !important;
 }
 .dark .VPSidebarItem.level-2.is-active > .item .link > .text,
 .dark .VPSidebarItem.level-3.is-active > .item .link > .text {
-    color: var(--mntm-yellow-1) !important;
+    color: var(--vp-c-alternate-1) !important;
 }
 .VPLink.link.link .text:hover {
     color: var(--vp-c-brand-1) !important;

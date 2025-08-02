@@ -50,7 +50,7 @@ function handleConfirm() {
                         <v-icon
                             name="ri-error-warning-line"
                             scale="1.15"
-                            class="text-[var(--mntm-yellow-1)]"
+                            class="text-[var(--vp-c-alternate-1)]"
                         />
                     </div>
                     <h2 id="warning-title" class="text-base font-semibold text-vp-1">

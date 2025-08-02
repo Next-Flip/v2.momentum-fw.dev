@@ -51,16 +51,16 @@ const mapErrorToUserFriendly = (error: Error): string => {
         message.includes("failed to execute 'open' on 'serialport'") ||
         message.includes("serial port is busy")
     ) {
-        return "Serial port is busy - please close other connections";
+        return "Serial port busy";
     }
     if (message.includes("could not start rpc session")) {
-        return "Could not start RPC session";
+        return "Couldn't start RPC session";
     }
     if (message.includes("no flipper device found")) {
-        return "No Flipper device found";
+        return "No Flipper found";
     }
     if (message.includes("serial not supported")) {
-        return "Serial not supported in this browser";
+        return "Serial not supported";
     }
     if (message.includes("connection failed") || message.includes("networkerror")) {
         return "Connection failed";
@@ -241,11 +241,17 @@ export const useSerialConnection = () => {
 
     const firmwareState = reactive<FirmwareState>({
         updateStage: "",
+        updateStageContext: {},
         writeProgress: {
             filename: "",
             progress: 0,
         },
     });
+
+    const setUpdateStage = (stage: string, context?: Record<string, string | number>) => {
+        firmwareState.updateStage = stage;
+        firmwareState.updateStageContext = context || {};
+    };
 
     navigator.serial.addEventListener("disconnect", () => {
         if (flags.connected) {
@@ -290,6 +296,7 @@ export const useSerialConnection = () => {
         }
 
         firmwareState.updateStage = "";
+        firmwareState.updateStageContext = {};
         firmwareState.writeProgress.filename = "";
         firmwareState.writeProgress.progress = 0;
         loadingInstalledPacks = false;
@@ -1258,11 +1265,11 @@ export const useSerialConnection = () => {
         const flipperModule = await getFlipperModule();
 
         if (connectionData.deviceInfo?.hardware_region !== "0") {
-            firmwareState.updateStage = "update_stage_loading_region_data";
+            setUpdateStage("update_stage_set_region");
             await provisionRegion(flipperModule);
         }
 
-        firmwareState.updateStage = "update_stage_loading_firmware_bundle";
+        setUpdateStage("update_stage_downloading_firmware");
 
         let files;
 
@@ -1274,6 +1281,7 @@ export const useSerialConnection = () => {
             files = await unpack(arrayBuffer);
             addLog("debug", `[Firmware] Extracted ${files.length} files from uploaded file`);
             console.log("uploaded files:", files);
+            setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
             const firmwareUrl = getFirmwareDownloadUrl(release);
 
@@ -1297,12 +1305,13 @@ export const useSerialConnection = () => {
             }
 
             addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
+            setUpdateStage("update_stage_extracted_files", { count: files.length });
         }
 
-        firmwareState.updateStage = "update_stage_loading_firmware_files";
         await createUpdateDirectory(flipperModule);
 
         let path = "/ext/update/";
+        let fileIndex = 0;
         for (const file of files) {
             if (file.size === 0) {
                 path = "/ext/update/" + file.name;
@@ -1311,7 +1320,9 @@ export const useSerialConnection = () => {
                 }
                 await flipperModule.commands.storage.mkdir(path);
                 addLog("debug", `[Firmware] Created directory: ${path}`);
+                setUpdateStage("update_stage_creating_directory", { name: path });
             } else {
+                fileIndex++;
                 firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
 
                 const unbind = flipperModule.emitter.on(
@@ -1325,6 +1336,10 @@ export const useSerialConnection = () => {
                 await flipperModule.commands.storage.write("/ext/update/" + file.name, file.buffer);
                 unbind();
                 addLog("debug", `[Firmware] Uploaded file: ${file.name}`);
+                setUpdateStage("update_stage_uploaded_file", {
+                    count: fileIndex,
+                    total: files.length,
+                });
             }
             await asyncSleep(300);
         }
@@ -1333,16 +1348,16 @@ export const useSerialConnection = () => {
         firmwareState.writeProgress.progress = 0;
         flags.progress = 0;
 
-        firmwareState.updateStage = "update_stage_loading_manifest";
+        setUpdateStage("update_stage_loading_manifest");
         await flipperModule.commands.system.update(path + "/update.fuf");
         addLog("debug", "[Firmware] Loaded update manifest");
 
-        firmwareState.updateStage = "update_stage_pay_attention";
+        setUpdateStage("update_stage_pay_attention");
 
         addLog("success", "[Firmware] Update completed successfully. Rebooting...");
-        firmwareState.updateStage = "update_stage_rebooting";
+        setUpdateStage("update_stage_rebooting");
         await asyncSleep(1000);
-        firmwareState.updateStage = "update_stage_done";
+        setUpdateStage("update_stage_done");
         await asyncSleep(2000);
 
         flags.updateInProgress = false;
@@ -1485,6 +1500,7 @@ export const useSerialConnection = () => {
         flags.updateInProgress = true;
         flags.progress = 0;
         firmwareState.updateStage = "";
+        firmwareState.updateStageContext = {};
         firmwareState.writeProgress.filename = "";
         firmwareState.writeProgress.progress = 0;
 
@@ -1511,6 +1527,7 @@ export const useSerialConnection = () => {
             flags.progress = 0;
             flags.screenStreamPaused = false;
             firmwareState.updateStage = "";
+            firmwareState.updateStageContext = {};
             firmwareState.writeProgress.filename = "";
             firmwareState.writeProgress.progress = 0;
         }
@@ -1519,13 +1536,13 @@ export const useSerialConnection = () => {
     const testLoadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
         try {
             if (connectionData.deviceInfo?.hardware_region !== "0") {
-                firmwareState.updateStage = "update_stage_loading_region_data";
+                setUpdateStage("update_stage_set_region");
                 addLog("info", "[Test] Region provisioning");
                 await asyncSleep(1000);
                 addLog("info", "[Test] Set Sub-GHz region: US");
             }
 
-            firmwareState.updateStage = "update_stage_loading_firmware_bundle";
+            setUpdateStage("update_stage_downloading_firmware");
             addLog("info", "[Test] Loading firmware bundle");
             await asyncSleep(1500);
 
@@ -1543,6 +1560,7 @@ export const useSerialConnection = () => {
                     { name: "assets/", size: 0 },
                 ];
                 addLog("debug", `[Test] Extracted ${files.length} files from uploaded file`);
+                setUpdateStage("update_stage_extracted_files", { count: files.length });
             } else {
                 const firmwareUrl = getFirmwareDownloadUrl(release);
                 if (!firmwareUrl) {
@@ -1564,17 +1582,21 @@ export const useSerialConnection = () => {
                     { name: "assets/", size: 0 },
                 ];
                 addLog("debug", `[Test] Extracted ${files.length} files from download`);
+                setUpdateStage("update_stage_extracted_files", { count: files.length });
             }
 
-            firmwareState.updateStage = "update_stage_loading_firmware_files";
-            addLog("info", "[Test] Loading firmware files");
             await asyncSleep(500);
 
+            let fileIndex = 0;
             for (const file of files) {
                 if (file.size === 0) {
                     addLog("debug", `[Test] Created directory: /ext/update/${file.name}`);
+                    setUpdateStage("update_stage_creating_directory", {
+                        name: `/ext/update/${file.name}`,
+                    });
                     await asyncSleep(100);
                 } else {
+                    fileIndex++;
                     firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
                     firmwareState.writeProgress.progress = 0;
 
@@ -1590,6 +1612,10 @@ export const useSerialConnection = () => {
                     }
 
                     addLog("debug", `[Test] Uploaded file: ${file.name}`);
+                    setUpdateStage("update_stage_uploaded_file", {
+                        count: fileIndex,
+                        total: files.length,
+                    });
                     await asyncSleep(300);
                 }
             }
@@ -1598,16 +1624,16 @@ export const useSerialConnection = () => {
             firmwareState.writeProgress.progress = 0;
             flags.progress = 0;
 
-            firmwareState.updateStage = "update_stage_loading_manifest";
+            setUpdateStage("update_stage_loading_manifest");
             addLog("info", "[Test] Loading update manifest");
             await asyncSleep(1000);
             addLog("debug", "[Test] Loaded update manifest");
 
-            firmwareState.updateStage = "update_stage_pay_attention";
+            setUpdateStage("update_stage_pay_attention");
             addLog("info", "[Test] Rebooting Flipper for update");
             await asyncSleep(2000);
 
-            firmwareState.updateStage = "update_stage_flashing_firmware";
+            setUpdateStage("update_stage_flashing_firmware");
             addLog("info", "[Test] Flashing firmware");
 
             for (let i = 0; i <= 100; i += 5) {
@@ -1615,9 +1641,9 @@ export const useSerialConnection = () => {
                 await asyncSleep(200);
             }
 
-            firmwareState.updateStage = "update_stage_rebooting";
+            setUpdateStage("update_stage_rebooting");
             await asyncSleep(1000);
-            firmwareState.updateStage = "update_stage_done";
+            setUpdateStage("update_stage_done");
             await asyncSleep(2000);
             flags.updateInProgress = false;
 

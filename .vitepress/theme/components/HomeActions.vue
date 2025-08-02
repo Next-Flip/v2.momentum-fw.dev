@@ -3,6 +3,7 @@ import { computed, inject } from "vue";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { ConnectionState } from "../types";
@@ -11,6 +12,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialC
 const { connectionData } = serialConnection;
 const { tr, getLocalizedPath } = useI18n();
 const { dots } = useDots();
+const { currentTheme } = useThemeSwitcher();
 
 const isConnected = computed(
     () => connectionData.state === ConnectionState.CONNECTED && connectionData.deviceInfo,
@@ -110,12 +112,12 @@ const dynamicButtons = computed((): ActionButton[] => {
                 :key="button.href"
                 :href="button.isLatest ? '#' : button.href"
                 :class="[
-                    'px-7 text-sm leading-9 font-semibold rounded-full border transition-all duration-100',
+                    'px-7 text-sm leading-9 font-semibold rounded-full border transition-all duration-100 bg-vp-dark/75 backdrop-blur-[1px]',
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest
-                            ? 'border-vp-brand-2 bg-vp-brand-2 hover:bg-vp-brand-3 text-neutral-50 hover:text-white'
-                            : 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 hover:text-white'
+                            ? `border-vp-brand-2 dark:border-vp-brand-1 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'}`
+                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'}`
                         : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/20 text-vp-1 hover:text-white',
                 ]"
                 >{{ button.text }}</a

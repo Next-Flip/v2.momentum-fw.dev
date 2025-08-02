@@ -55,6 +55,9 @@ _data/*
 *.njsproj
 *.sln
 *.sw?
+**/*.psd
+public/backup/
 
 .DS_Store
 .vercel
+TODO.md

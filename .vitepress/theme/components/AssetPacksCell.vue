@@ -13,9 +13,11 @@ import { useI18n } from "../composables/useI18n";
 import { useImageCache } from "../composables/useImageCache";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useTempState } from "../composables/useTempState";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import Tooltip from "./Tooltip.vue";
 
 const { dots, setDelay } = useDots();
+const { currentTheme } = useThemeSwitcher();
 const { setGalleryIndex, getGalleryIndex, hasGalleryState } = useGalleryState();
 const { getCachedOrProxiedUrl } = useImageCache();
 const { tr } = useI18n();
@@ -417,12 +419,17 @@ onUnmounted(() => {
                                 :href="githubUrl"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-vp-brand-1 hover:underline truncate block overflow-hidden text-ellipsis max-w-full"
+                                class="hover:underline truncate block overflow-hidden text-ellipsis max-w-full"
+                                :class="
+                                    currentTheme === 'orange'
+                                        ? 'text-vp-alternate-1 hover:text-vp-alternate-2'
+                                        : 'text-vp-brand-1 hover:text-vp-brand-2'
+                                "
                                 >{{ author }}</a
                             >
                             <span
                                 v-else
-                                class="block overflow-hidden text-ellipsis truncate max-w-full whitespace-nowrap font-medium transition-colors duration-200 text-vp-brand-1 hover:text-vp-brand-2"
+                                class="block overflow-hidden text-ellipsis truncate max-w-full whitespace-nowrap font-medium transition-colors duration-200"
                                 >{{ author }}</span
                             >
                             <template #content>{{ author }}</template>
@@ -430,7 +437,7 @@ onUnmounted(() => {
                     </div>
                     <Tooltip v-if="updatedDate" :delay="300" class="shrink-0">
                         <span
-                            class="text-right text-[13px] text-vp-2 opacity-70 italic whitespace-nowrap cursor-default"
+                            class="text-right text-[13px] text-vp-2 opacity-70 italic whitespace-nowrap cursor-help"
                             >{{ shortTimeAgo }}</span
                         >
                         <template #content>
@@ -509,7 +516,7 @@ onUnmounted(() => {
             <div class="asset-pack-actions flex gap-2 justify-end">
                 <div v-if="downloadUrl" class="action flex-1 z-[5] cursor-pointer">
                     <a
-                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 hover:!border-vp-brand-2 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 text-vp-1 uppercase hover:text-white select-none pointer-events-auto z-10"
+                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 hover:!border-vp-brand-2 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 text-vp-1 uppercase select-none pointer-events-auto z-10"
                         :class="{
                             'tracking-widest':
                                 serialConnection.connectionData.state ===
@@ -521,6 +528,7 @@ onUnmounted(() => {
                                 serialConnection.queueState.queue.some(
                                     (queuedPack) => queuedPack.id === props.id,
                                 ) || isBeingDeleted,
+                            'hover:text-black': currentTheme === 'orange',
                         }"
                         :aria-label="getActionLabel"
                         download

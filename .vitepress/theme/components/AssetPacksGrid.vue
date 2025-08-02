@@ -2,8 +2,8 @@
 import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
 import { motion } from "motion-v";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-
 import { useI18n } from "../composables/useI18n";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import type { AssetPack, FilterOption, SortDirection, SortField } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { scrollToTop } from "../util";
@@ -13,6 +13,7 @@ import AssetPacksControls from "./AssetPacksControls.vue";
 import ExtractNotice from "./ExtractNotice.vue";
 
 const { tr } = useI18n();
+const { currentTheme } = useThemeSwitcher();
 
 interface Props {
     title?: string;
@@ -386,7 +387,8 @@ const filteredAssetPacks = computed(() => {
         <div v-if="filteredAssetPacks.length === 0" class="text-center text-vp-2 py-12 px-0">
             <p>{{ tr("no_packs_found") }}</p>
             <button
-                class="reset-button mt-3 bg-vp-brand-2 p-4 py-2 rounded-md text-[14px] cursor-pointer transition-colors duration-100 text-neutral-50"
+                class="reset-button mt-6 bg-vp-dark/75 p-4 py-2 text-[14px] cursor-pointer transition-colors duration-100 text-vp-neutral rounded-full"
+                :class="currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'"
                 @click="resetFilters"
             >
                 {{ tr("reset_filters") }}
@@ -394,15 +396,19 @@ const filteredAssetPacks = computed(() => {
         </div>
 
         <div
-            v-if="isStuck"
-            class="hidden sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-6 max-w-[1200px] mx-auto pt-3"
+            class="sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-6 max-w-[1200px] mx-auto pt-3 h-12"
         >
-            <button
-                class="bg-vp-brand-2 text-neutral-100 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
-                @click="scrollToTop('smooth')"
+            <div
+                v-if="isStuck"
+                class="hidden sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-6 max-w-[1200px] mx-auto pt-3"
             >
-                {{ tr("return_to_top") }}
-            </button>
+                <button
+                    class="bg-vp-brand-2 text-neutral-100 px-4 py-2 rounded-full text-sm font-medium shadow-lg hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
+                    @click="scrollToTop('smooth')"
+                >
+                    {{ tr("return_to_top") }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -419,7 +425,14 @@ const filteredAssetPacks = computed(() => {
     }
 }
 
+.reset-button {
+    border: 1px solid var(--vp-c-brand-1);
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 75%, transparent);
+    backdrop-filter: blur(1px);
+}
+
 .reset-button:hover {
+    border-color: var(--vp-c-brand-2);
     background-color: var(--vp-c-brand-3);
 }
 

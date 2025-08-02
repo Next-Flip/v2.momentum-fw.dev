@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
+import { useClickOutside } from "../composables/useClickOutside";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
-import { supportsSerialPort } from "../util";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
+import { supportsSerialPort } from "../util";
 
 import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { dots } = useDots();
+const { currentTheme } = useThemeSwitcher();
 
 interface Props {
     selectedChannel: "mainline" | "devbuild" | null;
@@ -53,6 +56,21 @@ const channelDropdownRef = ref<HTMLElement | null>(null);
 const releaseDropdownRef = ref<HTMLElement | null>(null);
 const isChannelDropdownOpen = ref(false);
 const isReleaseDropdownOpen = ref(false);
+
+useClickOutside([
+    {
+        element: channelDropdownRef,
+        callback: () => {
+            isChannelDropdownOpen.value = false;
+        },
+    },
+    {
+        element: releaseDropdownRef,
+        callback: () => {
+            isReleaseDropdownOpen.value = false;
+        },
+    },
+]);
 
 const channelOptions = computed(() => [
     {
@@ -125,24 +143,6 @@ const handleFlashFirmware = () => {
 const handleDownloadRelease = () => {
     emit("download-release");
 };
-
-const clickOutside = (event: MouseEvent) => {
-    const target = event.target as Node;
-    if (channelDropdownRef.value && !channelDropdownRef.value.contains(target)) {
-        isChannelDropdownOpen.value = false;
-    }
-    if (releaseDropdownRef.value && !releaseDropdownRef.value.contains(target)) {
-        isReleaseDropdownOpen.value = false;
-    }
-};
-
-onMounted(() => {
-    document.addEventListener("click", clickOutside);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener("click", clickOutside);
-});
 </script>
 
 <template>
@@ -304,12 +304,7 @@ onBeforeUnmount(() => {
                                                 :z-index="9999"
                                             >
                                                 <div
-                                                    class="flex items-center text-sm text-vp-brand-1 dark:text-vp-brand-1 rounded-full bg-vp-brand-1/10 dark:bg-vp-brand-1/10 p-0.5 border border-vp-brand-1/20 hover:border-vp-brand-1/40 transition-all duration-100"
-                                                    :class="{
-                                                        'text-vp-neutral dark:text-vp-neutral/80 border-vp-neutral/20 dark:border-vp-neutral/30 hover:border-vp-neutral/60':
-                                                            selectedRelease?.commit ===
-                                                            release.commit,
-                                                    }"
+                                                    class="flex items-center text-sm text-vp-alternate-1 dark:text-vp-alternate-1 rounded-full bg-vp-alternate-1/10 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
                                                     :aria-label="tr('releases_current_version')"
                                                 >
                                                     <v-icon name="oi-check" scale="0.60" />
@@ -404,7 +399,7 @@ onBeforeUnmount(() => {
                             class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase whitespace-nowrap"
                             :class="
                                 canFlash
-                                    ? 'cursor-pointer hover:text-neutral-50 px-14'
+                                    ? `cursor-pointer ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'} px-14`
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
                             "
                             @click="handleFlashFirmware"

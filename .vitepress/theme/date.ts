@@ -31,3 +31,21 @@ export const formatDate = (
 
     return `${dateStr}, ${timeStr}`;
 };
+
+export const formatTimestamp = (timestamp: string): string => {
+    const date = new Date(parseInt(timestamp) * 1000);
+
+    const dateStr = date.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+    });
+
+    const timeStr = date.toLocaleTimeString("en-US", {
+        hour12: true,
+        hour: "numeric",
+        minute: "2-digit",
+    });
+
+    return `${dateStr} ${timeStr}`;
+};

@@ -33,7 +33,7 @@ onMounted(async () => {
         :delay="400"
         :z-index="9999"
         :offset="13"
-        position="bottom"
+        position="right"
         :force-visible="isInstallButtonHovered && !isAutoconnectEnabled"
     >
         <button

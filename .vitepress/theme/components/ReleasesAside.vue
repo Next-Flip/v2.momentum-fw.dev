@@ -110,7 +110,7 @@ watch(
 <template>
     <aside class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pl-8 pt-5 pb-8">
         <div class="sticky top-20 lg:top-24 flex flex-col">
-            <span class="text-vp-2 text-sm font-medium mb-0.5" v-html="tr('aside_desc')"></span>
+            <span class="text-vp-2 text-sm font-normal mb-0.5" v-html="tr('aside_desc')"></span>
 
             <div class="border-t border-[var(--vp-c-divider)] my-4"></div>
 

@@ -1,32 +1,31 @@
 name: Force Deploy to Vercel Production
 env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
-  repository_dispatch:
-    types: [force-deploy]
-  workflow_dispatch:
+    repository_dispatch:
+        types: [force-deploy]
+    workflow_dispatch:
 
 jobs:
-  force-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+    force-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Install Bun
-        run: curl -fsSL https://bun.sh/install | bash
+            - name: Install Bun
+              run: curl -fsSL https://bun.sh/install | bash
 
-      - name: Add Bun to PATH
-        run: echo "$HOME/.bun/bin" >> $GITHUB_PATH
+            - name: Add Bun to PATH
+              run: echo "$HOME/.bun/bin" >> $GITHUB_PATH
 
-      - name: Install Vercel CLI
-        run: bun install -g vercel@latest
+            - name: Pull Vercel Environment Information
+              run: bunx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Build Vercel Output
+              run: bunx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build Vercel Output
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+            - name: Deploy to Vercel
+              run: bunx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

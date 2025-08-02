@@ -6,6 +6,7 @@ import type {
     MainlineFile,
     ReleaseItem,
 } from "../../../_data/releases";
+import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
 
 import FileGrid from "./FileGrid.vue";
@@ -16,9 +17,25 @@ const { tr, getLocalizedPath } = useI18n();
 interface Props {
     selectedRelease: ReleaseItem | null;
     isCurrentVersion: boolean;
+    devFilesOpen: boolean;
 }
 
 const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    toggleDevFilesOpen: [devFilesOpen: boolean];
+}>();
+
+const devFilesRef = ref<HTMLElement | null>(null);
+
+useClickOutside({
+    element: devFilesRef,
+    callback: () => {
+        if (props.devFilesOpen) {
+            emit("toggleDevFilesOpen", false);
+        }
+    },
+});
 
 const installMethods = computed(() => [
     {
@@ -88,36 +105,61 @@ const categorizedFiles = computed(() => {
     return { regular, development };
 });
 
-const isDevelopmentSectionExpanded = ref(false);
-
 const toggleDevelopmentSection = () => {
-    isDevelopmentSectionExpanded.value = !isDevelopmentSectionExpanded.value;
+    emit("toggleDevFilesOpen", !props.devFilesOpen);
 };
 
 watch(
     () => props.selectedRelease,
     () => {
-        isDevelopmentSectionExpanded.value = false;
+        emit("toggleDevFilesOpen", false);
     },
 );
 </script>
 
 <template>
-    <div v-if="selectedRelease?.files" class="px-6 sm:px-8 pt-24 pb-3">
+    <div v-if="selectedRelease?.files" class="relative px-6 sm:px-8 pt-32 pb-3">
+        <div class="absolute inset-0 release-files-backdrop mb-3"></div>
         <div
-            class="flex flex-row justify-start items-end gap-1.5 pb-2 mb-3 border-b border-vp-divider"
+            class="relative z-10 flex flex-row justify-between items-end gap-1.5 pb-2 mb-3 border-b border-vp-divider"
         >
             <span
                 class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
                 >{{ tr("releases_files") }}</span
             >
+            <Transition
+                enter-active-class="transition-opacity duration-200 ease-in-out"
+                leave-active-class="transition-opacity duration-200 ease-in-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div v-if="devFilesOpen" class="flex items-center">
+                    <Tooltip :aria-label="tr('updater_close')" :delay="0" class="z-[1]">
+                        <button
+                            class="flex items-center justify-center text-vp-3/70 hover:text-vp-2 transition-colors duration-200 p-1 rounded cursor-pointer rotate-45"
+                            @click="emit('toggleDevFilesOpen', false)"
+                        >
+                            <v-icon name="hi-plus-sm" scale="1.1" />
+                        </button>
+                        <template #content>
+                            <span class="text-vp-1">{{ tr("updater_close") }}</span>
+                        </template>
+                    </Tooltip>
+                </div>
+            </Transition>
         </div>
 
-        <div v-if="categorizedFiles.regular.length > 0" class="mb-4">
+        <div v-if="categorizedFiles.regular.length > 0" class="relative z-10 mb-4">
             <FileGrid :files="categorizedFiles.regular as any" :branch="selectedRelease.branch" />
         </div>
 
-        <div v-if="categorizedFiles.development.length > 0" class="mt-3 mb-4">
+        <div
+            v-if="categorizedFiles.development.length > 0"
+            ref="devFilesRef"
+            class="relative z-10 mt-3 mb-4"
+        >
             <button
                 class="flex gap-2 w-full text-left py-2 text-vp-2 hover:text-vp-1 items-center justify-start transition-colors duration-100 group"
                 @click="toggleDevelopmentSection"
@@ -126,7 +168,7 @@ watch(
                     name="oi-chevron-down"
                     scale="0.8"
                     class="transition-transform duration-200 text-vp-2"
-                    :class="{ '-rotate-180': isDevelopmentSectionExpanded }"
+                    :class="{ '-rotate-180': props.devFilesOpen }"
                 />
                 <span
                     class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-100"
@@ -138,8 +180,15 @@ watch(
                 <div class="flex-1 bg-vp-divider w-full h-px"></div>
             </button>
 
-            <Transition name="dev-files">
-                <div v-if="isDevelopmentSectionExpanded" class="mt-1">
+            <Transition
+                enter-active-class="transition-all duration-300 ease-in-out overflow-hidden"
+                leave-active-class="transition-all duration-300 ease-in-out overflow-hidden"
+                enter-from-class="opacity-0 max-h-0 -translate-y-2.5"
+                enter-to-class="opacity-100 max-h-[1000px] translate-y-0"
+                leave-from-class="opacity-100 max-h-[1000px] translate-y-0"
+                leave-to-class="opacity-0 max-h-0 -translate-y-2.5"
+            >
+                <div v-if="props.devFilesOpen" class="mt-1">
                     <div class="flex flex-col gap-5">
                         <div class="flex-shrink-0">
                             <p class="text-xs text-vp-3 leading-relaxed my-0">
@@ -161,7 +210,7 @@ watch(
         </div>
 
         <div
-            class="flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4 pb-4"
+            class="relative z-10 flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4 pb-4"
         >
             <div class="flex flex-row gap-x-1.5 items-center text-sm mr-auto">
                 <Tooltip
@@ -169,10 +218,10 @@ watch(
                     :delay="0"
                     :hide-delay="100"
                     :max-width="'315px'"
-                    class="files-tooltip z-[1] -mb-[6px]"
+                    class="z-[1] -mb-[6px]"
                 >
                     <div
-                        class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200"
+                        class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
                     >
                         <v-icon name="la-info-circle-solid" scale="0.9" />
                     </div>
@@ -205,8 +254,12 @@ watch(
                         :href="method.href"
                         target="_blank"
                         rel="noopener"
-                        class="install-method-btn text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
-                        :class="{ 'install-method-btn-visible': method.show }"
+                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-300 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        :class="
+                            method.show
+                                ? 'opacity-100 visible relative pointer-events-auto'
+                                : 'opacity-0 invisible absolute pointer-events-none'
+                        "
                     >
                         {{ method.name }}
                     </a>
@@ -217,57 +270,33 @@ watch(
 </template>
 
 <style scoped>
-.files-tooltip :deep(.tooltip-trigger) {
-    display: inline-flex;
-    height: 16px;
-    width: 20px;
-    align-items: center;
-    justify-content: center;
-    cursor: default !important;
-}
-
-.install-method-btn {
-    opacity: 0;
-    visibility: hidden;
-    position: absolute;
+.release-files-backdrop {
+    backdrop-filter: blur(1px);
+    background-image: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
+        color-mix(in srgb, var(--vp-c-bg-dark) 90%, transparent) 70%,
+        color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
+    );
+    mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 70%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1) 0%,
+        rgba(0, 0, 0, 1) 70%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    will-change: transform;
+    transform: translateZ(0);
+    z-index: 0;
     pointer-events: none;
-    transition: all 0.3s ease-in-out;
 }
 
-.install-method-btn-visible {
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-    pointer-events: auto;
-}
-
-.dev-files-enter-active,
-.dev-files-leave-active {
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-}
-
-.dev-files-enter-from {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-}
-
-.dev-files-enter-to {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-.dev-files-leave-from {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-.dev-files-leave-to {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
+:deep(.tooltip-trigger) {
+    @apply inline-flex h-4 w-5 items-center justify-center cursor-default;
 }
 </style>

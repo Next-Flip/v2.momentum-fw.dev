@@ -54,19 +54,19 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 |Feature|[&nearr;&nbsp;OFW](https://github.com/flipperdevices/flipperzero-firmware)|[&nearr;&nbsp;RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[&nearr;&nbsp;Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
 |-|:-:|:-:|:-:|:-:|
 |Stable Updates|<span class="check">&#10003;</span>|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
-|(Some) Rolling Code Support|&#10033;<sup>1</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
-|FindMy Flipper|&#10033;<sup>2</sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|(Some) Rolling Code Support|&#10033;<sup><a href="#fn1" id="ref1">1</a></sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
+|FindMy Flipper|&#10033;<sup><a href="#fn2" id="ref2">2</a></sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |BLE Spam|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
-|Bad Keyboard (Extra Options)|&#10007;|<span class="check">&#10003;</span><sup>3</sup>|<span class="check">&#10003;</span><sup>3</sup>|<span class="check-last">&#10003;</span>|
+|Bad Keyboard (Extra Options)|&#10007;|<span class="check">&#10003;</span><sup><a href="#fn3" id="ref3">3</a></sup>|<span class="check">&#10003;</span><sup><a href="#fn3" id="ref3b">3</a></sup>|<span class="check-last">&#10003;</span>|
 |NFC Type 4 (NDEF on NTAG4xx/DESFire)|&#10007;|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |NFC EMV (Only basic card info)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Subdriving (Saving coordinates for subghz)|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
 |Full Customization (Layouts, Menus, Keybinds, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
-|Management App (For easy configuration)|&#10007;|&#10033;<sup>4</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|Management App (For easy configuration)|&#10007;|&#10033;<sup><a href="#fn4" id="ref4">4</a></sup>|&#10007;|<span class="check-last">&#10003;</span>|
 |Enhanced RGB Backlight modes (Full customization & Rainbow mode)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Spoofing (Name, Mac, Serial)|&#10007;|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |Improved Security (Lock on Boot, reset on false pins, etc.)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
-|Asset Packs|&#10007;|&#10033;<sup>5</sup>|&#10007;|<span class="check-last">&#10003;</span>|
+|Asset Packs|&#10007;|&#10033;<sup><a href="#fn5" id="ref5">5</a></sup>|&#10007;|<span class="check-last">&#10003;</span>|
 |VGM Color Options|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
 |Enhanced Level System|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
 |File Search|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
@@ -78,14 +78,14 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <div class="footnotes-container">
 
-<sup>1: Official Firmware can pair to some rolling code receivers (less than Custom Firmwares), and it does not allow sending rolling code signals captured in the wild (Custom Firmwares listed above allow it at your own risk of de-synchronizing the original remote).</sup>
+<sup id="fn1">1. OFW supports some rolling code receivers, but can't send captured signals. Custom Firmwares can (at your own risk).</sup>
 
-<sup>2: Official Firmware can use FindMy Flipper by installing the app from the App Catalog, but it will not automatically enable at startup. Custom Firmwares can enable it automatically every time Flipper turns on, so it is always being tracked while turned on.</sup>
+<sup id="fn2">2. OFW needs manual setup for FindMy Flipper; Custom Firmwares enable it automatically at startup.</sup>
 
-<sup>3: These Firmwares include the extra Bad KB configuration options in the Bad USB app since they were proposed to OFW in PR 4136. Technically not Bad KB, but the functionality is there.</sup>
+<sup id="fn3">3. These Firmwares add extra Bad KB options in Bad USB, as proposed to OFW in PR <a href="https://github.com/flipperdevices/flipperzero-firmware/pull/4136" target="_blank" rel="noopener noreferrer">4136</a>.</sup>
 
-<sup>4: Partional functionality, less options in the "CFW Settings" management app.</sup>
+<sup id="fn4">4. Partional functionality, less options in the "CFW Settings" management app.</sup>
 
-<sup>5: Different format (manifest_xyz.txt) that only supports animations, not icons and fonts</sup>
+<sup id="fn5">5. Different format (manifest_xyz.txt) that only supports animations, not icons and fonts.</sup>
 
 </div>

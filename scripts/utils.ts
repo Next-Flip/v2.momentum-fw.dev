@@ -37,26 +37,43 @@ export function replaceTemplateSection(
     return content.replace(regex, `$1\n${replacement}\n${indent}$2`);
 }
 
+export async function getGitCommitHash(): Promise<string> {
+    try {
+        const { execSync } = await import("node:child_process");
+        const commitHash = execSync("git rev-parse --short HEAD", {
+            encoding: "utf8",
+            cwd: process.cwd(),
+        }).trim();
+        return commitHash;
+    } catch (error) {
+        console.warn("❌ Failed to get git commit hash:", error);
+        return "";
+    }
+}
+
 export async function updateBuildInfo(): Promise<void> {
     const now = new Date();
     const timestamp = now.getTime();
     const isoDate = now.toISOString();
+    const commitHash = await getGitCommitHash();
     const buildInfoContent = `${HEADER}
 
 export interface BuildInfo {
     timestamp: number;
     date: string;
+    commitHash: string;
 }
 
 export const buildInfo: BuildInfo = {
     timestamp: ${timestamp},
-    date: "${isoDate}"
+    date: "${isoDate}",
+    commitHash: "${commitHash}"
 };
 `;
 
     const buildInfoPath = join(DIR_DATA, "./buildInfo.ts");
     await fs.writeFile(buildInfoPath, buildInfoContent, "utf8");
-    console.log(`  Generated buildInfo.ts: ${isoDate}`);
+    console.log(`  Generated buildInfo.ts: ${isoDate} (${commitHash})`);
 }
 
 export async function patchVueIcons(): Promise<void> {

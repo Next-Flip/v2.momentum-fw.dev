@@ -38,6 +38,7 @@ const messages: MessageSchema = {
     save: "Save",
     copied: "Copied",
     saved: "Saved",
+    theme_locked: "Theme Locked",
     search: "Search",
     no_packs_found: "No asset packs found matching your criteria",
     reset_filters: "Reset Filters",
@@ -110,6 +111,7 @@ const messages: MessageSchema = {
     nav_resources: "Resources",
     nav_web_updater: "Web Updater",
     nav_recent: "Most Recent",
+    nav_bug_report: "Bug Report",
 
     aside_title: "General Info",
     aside_desc:
@@ -213,6 +215,11 @@ const messages: MessageSchema = {
 
     update_stage_updating: "Updating...",
     update_stage_updating_short: "Updating",
+    update_stage_set_region: "Setting Sub-GHz region...",
+    update_stage_downloading_firmware: "Downloading firmware bundle...",
+    update_stage_extracted_files: "Extracted {{count}} files...",
+    update_stage_creating_directory: "Created directory: {{name}}",
+    update_stage_uploaded_file: "Uploaded file {{count}}/{{total}}",
     update_stage_loading_region_data: "Loading region data...",
     update_stage_loading_firmware_bundle: "Loading firmware bundle...",
     update_stage_loading_firmware_files: "Loading firmware files...",
@@ -283,7 +290,7 @@ const messages: MessageSchema = {
     updater_select_firmware: "Select Firmware",
     updater_or_install_from_file: "Or install from file",
     updater_install_from_file_tooltip:
-        "You can get release tgz files from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
+        "We recommend only flashing firmware from verified sources. You can get Momentum releases from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 underline transition-colors duration-100 font-medium'>{{text}}</a>.",
     updater_change_button: "Change",
     updater_remove_button: "Remove",
     updater_drop_file_here: "Drop .tgz here",

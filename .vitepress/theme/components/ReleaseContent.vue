@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MarkdownIt from "markdown-it";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { replaceIssuesAndMentions } from "../util";
 
@@ -22,6 +22,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
     selectRelease: [release: ReleaseItem];
+    toggleDevFilesOpen: [devFilesOpen: boolean];
 }>();
 
 const parsedChangelog = computed(() => {
@@ -29,18 +30,23 @@ const parsedChangelog = computed(() => {
     const withGitHubLinks = replaceIssuesAndMentions(props.selectedRelease.changelog);
     return md.render(withGitHubLinks);
 });
+const devFilesOpen = ref(false);
 
 const handleSelectRelease = (release: ReleaseItem) => {
     emit("selectRelease", release);
+};
+
+const toggleDevFilesOpen = (open: boolean) => {
+    devFilesOpen.value = open;
 };
 </script>
 
 <template>
     <main
         v-if="selectedRelease"
-        class="relative flex-1 col-span-5 lg:col-span-3 lg:pb-16 rounded-[10px] overflow-clip"
+        class="relative flex-1 col-span-5 lg:col-span-3 lg:pb-8 rounded-[10px] overflow-clip"
     >
-        <div class="border border-vp-divider rounded-[10px] overflow-clip pb-3">
+        <div class="border border-vp-divider rounded-[10px] overflow-clip">
             <ReleaseHeader
                 :selected-release="selectedRelease"
                 :is-current-version="props.isCurrentVersion"
@@ -49,19 +55,22 @@ const handleSelectRelease = (release: ReleaseItem) => {
 
             <div
                 v-if="selectedRelease.changelog"
-                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6"
+                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6 opacity-100 transition-opacity duration-200"
+                :class="{ 'opacity-30': devFilesOpen }"
             >
                 <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6">
                     <span v-html="parsedChangelog"></span>
                 </div>
             </div>
 
-            <div class="h-px border-b border-vp-border w-auto mx-6 sm:mx-8"></div>
+            <div class="h-px border-b border-vp-neutral/35 w-auto mx-6 sm:mx-8"></div>
 
-            <div class="max-w-none files-container lg:sticky lg:bottom-0 -mt-16">
+            <div class="max-w-none files-container lg:sticky lg:bottom-0 -mt-24">
                 <ReleaseFiles
                     :selected-release="selectedRelease"
                     :is-current-version="props.isCurrentVersion"
+                    :dev-files-open="devFilesOpen"
+                    @toggle-dev-files-open="toggleDevFilesOpen"
                 />
             </div>
         </div>
@@ -82,7 +91,7 @@ const handleSelectRelease = (release: ReleaseItem) => {
         to top,
         color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
         /* color-mix(in srgb, var(--vp-c-bg-dark) 98%, transparent) 50%, */
-            color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 75%,
+            color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 70%,
         color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
     );
 }
@@ -90,12 +99,17 @@ const handleSelectRelease = (release: ReleaseItem) => {
 .release-content {
     position: relative;
     background-color: transparent;
-    background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
-    );
     backdrop-filter: blur(10px);
+}
+
+@media (min-width: 1024px) {
+    .release-content {
+        background-image: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
+            color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
+        );
+    }
 }
 
 .dark .release-content {

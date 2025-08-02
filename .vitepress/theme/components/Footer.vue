@@ -6,13 +6,12 @@ import { useI18n } from "../composables/useI18n";
 import { formatDate } from "../date";
 
 import { buildInfo } from "../../../_data/buildInfo";
-import { useLogoCycle } from "../composables/useLogoCycle";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import FooterSection from "./FooterSection.vue";
 
 const { site } = useData();
 const { tr } = useI18n();
-const logoColors = ["black", "purp", "orange", "pink"];
-const { currentLogo, nextLogo } = useLogoCycle(logoColors);
+const { currentLogo, nextLogo, isLocked, toggleLock } = useThemeSwitcher();
 const route = useRoute();
 const isWiki = route.path.includes("/wiki");
 
@@ -46,32 +45,48 @@ const navigationLinks = computed(() => [
 </script>
 
 <template>
-    <footer class="overflow-hidden footer" :style="{ '--footer-bg-width': '1152px' }">
-        <div
-            class="max-w-full mx-auto border-t border-vp-divider"
-            :class="`py-12 ${isWiki ? 'lg:px-0' : ''}`"
-        >
+    <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
+        <div class="max-w-full mx-auto" :class="`py-16 pb-24 lg:pb-32 ${isWiki ? 'lg:px-0' : ''}`">
             <div
-                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl px-6 lg:px-8"
+                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl px-10 lg:px-16"
             >
-                <div class="lg:max-w-md flex flex-col justify-start">
-                    <div class="flex items-center space-x-3">
-                        <a
-                            href="/"
-                            class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
-                            @mouseenter="nextLogo"
-                        >
-                            <img
-                                :src="currentLogo"
-                                alt="Momentum Firmware"
-                                class="w-8 h-8 object-contain object-center"
-                            />
-                        </a>
-                    </div>
+                <div class="lg:max-w-md flex flex-col justify-start z-50">
+                    <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">
+                        <div class="flex flex-row items-center gap-3 pb-3.5">
+                            <a
+                                href="/"
+                                class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
+                                @mouseenter="nextLogo"
+                            >
+                                <img
+                                    :src="currentLogo"
+                                    alt="Momentum Firmware"
+                                    class="w-8 h-8 object-contain object-center"
+                                />
+                            </a>
+                            <button
+                                :aria-label="isLocked ? tr('theme_locked') : ''"
+                                class="lock-button opacity-0 group-hover/logo:opacity-100 transition-all duration-200 pl-0.5 p-1 rounded hover:bg-vp-c-default-soft text-vp-c-text-2 hover:text-vp-c-brand-1 text-vp-3/80 hover:text-vp-2"
+                                @click="toggleLock"
+                            >
+                                <v-icon :name="isLocked ? 'oi-lock' : 'oi-unlock'" scale="0.85" />
+                            </button>
+                            <span
+                                class="text-vp-3/80 text-[11px] italic transition-all duration-200 mt-px -ml-2.5 select-none"
+                                :class="
+                                    !isLocked
+                                        ? 'opacity-0'
+                                        : 'opacity-0 group-hover/logo:opacity-100'
+                                "
+                            >
+                                {{ tr("theme_locked") }}
+                            </span>
+                        </div>
 
-                    <p class="text-sm text-vp-2 max-w-72 mt-3.5">
-                        {{ siteDescription }}
-                    </p>
+                        <p class="text-sm text-vp-2 max-w-72">
+                            {{ siteDescription }}
+                        </p>
+                    </div>
 
                     <p class="text-xs text-vp-3 mt-2">
                         <a
@@ -84,11 +99,24 @@ const navigationLinks = computed(() => [
                         </a>
                     </p>
 
-                    <p
-                        class="text-xs text-[color-mix(in_srgb,var(--vp-c-text-3),transparent_50%)] mt-2 sm:mt-auto"
+                    <div
+                        class="flex flex-row gap-1.5 sm:mt-auto mt-2 justify-start items-center leading-none"
                     >
-                        {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
-                    </p>
+                        <p class="text-xs text-vp-3/50">
+                            {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
+                        </p>
+                        <template v-if="buildInfo.commitHash">
+                            <span class="text-vp-3/40">·</span>
+                            <a
+                                class="text-[13px] font-normal text-vp-3/50 hover:underline hover:text-vp-brand-1 transition-colors duration-100"
+                                :href="`https://github.com/Next-Flip/v2.momentum-fw.dev/commit/${buildInfo.commitHash}`"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ buildInfo.commitHash }}
+                            </a>
+                        </template>
+                    </div>
                 </div>
 
                 <div
@@ -123,7 +151,46 @@ const navigationLinks = computed(() => [
     position: relative;
 }
 
+.lock-button {
+    transition:
+        opacity 0.2s ease-in-out,
+        background-color 0.15s ease-in-out,
+        color 0.15s ease-in-out;
+}
+
+.lock-button:hover {
+    transform: scale(1.05);
+}
+
 footer {
     position: relative;
+}
+
+footer:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) scaleX(-1);
+    bottom: 0;
+    width: 100%;
+    height: 50vw;
+    min-height: 400px;
+    max-height: 800px;
+    max-width: 1536px;
+    background-image: url("/bg/006-line.png");
+    background-size: cover;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    filter: saturate(0);
+    mix-blend-mode: multiply;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.dark footer:before {
+    mix-blend-mode: screen;
+    opacity: 0.27;
+    filter: saturate(0) invert(1);
 }
 </style>

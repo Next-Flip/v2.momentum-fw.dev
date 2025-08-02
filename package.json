@@ -60,6 +60,7 @@
         "tailwindcss": "^3.2.4",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.32.1",
+        "vercel": "^44.6.6",
         "vitepress": "^1.6.3",
         "vue": "^3.5.14"
     },

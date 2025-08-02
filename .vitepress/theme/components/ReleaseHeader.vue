@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
+import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
-import { formatDate } from "../date";
+import { formatDate, formatTimestamp } from "../date";
 import { scrollToTop } from "../util";
 
 import Tooltip from "./Tooltip.vue";
@@ -26,6 +27,13 @@ const emit = defineEmits<{
 const dropdownRef = ref<HTMLElement | null>(null);
 const dropdownMenuRef = ref<HTMLElement | null>(null);
 const isDropdownOpen = ref(false);
+
+useClickOutside({
+    element: dropdownRef,
+    callback: () => {
+        isDropdownOpen.value = false;
+    },
+});
 
 const getReleaseDisplayName = (release: ReleaseItem) => {
     return release.version || `${release.commit.substring(0, 8)}`;
@@ -79,21 +87,6 @@ const handleHeaderClick = () => {
         scrollToTop("smooth");
     }
 };
-
-const clickOutside = (event: MouseEvent) => {
-    const target = event.target as Node;
-    if (dropdownRef.value && !dropdownRef.value.contains(target)) {
-        isDropdownOpen.value = false;
-    }
-};
-
-onMounted(() => {
-    document.addEventListener("click", clickOutside);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener("click", clickOutside);
-});
 </script>
 
 <template>
@@ -121,12 +114,12 @@ onBeforeUnmount(() => {
                         :z-index="9999"
                     >
                         <div
-                            class="flex items-center text-sm text-vp-brand-1 dark:text-vp-brand-1 rounded-full bg-vp-brand-1/10 dark:bg-vp-brand-1/10 p-0.5 border border-vp-brand-1/20 hover:border-vp-brand-1/40 transition-all duration-100"
+                            class="flex items-center text-sm text-vp-alternate-1 dark:text-vp-alternate-1 rounded-full bg-vp-alternate-1/10 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
                             :aria-label="tr('releases_current_version')"
                         >
                             <v-icon name="oi-check" scale="0.65" />
                         </div>
-                        <template #content>{{ tr("releases_current_version") }}</template>
+                        <template #content>{{ tr("installed") }}</template>
                     </Tooltip>
                     <div
                         class="lg:hidden flex items-center text-vp-3 transition-transform duration-200"
@@ -136,10 +129,21 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
                 <div class="flex flex-row items-center gap-2">
+                    <Tooltip v-if="selectedRelease?.timestamp" position="left" :delay="0">
+                        <div
+                            class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm cursor-help tracking-wider"
+                        >
+                            <span>{{ formatDate(selectedRelease?.date || "", "fullYear") }}</span>
+                        </div>
+                        <template #content>
+                            {{ formatTimestamp(selectedRelease.timestamp.toString()) }}
+                        </template>
+                    </Tooltip>
                     <div
+                        v-else
                         class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm"
                     >
-                        <span>{{ formatDate(selectedRelease.timestamp, "fullYear") }}</span>
+                        <span>{{ formatDate(selectedRelease?.timestamp || 0, "fullYear") }}</span>
                     </div>
                 </div>
             </div>

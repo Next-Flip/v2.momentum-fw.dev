@@ -4,9 +4,9 @@ import { useRoute } from "vitepress";
 import { computed, onMounted, ref, watch } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
+import { formatDate } from "../date";
 import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
-import { formatDate } from "../date";
 
 import { MessageSchema } from ".vitepress/i18n";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
@@ -167,7 +167,7 @@ onMounted(() => {
                             class="relative w-4 h-4 rounded-full flex items-center justify-center mr-2"
                         >
                             <div
-                                class="absolute inset-0 rounded-full border-2 border-transparent border-t-mntm-yellow-1 animate-spin"
+                                class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-alternate-1 animate-spin"
                             ></div>
                         </div>
                         <span v-else class="relative flex size-2 mr-2">
@@ -248,7 +248,7 @@ onMounted(() => {
                         <div class="menu-item">
                             <span class="menu-label">{{ tr("connection_build_date") }}</span>
                             <span class="menu-value">{{
-                                formatBuildDate(deviceInfo?.firmware_build_date)
+                                formatBuildDate(deviceInfo?.firmware_build_date as string)
                             }}</span>
                         </div>
 

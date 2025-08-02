@@ -1,4 +1,4 @@
-import { onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 interface UseDotsOptions {
     count?: number;
@@ -15,12 +15,9 @@ export function useDots(options: UseDotsOptions = {}) {
     let interval: NodeJS.Timeout;
 
     const startInterval = () => {
-        if (interval) {
-            clearInterval(interval);
-        }
+        stopInterval();
         interval = setInterval(() => {
-            currentDots.value = char.repeat(currentCount.value);
-            currentCount.value = currentCount.value >= count ? 1 : currentCount.value + 1;
+            tick();
         }, currentDelay);
     };
 
@@ -29,16 +26,30 @@ export function useDots(options: UseDotsOptions = {}) {
         startInterval();
     };
 
-    startInterval();
+    const tick = () => {
+        currentDots.value = char.repeat(currentCount.value);
+        currentCount.value = currentCount.value >= count ? 1 : currentCount.value + 1;
+    };
 
-    onUnmounted(() => {
+    const stopInterval = () => {
         if (interval) {
             clearInterval(interval);
         }
+    };
+
+    onMounted(() => {
+        startInterval();
+    });
+
+    onUnmounted(() => {
+        stopInterval();
     });
 
     return {
         dots: currentDots,
+        startInterval,
+        stopInterval,
         setDelay,
+        tick,
     };
 }

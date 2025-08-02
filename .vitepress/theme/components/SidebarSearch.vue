@@ -44,23 +44,12 @@ function openSearch() {
                 @click="openSearch"
             >
                 <span class="DocSearch-Button-Container">
-                    <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
-                        <path
-                            d="m19 19-3.5-3.5m0-6.5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-                            stroke="currentColor"
-                            fill="none"
-                            fill-rule="evenodd"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                        />
-                    </svg>
                     <span class="DocSearch-Button-Placeholder">Search</span>
                 </span>
                 <div class="DocSearch-Button">
-                    <span class="DocSearch-Button-Keys"
-                        ><kbd class="DocSearch-Button-Key"></kbd
-                        ><kbd class="DocSearch-Button-Key">K</kbd></span
+                    <kbd
+                        class="bg-vp-soft-mute border border-vp-divider rounded px-1.5 py-1 text-[11px] leading-none text-vp-2 font-mono font-medium"
+                        >/</kbd
                     >
                 </div>
             </button>
@@ -84,9 +73,9 @@ function openSearch() {
     justify-content: space-between;
     width: 100%;
     height: 40px;
-    background: var(--vp-c-bg-alt);
+    background: color-mix(in srgb, var(--vp-c-bg-dark) 55%, transparent);
+    border: 1px solid var(--vp-c-divider);
     margin-left: 0 !important;
-    border: 1px solid transparent;
     border-radius: 8px;
     padding: 0 10px;
     font-size: 13px;

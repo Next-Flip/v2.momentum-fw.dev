@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { useTimeAgo } from "@vueuse/core";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { shortenTimeString } from "../util";
+import { formatDate, formatTimestamp } from "../date";
+
+import Tooltip from "./Tooltip.vue";
 
 interface Props {
     title: string;
@@ -99,6 +100,7 @@ onMounted(() => {
                     width: 'calc(100% - 4px)',
                     backgroundImage:
                         'linear-gradient(to left, color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent), transparent)',
+                    backdropFilter: 'blur(4px)',
                 }"
             ></div>
 
@@ -137,16 +139,17 @@ onMounted(() => {
                 >
                     {{ release.commit }}
                 </span>
-                <span
-                    class="text-[11px] text-right font-mono pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap"
-                    :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
-                >
-                    {{
-                        shortenTimeString(
-                            useTimeAgo(new Date((release.timestamp || 0) * 1000)).value,
-                        )
-                    }}
-                </span>
+                <Tooltip position="right" :delay="400" :offset="18">
+                    <span
+                        class="text-[11px] text-right font-mono pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap tracking-tighter"
+                        :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
+                    >
+                        {{ formatDate(release.date || "", "short") }}
+                    </span>
+                    <template #content>
+                        {{ formatTimestamp(release?.timestamp?.toString() || "") }}
+                    </template>
+                </Tooltip>
             </button>
         </div>
     </div>
@@ -176,10 +179,10 @@ onMounted(() => {
 }
 
 .item-line {
-    background-color: var(--vp-c-brand-2);
+    background-color: var(--vp-c-alternate-1);
 }
 
 .dark .item-line {
-    background-color: var(--vp-c-brand-2);
+    background-color: var(--vp-c-alternate-1);
 }
 </style>

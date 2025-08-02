@@ -114,7 +114,7 @@ export const replaceIssuesAndMentions = (text: string): string => {
     result = result.replace(/#(\d+)/g, (_, issueNumber) =>
         a(
             `https://github.com/Next-Flip/Momentum-Firmware/issues/${issueNumber}`,
-            "text-mntm-yellow-1 hover:text-mntm-yellow-2",
+            "text-vp-alternate-1 hover:text-vp-alternate-2",
             `#${issueNumber}`,
         ),
     );

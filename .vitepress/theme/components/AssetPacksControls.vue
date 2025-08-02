@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
+import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
 import type { DropdownOption, FilterOption, SortDirection, SortField } from "../types";
 
@@ -33,6 +34,21 @@ const isFilterDropdownOpen = ref(false);
 const sortField = ref<SortField>(props.initialSortField);
 const sortDirection = ref<SortDirection>(props.initialSortDirection);
 const activeFilters = ref<FilterOption[]>([...props.initialFilter]);
+
+useClickOutside([
+    {
+        element: sortDropdownRef,
+        callback: () => {
+            isSortDropdownOpen.value = false;
+        },
+    },
+    {
+        element: filterDropdownRef,
+        callback: () => {
+            isFilterDropdownOpen.value = false;
+        },
+    },
+]);
 
 const sortOptions = computed<DropdownOption[]>(() => [
     { value: "updatedDate", label: tr("Last Updated") },
@@ -136,22 +152,6 @@ const toggleFilterOption = (value: FilterOption) => {
     emit("filter", newFilters);
 };
 
-const clickOutside = (event: MouseEvent) => {
-    const target = event.target as Node;
-    if (sortDropdownRef.value && !sortDropdownRef.value.contains(target)) {
-        isSortDropdownOpen.value = false;
-    }
-    if (filterDropdownRef.value && !filterDropdownRef.value.contains(target)) {
-        isFilterDropdownOpen.value = false;
-    }
-};
-
-onMounted(() => {
-    document.addEventListener("click", clickOutside);
-});
-onBeforeUnmount(() => {
-    document.removeEventListener("click", clickOutside);
-});
 watch(
     () => ({
         search: props.initialSearchQuery,

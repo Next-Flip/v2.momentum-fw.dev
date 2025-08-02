@@ -112,7 +112,7 @@ const releaseHref = computed(() => {
         }"
     >
         <div
-            class="border rounded-[10px] border-vp-divider bg-vp-elv/95 flex flex-col overflow-hidden relative mb-5"
+            class="border rounded-[10px] border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative mb-5"
             :class="{
                 'changelog-expanded mt-5': isExpanded,
                 'flex-1': !isClosed,
@@ -158,7 +158,11 @@ const releaseHref = computed(() => {
                     </template>
                 </div>
                 <div class="flex items-center gap-1 flex-shrink-0">
-                    <Tooltip :delay="0" :z-index="9999">
+                    <Tooltip
+                        :delay="0"
+                        :z-index="9999"
+                        :disabled="(!uploadedFileRelease && !selectedRelease) || isClosed"
+                    >
                         <button
                             class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                             :class="{
@@ -167,6 +171,8 @@ const releaseHref = computed(() => {
                                 'opacity-100': isAccessible && isExpanded,
                                 'group-hover:opacity-100':
                                     isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
+                                'opacity-0 pointer-events-none cursor-not-allowed':
+                                    (!uploadedFileRelease && !selectedRelease) || isClosed,
                             }"
                             :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
                             @click="handleToggleExpand"
@@ -334,13 +340,6 @@ const releaseHref = computed(() => {
 .changelog-content {
     position: relative;
     background-color: transparent;
-    /* background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--vp-c-bg) 35%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
-    );
-    backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px); */
 }
 
 .dark .changelog-content {

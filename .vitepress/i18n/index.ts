@@ -38,6 +38,7 @@ export type MessageSchema = {
     save: string;
     copied: string;
     saved: string;
+    theme_locked: string;
     search: string;
     no_packs_found: string;
     reset_filters: string;
@@ -109,6 +110,7 @@ export type MessageSchema = {
     nav_resources: string;
     nav_web_updater: string;
     nav_recent: string;
+    nav_bug_report: string;
 
     aside_title: string;
     aside_desc: string;
@@ -208,6 +210,11 @@ export type MessageSchema = {
 
     update_stage_updating: string;
     update_stage_updating_short: string;
+    update_stage_set_region: string;
+    update_stage_downloading_firmware: string;
+    update_stage_extracted_files: string;
+    update_stage_creating_directory: string;
+    update_stage_uploaded_file: string;
     update_stage_loading_region_data: string;
     update_stage_loading_firmware_bundle: string;
     update_stage_loading_firmware_files: string;

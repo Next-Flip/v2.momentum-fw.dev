@@ -504,6 +504,7 @@ export interface MainlineFile {
 }
 
 export interface ReleaseItem {
+    type: "mainline" | "devbuild";
     branch: string;
     commit: string;
     date: string;

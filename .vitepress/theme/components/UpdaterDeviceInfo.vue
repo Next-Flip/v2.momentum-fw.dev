@@ -4,9 +4,10 @@ import { computed, useTemplateRef } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useSharedHover } from "../composables/useSharedHover";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { formatDate } from "../date";
 import type { DeviceInfo } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
-import { formatDate } from "../date";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
 import Tooltip from "./Tooltip.vue";
@@ -14,7 +15,7 @@ import Tooltip from "./Tooltip.vue";
 const el = useTemplateRef<HTMLElement>("el");
 const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
-
+const { currentTheme } = useThemeSwitcher();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const {
@@ -152,153 +153,113 @@ const deviceSections = computed(() => {
     const device = deviceInfo.value as DeviceInfo;
     if (!device) return [];
 
-    return [
+    const sections = [
         {
             title: tr("updater_firmware_section"),
             items: [
-                {
-                    label: tr("updater_version_label"),
-                    value: device.firmware_version?.includes("dev")
+                [
+                    "updater_version_label",
+                    device.firmware_version?.includes("dev")
                         ? `${tr("updater_dev_prefix")} (${device.firmware_commit})`
                         : device.firmware_version,
-                    href: `${getLocalizedPath("/releases")}/${commitInReleases.value?.commit || ""}`,
-                    isLink: true,
-                },
-                {
-                    label: tr("updater_branch_label"),
-                    value: device.firmware_branch || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_build_date_label"),
-                    value: formatBuildDate(device.firmware_build_date as string),
-                },
-                {
-                    label: tr("updater_origin_label"),
-                    value: device.firmware_origin_fork || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_api_version_label"),
-                    value: `${device.firmware_api_major}.${device.firmware_api_minor}`,
-                },
+                    `${getLocalizedPath("/releases")}/${commitInReleases.value?.commit || ""}`,
+                    true,
+                ],
+                ["updater_branch_label", device.firmware_branch],
+                ["updater_build_date_label", formatBuildDate(device.firmware_build_date as string)],
+                ["updater_origin_label", device.firmware_origin_fork],
+                [
+                    "updater_api_version_label",
+                    `${device.firmware_api_major}.${device.firmware_api_minor}`,
+                ],
             ],
         },
         {
             title: tr("updater_storage_section"),
             items: [
-                { label: tr("updater_sd_card_label"), value: getStorageInfo.value.sdCard },
-                {
-                    label: tr("updater_databases_label"),
-                    value:
-                        device.storage_databases_present === "loading"
-                            ? "..."
-                            : (device.storage_databases_present as string) ||
-                              connectionTr("missing"),
-                },
+                ["updater_sd_card_label", getStorageInfo.value.sdCard],
+                [
+                    "updater_databases_label",
+                    device.storage_databases_present === "loading"
+                        ? "..."
+                        : (device.storage_databases_present as string) || connectionTr("missing"),
+                ],
             ],
         },
         {
             title: tr("updater_power_section"),
             items: [
-                {
-                    label: tr("updater_charge_level_label"),
-                    value: formatPercentage(device.charge_level as string),
-                },
-                {
-                    label: tr("updater_charge_state_label"),
-                    value: formatChargeState(device.charge_state as string),
-                },
-                {
-                    label: tr("updater_voltage_label"),
-                    value: formatBatteryVoltage(device.battery_voltage as string),
-                },
-                {
-                    label: tr("updater_temperature_label"),
-                    value: formatTemperature(device.battery_temp as string),
-                },
-                {
-                    label: tr("updater_health_label"),
-                    value: formatPercentage(device.battery_health as string),
-                },
-                { label: tr("updater_capacity_label"), value: getBatteryCapacity.value },
+                ["updater_charge_level_label", formatPercentage(device.charge_level as string)],
+                ["updater_charge_state_label", formatChargeState(device.charge_state as string)],
+                ["updater_voltage_label", formatBatteryVoltage(device.battery_voltage as string)],
+                ["updater_temperature_label", formatTemperature(device.battery_temp as string)],
+                ["updater_health_label", formatPercentage(device.battery_health as string)],
+                ["updater_capacity_label", getBatteryCapacity.value],
             ],
         },
         {
             title: tr("updater_hardware_section"),
             items: [
-                {
-                    label: tr("updater_model_label"),
-                    value: device.hardware_model || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_version_hw_label"),
-                    value: device.hardware_ver || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_region_label"),
-                    value: device.hardware_region_provisioned || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_color_label"),
-                    value: device.hardware_color || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_manufactured_label"),
-                    value: formatHardwareTimestamp(device.hardware_timestamp as string),
-                },
+                ["updater_model_label", device.hardware_model],
+                ["updater_version_hw_label", device.hardware_ver],
+                ["updater_region_label", device.hardware_region_provisioned],
+                ["updater_color_label", device.hardware_color],
+                [
+                    "updater_manufactured_label",
+                    formatHardwareTimestamp(device.hardware_timestamp as string),
+                ],
             ],
         },
         {
             title: tr("updater_radio_section"),
             items: [
-                { label: tr("updater_stack_version_label"), value: getRadioVersion.value },
-                {
-                    label: tr("updater_ble_mac_label"),
-                    value: device.radio_ble_mac || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_stack_flash_label"),
-                    value: device.radio_stack_flash || tr("updater_na"),
-                },
-                {
-                    label: tr("updater_fus_version_label"),
-                    value: `${device.radio_fus_major}.${device.radio_fus_minor}.${device.radio_fus_sub}`,
-                },
+                ["updater_stack_version_label", getRadioVersion.value],
+                ["updater_ble_mac_label", device.radio_ble_mac],
+                ["updater_stack_flash_label", device.radio_stack_flash],
+                [
+                    "updater_fus_version_label",
+                    `${device.radio_fus_major}.${device.radio_fus_minor}.${device.radio_fus_sub}`,
+                ],
             ],
         },
         {
             title: tr("updater_system_section"),
             items: [
-                {
-                    label: tr("updater_protobuf_api_label"),
-                    value: `${device.protobuf_version_major}.${device.protobuf_version_minor}`,
-                },
-                {
-                    label: tr("updater_debug_mode_label"),
-                    value:
-                        device.system_debug === "1"
-                            ? tr("updater_enabled")
-                            : tr("updater_disabled"),
-                },
-                {
-                    label: tr("updater_stealth_mode_label"),
-                    value:
-                        device.system_stealth === "1"
-                            ? tr("updater_enabled")
-                            : tr("updater_disabled"),
-                },
-                {
-                    label: tr("updater_enclave_label"),
-                    value: `${device.enclave_valid === "true" ? tr("updater_valid") : tr("updater_invalid")} (${device.enclave_valid_keys || 0} ${tr("updater_keys_suffix")})`,
-                },
+                [
+                    "updater_protobuf_api_label",
+                    `${device.protobuf_version_major}.${device.protobuf_version_minor}`,
+                ],
+                [
+                    "updater_debug_mode_label",
+                    device.system_debug === "1" ? tr("updater_enabled") : tr("updater_disabled"),
+                ],
+                [
+                    "updater_stealth_mode_label",
+                    device.system_stealth === "1" ? tr("updater_enabled") : tr("updater_disabled"),
+                ],
+                [
+                    "updater_enclave_label",
+                    `${device.enclave_valid === "true" ? tr("updater_valid") : tr("updater_invalid")} (${device.enclave_valid_keys || 0} ${tr("updater_keys_suffix")})`,
+                ],
             ],
         },
     ];
+
+    return sections.map((section) => ({
+        title: section.title,
+        items: section.items.map(([labelKey, value, href, isLink]) => ({
+            label: tr(labelKey as keyof typeof tr),
+            value: value || tr("updater_na"),
+            href: href || undefined,
+            isLink: isLink || false,
+        })),
+    }));
 });
 </script>
 
 <template>
     <div
-        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/95"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/85"
         :class="{
             '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
             'py-8 pb-12': !isConnected,
@@ -345,9 +306,12 @@ const deviceSections = computed(() => {
                                     >
                                         <a
                                             :class="[
-                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 hover:text-white transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55',
+                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55',
                                                 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50',
                                                 { 'wiggle-loop': isInstallButtonHovered },
+                                                currentTheme === 'orange'
+                                                    ? 'hover:text-black'
+                                                    : 'hover:text-white',
                                             ]"
                                             @click="handleConnect"
                                             >{{ tr("updater_connect_button") }}</a
@@ -387,7 +351,7 @@ const deviceSections = computed(() => {
                                     <a
                                         v-if="item.isLink"
                                         class="menu-value vp-external-link-icon hover:underline"
-                                        :href="item.href"
+                                        :href="item.href as string"
                                     >
                                         {{ item.value }}
                                     </a>
@@ -437,7 +401,7 @@ const deviceSections = computed(() => {
                                 :aria-label="connectionTr('connection_disconnect')"
                                 :disabled="flags.updateInProgress"
                                 :class="[
-                                    'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
+                                    'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10 select-none',
                                     flags.updateInProgress &&
                                         'opacity-40 !cursor-not-allowed !bg-vp-soft !text-vp-3/70 dark:!bg-vp-soft dark:!text-vp-3/70',
                                     !flags.updateInProgress &&
@@ -468,7 +432,7 @@ const deviceSections = computed(() => {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.035;
+    opacity: 0.04;
     filter: saturate(0);
     z-index: -1;
     transition: opacity 0.2s ease-in-out;

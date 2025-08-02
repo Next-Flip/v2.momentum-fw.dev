@@ -9,6 +9,7 @@ import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
+import { formatDate } from "../date";
 import { STORAGE_KEYS } from "../types";
 import {
     bytesToSize,
@@ -17,7 +18,6 @@ import {
     parseUploadedFileName,
     supportsSerialPort,
 } from "../util";
-import { formatDate } from "../date";
 
 import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
@@ -65,6 +65,7 @@ provide("logsScrollTrigger", logsScrollTrigger);
 
 const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false);
 const updateStage = computed(() => serialConnection?.firmwareState.updateStage || "");
+const updateStageContext = computed(() => serialConnection?.firmwareState.updateStageContext || {});
 const updateProgress = computed(() => serialConnection?.flags.progress || 0);
 const isConnected = computed(() => connectionIsConnected.value);
 const isMatchingRelease = computed(() => {
@@ -396,7 +397,7 @@ onBeforeUnmount(() => {
         :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
     >
         <div
-            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider"
+            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider backdrop-blur-sm bg-vp-dark/55"
         >
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
                 <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
@@ -465,8 +466,10 @@ onBeforeUnmount(() => {
                                                     class="text-lg font-medium text-vp-1 whitespace-nowrap overflow-hidden text-ellipsis"
                                                 >
                                                     {{
-                                                        tr(updateStage as any) ||
-                                                        tr("update_stage_updating")
+                                                        tr(
+                                                            updateStage as any,
+                                                            updateStageContext,
+                                                        ) || tr("update_stage_updating")
                                                     }}
                                                 </p>
                                                 <div class="w-full bg-vp-soft rounded-full h-1">
@@ -474,6 +477,10 @@ onBeforeUnmount(() => {
                                                         class="bg-vp-brand-2 h-1 rounded-full transition-all duration-300"
                                                         :style="{
                                                             width: `${updateProgress * 100}%`,
+                                                            boxShadow:
+                                                                updateProgress > 0
+                                                                    ? '0 0 8px 2px rgba(84, 83, 219, 0.2)'
+                                                                    : '0 0 8px 2px rgba(0, 0, 0, 0.0)',
                                                         }"
                                                     ></div>
                                                 </div>
@@ -616,7 +623,7 @@ onBeforeUnmount(() => {
                                                 class="files-tooltip z-[1]"
                                             >
                                                 <div
-                                                    class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200"
+                                                    class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
                                                 >
                                                     <v-icon
                                                         name="la-info-circle-solid"
@@ -625,7 +632,7 @@ onBeforeUnmount(() => {
                                                 </div>
                                                 <template #content>
                                                     <div
-                                                        class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-left justify-center"
+                                                        class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-center justify-center"
                                                     >
                                                         <span
                                                             v-html="
