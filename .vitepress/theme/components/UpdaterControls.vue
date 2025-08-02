@@ -83,11 +83,9 @@ const getReleaseLabel = () => {
 
     const shortCommit = commit.substring(0, 8);
 
-    if (version && version.startsWith("mntm-")) {
-        return version;
-    }
+    const releaseName = version && version.startsWith("mntm-") ? version : shortCommit;
 
-    return `${shortCommit} (${props.selectedRelease.timestamp ? formatDate(props.selectedRelease.timestamp, "short") : tr("updater_unknown_date")})`;
+    return `${releaseName} (${props.selectedRelease.timestamp ? formatDate(props.selectedRelease.timestamp, "short") : tr("updater_unknown_date")})`;
 };
 
 const toggleChannelDropdown = () => {

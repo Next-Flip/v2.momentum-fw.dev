@@ -17,7 +17,7 @@ function generateConfigContent(
     const searchConfigName = isRoot ? "rootSearchLocale" : `${locale}SearchLocale`;
 
     const navMainlineItems = mainlineItems.map((item) => ({
-        text: item.commit + ` (${formatDate(item.date, "short")})`,
+        text: item.branch + ` (${formatDate(item.date, "short")})`,
         link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
         activeMatch: `/update?version=${item.commit}`,
     }));
