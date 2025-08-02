@@ -50,6 +50,7 @@ export default [
                 performance: "readonly",
                 TextEncoder: "readonly",
                 TextDecoder: "readonly",
+                MutationObserver: "readonly",
                 NodeJS: "readonly",
                 global: "readonly",
                 process: "readonly",

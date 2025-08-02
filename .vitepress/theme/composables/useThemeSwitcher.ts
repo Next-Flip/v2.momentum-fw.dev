@@ -10,6 +10,16 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
     const isInitialized = ref(false);
     const isLocked = useStorage("momentum-theme-locked", false);
 
+    const updateThemeColor = (color: string) => {
+        let meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+        meta.setAttribute("content", color);
+    };
+
     const applyTheme = (theme: string) => {
         const htmlElement = document.documentElement;
 
@@ -19,6 +29,8 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
 
         htmlElement.classList.add(`theme-${theme}`);
         currentTheme.value = theme;
+        const isDark = htmlElement.classList.contains("dark");
+        updateThemeColor(isDark ? "#0f0f12" : "#ffffff");
     };
 
     watch(
@@ -64,6 +76,16 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
 
     onMounted(() => {
         initTheme();
+
+        const observer = new MutationObserver(() => {
+            const isDark = document.documentElement.classList.contains("dark");
+            updateThemeColor(isDark ? "#0f0f12" : "#ffffff");
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
     });
 
     return {

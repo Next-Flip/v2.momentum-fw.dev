@@ -22,6 +22,29 @@ export default defineConfig({
     head: [
         ["link", { rel: "icon", href: "/logos/black_round.png" }],
         ["link", { rel: "icon", href: "/logos/black.ico" }],
+        [
+            "meta",
+            { name: "theme-color", media: "(prefers-color-scheme: light)", content: "#ffffff" },
+        ],
+        [
+            "meta",
+            { name: "theme-color", media: "(prefers-color-scheme: dark)", content: "#0f0f12" },
+        ],
+        [
+            "meta",
+            {
+                name: "description",
+                content: "Feature-rich, stable and customizable firmware for Flipper Zero",
+            },
+        ],
+        [
+            "meta",
+            {
+                name: "keywords",
+                content:
+                    "Momentum, Momentum Firmware, MNTM, Flipper, Flipper Zero, Firmware, Fork, Custom, Customization, Updater, Asset Packs, Github",
+            },
+        ],
         ["meta", { property: "og:title", content: "Momentum FW for Flipper Zero" }],
         [
             "meta",
@@ -30,6 +53,7 @@ export default defineConfig({
                 content: "Feature-rich, stable and customizable firmware for Flipper Zero",
             },
         ],
+        ["meta", { name: "author", content: "Next-Flip" }],
         ["meta", { property: "og:author", content: "Next-Flip" }],
         [
             "meta",
@@ -42,6 +66,7 @@ export default defineConfig({
         ["meta", { property: "og:type", content: "website" }],
         ["meta", { property: "og:site_name", content: "v2.momentum-fw.dev" }],
         ["meta", { property: "og:locale", content: "en_US" }],
+        ["meta", { name: "twitter:creator", content: "@FlipperMomentum" }],
         ["meta", { name: "twitter:card", content: "summary_large_image" }],
         ["meta", { name: "twitter:title", content: "Momentum FW for Flipper Zero" }],
         [
