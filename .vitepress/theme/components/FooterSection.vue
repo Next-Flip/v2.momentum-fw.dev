@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "../composables/useI18n";
-import { formatDate, isExternalLink } from "../util";
+import { formatDate } from "../date";
+import { isExternalLink } from "../util";
 
 const { getLocalizedPath } = useI18n();
 
@@ -64,7 +65,7 @@ const getItemText = (item: FooterItem) => {
                             getItemText(item)
                         }}</span>
                         <span class="text-vp-3 text-xs">
-                            {{ formatDate(item.date || "") }}
+                            {{ formatDate(item.date || "", "short") }}
                         </span>
                     </template>
                     <template v-else>

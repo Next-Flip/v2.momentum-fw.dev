@@ -4,7 +4,8 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
-import { formatFullDate, scrollToTop } from "../util";
+import { formatDate } from "../date";
+import { scrollToTop } from "../util";
 
 import Tooltip from "./Tooltip.vue";
 
@@ -138,7 +139,7 @@ onBeforeUnmount(() => {
                     <div
                         class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm"
                     >
-                        <span>{{ selectedRelease?.date }}</span>
+                        <span>{{ formatDate(selectedRelease.timestamp, "fullYear") }}</span>
                     </div>
                 </div>
             </div>
@@ -190,7 +191,7 @@ onBeforeUnmount(() => {
                                             'text-vp-brand-1/60': isSelected(release),
                                         }"
                                     >
-                                        {{ formatFullDate(release.timestamp || 0) }}
+                                        {{ formatDate(release.timestamp || 0, "fullYear") }}
                                     </span>
                                 </div>
                             </template>

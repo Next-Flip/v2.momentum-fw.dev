@@ -6,6 +6,7 @@ import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
+import { formatDate } from "../date";
 
 import { MessageSchema } from ".vitepress/i18n";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
@@ -80,6 +81,11 @@ const getConnectionDisplay = computed(() => {
             };
     }
 });
+
+const formatBuildDate = (date: string) => {
+    const isoDate = date.split("-").reverse().join("-");
+    return formatDate(isoDate, "fullYear");
+};
 
 const checkConnect = () => {
     if (supportsSerialPort()) {
@@ -241,7 +247,9 @@ onMounted(() => {
 
                         <div class="menu-item">
                             <span class="menu-label">{{ tr("connection_build_date") }}</span>
-                            <span class="menu-value">{{ deviceInfo?.firmware_build_date }}</span>
+                            <span class="menu-value">{{
+                                formatBuildDate(deviceInfo?.firmware_build_date)
+                            }}</span>
                         </div>
 
                         <div class="menu-item">

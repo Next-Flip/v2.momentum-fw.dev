@@ -6,6 +6,7 @@ import { useI18n } from "../composables/useI18n";
 import { useSharedHover } from "../composables/useSharedHover";
 import type { DeviceInfo } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
+import { formatDate } from "../date";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
 import Tooltip from "./Tooltip.vue";
@@ -104,10 +105,14 @@ const formatPercentage = (value: string) => {
     return `${value}%`;
 };
 
+const formatBuildDate = (date: string) => {
+    const isoDate = date.split("-").reverse().join("-");
+    return formatDate(isoDate, "fullYear");
+};
+
 const formatHardwareTimestamp = (timestamp: string) => {
     if (!timestamp) return tr("updater_na");
-    const date = new Date(parseInt(timestamp) * 1000);
-    return date.toLocaleDateString();
+    return formatDate(parseInt(timestamp), "fullYear");
 };
 
 const formatChargeState = (state: string) => {
@@ -163,7 +168,10 @@ const deviceSections = computed(() => {
                     label: tr("updater_branch_label"),
                     value: device.firmware_branch || tr("updater_na"),
                 },
-                { label: tr("updater_build_date_label"), value: device.firmware_build_date },
+                {
+                    label: tr("updater_build_date_label"),
+                    value: formatBuildDate(device.firmware_build_date as string),
+                },
                 {
                     label: tr("updater_origin_label"),
                     value: device.firmware_origin_fork || tr("updater_na"),

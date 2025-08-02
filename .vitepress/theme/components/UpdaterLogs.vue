@@ -4,6 +4,7 @@ import { computed, inject, nextTick, onMounted, ref, watch, type Ref } from "vue
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { formatDate } from "../date";
 
 import Tooltip from "./Tooltip.vue";
 
@@ -82,22 +83,13 @@ const clearLogs = () => {
     }
 };
 
-const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-};
-
 const handleToggle = () => {
     emit("toggle");
 };
 
 const copyLogs = async () => {
     const logsString = logs.value
-        .map((log) => `${log.timestamp.toLocaleString()} ${log.message}`)
+        .map((log) => `${formatDate(log.timestamp, "withTime")} ${log.message}`)
         .join("\n");
     try {
         if (navigator.clipboard) {
@@ -320,7 +312,7 @@ onMounted(() => {
                                                 group.log.level === 'success',
                                         }"
                                     >
-                                        {{ formatTime(group.log.timestamp) }}
+                                        {{ formatDate(group.log.timestamp, "timeOnly") }}
                                     </span>
                                     <span
                                         class="text-vp-1 flex-1 min-w-0 text-left message-text whitespace-nowrap overflow-hidden text-ellipsis"

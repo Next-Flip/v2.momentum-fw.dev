@@ -3,6 +3,7 @@ import { useData, useRoute } from "vitepress";
 import { computed } from "vue";
 import { recentReleases } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
+import { formatDate } from "../date";
 
 import { buildInfo } from "../../../_data/buildInfo";
 import { useLogoCycle } from "../composables/useLogoCycle";
@@ -20,8 +21,7 @@ const siteDescription = computed(() => {
 });
 
 const formattedLastUpdate = computed(() => {
-    const date = new Date(buildInfo.date);
-    return date.toLocaleString();
+    return formatDate(buildInfo.date, "withTime");
 });
 
 const socialLinks = computed(() => [

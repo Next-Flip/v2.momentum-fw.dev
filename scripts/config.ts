@@ -1,17 +1,9 @@
 import { promises as fs } from "fs";
 import type { MessageSchema, SupportedLocales } from "../.vitepress/i18n/index.ts";
 import messages from "../.vitepress/i18n/index.ts";
+import { formatDate } from "../.vitepress/theme/date.ts";
 import type { ReleaseItem } from "./releases.ts";
 import { HEADER, jsonToTypeScript, replaceTemplateSection } from "./utils.ts";
-
-const formatDate = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const month = (date.getMonth() + 1).toString();
-    const day = date.getDate().toString();
-    const year = date.getFullYear().toString().slice(-2);
-    return `${month}/${day}/${year}`;
-};
 
 function generateConfigContent(
     locale: string,
@@ -25,12 +17,12 @@ function generateConfigContent(
     const searchConfigName = isRoot ? "rootSearchLocale" : `${locale}SearchLocale`;
 
     const navMainlineItems = mainlineItems.map((item) => ({
-        text: item.commit + ` (${formatDate(item.date)})`,
+        text: item.commit + ` (${formatDate(item.date, "short")})`,
         link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
         activeMatch: `/update?version=${item.commit}`,
     }));
     const navDevbuildsItems = devbuildsItems.slice(0, 1).map((item) => ({
-        text: item.commit + ` (${formatDate(item.date)})`,
+        text: item.commit + ` (${formatDate(item.date, "short")})`,
         link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
         activeMatch: `/update?version=${item.commit}`,
     }));

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue";
 import { devbuildReleases, mainlineReleases, type ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
+import { formatDate } from "../date";
 
 const { getLocalizedPath, tr } = useI18n();
 
@@ -59,7 +60,7 @@ const infoItems = computed(() => [
     {
         key: "aside_last_build_date" as const,
         value: devbuildReleases[0]?.timestamp
-            ? new Date(devbuildReleases[0].timestamp * 1000).toLocaleString()
+            ? formatDate(devbuildReleases[0].timestamp, "withTime")
             : null,
         condition: devbuildReleases[0]?.timestamp,
     },

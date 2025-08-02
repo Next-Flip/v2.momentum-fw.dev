@@ -15,10 +15,10 @@ import {
     bytesToSize,
     devMode,
     downloadFile,
-    formatFileDate,
     parseUploadedFileName,
     supportsSerialPort,
 } from "../util";
+import { formatDate } from "../date";
 
 import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
@@ -349,9 +349,9 @@ const displayFileSize = computed(() => {
 
 const displayFileDate = computed(() => {
     if (uploadedFileRelease.value?.timestamp) {
-        return formatFileDate(uploadedFileRelease.value.timestamp * 1000);
+        return formatDate(uploadedFileRelease.value.timestamp, "short");
     }
-    return uploadedFile.value ? formatFileDate(uploadedFile.value.lastModified) : "";
+    return uploadedFile.value ? formatDate(uploadedFile.value.lastModified / 1000, "short") : "";
 });
 
 const toggleLogs = () => {

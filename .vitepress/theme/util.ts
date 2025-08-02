@@ -28,68 +28,6 @@ export const isExternalLink = (url: string) => {
     return url.startsWith("http");
 };
 
-export const formatDate = (dateString: string): string => {
-    if (!dateString) return "";
-
-    const date = new Date(dateString);
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear().toString().slice(-2);
-
-    return `${month}/${day}/${year}`;
-};
-
-const ensureDate = (dateInput: number) => {
-    if (!dateInput) return null;
-    if (typeof dateInput === "number") return new Date(dateInput * 1000);
-    return new Date(dateInput);
-};
-
-export const formatFullDate = (dateInput: number) => {
-    const date = ensureDate(dateInput);
-    if (!date) return "";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${month}/${day}/${year}`;
-};
-
-export const formatDisplayDate = (dateInput: number) => {
-    const date = ensureDate(dateInput);
-    if (!date) return "";
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 1) return "today";
-    if (diffDays < 2) return "yesterday";
-    if (diffDays < 30) return `${diffDays} days ago`;
-
-    if (date.getFullYear() !== now.getFullYear()) {
-        return formatFullDate(dateInput);
-    }
-
-    const month = date.toLocaleString("default", { month: "short" });
-    const day = date.getDate();
-    return `${month} ${day}`;
-};
-
-export const formatMonthDay = (dateInput: number) => {
-    const date = ensureDate(dateInput);
-    if (!date) return { month: "", day: 0, year: 0, isCurrentYear: false };
-
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const dateYear = date.getFullYear();
-
-    return {
-        month: date.toLocaleString("default", { month: "short" }).toLowerCase(),
-        day: date.getDate(),
-        year: dateYear,
-        isCurrentYear: dateYear === currentYear,
-    };
-};
-
 export const bytesToSize = (bytes: number, useStandardUnits = false) => {
     const sizes = useStandardUnits ? ["Bytes", "KB", "MB", "GB", "TB"] : ["Bytes", "KiB", "MiB", "GiB", "TiB"];
     const base = useStandardUnits ? 1000 : 1024;
@@ -318,15 +256,6 @@ export function findReleaseByVersion(version: string): ReleaseItem | null {
 
     return null;
 }
-
-export const formatFileDate = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-};
 
 export const parseUploadedFileName = (filename: string): string | null => {
     const mntmMatch = filename.match(/mntm-(\d+)/);

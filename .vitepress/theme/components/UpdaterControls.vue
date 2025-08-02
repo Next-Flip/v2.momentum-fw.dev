@@ -7,6 +7,7 @@ import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
 import { supportsSerialPort } from "../util";
+import { formatDate } from "../date";
 
 import Tooltip from "./Tooltip.vue";
 
@@ -86,7 +87,7 @@ const getReleaseLabel = () => {
         return version;
     }
 
-    return `${shortCommit} (${props.selectedRelease.timestamp ? new Date(props.selectedRelease.timestamp * 1000).toLocaleDateString() : tr("updater_unknown_date")})`;
+    return `${shortCommit} (${props.selectedRelease.timestamp ? formatDate(props.selectedRelease.timestamp, "short") : tr("updater_unknown_date")})`;
 };
 
 const toggleChannelDropdown = () => {
@@ -327,9 +328,7 @@ onBeforeUnmount(() => {
                                         >
                                             {{
                                                 release.timestamp
-                                                    ? new Date(
-                                                          release.timestamp * 1000,
-                                                      ).toLocaleDateString()
+                                                    ? formatDate(release.timestamp, "fullYear")
                                                     : tr("updater_unknown_date")
                                             }}
                                         </span>

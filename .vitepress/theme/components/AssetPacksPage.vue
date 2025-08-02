@@ -5,7 +5,7 @@ import { useI18n } from "../composables/useI18n";
 import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import type { AssetPack, AssetPackFile } from "../types";
 import { AssetPackEntry } from "../types.ts";
-import { formatFullDate } from "../util.ts";
+import { formatDate } from "../date";
 
 import { useProxiedUrl } from "../composables/useProxiedUrl";
 import type { useSerialConnection } from "../composables/useSerialConnection";
@@ -98,8 +98,8 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
             previewUrls: previewUrls,
             downloadUrl: useProxiedUrl(downloadUrl),
             githubUrl: pack.source_url || "",
-            updatedDate: formatFullDate(pack.stats?.updated || 0),
-            addedDate: formatFullDate(pack.stats?.added || 0),
+            updatedDate: formatDate(pack.stats?.updated || 0, "fullYear"),
+            addedDate: formatDate(pack.stats?.added || 0, "fullYear"),
             stats: {
                 ...pack.stats,
                 folders: pack.stats?.folders || [],
