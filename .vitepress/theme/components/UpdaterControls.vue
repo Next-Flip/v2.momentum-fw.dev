@@ -80,7 +80,7 @@ const getReleaseLabel = () => {
 
     if (!commit) return tr("updater_select_version");
 
-    const shortCommit = commit.substring(0, 7);
+    const shortCommit = commit.substring(0, 8);
 
     if (version && version.startsWith("mntm-")) {
         return version;
@@ -289,7 +289,7 @@ onBeforeUnmount(() => {
                                                     release.version &&
                                                     release.version.startsWith("mntm-")
                                                         ? release.version
-                                                        : release.commit.substring(0, 7)
+                                                        : release.commit.substring(0, 8)
                                                 }}
                                             </span>
                                             <Tooltip

@@ -90,8 +90,8 @@ const isMatchingRelease = computed(() => {
         const selectedVersion = selectedRelease.value.version;
         if (
             selectedCommit === deviceCommit ||
-            selectedCommit.substring(0, 7).toLowerCase() ===
-                deviceCommit.substring(0, 7).toLowerCase() ||
+            selectedCommit.substring(0, 8).toLowerCase() ===
+                deviceCommit.substring(0, 8).toLowerCase() ||
             (selectedVersion && selectedVersion === deviceVersion) ||
             (selectedVersion && selectedVersion.toLowerCase().includes(deviceVersion.toLowerCase()))
         ) {

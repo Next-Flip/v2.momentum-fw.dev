@@ -70,7 +70,7 @@ const displayVersion = computed(() => {
     if (!release) return "";
 
     const version = release.version;
-    const commit = release.commit.substring(0, 7);
+    const commit = release.commit.substring(0, 8);
 
     if (version && version.startsWith("mntm-")) {
         return version;
