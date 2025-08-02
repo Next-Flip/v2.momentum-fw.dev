@@ -3,7 +3,9 @@ import { computed } from "vue";
 import { STORAGE_KEYS } from "../types";
 
 export function useAutoconnectSetting() {
-    const autoconnectEnabled = useStorage(STORAGE_KEYS.AUTO_CONNECT, true);
+    const autoconnectEnabled = useStorage(STORAGE_KEYS.AUTO_CONNECT, true, undefined, {
+        initOnMounted: true,
+    });
 
     const isAutoconnectEnabled = computed({
         get: () => autoconnectEnabled.value,

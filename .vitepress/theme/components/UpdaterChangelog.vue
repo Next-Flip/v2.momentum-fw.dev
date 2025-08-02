@@ -172,7 +172,8 @@ const releaseHref = computed(() => {
                                 'group-hover:opacity-100':
                                     isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
                                 'opacity-0 pointer-events-none cursor-not-allowed':
-                                    (!uploadedFileRelease && !selectedRelease) || isClosed,
+                                    (!uploadedFileRelease && !selectedRelease && !isExpanded) ||
+                                    isClosed,
                             }"
                             :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
                             @click="handleToggleExpand"

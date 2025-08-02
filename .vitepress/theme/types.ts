@@ -227,6 +227,9 @@ export interface FlipperModule {
     commands: FlipperCommands;
 }
 
+export const LOGO_COLORS = ["purp", "orange", "pink", "white"] as const;
+export type LogoColor = (typeof LOGO_COLORS)[number];
+
 export type SortField = "updatedDate" | "addedDate" | "name" | "author";
 export type SortDirection = "asc" | "desc";
 export type FilterOption = "isInstalled" | "hasAnims" | "hasIcons" | "hasPassport" | "hasFonts";
@@ -246,4 +249,6 @@ export const STORAGE_KEYS = {
     UPDATER_SELECTED_VERSION: "momentum-updater_selected_version",
     UPDATER_DEVICE_INFO_TAB: "momentum-updater_device-info-tab",
     AUTO_CONNECT: "momentum-autoconnect-enabled",
+    THEME_LOCKED: "momentum-theme-locked",
+    THEME: "momentum-theme",
 } as const;

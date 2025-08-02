@@ -1,14 +1,29 @@
 import { useStorage } from "@vueuse/core";
+import { useData } from "vitepress";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { LOGO_COLORS, LogoColor, STORAGE_KEYS } from "../types";
 
 export function useThemeSwitcher(basePath: string = "/logos/") {
-    const logoColors = ["purp", "orange", "pink", "white"];
+    const logoColors = LOGO_COLORS;
     const currentIndex = ref(0);
-    const currentLogo = computed(() => `${basePath}${logoColors[currentIndex.value]}_round.png`);
-    const currentTheme = useStorage("momentum-theme", logoColors[0]);
+    const { isDark } = useData();
+
+    const currentLogo = computed(() => {
+        const currentColor = logoColors[currentIndex.value];
+
+        return `${basePath}${
+            currentColor === "white" ? (isDark.value ? "white" : "black") : currentColor
+        }_round.png`;
+    });
+
+    const currentTheme = useStorage(STORAGE_KEYS.THEME, logoColors[0], undefined, {
+        initOnMounted: true,
+    });
     const currentThemeClass = computed(() => `theme-${logoColors[currentIndex.value]}`);
     const isInitialized = ref(false);
-    const isLocked = useStorage("momentum-theme-locked", false);
+    const isLocked = useStorage(STORAGE_KEYS.THEME_LOCKED, false, undefined, {
+        initOnMounted: true,
+    });
 
     const updateThemeColor = (color: string) => {
         let meta = document.querySelector('meta[name="theme-color"]');
@@ -23,7 +38,7 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
     const applyTheme = (theme: string) => {
         const htmlElement = document.documentElement;
 
-        logoColors.forEach((color) => {
+        logoColors.forEach((color: LogoColor) => {
             htmlElement.classList.remove(`theme-${color}`);
         });
 
@@ -63,10 +78,13 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
     const initTheme = () => {
         nextTick(() => {
             const savedTheme = currentTheme.value;
-            const themeIndex = logoColors.indexOf(savedTheme);
+            const themeIndex = logoColors.indexOf(savedTheme as LogoColor);
 
             if (themeIndex !== -1) {
                 currentIndex.value = themeIndex;
+            } else {
+                currentIndex.value = 0;
+                currentTheme.value = logoColors[0];
             }
 
             applyTheme(logoColors[currentIndex.value]);
@@ -75,6 +93,13 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
     };
 
     onMounted(() => {
+        const htmlElement = document.documentElement;
+        if (
+            !logoColors.some((color: LogoColor) => htmlElement.classList.contains(`theme-${color}`))
+        ) {
+            htmlElement.classList.add(`theme-${logoColors[0]}`);
+        }
+
         initTheme();
 
         const observer = new MutationObserver(() => {

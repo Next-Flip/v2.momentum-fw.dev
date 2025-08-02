@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
-import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from "vue";
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
@@ -382,6 +382,12 @@ const toggleChangelogExpand = () => {
         triggerLogsScroll();
     });
 };
+
+onMounted(() => {
+    if (changelogState.value === "expanded") {
+        changelogState.value = "open";
+    }
+});
 
 onBeforeUnmount(() => {
     clearUploadedFile();

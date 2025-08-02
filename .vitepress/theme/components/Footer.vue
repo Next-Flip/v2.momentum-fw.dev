@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useData, useRoute } from "vitepress";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { recentReleases } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
 import { formatDate } from "../date";
@@ -11,9 +11,20 @@ import FooterSection from "./FooterSection.vue";
 
 const { site } = useData();
 const { tr } = useI18n();
-const { currentLogo, nextLogo, isLocked, toggleLock, currentTheme } = useThemeSwitcher();
+const { currentLogo, nextLogo, isLocked, toggleLock } = useThemeSwitcher();
 const route = useRoute();
 const isWiki = route.path.includes("/wiki");
+
+const isHovering = ref(false);
+const handleLogoHover = () => {
+    if (!isHovering.value) {
+        isHovering.value = true;
+        nextLogo();
+    }
+};
+const handleLogoLeave = () => {
+    isHovering.value = false;
+};
 
 const siteDescription = computed(() => {
     return (site.value as { description?: string })?.description || tr("site_description");
@@ -56,8 +67,8 @@ const navigationLinks = computed(() => [
                             <a
                                 href="/"
                                 class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
-                                :class="currentTheme === 'white' ? 'invert dark:invert-0' : ''"
-                                @mouseenter="nextLogo"
+                                @mouseenter="handleLogoHover"
+                                @mouseleave="handleLogoLeave"
                             >
                                 <img
                                     :src="currentLogo"
