@@ -280,7 +280,8 @@ const isBeingDeleted = computed(() => {
 
 const shortTimeAgo = computed(() => {
     if (!props.updatedDate) return "";
-    const timeAgo = useTimeAgo(props.updatedDate);
+    const isoDate = props.updatedDate.split(".").reverse().join("-");
+    const timeAgo = useTimeAgo(isoDate);
     return shortenTimeString(timeAgo.value);
 });
 
