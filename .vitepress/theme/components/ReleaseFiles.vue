@@ -60,8 +60,15 @@ const findUpdateTgz = (files: DevbuildFile[]): string | undefined => {
 };
 
 const isDevelopmentFile = (filename: string): boolean => {
-    const devKeywords = ["any-core2", "any-scripts", "sdk"];
-    return devKeywords.some((keyword) => filename.toLowerCase().includes(keyword));
+    const devFiles = [
+        { type: "core2_firmware", ext: ".tgz" },
+        { type: "scripts", ext: ".tgz" },
+        { type: "sdk", ext: ".zip" },
+        { type: "full", ext: ".dfu" },
+    ];
+    return devFiles.some(
+        (devFile) => filename.split("-")[3] === devFile.type && filename.endsWith(devFile.ext),
+    );
 };
 
 const categorizedFiles = computed(() => {
@@ -75,7 +82,6 @@ const categorizedFiles = computed(() => {
         const f = filename.toLowerCase();
         if (f.endsWith(".tgz")) return 0;
         if (f.endsWith(".zip")) return 1;
-        if (f.endsWith(".dfu")) return 2;
 
         return 3;
     };
