@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
+import { computed, inject, nextTick, onBeforeUnmount, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
-import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
@@ -28,7 +27,6 @@ import UpdaterLogs from "./UpdaterLogs.vue";
 
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
-const { isAutoconnectEnabled } = useAutoconnectSetting();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
@@ -388,12 +386,6 @@ onBeforeUnmount(() => {
     clearUploadedFile();
     if (dropZoneRef.value) {
         dropZoneRef.value = null;
-    }
-});
-
-onMounted(async () => {
-    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
-        await serialConnection.autoConnect();
     }
 });
 </script>

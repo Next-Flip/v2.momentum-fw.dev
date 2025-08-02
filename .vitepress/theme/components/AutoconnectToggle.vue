@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { inject, onMounted } from "vue";
+import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useAutoconnectSetting } from "../composables/useAutoconnectSetting";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
@@ -8,6 +10,7 @@ import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { isAutoconnectEnabled, toggleAutoconnect } = useAutoconnectSetting();
+const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const { handleConnect, connectionState } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
@@ -17,6 +20,12 @@ const toggleConnect = async () => {
         await handleConnect();
     }
 };
+
+onMounted(async () => {
+    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
+        await serialConnection.autoConnect();
+    }
+});
 </script>
 
 <template>
