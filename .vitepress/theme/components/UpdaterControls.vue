@@ -399,7 +399,7 @@ const handleDownloadRelease = () => {
                             class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase whitespace-nowrap"
                             :class="
                                 canFlash
-                                    ? `cursor-pointer ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'} px-14`
+                                    ? `cursor-pointer ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
                             "
                             @click="handleFlashFirmware"

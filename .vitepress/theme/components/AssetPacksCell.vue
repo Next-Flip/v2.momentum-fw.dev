@@ -333,6 +333,7 @@ onUnmounted(() => {
                 <canvas
                     ref="shadowCanvas"
                     class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-5 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65] saturate-0 dark:saturate-100"
+                    :class="currentTheme === 'white' ? '!saturate-0' : ''"
                 ></canvas>
             </div>
             <div
@@ -349,6 +350,9 @@ onUnmounted(() => {
                     :alt="`${name} - preview ${index + 1}`"
                     :class="[
                         'cell-image absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100',
+                        currentTheme === 'white'
+                            ? '!saturate-0 dark:contrast-200 dark:brightness-[3]'
+                            : '',
                         {
                             'opacity-100 visible':
                                 index === currentImageIndex && loadedImages.has(index),
@@ -532,6 +536,7 @@ onUnmounted(() => {
                                     (queuedPack) => queuedPack.id === props.id,
                                 ) || isBeingDeleted,
                             'hover:text-black': currentTheme === 'orange',
+                            'hover:text-vp-neutral-inverse': currentTheme === 'white',
                         }"
                         :aria-label="getActionLabel"
                         download

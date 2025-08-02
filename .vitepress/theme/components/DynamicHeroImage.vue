@@ -13,6 +13,8 @@ const heroImageSrc = computed(() => {
 
     if (themeColor === "pink") {
         return `/banners/logo_${isDark ? "dark" : "light"}_pink.png`;
+    } else if (themeColor === "white") {
+        return `/banners/logo_${isDark ? "dark" : "light"}_white.png`;
     } else {
         return `/banners/logo_${isDark ? "dark" : "light"}.png`;
     }

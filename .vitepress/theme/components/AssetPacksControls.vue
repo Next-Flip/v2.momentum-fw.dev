@@ -454,7 +454,27 @@ watch(
 .dropdown-item.is-selected .checkbox {
     background-color: var(--vp-c-brand-2);
     border-color: var(--vp-c-brand-2);
+    color: var(--vp-c-neutral);
+}
+
+.theme-purp .dropdown-item.is-selected .checkbox {
     color: white;
+}
+
+.theme-pink .dropdown-item.is-selected .checkbox {
+    color: white;
+    background-color: var(--vp-c-brand-1);
+    border-color: var(--vp-c-brand-1);
+}
+
+.theme-orange .dropdown-item.is-selected .checkbox {
+    color: #000;
+    background-color: var(--vp-c-brand-1);
+    border-color: var(--vp-c-brand-1);
+}
+
+.theme-white .dropdown-item.is-selected .checkbox {
+    color: var(--vp-c-neutral-inverse);
 }
 
 .fade-dropdown-enter-active,

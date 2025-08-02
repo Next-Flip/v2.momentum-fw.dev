@@ -311,7 +311,9 @@ const deviceSections = computed(() => {
                                                 { 'wiggle-loop': isInstallButtonHovered },
                                                 currentTheme === 'orange'
                                                     ? 'hover:text-black'
-                                                    : 'hover:text-white',
+                                                    : currentTheme === 'white'
+                                                      ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
+                                                      : 'hover:text-white',
                                             ]"
                                             @click="handleConnect"
                                             >{{ tr("updater_connect_button") }}</a

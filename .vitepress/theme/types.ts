@@ -146,7 +146,7 @@ export interface QueueState {
 
 export interface FirmwareState {
     updateStage: string;
-    updateStageContext?: Record<string, string | number>;
+    updateStageContext: Record<string, string | number>;
     writeProgress: {
         filename: string;
         progress: number;

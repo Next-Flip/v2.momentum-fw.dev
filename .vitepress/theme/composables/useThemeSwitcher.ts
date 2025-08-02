@@ -2,7 +2,7 @@ import { useStorage } from "@vueuse/core";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 
 export function useThemeSwitcher(basePath: string = "/logos/") {
-    const logoColors = ["purp", "orange", "pink"];
+    const logoColors = ["purp", "orange", "pink", "white"];
     const currentIndex = ref(0);
     const currentLogo = computed(() => `${basePath}${logoColors[currentIndex.value]}_round.png`);
     const currentTheme = useStorage("momentum-theme", logoColors[0]);

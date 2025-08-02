@@ -116,8 +116,8 @@ const dynamicButtons = computed((): ActionButton[] => {
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest
-                            ? `border-vp-brand-2 dark:border-vp-brand-1 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'}`
-                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 ${currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'}`
+                            ? `border-vp-brand-2 dark:border-vp-brand-1 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
+                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
                         : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/20 text-vp-1 hover:text-white',
                 ]"
                 >{{ button.text }}</a

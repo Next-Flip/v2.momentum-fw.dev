@@ -11,7 +11,7 @@ import FooterSection from "./FooterSection.vue";
 
 const { site } = useData();
 const { tr } = useI18n();
-const { currentLogo, nextLogo, isLocked, toggleLock } = useThemeSwitcher();
+const { currentLogo, nextLogo, isLocked, toggleLock, currentTheme } = useThemeSwitcher();
 const route = useRoute();
 const isWiki = route.path.includes("/wiki");
 
@@ -56,6 +56,7 @@ const navigationLinks = computed(() => [
                             <a
                                 href="/"
                                 class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
+                                :class="currentTheme === 'white' ? 'invert dark:invert-0' : ''"
                                 @mouseenter="nextLogo"
                             >
                                 <img

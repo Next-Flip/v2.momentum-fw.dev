@@ -7,6 +7,7 @@ import "./style.css";
 
 import { OhVueIcon, addIcons } from "oh-vue-icons";
 import * as icons from "./icons";
+import { devMode } from "./util";
 
 import AssetPacksPage from "./components/AssetPacksPage.vue";
 import ConnectButton from "./components/ConnectButton.vue";
@@ -32,7 +33,10 @@ export default {
     },
     enhanceApp({ app, router }) {
         if (typeof window !== "undefined") {
-            inject({ mode: "auto" });
+            inject({
+                mode: "production",
+                debug: devMode(),
+            });
             injectSpeedInsights({
                 framework: "vitepress",
             });

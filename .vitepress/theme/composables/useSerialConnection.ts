@@ -175,6 +175,7 @@ export const useSerialConnection = () => {
             }),
             firmwareState: reactive<FirmwareState>({
                 updateStage: "",
+                updateStageContext: {},
                 writeProgress: { filename: "", progress: 0 },
             }),
             connect: () => Promise.reject(new Error("Serial not available in SSR")),

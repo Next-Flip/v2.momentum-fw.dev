@@ -389,7 +389,13 @@ const filteredAssetPacks = computed(() => {
             <p>{{ tr("no_packs_found") }}</p>
             <button
                 class="reset-button mt-6 bg-vp-dark/75 p-4 py-2 text-[14px] cursor-pointer transition-colors duration-100 text-vp-neutral rounded-full"
-                :class="currentTheme === 'orange' ? 'hover:text-black' : 'hover:text-white'"
+                :class="
+                    currentTheme === 'orange'
+                        ? 'hover:text-black'
+                        : currentTheme === 'white'
+                          ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
+                          : 'hover:text-white'
+                "
                 @click="resetFilters"
             >
                 {{ tr("reset_filters") }}

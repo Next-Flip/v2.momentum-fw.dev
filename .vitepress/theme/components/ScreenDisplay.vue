@@ -2,7 +2,9 @@
 import { inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 
+const { currentTheme } = useThemeSwitcher();
 const { flags, isConnected } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -166,13 +168,18 @@ onBeforeUnmount(() => {
                 ></div>
                 <div
                     class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill rounded-md overflow-hidden p-3 z-4"
+                    :class="currentTheme === 'white' ? 'dark:bg-vp-neutral' : ''"
                 >
                     <canvas
                         ref="canvasRef"
                         :width="128 * (serialConnection?.screenScale?.value || 2)"
                         :height="64 * (serialConnection?.screenScale?.value || 2)"
                         class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100"
-                        :class="{ 'opacity-30': !flags.screenStream }"
+                        :class="{
+                            'opacity-30': !flags.screenStream,
+                            'dark:bg-vp-bg dark:saturate-0 dark:contrast-200 dark:brightness-[3]':
+                                currentTheme === 'white',
+                        }"
                     />
 
                     <div
@@ -183,6 +190,7 @@ onBeforeUnmount(() => {
                     >
                         <div
                             class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
+                            :class="currentTheme === 'white' ? 'dark:bg-white/80' : ''"
                         >
                             <div
                                 class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"

@@ -15,6 +15,12 @@
     --mntm-blue-1: #0080ff;
     --mntm-blue-2: #0080ff;
     --mntm-blue-3: #0080ff;
+    --mntm-white-1: #ffffff;
+    --mntm-white-2: #ffffff;
+    --mntm-white-3: #ffffff;
+    --mntm-gray-1: #808080;
+    --mntm-gray-2: #808080;
+    --mntm-gray-3: #808080;
     --vp-c-bg-dark: #ffffff;
     --vp-c-default-1: var(--vp-c-gray-1);
     --vp-c-default-2: var(--vp-c-gray-2);
@@ -102,13 +108,31 @@
     --vp-c-alternate-3: var(--mntm-purp-3);
 }
 
-.theme-purp ::selection {
-    background-color: color-mix(in srgb, var(--mntm-purp-1) 100%, transparent);
-    color: black;
+.theme-white {
+    --vp-c-brand-1: #000;
+    --vp-c-brand-2: #000;
+    --vp-c-brand-3: #000;
+    --vp-c-alternate-1: var(--mntm-gray-1);
+    --vp-c-alternate-2: var(--mntm-gray-2);
+    --vp-c-alternate-3: var(--mntm-gray-3);
+}
+.theme-white.dark {
+    --vp-c-brand-1: var(--mntm-white-1);
+    --vp-c-brand-2: var(--mntm-white-2);
+    --vp-c-brand-3: var(--mntm-white-3);
+    --vp-c-alternate-1: var(--mntm-gray-1);
+    --vp-c-alternate-2: var(--mntm-gray-2);
+    --vp-c-alternate-3: var(--mntm-gray-3);
 }
 
-.theme-purp html.dark ::selection {
+.theme-purp ::selection {
     background-color: color-mix(in srgb, var(--mntm-purp-1) 100%, transparent);
+    color: white;
+}
+
+.theme-purp.dark ::selection {
+    background-color: color-mix(in srgb, var(--mntm-purp-1) 100%, transparent);
+    color: black;
 }
 
 .theme-orange ::selection {
@@ -116,8 +140,9 @@
     color: black;
 }
 
-.theme-orange html.dark ::selection {
+.theme-orange.dark ::selection {
     background-color: color-mix(in srgb, var(--mntm-yellow-1) 100%, transparent);
+    color: black;
 }
 
 .theme-pink ::selection {
@@ -125,8 +150,26 @@
     color: white;
 }
 
-.theme-pink html.dark ::selection {
+.theme-pink.dark ::selection {
     background-color: color-mix(in srgb, var(--mntm-pink-1) 100%, transparent);
+    color: white;
+}
+
+.theme-white ::selection {
+    background-color: color-mix(in srgb, #000 100%, transparent);
+    color: white;
+}
+
+.theme-white.dark ::selection {
+    background-color: color-mix(in srgb, var(--mntm-white-1) 100%, transparent);
+    color: black;
+}
+
+.theme-white .logo {
+    filter: saturate(0) !important;
+}
+.theme-white.dark .logo {
+    filter: saturate(0) invert(1) !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
@@ -172,6 +215,14 @@
 .overflow-y-auto::-webkit-scrollbar-corner,
 .overflow-x-auto::-webkit-scrollbar-corner {
     background: transparent;
+}
+
+.custom-block.warning {
+    backdrop-filter: blur(4px) !important;
+}
+
+.custom-block.caution {
+    backdrop-filter: blur(4px) !important;
 }
 
 .custom-block.mntm {
@@ -263,6 +314,9 @@ body {
 .dark .VPFeature:hover {
     box-shadow: inset 0 0 0 1px var(--vp-c-alternate-1) !important;
 }
+.theme-white .VPFeature:hover {
+    box-shadow: inset 0 0 0 1px var(--vp-c-brand-1) !important;
+}
 
 .VPFeature .VPImage {
     position: absolute;
@@ -280,6 +334,10 @@ body {
 
 .dark .VPFeature .VPImage {
     filter: invert(1);
+}
+
+.theme-white .VPImage .logo {
+    filter: saturate(0) !important;
 }
 
 @media (min-width: 640px) {
@@ -555,6 +613,9 @@ body:before {
 .dark .full-width-table .check {
     color: var(--vp-c-brand-1);
 }
+.theme-white.dark .full-width-table .check {
+    color: var(--vp-c-alternate-1);
+}
 
 .full-width-table .check-last {
     font-weight: 600;
@@ -564,6 +625,10 @@ body:before {
 .dark .full-width-table .check-last {
     font-weight: 600;
     color: var(--vp-c-alternate-1);
+}
+
+.theme-white.dark .full-width-table .check-last {
+    color: var(--vp-c-brand-1);
 }
 
 .centered-content {
@@ -990,4 +1055,9 @@ body[data-route*="/wiki"] {
 .vp-doc :not(pre) > code {
     background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent) !important;
     color: var(--vp-c-alternate-1) !important;
+}
+
+.theme-white .vp-doc :not(pre) > code {
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
+    color: var(--vp-c-brand-1) !important;
 }

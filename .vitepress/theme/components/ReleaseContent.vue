@@ -156,6 +156,10 @@ const toggleDevFilesOpen = (open: boolean) => {
     border-radius: 0.25rem !important;
 }
 
+.theme-white .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+    color: var(--vp-c-brand-1) !important;
+}
+
 .shadow {
     opacity: 0.15;
 }
