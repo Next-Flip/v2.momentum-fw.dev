@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
-import { computed, inject } from "vue";
+import { computed } from "vue";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
-import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
 
 import ReleaseContent from "./ReleaseContent.vue";
 import ReleaseItems from "./ReleaseItems.vue";
 import ReleasesAside from "./ReleasesAside.vue";
 
-const { tr } = useI18n();
-const { width } = useWindowSize();
+const { deviceInfo, isConnected, tr } = useConnectionInfo();
 
-const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
+const { width } = useWindowSize();
 
 const { selectedRelease, selectRelease } = useReleaseNavigation({
     basePath: "/releases",
@@ -22,28 +20,19 @@ const { selectedRelease, selectRelease } = useReleaseNavigation({
 });
 
 const isCurrentVersion = computed(() => {
-    if (
-        !serialConnection?.flags.connected ||
-        !serialConnection?.connectionData.deviceInfo ||
-        !selectedRelease.value
-    ) {
+    if (!isConnected.value || !deviceInfo.value || !selectedRelease.value) {
         return false;
     }
 
-    const deviceInfo = serialConnection.connectionData.deviceInfo;
     const release = selectedRelease.value;
-
-    if (release.version && release.version.startsWith("mntm-")) {
-        const deviceVersion = deviceInfo.firmware_version || "";
-        return deviceVersion.includes(release.version);
-    }
+    const deviceVersion = deviceInfo.value.firmware_version || "";
+    const deviceCommit = deviceInfo.value.firmware_commit || "";
 
     if (release.commit) {
-        const deviceCommit = deviceInfo.firmware_commit || "";
-        return deviceCommit === release.commit;
+        return deviceVersion === "mntm-dev" && deviceCommit === release.version;
+    } else {
+        return deviceVersion === release.version;
     }
-
-    return false;
 });
 </script>
 

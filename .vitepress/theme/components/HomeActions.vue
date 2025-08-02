@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
+import { computed } from "vue";
+import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
 import { useDots } from "../composables/useDots";
-import { useI18n } from "../composables/useI18n";
+import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { ConnectionState } from "../types";
-
-const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialConnection")!;
-const { connectionData } = serialConnection;
-const { tr, getLocalizedPath } = useI18n();
 const { dots } = useDots();
 const { currentTheme } = useThemeSwitcher();
 
-const isConnected = computed(
-    () => connectionData.state === ConnectionState.CONNECTED && connectionData.deviceInfo,
-);
-const isConnecting = computed(
-    () => serialConnection.connectionData.state === ConnectionState.CONNECTING,
-);
+const { deviceInfo, isConnected, isConnecting, versionInReleases, tr, getLocalizedPath } =
+    useConnectionInfo();
 
 interface ActionButton {
     theme: "brand" | "alt";
@@ -29,37 +19,31 @@ interface ActionButton {
 }
 
 const dynamicButtons = computed((): ActionButton[] => {
-    const isConnecting = serialConnection.connectionData.state === ConnectionState.CONNECTING;
     const defaultButtons: ActionButton[] = [
         {
             theme: "brand",
-            text: isConnecting ? dots.value : tr("install"),
+            text: isConnecting.value ? dots.value : tr("install"),
             href: getLocalizedPath("/update"),
         },
         {
             theme: "alt",
-            text: isConnecting ? dots.value : tr("nav_releases"),
+            text: isConnecting.value ? dots.value : tr("nav_releases"),
             href: getLocalizedPath("/releases"),
         },
     ];
 
-    const deviceInfo = connectionData.deviceInfo;
     if (!isConnected.value || !deviceInfo) {
         return defaultButtons;
     }
 
-    const currentVersion = deviceInfo.firmware_version || "Unknown";
-    const currentCommit = deviceInfo.firmware_commit || "";
-    const versionMatch = currentVersion.match(/mntm-(\d+(?:\.\d+)*)/);
-    const commitInReleases = getReleaseByCommit(currentCommit);
+    const currentVersion = deviceInfo.value?.firmware_version || "";
+    const currentCommit = deviceInfo.value?.firmware_commit || "";
     const latestMainline = mainlineReleases.length > 0 ? mainlineReleases[0] : null;
     const latestDevbuild = devbuildReleases.length > 0 ? devbuildReleases[0] : null;
-    const isMainlineVersion = versionMatch && currentVersion.includes("mntm-");
-    const isLatestMainline =
-        latestMainline &&
-        (currentCommit === latestMainline.commit ||
-            currentVersion.includes(latestMainline.version || ""));
-    const isLatestDevbuild = latestDevbuild && currentCommit === latestDevbuild.commit;
+    const isMainlineVersion = currentVersion.match(/mntm-\d{3}/);
+    const isDevbuildVersion = currentVersion === "mntm-dev";
+    const isLatestMainline = latestMainline && currentVersion === latestMainline.version;
+    const isLatestDevbuild = latestDevbuild && currentCommit === latestDevbuild.version;
     let updateText: string;
     let updateHref: string;
     let isLatest = false;
@@ -70,20 +54,20 @@ const dynamicButtons = computed((): ActionButton[] => {
             updateHref = getLocalizedPath("/update");
             isLatest = true;
         } else {
-            const latestMainlineVersion = `${latestMainline?.version?.replace("mntm-", "").toUpperCase() || tr("home_latest_mainline")}`;
-            updateText = `${tr("home_update_to")} ${latestMainlineVersion}`;
-            updateHref = `${getLocalizedPath("/update")}/${latestMainline?.commit || latestMainlineVersion}`;
+            updateText = `${tr("home_update_to")} ${latestMainline?.version}`;
+            updateHref = `${getLocalizedPath("/update")}?version=${latestMainline?.version || ""}`;
         }
-    } else {
+    } else if (isDevbuildVersion) {
         if (isLatestDevbuild) {
             updateText = tr("home_latest_devbuild");
             updateHref = getLocalizedPath("/update");
             isLatest = true;
         } else {
-            const latestDevCommit = latestDevbuild?.commit?.substring(0, 8) || "latest";
-            updateText = `${tr("home_update_to")} ${latestDevCommit} (${tr("home_dev")})`;
-            updateHref = `${getLocalizedPath("/update")}/${latestDevbuild?.commit || ""}`;
+            updateText = `${tr("home_update_to")} ${latestDevbuild?.version} (${tr("home_dev")})`;
+            updateHref = `${getLocalizedPath("/update")}?version=${latestDevbuild?.version || ""}`;
         }
+    } else {
+        return defaultButtons;
     }
 
     const connectedButtons: ActionButton[] = [
@@ -95,8 +79,8 @@ const dynamicButtons = computed((): ActionButton[] => {
         },
         {
             theme: "alt",
-            text: commitInReleases ? tr("home_changelog") : tr("nav_releases"),
-            href: `${getLocalizedPath("/releases")}/${commitInReleases?.commit || ""}`,
+            text: versionInReleases ? tr("home_changelog") : tr("nav_releases"),
+            href: `${getLocalizedPath("/releases")}/${versionInReleases.value?.version || ""}`,
         },
     ];
 

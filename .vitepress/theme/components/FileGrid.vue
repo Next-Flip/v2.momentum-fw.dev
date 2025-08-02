@@ -9,7 +9,6 @@ type FirmwareFile = DevbuildFile | MainlineFile;
 
 interface Props {
     files: FirmwareFile[];
-    branch: string;
 }
 
 defineProps<Props>();

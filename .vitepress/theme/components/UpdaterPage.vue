@@ -3,7 +3,7 @@ import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { devbuildReleases, getReleaseByCommit, mainlineReleases } from "../../../_data/releases";
+import { devbuildReleases, getReleaseByVersion, mainlineReleases } from "../../../_data/releases";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
@@ -85,16 +85,10 @@ const isMatchingRelease = computed(() => {
     if (selectedRelease.value) {
         if (uploadedFile.value || uploadedFileRelease.value) return false;
 
-        const selectedCommit = selectedRelease.value.commit;
-        const selectedVersion = selectedRelease.value.version;
-        if (
-            selectedCommit === deviceCommit ||
-            selectedCommit.substring(0, 8).toLowerCase() ===
-                deviceCommit.substring(0, 8).toLowerCase() ||
-            (selectedVersion && selectedVersion === deviceVersion) ||
-            (selectedVersion && selectedVersion.toLowerCase().includes(deviceVersion.toLowerCase()))
-        ) {
-            return true;
+        if (deviceVersion === "mntm-dev") {
+            return deviceCommit === selectedRelease.value.version;
+        } else {
+            return deviceVersion === selectedRelease.value.version;
         }
     }
 
@@ -131,7 +125,7 @@ watch(
                     const currentChannelReleases =
                         newChannel === "mainline" ? mainlineReleases : devbuildReleases;
                     const releaseExists = currentChannelReleases.some(
-                        (release) => release.commit === selectedRelease.value?.commit,
+                        (release) => release.version === selectedRelease.value?.version,
                     );
 
                     if (!releaseExists) {
@@ -148,9 +142,17 @@ watch(
                     if (uploadedFile.value || uploadedFileRelease.value) {
                         inner = "Uploaded file";
                     }
+                    const logVersion =
+                        deviceVersion === "mntm-dev"
+                            ? "mntm-dev"
+                            : `<a href="${getLocalizedPath("/releases")}/${deviceVersion}" target="_blank">${deviceVersion}</a>`;
+                    const logCommit =
+                        deviceVersion === "mntm-dev"
+                            ? `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>`
+                            : deviceCommit;
                     logToSerial(
                         "warning",
-                        `[${inner === "Selected firmware" ? "Release" : "Upload"}] ${inner} matches current device firmware (<a href="${getLocalizedPath("/releases")}/${deviceVersion?.includes("mntm-dev") ? "" : deviceVersion?.replace("mntm-", "")}" target="_blank">${deviceVersion}</a>${deviceCommit && deviceCommit !== deviceVersion ? ", " + `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>` : ""})`,
+                        `[${inner === "Selected firmware" ? "Release" : "Upload"}] ${inner} matches current device firmware (${logVersion}, ${logCommit})`,
                     );
                 }
             }
@@ -174,17 +176,17 @@ const processFile = (file: File, source: "uploaded" | "selected") => {
     }
 
     uploadedFile.value = file;
-    const versionOrCommit = parseUploadedFileName(file.name);
+    const version = parseUploadedFileName(file.name);
     const action = source === "uploaded" ? "uploaded" : "selected";
 
-    if (versionOrCommit) {
-        const foundRelease = getReleaseByCommit(versionOrCommit);
+    if (version) {
+        const foundRelease = getReleaseByVersion(version);
         uploadedFileRelease.value = foundRelease || null;
 
         if (foundRelease) {
             logToSerial(
                 "info",
-                `[Upload] File ${action}: \`${file.name}\` (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.commit}" target="_blank">${foundRelease.version || foundRelease.commit}</a>)`,
+                `[Upload] File ${action}: \`${file.name}\` (matched release: <a href="${getLocalizedPath("/releases")}/${foundRelease.version}" target="_blank">${foundRelease.version}</a>)`,
             );
         } else {
             logToSerial(
@@ -261,7 +263,7 @@ const handleFlashFirmware = async () => {
 
         if (success) {
             track("firmware_flash", {
-                version: `${(releaseToFlash as ReleaseItem).version || (releaseToFlash as ReleaseItem).commit}`,
+                version: (releaseToFlash as ReleaseItem).version,
             });
         }
     } catch (error) {
@@ -276,10 +278,7 @@ const handleDownloadRelease = () => {
 
     if (firmwareUrl) {
         downloadFile(firmwareUrl);
-        logToSerial(
-            "info",
-            `[Download] Downloading firmware: ${selectedRelease.value.version || selectedRelease.value.commit}`,
-        );
+        logToSerial("info", `[Download] Downloading firmware: ${selectedRelease.value.version}`);
     } else {
         logToSerial("error", "[Download] No firmware download URL found for selected release");
     }
@@ -543,7 +542,7 @@ onBeforeUnmount(() => {
                                                 <div class="flex flex-row gap-px">
                                                     <a
                                                         class="text-vp-2 hover:underline vp-external-link-icon"
-                                                        :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion?.replace('mntm-', '')}`"
+                                                        :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion}`"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
@@ -693,16 +692,10 @@ onBeforeUnmount(() => {
                                                             class="flex items-center gap-3 text-xs text-vp-3"
                                                         >
                                                             <span
-                                                                v-if="
-                                                                    uploadedFileRelease?.branch ||
-                                                                    uploadedFileRelease?.commit
-                                                                "
+                                                                v-if="uploadedFileRelease?.version"
                                                             >
-                                                                {{
-                                                                    uploadedFileRelease?.branch ||
-                                                                    uploadedFileRelease?.commit
-                                                                }}</span
-                                                            >
+                                                                {{ uploadedFileRelease?.version }}
+                                                            </span>
                                                             <span>{{ displayFileSize }}</span>
                                                             <span>{{ displayFileDate }}</span>
                                                         </div>

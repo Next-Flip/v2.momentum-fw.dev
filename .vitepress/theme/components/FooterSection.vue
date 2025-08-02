@@ -6,7 +6,6 @@ import { isExternalLink } from "../util";
 const { getLocalizedPath } = useI18n();
 
 interface FooterItem {
-    type?: string;
     text?: string;
     name?: string;
     url?: string;
@@ -14,8 +13,7 @@ interface FooterItem {
     date?: string;
     target?: string;
     rel?: string;
-    branch?: string;
-    commit?: string;
+    version?: string;
 }
 
 interface Props {
@@ -29,15 +27,14 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const getItemUrl = (item: FooterItem) => {
-    return props.type === "release"
-        ? getLocalizedPath(`/releases/${item.commit}`)
-        : item.url || item.link || "";
+    if (props.type === "release") {
+        return getLocalizedPath(`/releases/${item.version}`);
+    }
+    return item.url || item.link || "";
 };
 
 const getItemText = (item: FooterItem) => {
-    if (item.type === "mainline") return item.branch;
-    if (item.type === "devbuild") return item.commit;
-    return item.text || item.name || "";
+    return item.version || item.text || item.name || "";
 };
 </script>
 
@@ -61,9 +58,7 @@ const getItemText = (item: FooterItem) => {
                     ]"
                 >
                     <template v-if="type === 'release'">
-                        <span :class="item.commit ? 'min-w-[68px]' : ''">{{
-                            getItemText(item)
-                        }}</span>
+                        <span class="min-w-[68px] font-mono">{{ getItemText(item) }}</span>
                         <span
                             class="text-vp-3 text-[11px] tracking-tighter text-right whitespace-nowrap font-mono"
                         >

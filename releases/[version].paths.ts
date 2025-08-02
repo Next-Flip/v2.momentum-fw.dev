@@ -7,7 +7,7 @@ export default {
         for (const release of mainlineReleases) {
             paths.push({
                 params: {
-                    version: release.commit,
+                    version: release.version,
                 },
             });
         }
@@ -15,7 +15,7 @@ export default {
         for (const release of devbuildReleases.slice(0, 50)) {
             paths.push({
                 params: {
-                    version: release.commit,
+                    version: release.version,
                 },
             });
         }

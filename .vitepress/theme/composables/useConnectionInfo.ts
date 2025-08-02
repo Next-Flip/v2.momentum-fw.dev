@@ -1,6 +1,6 @@
 import { useClipboard, useObjectUrl } from "@vueuse/core";
 import { computed, inject, shallowRef } from "vue";
-import { getReleaseByCommit } from "../../../_data/releases";
+import { getReleaseByVersion } from "../../../_data/releases";
 import { ConnectionState } from "../types";
 import { bytesToSize, getRadioStackType } from "../util";
 import { useI18n } from "./useI18n";
@@ -57,9 +57,12 @@ export function useConnectionInfo() {
     const connectionState = computed(() => connectionData.value.state);
     const deviceInfo = computed(() => connectionData.value.deviceInfo);
     const isConnected = computed(() => connectionState.value === "connected");
+    const isConnecting = computed(() => connectionState.value === "connecting");
 
-    const commitInReleases = computed(() =>
-        getReleaseByCommit(deviceInfo.value?.firmware_commit || ""),
+    const versionInReleases = computed(
+        () =>
+            getReleaseByVersion(deviceInfo.value?.firmware_version || "") ||
+            getReleaseByVersion(deviceInfo.value?.firmware_commit || ""),
     );
 
     const copyState = useTempState({
@@ -172,7 +175,8 @@ export function useConnectionInfo() {
         connectionState,
         deviceInfo,
         isConnected,
-        commitInReleases,
+        isConnecting,
+        versionInReleases,
         sdCardUsage,
         radioFwVersion,
         radioStackType,

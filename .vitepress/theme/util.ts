@@ -240,37 +240,15 @@ export async function unpack(buffer: ArrayBuffer) {
     }
 }
 
-export function findReleaseByVersion(version: string): ReleaseItem | null {
-    if (!version) return null;
-
-    const allReleases = [...mainlineReleases, ...devbuildReleases];
-
-    let release = allReleases.find((r) => r.commit === version);
-    if (release) return release;
-
-    release = allReleases.find((r) => r.commit.startsWith(version));
-    if (release) return release;
-
-    release = allReleases.find((r) => r.version && r.version.includes(version));
-    if (release) return release;
-
-    return null;
-}
-
 export const parseUploadedFileName = (filename: string): string | null => {
-    const mntmMatch = filename.match(/mntm-(\d+)/);
+    const mntmMatch = filename.match(/(mntm-\d{3})/);
     if (mntmMatch) {
         return `${mntmMatch[1]}`;
     }
 
-    const devMatch = filename.match(/mntm-dev-([a-f0-9]{7,})/);
+    const devMatch = filename.match(/mntm-dev-([a-f0-9]{8})/);
     if (devMatch) {
         return devMatch[1];
-    }
-
-    const commitMatch = filename.match(/update-([a-f0-9]{7,})/);
-    if (commitMatch) {
-        return commitMatch[1];
     }
 
     return null;

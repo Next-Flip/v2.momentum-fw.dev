@@ -27,11 +27,11 @@ const selectRelease = (release: ReleaseItem) => {
 };
 
 const isSelected = (release: ReleaseItem) => {
-    return props.selectedRelease?.commit === release.commit;
+    return props.selectedRelease?.version === release.version;
 };
 
 const selectedReleaseInThisList = computed(() => {
-    return props.releases.find((release) => release.commit === props.selectedRelease?.commit);
+    return props.releases.find((release) => release.version === props.selectedRelease?.version);
 });
 
 const updateLinePosition = async () => {
@@ -55,7 +55,7 @@ const updateLinePosition = async () => {
     }
 
     const selectedIndex = props.releases.findIndex(
-        (release) => release.commit === props.selectedRelease?.commit,
+        (release) => release.version === props.selectedRelease?.version,
     );
 
     if (selectedIndex >= 0 && buttons[selectedIndex]) {
@@ -121,7 +121,7 @@ onMounted(() => {
 
             <button
                 v-for="release in releases"
-                :key="release.commit"
+                :key="release.version"
                 :class="[
                     'relative flex flex-row w-full justify-between items-center text-sm group py-1 pr-2.5 transition-all duration-100 z-[2] !cursor-pointer',
                     isSelected(release) ? 'text-vp-brand-1 pl-3.5 gap-x-2.5' : 'pl-6 gap-x-3',
@@ -137,7 +137,7 @@ onMounted(() => {
                             : 'text-vp-2 group-hover:text-vp-brand-1',
                     ]"
                 >
-                    {{ release.commit }}
+                    {{ release.version }}
                 </span>
                 <Tooltip position="right" :delay="400" :offset="18">
                     <span

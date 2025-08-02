@@ -1,7 +1,7 @@
 import { useData } from "vitepress";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { findReleaseByVersion } from "../util";
+import { getReleaseByVersion } from "../../../_data/releases";
 
 export interface ReleaseNavigationConfig {
     basePath: string;
@@ -42,7 +42,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
         if (typeof window !== "undefined") {
             if (config.useQueryParams) {
                 const url = new URL(window.location.href);
-                url.searchParams.set("version", release.commit);
+                url.searchParams.set("version", release.version);
 
                 if (isInitialLoad.value) {
                     history.replaceState(null, "", url.toString());
@@ -53,7 +53,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             } else {
                 const currentPath = window.location.pathname;
                 const basePath = currentPath.split(config.basePath)[0] || "";
-                const newPath = `${basePath}${config.basePath}/${release.commit}`;
+                const newPath = `${basePath}${config.basePath}/${release.version}`;
 
                 if (isInitialLoad.value) {
                     history.replaceState(null, "", newPath);
@@ -73,7 +73,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
         const version = getVersionFromUrl();
 
         if (version) {
-            const release = findReleaseByVersion(version);
+            const release = getReleaseByVersion(version);
             if (release) {
                 selectedRelease.value = release;
                 if (config.onReleaseChange) {
@@ -92,9 +92,9 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             typeof window !== "undefined"
         ) {
             try {
-                const savedCommit = localStorage.getItem(config.storageKeys.selectedVersion);
-                if (savedCommit && savedCommit !== "null") {
-                    const release = findReleaseByVersion(savedCommit);
+                const savedVersion = localStorage.getItem(config.storageKeys.selectedVersion);
+                if (savedVersion && savedVersion !== "null") {
+                    const release = getReleaseByVersion(savedVersion);
                     if (release) {
                         selectedRelease.value = release;
                         if (config.onReleaseChange) {
@@ -131,8 +131,8 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             () => params.value?.version,
             (newVersion) => {
                 if (newVersion) {
-                    const release = findReleaseByVersion(newVersion);
-                    if (release && release.commit !== selectedRelease.value?.commit) {
+                    const release = getReleaseByVersion(newVersion);
+                    if (release && release.version !== selectedRelease.value?.version) {
                         selectedRelease.value = release;
                         if (config.onReleaseChange) {
                             config.onReleaseChange(release);
@@ -148,10 +148,10 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             () => selectedRelease.value,
             (newRelease) => {
                 if (typeof window !== "undefined") {
-                    if (newRelease?.commit) {
+                    if (newRelease?.version) {
                         localStorage.setItem(
                             config.storageKeys!.selectedVersion!,
-                            newRelease.commit,
+                            newRelease.version,
                         );
                     } else {
                         localStorage.removeItem(config.storageKeys!.selectedVersion!);

@@ -1287,9 +1287,7 @@ export const useSerialConnection = () => {
             const firmwareUrl = getFirmwareDownloadUrl(release);
 
             if (!firmwareUrl) {
-                throw new Error(
-                    `No firmware URL found for release: ${release.version || release.commit}`,
-                );
+                throw new Error(`No firmware URL found for release: ${release.version}`);
             }
 
             const proxiedUrl = useProxiedUrl(firmwareUrl);
@@ -1565,9 +1563,7 @@ export const useSerialConnection = () => {
             } else {
                 const firmwareUrl = getFirmwareDownloadUrl(release);
                 if (!firmwareUrl) {
-                    throw new Error(
-                        `No firmware URL found for release: ${release.version || release.commit}`,
-                    );
+                    throw new Error(`No firmware URL found for release: ${release.version}`);
                 }
 
                 addLog(

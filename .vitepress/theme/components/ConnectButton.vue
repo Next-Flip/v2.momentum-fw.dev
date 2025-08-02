@@ -22,7 +22,7 @@ const {
     connectionState,
     deviceInfo,
     isConnected,
-    commitInReleases,
+    versionInReleases,
     sdCardUsage,
     getRadioVersion,
     copyState,
@@ -236,9 +236,9 @@ onMounted(() => {
                             <a
                                 class="menu-value vp-external-link-icon hover:underline"
                                 :title="deviceInfo?.firmware_branch || ''"
-                                :href="`${getLocalizedPath('/releases')}/${commitInReleases?.commit || ''}`"
+                                :href="`${getLocalizedPath('/releases')}/${versionInReleases?.version || ''}`"
                                 >{{
-                                    deviceInfo?.firmware_version?.includes("dev")
+                                    deviceInfo?.firmware_version === "mntm-dev"
                                         ? `dev (${deviceInfo.firmware_commit})`
                                         : deviceInfo?.firmware_version
                                 }}</a

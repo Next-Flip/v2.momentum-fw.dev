@@ -17,14 +17,14 @@ function generateConfigContent(
     const searchConfigName = isRoot ? "rootSearchLocale" : `${locale}SearchLocale`;
 
     const navMainlineItems = mainlineItems.map((item) => ({
-        text: item.branch + ` (${formatDate(item.date, "short")})`,
-        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
-        activeMatch: `/update?version=${item.commit}`,
+        text: `${item.version} (${formatDate(item.date, "short")})`,
+        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.version}`,
+        activeMatch: `/update?version=${item.version}`,
     }));
     const navDevbuildsItems = devbuildsItems.slice(0, 1).map((item) => ({
-        text: item.commit + ` (${formatDate(item.date, "short")})`,
-        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.commit}`,
-        activeMatch: `/update?version=${item.commit}`,
+        text: `${item.version} (${formatDate(item.date, "short")})`,
+        link: `${isRoot ? "" : "/" + langCode}/update?version=${item.version}`,
+        activeMatch: `/update?version=${item.version}`,
     }));
 
     const wikiOverrides = isRoot

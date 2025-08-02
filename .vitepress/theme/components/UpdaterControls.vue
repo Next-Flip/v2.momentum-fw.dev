@@ -85,26 +85,17 @@ const channelOptions = computed(() => [
     },
 ]);
 
-const getChannelLabel = () => {
+const channelLabel = computed(() => {
     if (!props.selectedChannel) return tr("updater_select_channel");
     const option = channelOptions.value.find((opt) => opt.value === props.selectedChannel);
     return option ? option.label : tr("updater_select_channel");
-};
+});
 
-const getReleaseLabel = () => {
+const releaseLabel = computed(() => {
     if (!props.selectedRelease) return tr("updater_select_version");
-
-    const version = props.selectedRelease.version;
-    const commit = props.selectedRelease.commit;
-
-    if (!commit) return tr("updater_select_version");
-
-    const shortCommit = commit.substring(0, 8);
-
-    const releaseName = version && version.startsWith("mntm-") ? version : shortCommit;
-
-    return `${releaseName} (${props.selectedRelease.timestamp ? formatDate(props.selectedRelease.timestamp, "short") : tr("updater_unknown_date")})`;
-};
+    const release = props.selectedRelease;
+    return `${release.version} (${release.timestamp ? formatDate(release.timestamp, "short") : tr("updater_unknown_date")})`;
+});
 
 const toggleChannelDropdown = () => {
     if (props.uploadedFile) return;
@@ -165,7 +156,7 @@ const handleDownloadRelease = () => {
                         @click="toggleChannelDropdown"
                     >
                         <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
-                            {{ getChannelLabel() }}
+                            {{ channelLabel }}
                         </span>
                         <div
                             class="select-icon flex items-center text-vp-3 transition-transform duration-200"
@@ -243,7 +234,7 @@ const handleDownloadRelease = () => {
                         @click="toggleReleaseDropdown"
                     >
                         <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
-                            {{ getReleaseLabel() }}
+                            {{ releaseLabel }}
                         </span>
                         <div
                             class="select-icon flex items-center text-vp-3 transition-transform duration-200"
@@ -266,11 +257,11 @@ const handleDownloadRelease = () => {
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
-                                        :key="release.commit"
+                                        :key="release.version"
                                         class="dropdown-item flex flex-row min-h-7 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                         :class="{
                                             'is-selected':
-                                                selectedRelease?.commit === release.commit,
+                                                selectedRelease?.version === release.version,
                                             'rounded-t-[4px]': index === 0,
                                             'rounded-b-[4px]': index === channelReleases.length - 1,
                                         }"
@@ -281,23 +272,22 @@ const handleDownloadRelease = () => {
                                                 class="font-medium text-vp-1 font-mono flex-shrink-0"
                                                 :class="{
                                                     'text-vp-brand-1':
-                                                        selectedRelease?.commit === release.commit,
+                                                        selectedRelease?.version ===
+                                                        release.version,
                                                 }"
                                             >
-                                                {{
-                                                    release.version &&
-                                                    release.version.startsWith("mntm-")
-                                                        ? release.version
-                                                        : release.commit.substring(0, 8)
-                                                }}
+                                                {{ release.version }}
                                             </span>
                                             <Tooltip
                                                 v-if="
                                                     isConnected &&
-                                                    (deviceInfo?.firmware_commit ===
-                                                        release.commit ||
-                                                        deviceInfo?.firmware_version ===
-                                                            release.version)
+                                                    (release.commit
+                                                        ? deviceInfo?.firmware_version ===
+                                                              'mntm-dev' &&
+                                                          deviceInfo?.firmware_commit ===
+                                                              release.version
+                                                        : deviceInfo?.firmware_version ===
+                                                          release.version)
                                                 "
                                                 :delay="0"
                                                 :position="'right'"
@@ -316,7 +306,7 @@ const handleDownloadRelease = () => {
                                             class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono"
                                             :class="{
                                                 'text-vp-brand-1/60':
-                                                    selectedRelease?.commit === release.commit,
+                                                    selectedRelease?.version === release.version,
                                             }"
                                         >
                                             {{

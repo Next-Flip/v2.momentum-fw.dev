@@ -23,7 +23,7 @@ const {
     deviceInfo,
     isConnected: connectionIsConnected,
     connectionState,
-    commitInReleases,
+    versionInReleases,
     getRadioVersion,
     copyState,
     saveState,
@@ -159,10 +159,10 @@ const deviceSections = computed(() => {
             items: [
                 [
                     "updater_version_label",
-                    device.firmware_version?.includes("dev")
+                    device.firmware_version === "mntm-dev"
                         ? `${tr("updater_dev_prefix")} (${device.firmware_commit})`
                         : device.firmware_version,
-                    `${getLocalizedPath("/releases")}/${commitInReleases.value?.commit || ""}`,
+                    `${getLocalizedPath("/releases")}/${versionInReleases.value?.version || ""}`,
                     true,
                 ],
                 ["updater_branch_label", device.firmware_branch],

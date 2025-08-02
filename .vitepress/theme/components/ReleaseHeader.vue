@@ -35,10 +35,6 @@ useClickOutside({
     },
 });
 
-const getReleaseDisplayName = (release: ReleaseItem) => {
-    return release.version || `${release.commit.substring(0, 8)}`;
-};
-
 const renderReleaseSection = (title: string, releases: ReleaseItem[]) => {
     return { title, releases };
 };
@@ -77,7 +73,7 @@ const selectRelease = (release: ReleaseItem) => {
 };
 
 const isSelected = (release: ReleaseItem) => {
-    return props.selectedRelease?.commit === release.commit;
+    return props.selectedRelease?.version === release.version;
 };
 
 const handleHeaderClick = () => {
@@ -104,7 +100,7 @@ const handleHeaderClick = () => {
             >
                 <div class="flex flex-row ml-1.5 items-center gap-2">
                     <span class="text-lg leading-none font-semibold text-vp-1 uppercase font-mono">
-                        {{ selectedRelease ? getReleaseDisplayName(selectedRelease) : "" }}
+                        {{ selectedRelease?.version }}
                     </span>
                     <Tooltip
                         v-if="props.isCurrentVersion"
@@ -174,7 +170,7 @@ const handleHeaderClick = () => {
                                 </div>
                                 <div
                                     v-for="release in section.releases"
-                                    :key="`${section.title}-${release.commit}`"
+                                    :key="`${section.title}-${release.version}`"
                                     class="dropdown-item flex flex-row min-h-8 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-200 w-full z-[5] text-[13px] overflow-hidden min-w-0 rounded-[4px]"
                                     :class="{
                                         'is-selected': isSelected(release),
@@ -187,7 +183,7 @@ const handleHeaderClick = () => {
                                             'text-vp-brand-1': isSelected(release),
                                         }"
                                     >
-                                        {{ getReleaseDisplayName(release) }}
+                                        {{ release.version }}
                                     </span>
                                     <span
                                         class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"

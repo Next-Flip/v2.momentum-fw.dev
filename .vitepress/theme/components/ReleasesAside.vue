@@ -15,12 +15,12 @@ const imageExists = ref(false);
 const imageSrc = ref<string>("");
 
 const isDevBuild = computed(() => {
-    return props.selectedRelease?.branch.includes("dev");
+    return !!props.selectedRelease?.commit;
 });
 
-const loadImageAsync = async (commit: string) => {
+const loadImageAsync = async (version: string) => {
     try {
-        const imageUrl = `/og/${commit}.png`;
+        const imageUrl = `/og/${version}.png`;
         const img = new Image();
 
         return new Promise<boolean>((resolve) => {
@@ -44,18 +44,18 @@ const shouldShowImage = computed(() => {
 
 const infoItems = computed(() => [
     {
-        href: getLocalizedPath(`/releases/${mainlineReleases[0]?.commit}`),
-        link: `https://github.com/Next-Flip/Momentum-Firmware/releases/tag/${mainlineReleases[0]?.branch}`,
+        href: getLocalizedPath(`/releases/${mainlineReleases[0]?.version}`),
+        link: `https://github.com/Next-Flip/Momentum-Firmware/releases/tag/${mainlineReleases[0]?.version}`,
         key: "aside_latest_release" as const,
         value: mainlineReleases[0]?.version,
         condition: mainlineReleases[0]?.version,
     },
     {
-        href: getLocalizedPath(`/releases/${devbuildReleases[0]?.commit}`),
+        href: getLocalizedPath(`/releases/${devbuildReleases[0]?.version}`),
         link: `https://github.com/Next-Flip/Momentum-Firmware/tree/${devbuildReleases[0]?.commit}`,
         key: "aside_latest_devbuild" as const,
-        value: devbuildReleases[0]?.commit?.substring(0, 8),
-        condition: devbuildReleases[0]?.commit,
+        value: devbuildReleases[0]?.version,
+        condition: devbuildReleases[0]?.version,
     },
     {
         key: "aside_last_build_date" as const,
@@ -84,19 +84,19 @@ const supportLinks = [
     },
 ];
 
-const openImageInNewTab = (commit: string) => {
-    window.open(`/og/${commit}.png`, "_blank");
+const openImageInNewTab = (version: string) => {
+    window.open(`/og/${version}.png`, "_blank");
 };
 
 watch(
-    () => props.selectedRelease?.commit,
-    async (newCommit) => {
+    () => props.selectedRelease?.version,
+    async (newVersion) => {
         imageExists.value = false;
         imageLoaded.value = false;
         imageSrc.value = "";
 
-        if (newCommit && !isDevBuild.value) {
-            const exists = await loadImageAsync(newCommit);
+        if (newVersion && !isDevBuild.value) {
+            const exists = await loadImageAsync(newVersion);
             if (exists) {
                 imageExists.value = true;
                 imageLoaded.value = true;
@@ -179,9 +179,9 @@ watch(
             <div v-if="shouldShowImage" class="mt-8">
                 <img
                     :src="imageSrc"
-                    :alt="`mntm-${selectedRelease?.commit}`"
+                    :alt="selectedRelease?.version"
                     class="w-full h-auto rounded-lg border !my-0 border-vp-divider/30 cursor-pointer"
-                    @click="openImageInNewTab(selectedRelease?.commit || '')"
+                    @click="openImageInNewTab(selectedRelease?.version || '')"
                 />
             </div>
         </div>

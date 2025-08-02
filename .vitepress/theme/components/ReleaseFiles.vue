@@ -41,16 +41,22 @@ const installMethods = computed(() => [
     {
         show: true,
         name: tr("releases_web_updater"),
-        href: getLocalizedPath(`/update/?version=${props.selectedRelease?.commit}`),
+        href: getLocalizedPath(`/update?version=${props.selectedRelease?.version}`),
     },
     {
-        show: props.selectedRelease?.branch.includes("dev"),
+        show: true,
         name: tr("releases_flipper_lab"),
-        href: props.selectedRelease?.branch.includes("dev")
-            ? `https://lab.flipper.net/?url=https://up.momentum-fw.dev/builds/firmware/dev/${findUpdateTgz(props.selectedRelease?.files as DevbuildFile[])}&channel=dev-cfw&version=${props.selectedRelease?.branch}-${props.selectedRelease?.commit}`
-            : "",
+        href: flipperLabUrl(props.selectedRelease as ReleaseItem),
     },
 ]);
+
+const flipperLabUrl = (release: ReleaseItem): string => {
+    const tgzDir = release.commit ? "dev" : release.version;
+    const tgzUrl = `https://up.momentum-fw.dev/builds/firmware/${tgzDir}/${findUpdateTgz(release.files as DevbuildFile[])}`;
+    const channel = release.commit ? "dev" : "release";
+    const version = (release.commit ? "mntm-dev-" : "") + release.version;
+    return `https://lab.flipper.net/?url=${tgzUrl}&channel=${channel}-cfw&version=${version}`;
+};
 
 const findUpdateTgz = (files: DevbuildFile[]): string | undefined => {
     const updateTgz = files.find(
@@ -158,7 +164,7 @@ watch(
         </div>
 
         <div v-if="categorizedFiles.regular.length > 0" class="relative z-10 mb-4">
-            <FileGrid :files="categorizedFiles.regular as any" :branch="selectedRelease.branch" />
+            <FileGrid :files="categorizedFiles.regular as any" />
         </div>
 
         <div
@@ -204,10 +210,7 @@ watch(
 
                         <div class="flex-1 min-w-80">
                             <div class="mb-3">
-                                <FileGrid
-                                    :files="categorizedFiles.development as any"
-                                    :branch="selectedRelease.branch"
-                                />
+                                <FileGrid :files="categorizedFiles.development as any" />
                             </div>
                         </div>
                     </div>

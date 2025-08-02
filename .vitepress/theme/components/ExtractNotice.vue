@@ -33,11 +33,14 @@ const shouldShow = computed(() => {
 });
 
 const extractNoticeText = computed(() => {
+    const firmwareVersion = (connectionData.value.deviceInfo as { firmware_version: string })
+        .firmware_version;
+    const release = (
+        firmwareVersion.includes("dev") ? recentReleases.devbuilds : recentReleases.mainline
+    )[0];
     return tr("connection_unable_to_extract_desc", {
-        version: `${connectionData.value.deviceInfo?.firmware_version} (${connectionData.value.deviceInfo?.firmware_commit})`,
-        url: getLocalizedPath(
-            `/releases/${(connectionData.value.deviceInfo as { firmware_version: string }).firmware_version.includes("dev") ? recentReleases.devbuilds[0].commit : recentReleases.mainline[0].commit}`,
-        ),
+        version: `${firmwareVersion} (${connectionData.value.deviceInfo?.firmware_commit})`,
+        url: getLocalizedPath(`/releases/${release.version}`),
     });
 });
 </script>

@@ -69,14 +69,7 @@ const displayVersion = computed(() => {
     const release = props.uploadedFileRelease || displayRelease.value;
     if (!release) return "";
 
-    const version = release.version;
-    const commit = release.commit.substring(0, 8);
-
-    if (version && version.startsWith("mntm-")) {
-        return version;
-    }
-
-    return commit;
+    return release.version;
 });
 
 const parsedChangelog = computed(() => {
@@ -97,8 +90,8 @@ const shouldShowExternalLink = computed(() => {
 });
 
 const releaseHref = computed(() => {
-    if (!shouldShowExternalLink.value || !displayRelease.value?.commit) return "";
-    return getLocalizedPath(`/releases/${displayRelease.value.commit}`);
+    if (!shouldShowExternalLink.value || !displayRelease.value) return "";
+    return getLocalizedPath(`/releases/${displayRelease.value.version}`);
 });
 </script>
 

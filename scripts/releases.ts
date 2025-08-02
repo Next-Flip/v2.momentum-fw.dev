@@ -17,13 +17,12 @@ interface DevbuildFile {
 }
 
 export interface ReleaseItem {
-    type: "mainline" | "devbuild";
+    version: string;
     branch: string;
-    commit: string;
     date: string;
-    version?: string;
-    changelog?: string;
+    commit?: string;
     timestamp?: number;
+    changelog?: string;
     files?: FirmwareFile[] | DevbuildFile[] | MainlineFile[];
 }
 
@@ -69,29 +68,29 @@ function parseDateString(dateStr: string): number {
     return 0;
 }
 
-async function fetchChangelogForCommit(commit: string): Promise<string> {
-    console.log(`  Fetching changelog for commit ${commit}...`);
+async function fetchChangelogForVersion(version: string): Promise<string> {
+    console.log(`  Fetching changelog for ${version}...`);
 
     try {
         const localChangelogVersions = ["mntm-004", "mntm-003", "mntm-002", "mntm-001"];
-        if (localChangelogVersions.includes(commit)) {
+        if (localChangelogVersions.includes(version)) {
             try {
-                const changelogPath = join(DIR_DATA, `changelogs/${commit}.txt`);
+                const changelogPath = join(DIR_DATA, `changelogs/${version}.txt`);
                 const changelog = await fs.readFile(changelogPath, "utf8");
                 console.log(
-                    `  Successfully loaded local changelog for ${commit} (${changelog.length} characters)`,
+                    `  Successfully loaded local changelog for ${version} (${changelog.length} characters)`,
                 );
                 return changelog.replace(/\r/g, "");
             } catch (error) {
-                console.warn(`⁉️  Failed to load local changelog for ${commit}:`, error);
+                console.warn(`⁉️  Failed to load local changelog for ${version}:`, error);
                 return "";
             }
         }
 
-        const isMainlineVersion = commit.startsWith("mntm-");
+        const isMainlineVersion = version.startsWith("mntm-");
         const url = isMainlineVersion
-            ? `https://raw.githubusercontent.com/Next-Flip/Momentum-Firmware/refs/tags/${commit}/CHANGELOG.md`
-            : `https://raw.githubusercontent.com/Next-Flip/Momentum-Firmware/${commit}/CHANGELOG.md`;
+            ? `https://raw.githubusercontent.com/Next-Flip/Momentum-Firmware/refs/tags/${version}/CHANGELOG.md`
+            : `https://raw.githubusercontent.com/Next-Flip/Momentum-Firmware/${version}/CHANGELOG.md`;
         const changelog: string = await ofetch(url, {
             parseResponse: (txt) => txt,
             timeout: 10000,
@@ -101,16 +100,16 @@ async function fetchChangelogForCommit(commit: string): Promise<string> {
         });
 
         if (!changelog || typeof changelog !== "string") {
-            console.warn(`⁉️  Empty or invalid changelog received for commit ${commit}`);
+            console.warn(`⁉️  Empty or invalid changelog received for ${version}`);
             return "";
         }
 
         console.log(
-            `  Successfully fetched changelog for commit ${commit} (${changelog.length} characters)`,
+            `  Successfully fetched changelog for ${version} (${changelog.length} characters)`,
         );
         return changelog.replace(/\n/g, "\n").replace(/\r/g, "");
     } catch (error) {
-        console.warn(`⁉️  Failed to fetch changelog for commit ${commit}:`, error);
+        console.warn(`⁉️  Failed to fetch changelog for ${version}:`, error);
         return "";
     }
 }
@@ -392,7 +391,7 @@ export async function getReleaseAndDevbuilds() {
         console.log(`  Successfully processed ${mainlineReleases.length} mainline releases`);
 
         const devbuildItems: ReleaseItem[] = [];
-        const seenCommits = new Set<string>();
+        const seenVersions = new Set<string>();
 
         if (hasDevBuilds) {
             const { commitGroups, commitTimestamps } = await parseDevbuildsHTML();
@@ -407,21 +406,21 @@ export async function getReleaseAndDevbuilds() {
                 );
 
                 for (const [commit, groupFiles] of validCommits) {
-                    if (seenCommits.has(commit)) {
-                        console.log(`  Skipping duplicate commit ${commit}`);
+                    if (seenVersions.has(commit)) {
+                        console.log(`  Skipping duplicate devbuild version ${commit}`);
                         continue;
                     }
-                    seenCommits.add(commit);
+                    seenVersions.add(commit);
 
                     const timestamp = commitTimestamps[commit];
                     const isoDate = new Date(timestamp * 1000).toISOString().split("T")[0];
-                    const changelog = await fetchChangelogForCommit(commit);
+                    const changelog = await fetchChangelogForVersion(commit);
 
                     devbuildItems.push({
-                        type: "devbuild",
+                        version: commit,
                         branch: "mntm-dev",
-                        commit: commit,
                         date: isoDate,
+                        commit: commit,
                         timestamp: timestamp,
                         changelog: changelog,
                         files: groupFiles,
@@ -434,24 +433,21 @@ export async function getReleaseAndDevbuilds() {
 
         const mainlineItems: ReleaseItem[] = [];
         for (const release of mainlineReleases) {
-            const changelog = await fetchChangelogForCommit(release.version);
-            const shortVersion = release.version.replace("mntm-", "");
+            const changelog = await fetchChangelogForVersion(release.version);
 
-            if (!seenCommits.has(shortVersion)) {
-                seenCommits.add(shortVersion);
+            if (!seenVersions.has(release.version)) {
+                seenVersions.add(release.version);
 
                 mainlineItems.push({
-                    type: "mainline",
-                    branch: release.version,
-                    commit: shortVersion,
-                    date: release.date,
                     version: release.version,
-                    changelog: changelog,
+                    branch: release.version,
+                    date: release.date,
                     timestamp: release.timestamp,
+                    changelog: changelog,
                     files: release.files,
                 });
             } else {
-                console.log(`  Skipping duplicate mainline commit ${shortVersion}`);
+                console.log(`  Skipping duplicate mainline version ${release.version}`);
             }
         }
 
@@ -504,11 +500,10 @@ export interface MainlineFile {
 }
 
 export interface ReleaseItem {
-    type: "mainline" | "devbuild";
+    version: string;
     branch: string;
-    commit: string;
     date: string;
-    version?: string;
+    commit?: string;
     timestamp?: number;
     changelog?: string;
     files?: FirmwareFile[] | DevbuildFile[] | MainlineFile[];
@@ -533,8 +528,8 @@ export function getRecentReleases() {
 
 export const recentReleases = getRecentReleases();
 
-export const getReleaseByCommit = (commit: string) => {
-    return [...mainlineReleases, ...devbuildReleases].find((release) => release.commit === commit);
+export const getReleaseByVersion = (version: string) => {
+    return [...mainlineReleases, ...devbuildReleases].find((release) => release.version === version);
 };
 `;
 
