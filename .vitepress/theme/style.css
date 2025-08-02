@@ -986,3 +986,8 @@ body[data-route*="/wiki"] {
 #default {
     opacity: 0.6;
 }
+
+.vp-doc :not(pre) > code {
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent) !important;
+    color: var(--vp-c-alternate-1) !important;
+}

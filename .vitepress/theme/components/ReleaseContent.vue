@@ -150,8 +150,8 @@ const toggleDevFilesOpen = (open: boolean) => {
 }
 
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
-    color: var(--vp-c-brand-1) !important;
-    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
+    color: var(--vp-c-alternate-1) !important;
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent) !important;
     padding: 0.2rem 0.2rem !important;
     border-radius: 0.25rem !important;
 }
