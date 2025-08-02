@@ -485,7 +485,7 @@ onBeforeUnmount(() => {
                                                             width: `${updateProgress * 100}%`,
                                                             boxShadow:
                                                                 updateProgress > 0
-                                                                    ? '0 0 8px 2px rgba(84, 83, 219, 0.2)'
+                                                                    ? '0 0 8px 2px color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent)'
                                                                     : '0 0 8px 2px rgba(0, 0, 0, 0.0)',
                                                         }"
                                                     ></div>

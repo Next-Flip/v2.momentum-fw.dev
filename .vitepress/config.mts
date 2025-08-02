@@ -165,7 +165,7 @@ export default defineConfig({
     cleanUrls: true,
     lastUpdated: true,
     themeConfig: {
-        logo: "/logos/black_round.png",
+        logo: "/logos/logo_round.png",
         outline: "deep",
         socialLinks: [
             { icon: "x", link: "https://x.com/FlipperMomentum" },
