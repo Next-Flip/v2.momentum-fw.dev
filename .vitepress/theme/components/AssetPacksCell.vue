@@ -44,6 +44,7 @@ interface Props {
     previewUrls?: string[];
     downloadUrl?: string;
     githubUrl?: string;
+    showTimeAgo: "updated" | "added";
     updatedDate?: string;
     addedDate?: string;
     stats?: AssetPackStats & { folders?: string[] };
@@ -279,8 +280,9 @@ const isBeingDeleted = computed(() => {
 });
 
 const shortTimeAgo = computed(() => {
-    if (!props.updatedDate) return "";
-    const isoDate = props.updatedDate.split(".").reverse().join("-");
+    const date = props.showTimeAgo === "added" ? props.addedDate : props.updatedDate;
+    if (!date) return "";
+    const isoDate = date.split(".").reverse().join("-");
     const timeAgo = useTimeAgo(isoDate);
     return shortenTimeString(timeAgo.value);
 });

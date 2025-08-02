@@ -370,6 +370,7 @@ const filteredAssetPacks = computed(() => {
                             :preview-urls="pack.previewUrls"
                             :download-url="pack.downloadUrl"
                             :github-url="pack.githubUrl"
+                            :show-time-ago="sortField === 'addedDate' ? 'added' : 'updated'"
                             :updated-date="pack.updatedDate"
                             :added-date="pack.addedDate"
                             :stats="pack.stats"
