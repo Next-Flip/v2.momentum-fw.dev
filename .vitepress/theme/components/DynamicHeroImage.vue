@@ -46,7 +46,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="hero-image-container mr-4">
+    <div class="hero-image-container mr-4 select-none">
         <img :src="heroImageSrc" alt="Momentum Firmware" class="hero-image" />
     </div>
 </template>

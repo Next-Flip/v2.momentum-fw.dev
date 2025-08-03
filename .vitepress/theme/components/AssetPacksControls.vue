@@ -4,6 +4,8 @@ import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
 import type { DropdownOption, FilterOption, SortDirection, SortField } from "../types";
 
+import Tooltip from "./Tooltip.vue";
+
 const { tr } = useI18n();
 
 interface Props {
@@ -11,7 +13,7 @@ interface Props {
     initialSortDirection?: SortDirection;
     initialFilter?: FilterOption[];
     initialSearchQuery?: string;
-    hasUpdates: boolean;
+    hasUpdates?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -204,14 +206,18 @@ watch(
         </div>
 
         <div class="grid grid-cols-[40px_1fr_1fr] gap-2.5 md:flex items-center justify-center">
-            <button
-                class="sort-direction-toggle w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] transition-all duration-100 hover:border-vp-brand-1 hover:text-vp-2 text-vp-3 cursor-pointer backdrop-blur"
-                :aria-label="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
-                :title="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
-                @click="toggleSortDirection"
-            >
-                <v-icon name="md-sort-round" :class="{ flip: sortDirection === 'desc' }" />
-            </button>
+            <Tooltip :position="'top'">
+                <button
+                    class="sort-direction-toggle w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] transition-all duration-100 hover:border-vp-brand-1 hover:text-vp-2 text-vp-3 cursor-pointer backdrop-blur"
+                    :aria-label="sortDirection === 'asc' ? tr('sort_desc') : tr('sort_asc')"
+                    @click="toggleSortDirection"
+                >
+                    <v-icon name="md-sort-round" :class="{ flip: sortDirection === 'desc' }" />
+                </button>
+                <template #content>
+                    {{ sortDirection === "asc" ? tr("sort_desc") : tr("sort_asc") }}
+                </template>
+            </Tooltip>
 
             <div
                 ref="sortDropdownRef"

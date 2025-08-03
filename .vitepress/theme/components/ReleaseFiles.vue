@@ -8,6 +8,7 @@ import type {
 } from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
+import { supportsSerialPort } from "../util";
 
 import FileGrid from "./FileGrid.vue";
 import Tooltip from "./Tooltip.vue";
@@ -39,7 +40,7 @@ useClickOutside({
 
 const installMethods = computed(() => [
     {
-        show: true,
+        show: supportsSerialPort(),
         name: tr("releases_web_updater"),
         href: getLocalizedPath(`/update?version=${props.selectedRelease?.version}`),
         isExternal: false,
@@ -270,7 +271,7 @@ watch(
                             method.show
                                 ? 'opacity-100 visible relative pointer-events-auto'
                                 : 'opacity-0 invisible absolute pointer-events-none',
-                            method.isExternal ? 'vp-external-link-icon' : '',
+                            method.isExternal ? 'vp-external-link-icon' : 'sm:pr-3',
                         ]"
                     >
                         {{ method.name }}

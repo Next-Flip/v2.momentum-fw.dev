@@ -4,7 +4,7 @@ import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
-import { replaceIssuesAndMentions } from "../util";
+import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
 
 import Tooltip from "./Tooltip.vue";
 
@@ -105,7 +105,7 @@ const releaseHref = computed(() => {
         }"
     >
         <div
-            class="border rounded-[10px] border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative mb-5"
+            class="border rounded-[10px] border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
             :class="{
                 'changelog-expanded mt-5': isExpanded,
                 'flex-1': !isClosed,
@@ -113,7 +113,7 @@ const releaseHref = computed(() => {
             }"
         >
             <div
-                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-5 dropdown-button"
+                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-5 dropdown-button z-[3]"
                 :class="{
                     'is-active': isExpanded,
                     'border-b border-vp-divider':
@@ -150,11 +150,15 @@ const releaseHref = computed(() => {
                         </span>
                     </template>
                 </div>
-                <div class="flex items-center gap-1 flex-shrink-0">
+                <div v-if="supportsSerialPort()" class="flex items-center gap-1 flex-shrink-0">
                     <Tooltip
                         :delay="0"
                         :z-index="9999"
-                        :disabled="(!uploadedFileRelease && !selectedRelease) || isClosed"
+                        :disabled="
+                            (!uploadedFileRelease && !selectedRelease) ||
+                            isClosed ||
+                            showUpdateOverlay
+                        "
                     >
                         <button
                             class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
@@ -200,11 +204,11 @@ const releaseHref = computed(() => {
             </div>
 
             <div
-                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-elv/95 dark:from-vp-elv/95 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-elv/95 dark:from-vp-elv/90 to-transparent pointer-events-none z-[2] mr-4 opacity-0 transition-opacity duration-300"
                 :class="{ 'opacity-100': isAccessible && !arrivedState.top && !isClosed }"
             ></div>
             <div
-                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-elv/95 dark:from-vp-elv/95 to-transparent pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300"
+                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-elv/95 dark:from-vp-elv/90 to-transparent pointer-events-none z-[2] mr-4 opacity-0 transition-opacity duration-300"
                 :class="{ 'opacity-100': isAccessible && !arrivedState.bottom && !isClosed }"
             ></div>
 

@@ -9,7 +9,7 @@ import { formatDate } from "../date";
 import Tooltip from "./Tooltip.vue";
 
 interface Props {
-    isExpanded: boolean;
+    isOpen: boolean;
     changelogIsOpen: boolean;
 }
 
@@ -67,8 +67,9 @@ const lastStatusLog = computed(() => {
 const hasStatus = computed(() => lastStatusLog.value !== null);
 const logContainer = ref<HTMLElement | null>(null);
 const autoScroll = ref(true);
+const showLogs = computed(() => (logs.value.length > 0 ? props.isOpen : false));
 const showButtons = computed(
-    () => logs.value.length > 0 && (props.isExpanded || windowWidth.value <= 1024),
+    () => logs.value.length > 0 && (props.isOpen || windowWidth.value <= 1024),
 );
 
 const scrollToBottom = () => {
@@ -104,7 +105,7 @@ const copyLogs = async () => {
 watch(
     [
         () => logs.value,
-        () => props.isExpanded,
+        () => props.isOpen,
         () => logsScrollTrigger.value,
         () => props.changelogIsOpen,
     ],
@@ -139,25 +140,25 @@ onMounted(() => {
     <div
         class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-[10px] border border-vp-divider"
         :class="{
-            'h-full': !props.changelogIsOpen && props.isExpanded,
-            'border-b border-vp-divider': !props.changelogIsOpen && !props.isExpanded,
+            'h-full': !props.changelogIsOpen && showLogs,
+            'border-b border-vp-divider': !props.changelogIsOpen && !showLogs,
         }"
     >
         <div
             class="flex flex-col"
             :class="{
-                'flex-1 min-h-0': !props.changelogIsOpen && props.isExpanded,
+                'flex-1 min-h-0': !props.changelogIsOpen && showLogs,
             }"
         >
             <div
                 class="w-full flex items-center justify-between text-left px-4 pr-2 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
                 :class="{
-                    'is-active': isExpanded,
+                    'is-active': showLogs,
                 }"
             >
                 <div class="flex flex-row items-center gap-2">
                     <span
-                        v-if="hasStatus && logs.length > 0 && !isExpanded"
+                        v-if="hasStatus && logs.length > 0 && !showLogs"
                         class="relative flex size-1.5 mt-0.5 mr-1"
                     >
                         <span
@@ -222,16 +223,20 @@ onMounted(() => {
                         <template #content>{{ copyState.currentText.value }}</template>
                     </Tooltip>
                     <button
-                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
+                        class="rounded-lg transition-all duration-200 text-vp-3 flex items-center justify-center flex-shrink-0 p-1.5"
+                        :class="{
+                            'opacity-50 !cursor-default': logs.length === 0,
+                            'opacity-100 hover:text-vp-brand-1 cursor-pointer': logs.length > 0,
+                        }"
                         @click="handleToggle"
                     >
                         <v-icon
                             :name="'oi-chevron-down'"
-                            :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
+                            :aria-label="showLogs ? tr('updater_collapse') : tr('updater_expand')"
                             scale="1"
                             class="transition-all duration-200"
                             :class="{
-                                'rotate-180': isExpanded,
+                                'rotate-180': showLogs,
                             }"
                         />
                     </button>
@@ -240,7 +245,7 @@ onMounted(() => {
 
             <Transition name="logs-expand" mode="in-out">
                 <div
-                    v-if="isExpanded"
+                    v-if="showLogs"
                     :class="{
                         'flex-1 flex flex-col min-h-0': !props.changelogIsOpen,
                     }"
@@ -255,7 +260,7 @@ onMounted(() => {
                             ref="logContainer"
                             class="pr-[7px] my-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
                             :class="{
-                                'h-64': props.changelogIsOpen,
+                                'h-48': props.changelogIsOpen,
                                 'flex-1 min-h-0': !props.changelogIsOpen,
                             }"
                         >
