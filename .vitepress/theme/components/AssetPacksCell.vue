@@ -6,6 +6,7 @@ import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 import type { AssetPackStats } from "../types";
 import { ConnectionState } from "../types";
 import { downloadFile, shortenTimeString } from "../util";
+import { formatDate } from "../date";
 
 import { useDots } from "../composables/useDots";
 import { useGalleryState } from "../composables/useGalleryState";
