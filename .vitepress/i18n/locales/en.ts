@@ -226,7 +226,7 @@ const messages: MessageSchema = {
     update_stage_loading_manifest: "Loading manifest...",
     update_stage_flashing_firmware: "Flashing firmware...",
     update_stage_rebooting: "Rebooting...",
-    update_stage_done: "Update complete!",
+    update_stage_done: "Upload complete!",
     update_stage_error: "Error...",
     update_stage_pay_attention: "Pay attention to your Flipper!",
 

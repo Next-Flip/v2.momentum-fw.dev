@@ -1353,7 +1353,7 @@ export const useSerialConnection = () => {
 
         setUpdateStage("update_stage_pay_attention");
 
-        addLog("success", "[Firmware] Update completed successfully. Rebooting...");
+        addLog("success", "[Firmware] Upload completed successfully. Rebooting...");
         setUpdateStage("update_stage_rebooting");
         await asyncSleep(1000);
         setUpdateStage("update_stage_done");
