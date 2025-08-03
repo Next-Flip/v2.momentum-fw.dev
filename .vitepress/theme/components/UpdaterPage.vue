@@ -506,7 +506,7 @@ onBeforeUnmount(() => {
                                             <v-icon
                                                 v-else-if="updateStage === 'update_stage_flipper_updating'"
                                                 name="md-hourglasstop-round"
-                                                :scale="1.85"
+                                                :scale="1.5"
                                                 class="text-yellow-500"
                                             />
                                         </div>
