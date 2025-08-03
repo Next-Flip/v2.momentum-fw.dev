@@ -10,10 +10,12 @@ let flipper, rpcIdle = true
 const commandQueue = []
 
 function enqueue (c) {
+  if (!c.commandId) c.commandId = rpc.nextCommandId()
   commandQueue.push(c)
   if (rpcIdle) {
     sendRpcRequest()
   }
+  return c.commandId
 }
 
 async function sendRpcRequest () {
@@ -85,11 +87,12 @@ async function startRpcSession (f) {
 
 function stopRpcSession () {
   return new Promise((resolve) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'stopSession',
       args: {}
     })
-    const unbind = emitter.on('response', async () => {
+    const unbind = emitter.on('response', async (res) => {
+      if (res.commandId !== commandId) return;
       await asyncSleep(300)
       await flipper.closeReader()
       rpc.flushCommandQueue()

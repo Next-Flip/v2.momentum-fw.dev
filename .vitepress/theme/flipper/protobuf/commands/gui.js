@@ -2,13 +2,14 @@ import { enqueue, emitter } from './core'
 
 function startVirtualDisplay (firstFrame) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiStartVirtualDisplayRequest',
       args: {
         firstFrame: firstFrame
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -21,11 +22,12 @@ function startVirtualDisplay (firstFrame) {
 
 function stopVirtualDisplay () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiStopVirtualDisplayRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -38,11 +40,12 @@ function stopVirtualDisplay () {
 
 function startScreenStreamRequest () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiStartScreenStreamRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -56,11 +59,12 @@ function startScreenStreamRequest () {
 function stopScreenStreamRequest () {
   emitter.emit('stop screen streaming')
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiStopScreenStreamRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -73,13 +77,14 @@ function stopScreenStreamRequest () {
 
 function screenFrame (data) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiScreenFrame',
       args: {
         data: data
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -92,7 +97,7 @@ function screenFrame (data) {
 
 function sendInputEvent (key, type) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'guiSendInputEventRequest',
       args: {
         key: key,
@@ -100,6 +105,7 @@ function sendInputEvent (key, type) {
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
