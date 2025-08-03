@@ -1022,13 +1022,14 @@ export const useSerialConnection = () => {
         flags.installStatus = InstallStatus.LOADING;
         step++;
 
-        let removeOldPacksTask: Promise<void> | null = null;
         const packTar = await downloadPackWithProgress(pack, setProgress).catch((error) => {
             addLog("error", `[AssetPacks] ${error.toString()}`);
             throw new Error(error.toString());
         });
 
-        removeOldPacksTask = removeOldPacks(pack);
+        flags.installStatus = InstallStatus.CLEANUP;
+        await removeOldPacks(pack);
+
         flags.installStatus = InstallStatus.COPYING;
         step++;
 
@@ -1038,8 +1039,6 @@ export const useSerialConnection = () => {
 
         await writePackToDevice(tempFile, packTar, setProgress);
 
-        flags.installStatus = InstallStatus.CLEANUP;
-        await removeOldPacksTask;
         flags.installStatus = InstallStatus.EXTRACT;
         step++;
 

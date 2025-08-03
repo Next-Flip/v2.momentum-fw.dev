@@ -9,6 +9,7 @@ export type MessageSchema = {
     delete: string;
     install: string;
     reflash: string;
+    update: string;
     pack_advert: string;
     added: string;
     "Last Updated": string;

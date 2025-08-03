@@ -80,12 +80,10 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
 
         const installedManifest =
             installedPacks && typeof installedPacks === "object"
-                ? (installedPacks as Record<string, unknown>)[pack.id]
+                ? installedPacks[pack.id]
                 : undefined;
         const isInstalled = !!installedManifest;
-        const currentSha256 = zipFile?.sha256 || pack.files?.[0]?.sha256;
-        const hasUpdate =
-            isInstalled && (installedManifest as { sha256?: string })?.sha256 !== currentSha256;
+        const hasUpdate = isInstalled && installedManifest.sha256 !== tarFile.sha256;
 
         return {
             id: String(pack.id || pack.name?.toLowerCase().replace(/\s+/g, "-") || "unknown"),

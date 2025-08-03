@@ -9,6 +9,7 @@ const messages: MessageSchema = {
     install: "Install",
     delete: "Remove from Flipper",
     reflash: "Reflash",
+    update: "Update",
     pack_advert: "Want your pack here? →",
     added: "Added",
     "Last Updated": "Last Updated",

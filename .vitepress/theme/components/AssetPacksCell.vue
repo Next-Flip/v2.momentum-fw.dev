@@ -269,7 +269,7 @@ const getActionLabel = computed(() => {
         return tr("Loading");
     }
 
-    return props.installed ? tr("reflash") : tr("install");
+    return !props.installed ? tr("install") : props.hasUpdate ? tr("update") : tr("reflash");
 });
 
 const isBeingDeleted = computed(() => {
@@ -451,8 +451,13 @@ onUnmounted(() => {
                             <div
                                 class="text-left whitespace-nowrap text-[13px] leading-[22px] py-[2px]"
                             >
-                                <div v-if="addedTimestamp">{{ tr("added") }}: {{ formatDate(addedTimestamp, "fullYear") }}</div>
-                                <div v-if="updatedTimestamp">{{ tr("last_updated") }}: {{ formatDate(updatedTimestamp, "fullYear") }}</div>
+                                <div v-if="addedTimestamp">
+                                    {{ tr("added") }}: {{ formatDate(addedTimestamp, "fullYear") }}
+                                </div>
+                                <div v-if="updatedTimestamp">
+                                    {{ tr("last_updated") }}:
+                                    {{ formatDate(updatedTimestamp, "fullYear") }}
+                                </div>
                             </div>
                         </template>
                     </Tooltip>
