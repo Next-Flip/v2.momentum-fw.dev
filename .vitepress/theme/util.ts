@@ -1,6 +1,4 @@
 import log from "loglevel";
-import type { ReleaseItem } from "../../_data/releases";
-import { devbuildReleases, mainlineReleases } from "../../_data/releases";
 import messages, { SupportedLocales } from "../i18n/index.js";
 import { useI18n } from "./composables/useI18n";
 import type { RegionsData } from "./types";
@@ -14,7 +12,7 @@ export function supportsSerialPort(): boolean {
 }
 
 export function devMode() {
-    if (typeof window === "undefined") return true;
+    if (typeof window === "undefined") return false;
     const host = window.location.hostname;
     return host === "localhost" || host === "127.0.0.1";
 }
