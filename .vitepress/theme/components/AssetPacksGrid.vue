@@ -366,7 +366,7 @@ const filteredAssetPacks = computed(() => {
                 >
                     <motion.div
                         v-for="(pack, cellIndex) in rows[index]"
-                        :key="`${pack.id}-${pack.installedSha256 || 'no-sha'}`"
+                        :key="pack.id"
                         class="min-w-0"
                         v-bind="getStaggeredVariant(index, cellIndex)"
                     >
@@ -384,7 +384,6 @@ const filteredAssetPacks = computed(() => {
                             :added-timestamp="pack.addedTimestamp"
                             :stats="pack.stats"
                             :installed="pack.installed"
-                            :installed-sha256="pack.installedSha256"
                             :has-update="pack.hasUpdate"
                             :tar-file="pack.tarFile"
                         />

@@ -52,7 +52,6 @@ interface Props {
     addedTimestamp?: number;
     stats?: AssetPackStats & { folders?: string[] };
     installed?: boolean;
-    installedSha256?: string;
     hasUpdate?: boolean;
     tarFile?: {
         url: string;
@@ -69,7 +68,6 @@ const props = withDefaults(defineProps<Props>(), {
     addedTimestamp: undefined,
     stats: () => ({ anims: 0, icons: 0, passport: [], fonts: [] }) as AssetPackStats,
     installed: false,
-    installedSha256: undefined,
     hasUpdate: false,
     tarFile: undefined,
 });
@@ -206,10 +204,7 @@ const handlePackAction = async (action: "install" | "remove" | "download") => {
             name: props.name,
             author: props.author,
             description: props.description,
-            tarFile: props.tarFile || {
-                url: props.downloadUrl || "",
-                sha256: props.installedSha256 || "",
-            },
+            tarFile: props.tarFile,
             stats: {
                 ...props.stats,
                 folders: props.stats?.folders || [],

@@ -101,7 +101,6 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
                 folders: pack.stats?.folders || [],
             },
             installed: isInstalled,
-            installedSha256: (installedManifest as { sha256?: string })?.sha256,
             hasUpdate: hasUpdate,
             tarFile: tarFile
                 ? {

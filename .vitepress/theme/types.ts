@@ -92,7 +92,6 @@ export interface AssetPack {
     addedTimestamp?: number;
     stats?: AssetPackStats;
     installed: boolean;
-    installedSha256?: string;
     hasUpdate?: boolean;
     tarFile?: {
         url: string;
