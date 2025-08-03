@@ -190,7 +190,6 @@ onBeforeUnmount(() => {
                     >
                         <div
                             class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
-                            :class="currentTheme === 'white' ? 'dark:bg-white/80' : ''"
                         >
                             <div
                                 class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"

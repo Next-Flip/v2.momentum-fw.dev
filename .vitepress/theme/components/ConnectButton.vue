@@ -142,7 +142,7 @@ onMounted(() => {
 <template>
     <div class="flex items-center mr-auto">
         <div
-            :class="['VPFlyout ml-8', isUpdatePage && '!hidden']"
+            :class="['VPFlyout ml-8', supportsSerialPort() && isUpdatePage && '!hidden']"
             @mouseenter="handleMouse(true)"
             @mouseleave="handleMouse(false)"
         >
@@ -326,7 +326,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div :class="isUpdatePage ? 'ml-8' : 'ml-3'">
+        <div v-if="supportsSerialPort()" :class="isUpdatePage ? 'ml-8' : 'ml-3'">
             <AutoconnectToggle />
         </div>
     </div>

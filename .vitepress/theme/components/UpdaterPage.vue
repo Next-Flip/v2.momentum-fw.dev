@@ -53,7 +53,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
-const isLogsExpanded = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
+const isLogsOpen = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
 const testMode = ref(devMode() || false);
 
 const logsScrollTrigger = ref(0);
@@ -353,7 +353,7 @@ const displayFileDate = computed(() => {
 });
 
 const toggleLogs = () => {
-    isLogsExpanded.value = !isLogsExpanded.value;
+    isLogsOpen.value = !isLogsOpen.value;
 };
 
 const isChangelogOpen = computed(() => changelogState.value === "open");
@@ -421,7 +421,7 @@ onBeforeUnmount(() => {
 
                     <div
                         ref="dropZoneRef"
-                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300"
+                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 gap-y-5 overflow-hidden"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
@@ -433,7 +433,7 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="!isChangelogExpanded"
-                            class="relative flex flex-col bg-vp-dark/55 backdrop-blur-sm z-10"
+                            class="relative flex flex-col z-10"
                             :class="{
                                 'min-h-[214px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
@@ -442,7 +442,7 @@ onBeforeUnmount(() => {
                             <Transition name="overlay-fade">
                                 <div
                                     v-if="showUpdateOverlay"
-                                    class="absolute inset-0 backdrop-blur-lg rounded-xl flex items-center justify-center z-50 min-h-0"
+                                    class="absolute inset-0 rounded-xl flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
                                         v-if="updateStage !== 'update_stage_done' && updateStage !== 'update_stage_flipper_updating'"
@@ -450,7 +450,7 @@ onBeforeUnmount(() => {
                                         :class="
                                             isChangelogExpanded
                                                 ? 'py-6 px-28 min-h-[175px] flex items-center justify-center'
-                                                : 'py-28 px-28'
+                                                : 'py-28 mt-6 px-28'
                                         "
                                     >
                                         <div class="flex flex-row items-start gap-5 w-full">
@@ -463,7 +463,7 @@ onBeforeUnmount(() => {
                                                 <v-icon
                                                     name="pr-download"
                                                     :scale="1.3"
-                                                    class="text-neutral-700"
+                                                    class="text-neutral-600"
                                                 />
                                             </div>
                                             <div class="flex flex-col gap-3.5 flex-1 min-w-0">
@@ -477,7 +477,7 @@ onBeforeUnmount(() => {
                                                         ) || tr("update_stage_updating")
                                                     }}
                                                 </p>
-                                                <div class="w-full bg-vp-soft rounded-full h-1">
+                                                <div class="w-full bg-vp-soft/80 rounded-full h-1">
                                                     <div
                                                         class="bg-vp-brand-2 h-1 rounded-full transition-all duration-100"
                                                         :style="{
@@ -493,7 +493,7 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
 
-                                    <div v-else class="flex flex-row items-center">
+                                    <div v-else class="flex flex-row items-center mt-[18px] mr-4">
                                         <div
                                             class="w-14 h-14 rounded-full flex items-center justify-center"
                                         >
@@ -518,11 +518,11 @@ onBeforeUnmount(() => {
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div v-if="!showUpdateOverlay" class="flex flex-col mb-7">
+                                <div v-if="!showUpdateOverlay" class="flex flex-col">
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[3%]"
+                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[5%]"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"
@@ -624,7 +624,7 @@ onBeforeUnmount(() => {
                                 >
                                     <div
                                         v-if="supportsSerialPort()"
-                                        class="flex items-end justify-start gap-2 mb-5"
+                                        class="flex items-end justify-start gap-2 mb-5 mt-7"
                                     >
                                         <div class="flex items-center justify-start gap-2">
                                             <Tooltip
@@ -728,19 +728,18 @@ onBeforeUnmount(() => {
 
                                     <div
                                         v-else-if="supportsSerialPort()"
-                                        class="w-full outline-dashed outline-vp-divider border-2 border-vp-dark rounded-[10px] flex items-center justify-center bg-vp-dark/60 dark:bg-vp-bg/70 cursor-pointer pt-6 pb-7 px-6 backdrop-blur-md relative z-10"
+                                        class="w-full border border-dashed border-vp-divider rounded-[10px] flex items-center justify-center cursor-pointer backdrop-blur-md relative z-10 p-px"
                                         :class="{
-                                            'border-vp-brand-1 bg-vp-brand-soft outline-vp-border/80':
-                                                isOverDropZone,
+                                            'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
                                                 flags.updateInProgress,
-                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/90 hover:outline-vp-border/80':
+                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/90 hover:border-vp-border/80':
                                                 !flags.updateInProgress,
                                         }"
                                         @click="handleFileUpload"
                                     >
                                         <div
-                                            class="flex flex-col items-center gap-0.5 text-center select-none"
+                                            class="flex flex-col items-center gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/70 w-full h-full pt-6 pb-7 px-6 rounded-[10px]"
                                         >
                                             <p class="text-sm text-vp-2">
                                                 {{
@@ -764,7 +763,7 @@ onBeforeUnmount(() => {
                                     />
                                     <div
                                         v-if="!showUpdateOverlay"
-                                        class="h-px bg-vp-divider w-auto mt-5 mb-5"
+                                        class="h-px bg-vp-divider w-auto mt-5 mx-5"
                                     ></div>
                                 </div>
                             </Transition>
@@ -785,7 +784,7 @@ onBeforeUnmount(() => {
                                 :selected-release="currentChangelogRelease"
                                 :uploaded-file="uploadedFile"
                                 :uploaded-file-release="uploadedFileRelease"
-                                :changelog-state="changelogState"
+                                :changelog-state="supportsSerialPort() ? changelogState : 'open'"
                                 @toggle-open-close="toggleChangelogOpenClose"
                                 @toggle-expand="toggleChangelogExpand"
                             />
@@ -802,7 +801,7 @@ onBeforeUnmount(() => {
                             }"
                         >
                             <UpdaterLogs
-                                :is-expanded="isLogsExpanded"
+                                :is-open="isLogsOpen"
                                 :changelog-is-open="isChangelogOpen"
                                 @toggle="toggleLogs"
                             />

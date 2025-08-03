@@ -87,7 +87,7 @@ const getButtonScale = (file: FirmwareFile) => {
             v-for="file in files"
             :key="'url' in file ? file.url : file.filename"
             :aria-label="file.filename"
-            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-all duration-100 group cursor-pointer"
+            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-all duration-75 group cursor-pointer"
             :class="getButtonScale(file)"
             @click="handleDownload(file)"
             @mousedown="handleMouse(file, 'down')"
@@ -96,7 +96,7 @@ const getButtonScale = (file: FirmwareFile) => {
         >
             <div
                 :class="[
-                    'py-2 pr-2 text-vp-brand-1/60 saturate-[70%] text-sm font-medium rounded-md transition-all duration-100 flex items-center justify-center flex-shrink-0 select-none',
+                    'py-2 pr-2 text-vp-brand-1/60 saturate-[70%] text-sm font-medium rounded-md transition-all duration-75 flex items-center justify-center flex-shrink-0 select-none',
                     currentTheme === 'orange'
                         ? 'group-hover:text-black dark:group-hover:text-black'
                         : currentTheme === 'white'

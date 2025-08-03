@@ -140,14 +140,15 @@ const handleDownloadRelease = () => {
     <div class="rounded-xl">
         <div class="flex flex-col lg:flex-row gap-3 items-end">
             <div class="flex flex-row gap-3 items-end w-full">
-                <div ref="channelDropdownRef" class="relative flex-shrink-0">
+                <div class="relative flex-shrink-0">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_channel_label") }}
                     </label>
                     <button
+                        ref="channelDropdownRef"
                         class="dropdown-button min-w-[160px] w-auto"
                         :class="{
                             'is-active': isChannelDropdownOpen,
@@ -215,14 +216,15 @@ const handleDownloadRelease = () => {
                     </Transition>
                 </div>
 
-                <div ref="releaseDropdownRef" class="relative flex-1 min-w-0">
+                <div class="relative flex-1 min-w-0">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_version_dropdown_label") }}
                     </label>
                     <button
+                        ref="releaseDropdownRef"
                         class="dropdown-button w-full"
                         :class="{
                             'is-active': isReleaseDropdownOpen,
@@ -368,7 +370,7 @@ const handleDownloadRelease = () => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
+                    class="rounded-full transition-all duration-150 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
                     :class="[
                         canFlash &&
                             !isMatchingRelease &&
@@ -379,14 +381,16 @@ const handleDownloadRelease = () => {
                     ]"
                 >
                     <Tooltip
-                        :disabled="!!canFlash || connectionState === 'connecting'"
+                        :disabled="
+                            !supportsSerialPort() || !!canFlash || connectionState === 'connecting'
+                        "
                         :delay="0"
                         :offset="18"
                         class="min-w-0 overflow-hidden"
                     >
                         <button
                             :disabled="!canFlash"
-                            class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-200 tracking-tighter uppercase whitespace-nowrap"
+                            class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-150 tracking-tighter uppercase whitespace-nowrap"
                             :class="
                                 canFlash
                                     ? `cursor-pointer ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
@@ -535,7 +539,7 @@ const handleDownloadRelease = () => {
 }
 
 .dropdown-item.is-selected {
-    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 7%, transparent);
     color: var(--vp-c-brand-1);
 }
 
