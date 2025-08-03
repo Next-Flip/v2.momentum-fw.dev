@@ -11,9 +11,13 @@ const commandQueue = [
   }
 ]
 
+function nextCommandId () {
+    return commandQueue.length
+}
+
 function createRequest (requestType, args, hasNext, commandId) {
   const options = {
-    commandId: commandId || commandQueue.length
+    commandId: commandId
   }
   options[requestType] = args
   if (hasNext) {
@@ -88,6 +92,6 @@ function flushCommandQueue () {
 }
 
 export {
-    createRequest, flushCommandQueue, parseResponse
+    nextCommandId, createRequest, flushCommandQueue, parseResponse
 }
 

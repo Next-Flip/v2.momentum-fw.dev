@@ -10,7 +10,7 @@ onmessage = function (event) {
       read(event.data.data)
       break
     case 'stop reading':
-      reader.cancel()
+      if(reader) reader.cancel()
       break
     case 'write':
       enqueue(event.data.data)

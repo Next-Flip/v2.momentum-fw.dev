@@ -2,11 +2,12 @@ import { enqueue, emitter } from './core'
 
 function ping () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemPingRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -19,11 +20,12 @@ function ping () {
 
 function getDatetime () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemGetDatetimeRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -49,13 +51,14 @@ function setDatetime (date) {
     weekday: date.getDay() || 7
   }
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemSetDatetimeRequest',
       args: {
         datetime: datetime
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -68,13 +71,14 @@ function setDatetime (date) {
 
 function reboot (mode) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemRebootRequest',
       args: {
         mode: mode
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -87,11 +91,12 @@ function reboot (mode) {
 
 function deviceInfo () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemDeviceInfoRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -104,11 +109,12 @@ function deviceInfo () {
 
 function powerInfo () {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemPowerInfoRequest',
       args: {}
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -121,13 +127,14 @@ function powerInfo () {
 
 function update (manifest) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'systemUpdateRequest',
       args: {
         updateManifest: manifest
       }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {

@@ -95,7 +95,7 @@ const InstallItems = [
     { text: "${m.nav_recent}", items: [...MainlineItems, ...DevbuildsItems] },
     {
         text: "${m.nav_releases}",
-        link: "${isRoot ? "/releases" : `/${locale}/releases`}",
+        link: "${isRoot ? "/releases/" : `/${locale}/releases/`}",
     },
 ];
 

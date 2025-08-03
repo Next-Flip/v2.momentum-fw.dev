@@ -2,11 +2,12 @@ import { enqueue, emitter } from './core'
 
 function info (path) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageInfoRequest',
       args: { path: path }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -19,11 +20,12 @@ function info (path) {
 
 function list (path) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageListRequest',
       args: { path: path }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -43,11 +45,12 @@ function list (path) {
 
 function read (path) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageReadRequest',
       args: { path: path }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -74,13 +77,15 @@ async function write (path, buffer) {
   for (let i = 0; i <= file.byteLength; i += 512) {
     const chunk = file.slice(i, i + 512)
     const write = new Promise((resolve, reject) => {
-      enqueue({
+      const newCommandId = enqueue({
         requestType: 'storageWriteRequest',
         args: { path: path, file: { data: chunk } },
         hasNext: chunk.byteLength === 512,
         commandId: commandId
       })
+      if (!commandId) commandId = newCommandId
       const unbind = emitter.on('response', res => {
+        if (res.commandId !== commandId) return;
         unbind()
         if (res && res.error) {
           reject(res.error, res)
@@ -96,7 +101,6 @@ async function write (path, buffer) {
           total: file.byteLength
         })
         lastRes = res
-        commandId = res.commandId
       })
   }
   return lastRes
@@ -104,11 +108,12 @@ async function write (path, buffer) {
 
 function mkdir (path) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageMkdirRequest',
       args: { path: path }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -121,11 +126,12 @@ function mkdir (path) {
 
 function remove (path, isRecursive) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageDeleteRequest',
       args: { path: path, recursive: isRecursive }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -138,11 +144,12 @@ function remove (path, isRecursive) {
 
 function rename (path, oldName, newName) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageRenameRequest',
       args: { oldPath: path + '/' + oldName, newPath: path + '/' + newName }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -155,11 +162,12 @@ function rename (path, oldName, newName) {
 
 function stat (path) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageStatRequest',
       args: { path: path }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
@@ -172,11 +180,12 @@ function stat (path) {
 
 function tarExtract (tarPath, outPath) {
   return new Promise((resolve, reject) => {
-    enqueue({
+    const commandId = enqueue({
       requestType: 'storageTarExtractRequest',
       args: { tarPath, outPath }
     })
     const unbind = emitter.on('response', res => {
+      if (res.commandId !== commandId) return;
       if (res && res.error) {
         reject(res.error, res)
       } else {
