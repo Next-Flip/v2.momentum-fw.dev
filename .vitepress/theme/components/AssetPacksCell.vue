@@ -535,6 +535,9 @@ onUnmounted(() => {
                                 serialConnection.queueState.queue.some(
                                     (queuedPack) => queuedPack.id === props.id,
                                 ) || isBeingDeleted,
+                            'opacity-50': installed && !hasUpdate,
+                            'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3':
+                                installed && hasUpdate,
                             'hover:text-black': currentTheme === 'orange',
                             'hover:text-vp-neutral-inverse': currentTheme === 'white',
                         }"
