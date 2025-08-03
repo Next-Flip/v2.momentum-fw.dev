@@ -26,6 +26,7 @@ const messages: MessageSchema = {
     Passports: "Passports",
     passport_moods: "Passport Moods",
     Fonts: "Fonts",
+    Updated: "Updated",
     coming_soon: "This feature is coming soon!",
     connect_flipper: "Connect your Flipper to install this pack directly!",
     Sort_By: "Sort by",

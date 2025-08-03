@@ -26,6 +26,7 @@ export type MessageSchema = {
     Passports: string;
     passport_moods: string;
     Fonts: string;
+    Updated: string;
     coming_soon: string;
     connect_flipper: string;
     Sort_By: string;

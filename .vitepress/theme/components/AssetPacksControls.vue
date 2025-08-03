@@ -11,6 +11,7 @@ interface Props {
     initialSortDirection?: SortDirection;
     initialFilter?: FilterOption[];
     initialSearchQuery?: string;
+    hasUpdates: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     initialSortDirection: "desc",
     initialFilter: () => [],
     initialSearchQuery: "",
+    hasUpdates: false,
 });
 
 const emit = defineEmits<{
@@ -57,12 +59,16 @@ const sortOptions = computed<DropdownOption[]>(() => [
     { value: "author", label: tr("Author") },
 ]);
 
-const filterOptions = computed<DropdownOption[]>(() => [
-    { value: "hasAnims", label: tr("Anims") },
-    { value: "hasIcons", label: tr("Icons") },
-    { value: "hasPassport", label: tr("Passports") },
-    { value: "hasFonts", label: tr("Fonts") },
-]);
+const filterOptions = computed(() => {
+    const options: DropdownOption[] = [
+        { value: "hasAnims", label: tr("Anims") },
+        { value: "hasIcons", label: tr("Icons") },
+        { value: "hasPassport", label: tr("Passports") },
+        { value: "hasFonts", label: tr("Fonts") },
+    ];
+    if (props.hasUpdates) options.push({ value: "hasUpdate", label: tr("Updated") });
+    return options;
+});
 
 const emitSearch = () => emit("search", searchQuery.value);
 const clearSearch = () => {

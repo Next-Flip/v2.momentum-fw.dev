@@ -146,6 +146,10 @@ const visibleRowIndexes = computed(() => {
     return indexes;
 });
 
+const hasUpdates = computed(() => {
+    return !!props.assetPacks.find((pack) => pack.hasUpdate);
+});
+
 const getStaggeredVariant = (rowIndex: number, cellIndex: number) => {
     const isScrollingDown = scrollDirection.value === "down";
     const perRow = ITEMS_PER_ROW.value;
@@ -251,27 +255,30 @@ const filteredAssetPacks = computed(() => {
     const direction = sortDirection.value;
     const multiplier = direction === "asc" ? 1 : -1;
 
-    if (activeFilters.value && activeFilters.value.length > 0) {
+    const filters = activeFilters.value;
+    if (filters && !hasUpdates.value) {
+        const hasUpdateIndex = filters.indexOf("hasUpdate");
+        if (hasUpdateIndex > -1) filters.splice(hasUpdateIndex, 1);
+    }
+
+    if (filters && filters.length > 0) {
         results = results.filter((pack) => {
-            return activeFilters.value.some((filterType: FilterOption) => {
-                let result = false;
+            return filters.some((filterType: FilterOption) => {
                 switch (filterType) {
                     case "hasAnims":
-                        result = (pack.stats?.anims ?? 0) > 0;
-                        break;
+                        return (pack.stats?.anims ?? 0) > 0;
                     case "hasIcons":
-                        result = (pack.stats?.icons ?? 0) > 0;
-                        break;
+                        return (pack.stats?.icons ?? 0) > 0;
                     case "hasPassport":
-                        result = (pack.stats?.passport?.length ?? 0) > 0;
-                        break;
+                        return (pack.stats?.passport?.length ?? 0) > 0;
                     case "hasFonts":
-                        result = (pack.stats?.fonts?.length ?? 0) > 0;
+                        return (pack.stats?.fonts?.length ?? 0) > 0;
+                    case "hasUpdate":
+                        return pack?.hasUpdate || false;
                         break;
                     default:
-                        result = false;
+                        return false;
                 }
-                return result;
             });
         });
     }
@@ -327,6 +334,7 @@ const filteredAssetPacks = computed(() => {
                     :initial-sort-field="sortField"
                     :initial-sort-direction="sortDirection"
                     :initial-filter="activeFilters"
+                    :has-updates="hasUpdates"
                     @search="handleSearch"
                     @sort="handleSort"
                     @filter="handleFilter"

@@ -231,7 +231,13 @@ export type LogoColor = (typeof LOGO_COLORS)[number];
 
 export type SortField = "updatedDate" | "addedDate" | "name" | "author";
 export type SortDirection = "asc" | "desc";
-export type FilterOption = "isInstalled" | "hasAnims" | "hasIcons" | "hasPassport" | "hasFonts";
+export type FilterOption =
+    | "isInstalled"
+    | "hasAnims"
+    | "hasIcons"
+    | "hasPassport"
+    | "hasFonts"
+    | "hasUpdate";
 
 export interface DropdownOption {
     value: SortField | FilterOption;
