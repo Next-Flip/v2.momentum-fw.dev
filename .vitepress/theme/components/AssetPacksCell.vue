@@ -47,8 +47,8 @@ interface Props {
     downloadUrl?: string;
     githubUrl?: string;
     showTimeAgo: "updated" | "added";
-    updatedDate?: string;
-    addedDate?: string;
+    updatedTimestamp?: number;
+    addedTimestamp?: number;
     stats?: AssetPackStats & { folders?: string[] };
     installed?: boolean;
     installedSha256?: string;
@@ -64,8 +64,8 @@ const props = withDefaults(defineProps<Props>(), {
     previewUrls: () => [],
     downloadUrl: "",
     githubUrl: "",
-    updatedDate: undefined,
-    addedDate: undefined,
+    updatedTimestamp: undefined,
+    addedTimestamp: undefined,
     stats: () => ({ anims: 0, icons: 0, passport: [], fonts: [] }) as AssetPackStats,
     installed: false,
     installedSha256: undefined,
@@ -282,10 +282,9 @@ const isBeingDeleted = computed(() => {
 });
 
 const shortTimeAgo = computed(() => {
-    const date = props.showTimeAgo === "added" ? props.addedDate : props.updatedDate;
-    if (!date) return "";
-    const isoDate = date.split(".").reverse().join("-");
-    const timeAgo = useTimeAgo(isoDate);
+    const timestamp = props.showTimeAgo === "added" ? props.addedTimestamp : props.updatedTimestamp;
+    if (!timestamp) return "";
+    const timeAgo = useTimeAgo(timestamp * 1000);
     return shortenTimeString(timeAgo.value);
 });
 
@@ -442,7 +441,7 @@ onUnmounted(() => {
                             <template #content>{{ author }}</template>
                         </Tooltip>
                     </div>
-                    <Tooltip v-if="updatedDate" :delay="300" class="shrink-0">
+                    <Tooltip v-if="shortTimeAgo" :delay="300" class="shrink-0">
                         <span
                             class="text-right text-[13px] text-vp-2 opacity-70 italic whitespace-nowrap cursor-help"
                             >{{ shortTimeAgo }}</span
@@ -451,8 +450,8 @@ onUnmounted(() => {
                             <div
                                 class="text-left whitespace-nowrap text-[13px] leading-[22px] py-[2px]"
                             >
-                                <div v-if="addedDate">{{ tr("added") }}: {{ addedDate }}</div>
-                                <div>{{ tr("last_updated") }}: {{ updatedDate }}</div>
+                                <div v-if="addedTimestamp">{{ tr("added") }}: {{ formatDate(addedTimestamp, "fullYear") }}</div>
+                                <div v-if="updatedTimestamp">{{ tr("last_updated") }}: {{ formatDate(updatedTimestamp, "fullYear") }}</div>
                             </div>
                         </template>
                     </Tooltip>

@@ -96,8 +96,8 @@ const mappedAssetPacks = computed<AssetPack[]>(() => {
             previewUrls: previewUrls,
             downloadUrl: useProxiedUrl(downloadUrl),
             githubUrl: pack.source_url || "",
-            updatedDate: formatDate(pack.stats?.updated || 0, "fullYear"),
-            addedDate: formatDate(pack.stats?.added || 0, "fullYear"),
+            updatedTimestamp: pack.stats?.updated,
+            addedTimestamp: pack.stats?.added,
             stats: {
                 ...pack.stats,
                 folders: pack.stats?.folders || [],

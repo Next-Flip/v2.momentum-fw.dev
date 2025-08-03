@@ -88,9 +88,8 @@ export interface AssetPack {
     previewUrls?: string[];
     downloadUrl?: string;
     githubUrl?: string;
-    updatedDate?: string;
-    updatedDateDisplay?: string;
-    addedDate?: string;
+    updatedTimestamp?: number;
+    addedTimestamp?: number;
     stats?: AssetPackStats;
     installed: boolean;
     installedSha256?: string;
