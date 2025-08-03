@@ -176,7 +176,6 @@ export const useSerialConnection = () => {
             firmwareState: reactive<FirmwareState>({
                 updateStage: "",
                 updateStageContext: {},
-                writeProgress: { filename: "", progress: 0 },
             }),
             connect: () => Promise.reject(new Error("Serial not available in SSR")),
             disconnect: () => Promise.reject(new Error("Serial not available in SSR")),
@@ -243,10 +242,6 @@ export const useSerialConnection = () => {
     const firmwareState = reactive<FirmwareState>({
         updateStage: "",
         updateStageContext: {},
-        writeProgress: {
-            filename: "",
-            progress: 0,
-        },
     });
 
     const setUpdateStage = (stage: string, context?: Record<string, string | number>) => {
@@ -296,10 +291,6 @@ export const useSerialConnection = () => {
             queueState.fakeExtractProgress = null;
         }
 
-        firmwareState.updateStage = "";
-        firmwareState.updateStageContext = {};
-        firmwareState.writeProgress.filename = "";
-        firmwareState.writeProgress.progress = 0;
         loadingInstalledPacks = false;
     };
 
@@ -1316,17 +1307,20 @@ export const useSerialConnection = () => {
                 if (file.name.endsWith("/")) {
                     path = path.slice(0, -1);
                 }
+                setUpdateStage("update_stage_creating_directory", { name: path });
                 await flipperModule.commands.storage.mkdir(path);
                 addLog("debug", `[Firmware] Created directory: ${path}`);
-                setUpdateStage("update_stage_creating_directory", { name: path });
             } else {
                 fileIndex++;
-                firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
+                setUpdateStage("update_stage_uploading_file", {
+                    count: fileIndex,
+                    total: files.length,
+                    name: file.name.split("/").pop() || file.name,
+                });
 
                 const unbind = flipperModule.emitter.on(
                     "storageWriteRequest/progress",
                     (e: { progress: number; total: number }) => {
-                        firmwareState.writeProgress.progress = e.progress / e.total;
                         flags.progress = e.progress / e.total;
                     },
                 );
@@ -1334,33 +1328,30 @@ export const useSerialConnection = () => {
                 await flipperModule.commands.storage.write("/ext/update/" + file.name, file.buffer);
                 unbind();
                 addLog("debug", `[Firmware] Uploaded file: ${file.name}`);
-                setUpdateStage("update_stage_uploaded_file", {
-                    count: fileIndex,
-                    total: files.length,
-                });
+
+                flags.progress = 1;
+                await asyncSleep(100);
+                flags.progress = 0;
+                await asyncSleep(100);
             }
-            await asyncSleep(300);
         }
 
-        firmwareState.writeProgress.filename = "";
-        firmwareState.writeProgress.progress = 0;
         flags.progress = 0;
 
         setUpdateStage("update_stage_loading_manifest");
         await flipperModule.commands.system.update(path + "/update.fuf");
         addLog("debug", "[Firmware] Loaded update manifest");
 
-        setUpdateStage("update_stage_pay_attention");
-
-        addLog("success", "[Firmware] Upload completed successfully. Rebooting...");
         setUpdateStage("update_stage_rebooting");
+        addLog("success", "[Firmware] Upload completed successfully. Rebooting...");
+        await flipperModule.commands.system.reboot(2);
         await asyncSleep(1000);
+
         setUpdateStage("update_stage_done");
         await asyncSleep(2000);
 
-        flags.updateInProgress = false;
-
-        await flipperModule.commands.system.reboot(2);
+        setUpdateStage("update_stage_flipper_updating");
+        await asyncSleep(2000);
     };
 
     const provisionRegion = async (flipperModule: FlipperModule): Promise<void> => {
@@ -1435,6 +1426,8 @@ export const useSerialConnection = () => {
             throw new Error("Device does not support firmware updates");
         }
 
+        firmwareState.updateStage = "";
+        firmwareState.updateStageContext = {};
         flags.updateInProgress = true;
         flags.progress = 0;
 
@@ -1495,12 +1488,10 @@ export const useSerialConnection = () => {
             addLog("warning", "[Test] Firmware update on unsupported device");
         }
 
-        flags.updateInProgress = true;
-        flags.progress = 0;
         firmwareState.updateStage = "";
         firmwareState.updateStageContext = {};
-        firmwareState.writeProgress.filename = "";
-        firmwareState.writeProgress.progress = 0;
+        flags.updateInProgress = true;
+        flags.progress = 0;
 
         flags.screenStreamPaused = true;
         if (flags.screenStream) {
@@ -1524,130 +1515,114 @@ export const useSerialConnection = () => {
             flags.updateInProgress = false;
             flags.progress = 0;
             flags.screenStreamPaused = false;
-            firmwareState.updateStage = "";
-            firmwareState.updateStageContext = {};
-            firmwareState.writeProgress.filename = "";
-            firmwareState.writeProgress.progress = 0;
         }
     };
 
     const testLoadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
-        try {
-            if (connectionData.deviceInfo?.hardware_region !== "0") {
-                setUpdateStage("update_stage_set_region");
-                addLog("info", "[Test] Region provisioning");
-                await asyncSleep(1000);
-                addLog("info", "[Test] Set Sub-GHz region: US");
-            }
-
-            setUpdateStage("update_stage_downloading_firmware");
-            addLog("info", "[Test] Loading firmware bundle");
-            await asyncSleep(1500);
-
-            let files: { name: string; size: number }[] = [];
-
-            if (uploadedFile) {
-                addLog("info", `[Test] Loading firmware from file: ${uploadedFile.name}`);
-                addLog("debug", `[Test] File size: ${uploadedFile.size} bytes`);
-
-                files = [
-                    { name: "update.fuf", size: 1024 },
-                    { name: "firmware.dfu", size: 2048000 },
-                    { name: "resources.tar", size: 512000 },
-                    { name: "scripts/update.sh", size: 256 },
-                    { name: "assets/", size: 0 },
-                ];
-                addLog("debug", `[Test] Extracted ${files.length} files from uploaded file`);
-                setUpdateStage("update_stage_extracted_files", { count: files.length });
-            } else {
-                const firmwareUrl = getFirmwareDownloadUrl(release);
-                if (!firmwareUrl) {
-                    throw new Error(`No firmware URL found for release: ${release.version}`);
-                }
-
-                addLog(
-                    "info",
-                    `[Test] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
-                );
-
-                files = [
-                    { name: "update.fuf", size: 1024 },
-                    { name: "firmware.dfu", size: 2048000 },
-                    { name: "resources.tar", size: 512000 },
-                    { name: "scripts/update.sh", size: 256 },
-                    { name: "assets/", size: 0 },
-                ];
-                addLog("debug", `[Test] Extracted ${files.length} files from download`);
-                setUpdateStage("update_stage_extracted_files", { count: files.length });
-            }
-
-            await asyncSleep(500);
-
-            let fileIndex = 0;
-            for (const file of files) {
-                if (file.size === 0) {
-                    addLog("debug", `[Test] Created directory: /ext/update/${file.name}`);
-                    setUpdateStage("update_stage_creating_directory", {
-                        name: `/ext/update/${file.name}`,
-                    });
-                    await asyncSleep(100);
-                } else {
-                    fileIndex++;
-                    firmwareState.writeProgress.filename = file.name.split("/").pop() || file.name;
-                    firmwareState.writeProgress.progress = 0;
-
-                    const uploadDuration = Math.max(500, Math.min(3000, file.size / 1000)); // 500ms to 3s based on file size
-                    const progressSteps = 20;
-                    const stepDuration = uploadDuration / progressSteps;
-
-                    for (let i = 0; i <= progressSteps; i++) {
-                        const progress = i / progressSteps;
-                        firmwareState.writeProgress.progress = progress;
-                        flags.progress = progress;
-                        await asyncSleep(stepDuration);
-                    }
-
-                    addLog("debug", `[Test] Uploaded file: ${file.name}`);
-                    setUpdateStage("update_stage_uploaded_file", {
-                        count: fileIndex,
-                        total: files.length,
-                    });
-                    await asyncSleep(300);
-                }
-            }
-
-            firmwareState.writeProgress.filename = "";
-            firmwareState.writeProgress.progress = 0;
-            flags.progress = 0;
-
-            setUpdateStage("update_stage_loading_manifest");
-            addLog("info", "[Test] Loading update manifest");
-            await asyncSleep(1000);
-            addLog("debug", "[Test] Loaded update manifest");
-
-            setUpdateStage("update_stage_pay_attention");
-            addLog("info", "[Test] Rebooting Flipper for update");
-            await asyncSleep(2000);
-
-            setUpdateStage("update_stage_flashing_firmware");
-            addLog("info", "[Test] Flashing firmware");
-
-            for (let i = 0; i <= 100; i += 5) {
-                flags.progress = i / 100;
-                await asyncSleep(200);
-            }
-
-            setUpdateStage("update_stage_rebooting");
-            await asyncSleep(1000);
-            setUpdateStage("update_stage_done");
-            await asyncSleep(2000);
-            flags.updateInProgress = false;
-
-            // await disconnect();
-        } catch (error) {
-            addLog("error", `[Test] Firmware error: ${error}`);
-            throw error;
+        if (!flags.connected || !flags.rpcActive) {
+            throw new Error("Device not connected or RPC not active");
         }
+
+        if (connectionData.deviceInfo?.hardware_region !== "0") {
+            setUpdateStage("update_stage_set_region");
+            await asyncSleep(1000);
+            addLog("info", "[Test] Set Sub-GHz region: US");
+        }
+
+        setUpdateStage("update_stage_downloading_firmware");
+        await asyncSleep(1500);
+
+        let files: { name: string; size: number }[] = [];
+
+        if (uploadedFile) {
+            addLog("info", `[Test] Loading firmware from file: ${uploadedFile.name}`);
+            addLog("debug", `[Test] File size: ${uploadedFile.size} bytes`);
+
+            files = [
+                { name: "update.fuf", size: 1024 },
+                { name: "firmware.dfu", size: 2048000 },
+                { name: "resources.tar", size: 512000 },
+                { name: "scripts/update.sh", size: 256 },
+                { name: "assets/", size: 0 },
+            ];
+            addLog("debug", `[Test] Extracted ${files.length} files from uploaded file`);
+            setUpdateStage("update_stage_extracted_files", { count: files.length });
+        } else {
+            const firmwareUrl = getFirmwareDownloadUrl(release);
+
+            if (!firmwareUrl) {
+                throw new Error(`No firmware URL found for release: ${release.version}`);
+            }
+
+            addLog(
+                "info",
+                `[Test] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
+            );
+
+            files = [
+                { name: "update.fuf", size: 1024 },
+                { name: "firmware.dfu", size: 2048000 },
+                { name: "resources.tar", size: 512000 },
+                { name: "scripts/update.sh", size: 256 },
+                { name: "assets/", size: 0 },
+            ];
+
+            addLog("debug", `[Test] Extracted ${files.length} files from download`);
+            setUpdateStage("update_stage_extracted_files", { count: files.length });
+        }
+
+        await asyncSleep(200);
+
+        let fileIndex = 0;
+        for (const file of files) {
+            if (file.size === 0) {
+                setUpdateStage("update_stage_creating_directory", {
+                    name: `/ext/update/${file.name}`,
+                });
+                await asyncSleep(50);
+                addLog("debug", `[Test] Created directory: /ext/update/${file.name}`);
+            } else {
+                fileIndex++;
+                setUpdateStage("update_stage_uploading_file", {
+                    count: fileIndex,
+                    total: files.length,
+                    name: file.name.split("/").pop() || file.name,
+                });
+
+                const uploadDuration = Math.max(500, Math.min(3000, file.size / 1000)); // 500ms to 3s based on file size
+                const progressSteps = 20;
+                const stepDuration = uploadDuration / progressSteps;
+
+                for (let i = 0; i <= progressSteps; i++) {
+                    const progress = i / progressSteps;
+                    flags.progress = progress;
+                    await asyncSleep(stepDuration);
+                }
+
+                addLog("debug", `[Test] Uploaded file: ${file.name}`);
+
+                flags.progress = 1;
+                await asyncSleep(100);
+                flags.progress = 0;
+                await asyncSleep(100);
+            }
+        }
+
+        flags.progress = 0;
+
+        setUpdateStage("update_stage_loading_manifest");
+        await asyncSleep(500);
+        addLog("debug", "[Test] Loaded update manifest");
+
+        setUpdateStage("update_stage_rebooting");
+        addLog("success", "[Test] Upload completed successfully. Rebooting...");
+        await asyncSleep(1000);
+
+        setUpdateStage("update_stage_done");
+        await asyncSleep(2000);
+
+        setUpdateStage("update_stage_flipper_updating");
+        await asyncSleep(2000);
     };
 
     return {

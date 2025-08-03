@@ -216,16 +216,15 @@ export type MessageSchema = {
     update_stage_downloading_firmware: string;
     update_stage_extracted_files: string;
     update_stage_creating_directory: string;
-    update_stage_uploaded_file: string;
+    update_stage_uploading_file: string;
     update_stage_loading_region_data: string;
     update_stage_loading_firmware_bundle: string;
     update_stage_loading_firmware_files: string;
     update_stage_loading_manifest: string;
-    update_stage_flashing_firmware: string;
     update_stage_rebooting: string;
     update_stage_done: string;
+    update_stage_flipper_updating: string;
     update_stage_error: string;
-    update_stage_pay_attention: string;
 
     updater_title: string;
     updater_description: string;

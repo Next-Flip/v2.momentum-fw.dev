@@ -12,6 +12,7 @@ export {
     LaInfoCircleSolid,
     MdCloseRound,
     MdFontdownloadOutlined,
+    MdHourglasstopRound,
     MdSortRound,
     OiCheck,
     OiChevronDown,

@@ -47,10 +47,7 @@ export function useConnectionInfo() {
         () =>
             serialConnection?.firmwareState || {
                 updateStage: "",
-                writeProgress: {
-                    filename: "",
-                    progress: 0,
-                },
+                updateStageContext: {},
             },
     );
 

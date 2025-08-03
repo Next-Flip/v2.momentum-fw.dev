@@ -445,7 +445,7 @@ onBeforeUnmount(() => {
                                     class="absolute inset-0 backdrop-blur-lg rounded-xl flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
-                                        v-if="updateStage !== 'update_stage_done'"
+                                        v-if="updateStage !== 'update_stage_done' && updateStage !== 'update_stage_flipper_updating'"
                                         class="w-full"
                                         :class="
                                             isChangelogExpanded
@@ -472,14 +472,14 @@ onBeforeUnmount(() => {
                                                 >
                                                     {{
                                                         tr(
-                                                            updateStage as any,
+                                                            updateStage,
                                                             updateStageContext,
                                                         ) || tr("update_stage_updating")
                                                     }}
                                                 </p>
                                                 <div class="w-full bg-vp-soft rounded-full h-1">
                                                     <div
-                                                        class="bg-vp-brand-2 h-1 rounded-full transition-all duration-300"
+                                                        class="bg-vp-brand-2 h-1 rounded-full transition-all duration-100"
                                                         :style="{
                                                             width: `${updateProgress * 100}%`,
                                                             boxShadow:
@@ -498,13 +498,20 @@ onBeforeUnmount(() => {
                                             class="w-14 h-14 rounded-full flex items-center justify-center"
                                         >
                                             <v-icon
+                                                v-if="updateStage === 'update_stage_done'"
                                                 name="oi-check"
                                                 :scale="1.85"
                                                 class="text-green-500"
                                             />
+                                            <v-icon
+                                                v-else-if="updateStage === 'update_stage_flipper_updating'"
+                                                name="md-hourglasstop-round"
+                                                :scale="1.85"
+                                                class="text-yellow-500"
+                                            />
                                         </div>
                                         <p class="text-lg font-medium text-vp-1 text-center">
-                                            {{ tr("update_stage_done") }}
+                                            {{ tr(updateStage, updateStageContext) }}
                                         </p>
                                     </div>
                                 </div>

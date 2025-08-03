@@ -77,13 +77,8 @@ function reboot (mode) {
         mode: mode
       }
     })
-    const unbind = emitter.on('response', res => {
-      if (res.commandId !== commandId) return;
-      if (res && res.error) {
-        reject(res.error, res)
-      } else {
-        resolve(res)
-      }
+    const unbind = emitter.on('disconnect', res => {
+      resolve(res)
       unbind()
     })
   })

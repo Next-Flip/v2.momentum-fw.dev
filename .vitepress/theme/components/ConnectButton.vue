@@ -44,6 +44,7 @@ const dotsState = computed(() => {
 });
 const isUpdatePage = computed(() => route.path.includes("/update"));
 const updateStage = computed(() => firmwareState.value.updateStage || "");
+const updateStageContext = computed(() => firmwareState.value.updateStageContext || {});
 
 const getConnectionDisplay = computed(() => {
     if (!supportsSerialPort()) {
@@ -189,7 +190,7 @@ onMounted(() => {
                         >
                             {{
                                 flags.updateInProgress
-                                    ? tr(updateStage as any) || tr("update_stage_updating_short")
+                                    ? tr(updateStage, updateStageContext) || tr("update_stage_updating_short")
                                     : getConnectionDisplay.text
                             }}
                         </span>

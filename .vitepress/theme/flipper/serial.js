@@ -22,6 +22,9 @@ if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
       operation.terminate(e.data)
     }
   }
+  navigator.serial.addEventListener("disconnect", () => {
+    flipper.emitter.emit('disconnect')
+  })
 }
 
 async function connect () {
