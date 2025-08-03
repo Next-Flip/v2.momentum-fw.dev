@@ -42,11 +42,13 @@ const installMethods = computed(() => [
         show: true,
         name: tr("releases_web_updater"),
         href: getLocalizedPath(`/update?version=${props.selectedRelease?.version}`),
+        isExternal: false,
     },
     {
         show: true,
         name: tr("releases_flipper_lab"),
         href: flipperLabUrl(props.selectedRelease as ReleaseItem),
+        isExternal: true,
     },
 ]);
 
@@ -261,14 +263,15 @@ watch(
                 <template v-for="method in installMethods" :key="method.name">
                     <a
                         :href="method.href"
-                        target="_blank"
+                        :target="method.isExternal ? '_blank' : undefined"
                         rel="noopener"
-                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-300 no-underline font-medium vp-external-link-icon whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
-                        :class="
+                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-300 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        :class="[
                             method.show
                                 ? 'opacity-100 visible relative pointer-events-auto'
-                                : 'opacity-0 invisible absolute pointer-events-none'
-                        "
+                                : 'opacity-0 invisible absolute pointer-events-none',
+                            method.isExternal ? 'vp-external-link-icon' : '',
+                        ]"
                     >
                         {{ method.name }}
                     </a>
