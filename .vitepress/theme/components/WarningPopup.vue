@@ -54,7 +54,7 @@ function handleConfirm() {
                         />
                     </div>
                     <h2 id="warning-title" class="text-base font-semibold text-vp-1">
-                        v2.momentum-fw.dev
+                        momentum-fw.dev
                     </h2>
                 </div>
             </div>

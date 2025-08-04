@@ -59,12 +59,12 @@ export default defineConfig({
             "meta",
             {
                 property: "og:image",
-                content: "https://v2.momentum-fw.dev/og.png",
+                content: "https://momentum-fw.dev/og.png",
             },
         ],
-        ["meta", { property: "og:url", content: "https://v2.momentum-fw.dev/" }],
+        ["meta", { property: "og:url", content: "https://momentum-fw.dev/" }],
         ["meta", { property: "og:type", content: "website" }],
-        ["meta", { property: "og:site_name", content: "v2.momentum-fw.dev" }],
+        ["meta", { property: "og:site_name", content: "momentum-fw.dev" }],
         ["meta", { property: "og:locale", content: "en_US" }],
         ["meta", { name: "twitter:creator", content: "@FlipperMomentum" }],
         ["meta", { name: "twitter:card", content: "summary_large_image" }],
@@ -80,7 +80,7 @@ export default defineConfig({
             "meta",
             {
                 name: "twitter:image",
-                content: "https://v2.momentum-fw.dev/og.png",
+                content: "https://momentum-fw.dev/og.png",
             },
         ],
         ["meta", { name: "twitter:alt", content: "Momentum Firmware" }],
@@ -89,7 +89,7 @@ export default defineConfig({
         ["link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" }],
     ],
     sitemap: {
-        hostname: "https://v2.momentum-fw.dev",
+        hostname: "https://momentum-fw.dev",
     },
     vite: {
         define: {

@@ -138,7 +138,7 @@ ${sidebarImport}${searchLocaleConfig}export const ${configName} = {
         ],
         sidebar: generateSidebars(${isRoot ? "undefined" : `"${locale}", ${locale}WikiTranslations`}),
         sitemap: {
-            hostname: 'https://v2.momentum-fw.dev'
+            hostname: 'https://momentum-fw.dev'
         },
         editLink: {
             pattern: editLinkPattern,
