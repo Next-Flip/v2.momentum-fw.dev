@@ -5,7 +5,7 @@ This repository contains the source for the Momentum Firmware website at [moment
 ## Project Structure
 
 ```zig
-v2.momentum-fw/
+v2.momentum-fw.dev/
 ├── .vitepress/          // VitePress configuration and theme
 │   ├── theme/           // Vue components and composables
 │   ├── config/          // Generated locale-specific configs
@@ -85,7 +85,7 @@ bun run clean:build     # Clean install and build
 
 - [flipperzero-protobuf](https://github.com/flipperdevices/flipperzero-protobuf)
 - [labs.flipper.net](https://github.com/flipperdevices/lab.flipper.net)
-- [Momentum-Website](https://github.com/Next-Flip/v2.momentum-fw.dev/tree/dev/.vitepress/i18n)
+- [Momentum-Website](https://github.com/Next-Flip/Momentum-Website)
 
 ## Support
 
