@@ -27,7 +27,7 @@ const generateWikiSidebar = (
             items: [
                 { page: "", text: override("Home", o, "home") },
                 {
-                    page: "faq",
+                    page: "FAQ",
                     text: override("Frequently Asked Questions", o, "faq"),
                 },
             ],
@@ -36,19 +36,19 @@ const generateWikiSidebar = (
             text: override("INSTALLATION", o, "installation"),
             items: [
                 {
-                    page: "installation",
+                    page: "Installation",
                     text: override("Web Updater (Browser)", o, "webUpdater"),
                 },
                 {
-                    page: "installation#flipper-labapp-browsermobile",
+                    page: "Installation#flipper-labapp-browsermobile",
                     text: override("Flipper Lab/App (Mobile)", o, "flipperLab"),
                 },
                 {
-                    page: "installation#qflipper-package-tgz",
+                    page: "Installation#qflipper-package-tgz",
                     text: override("qFlipper Package (.tgz)", o, "qflipper"),
                 },
                 {
-                    page: "installation#zipped-archive-zip",
+                    page: "Installation#zipped-archive-zip",
                     text: override("Zipped Archive (.zip)", o, "zippedArchive"),
                 },
             ],
@@ -57,19 +57,19 @@ const generateWikiSidebar = (
             text: override("ASSET PACKS", o, "assetPacks"),
             items: [
                 {
-                    page: "assets",
+                    page: "Assets",
                     text: override("What are Asset Packs", o, "whatAreAssetPacks"),
                 },
                 {
-                    page: "assets#how-to-install-asset-packs",
+                    page: "Assets#how-to-install-asset-packs",
                     text: override("How to install Asset Packs", o, "howToInstallAssetPacks"),
                 },
                 {
-                    page: "assets#create-your-own-asset-packs",
+                    page: "Assets#create-your-own-asset-packs",
                     text: override("Create your own Asset Packs", o, "createYourOwnAssetPacks"),
                 },
                 {
-                    page: "assets/community-asset-packs",
+                    page: "Assets/Community-Asset-Packs",
                     text: override("Community Asset Packs (List)", o, "communityAssetPacks"),
                 },
             ],
@@ -80,115 +80,115 @@ const generateWikiSidebar = (
             items: [
                 {
                     text: "Interface",
-                    page: "interface",
+                    page: "Interface",
                     collapsed: false,
                     items: [
                         {
                             text: "Graphics",
-                            page: "interface/graphics",
+                            page: "Interface/Graphics",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/graphics#asset-pack",
+                                    page: "Interface/Graphics#asset-pack",
                                     text: "Asset Pack",
                                 },
                                 {
-                                    page: "interface/graphics#animation-settings",
+                                    page: "Interface/Graphics#animation-settings",
                                     text: "Animation Settings",
                                 },
                             ],
                         },
                         {
                             text: "Mainmenu",
-                            page: "interface/mainmenu",
+                            page: "Interface/Mainmenu",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/mainmenu#menu-style",
+                                    page: "Interface/Mainmenu#menu-style",
                                     text: "Menu Style",
                                 },
                                 {
-                                    page: "interface/mainmenu#menu-management",
+                                    page: "Interface/Mainmenu#menu-management",
                                     text: "Menu Management",
                                 },
                             ],
                         },
                         {
                             text: "Lockscreen",
-                            page: "interface/lockscreen",
+                            page: "Interface/Lockscreen",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/lockscreen#lock-on-boot",
+                                    page: "Interface/Lockscreen#lock-on-boot",
                                     text: "Security",
                                 },
                                 {
-                                    page: "interface/lockscreen#allow-usb-rpc-while-locked",
+                                    page: "Interface/Lockscreen#allow-usb-rpc-while-locked",
                                     text: "RPC Access",
                                 },
                                 {
-                                    page: "interface/lockscreen#lockscreen-elements",
+                                    page: "Interface/Lockscreen#lockscreen-elements",
                                     text: "Lockscreen Elements",
                                 },
                             ],
                         },
                         {
                             text: "Statusbar",
-                            page: "interface/statusbar",
+                            page: "Interface/Statusbar",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/statusbar#battery-icon",
+                                    page: "Interface/Statusbar#battery-icon",
                                     text: "Battery Icon",
                                 },
                                 {
-                                    page: "interface/statusbar#show-clock",
+                                    page: "Interface/Statusbar#show-clock",
                                     text: "Show Clock",
                                 },
                                 {
-                                    page: "interface/statusbar#show-icons",
+                                    page: "Interface/Statusbar#show-icons",
                                     text: "Show Icons",
                                 },
                                 {
-                                    page: "interface/statusbar#bar-borders",
+                                    page: "Interface/Statusbar#bar-borders",
                                     text: "Bar Borders",
                                 },
                                 {
-                                    page: "interface/statusbar#bar-background",
+                                    page: "Interface/Statusbar#bar-background",
                                     text: "Bar Background",
                                 },
                             ],
                         },
                         {
                             text: "File Browser",
-                            page: "interface/file-browser",
+                            page: "Interface/File-Browser",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/file-browser#display-options",
+                                    page: "Interface/File-Browser#display-options",
                                     text: "Display Options",
                                 },
                                 {
-                                    page: "interface/file-browser#favorite-timeout",
+                                    page: "Interface/File-Browser#favorite-timeout",
                                     text: "Favorite Timeout",
                                 },
                             ],
                         },
                         {
                             text: "General",
-                            page: "interface/general",
+                            page: "Interface/General",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "interface/general#text-scroll",
+                                    page: "Interface/General#text-scroll",
                                     text: "Text Scroll",
                                 },
                                 {
-                                    page: "interface/general#clock-midnight-format",
+                                    page: "Interface/General#clock-midnight-format",
                                     text: "Clock Midnight Format",
                                 },
                                 {
-                                    page: "interface/general#popup-overlay",
+                                    page: "Interface/General#popup-overlay",
                                     text: "Popup Overlay",
                                 },
                             ],
@@ -197,51 +197,51 @@ const generateWikiSidebar = (
                 },
                 {
                     text: "Protocols",
-                    page: "protocols",
+                    page: "Protocols",
                     collapsed: false,
                     items: [
                         {
                             text: "SubGHz",
-                            page: "protocols/subghz",
+                            page: "Protocols/SubGHz",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "protocols/subghz#subghz-freqs",
+                                    page: "Protocols/SubGHz#subghz-freqs",
                                     text: "SubGHz Freqs",
                                 },
                                 {
-                                    page: "protocols/subghz#bypass-region-lock",
+                                    page: "Protocols/SubGHz#bypass-region-lock",
                                     text: "Bypass Region Lock",
                                 },
                                 {
-                                    page: "protocols/subghz#extend-freq-bands",
+                                    page: "Protocols/SubGHz#extend-freq-bands",
                                     text: "Extend Freq Bands",
                                 },
                                 {
-                                    page: "protocols/subghz#file-naming-prefix",
+                                    page: "Protocols/SubGHz#file-naming-prefix",
                                     text: "File Naming Prefix",
                                 },
                             ],
                         },
                         {
                             text: "GPIO Pins",
-                            page: "protocols/gpio",
+                            page: "Protocols/GPIO",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "protocols/gpio#cc1101-spi",
+                                    page: "Protocols/GPIO#cc1101-spi",
                                     text: "CC1101 SPI",
                                 },
                                 {
-                                    page: "protocols/gpio#hrf24-spi",
+                                    page: "Protocols/GPIO#hrf24-spi",
                                     text: "HRF24 SPI",
                                 },
                                 {
-                                    page: "protocols/gpio#esp32-8266-uart",
+                                    page: "Protocols/GPIO#esp32-8266-uart",
                                     text: "ESP32/8266 UART",
                                 },
                                 {
-                                    page: "protocols/gpio#nmea-gps-uart",
+                                    page: "Protocols/GPIO#nmea-gps-uart",
                                     text: "NMEA GPS UART",
                                 },
                             ],
@@ -250,68 +250,68 @@ const generateWikiSidebar = (
                 },
                 {
                     text: "Misc",
-                    page: "misc",
+                    page: "Misc",
                     collapsed: false,
                     items: [
                         {
                             text: "Screen",
-                            page: "misc/screen",
+                            page: "Misc/Screen",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "misc/screen#display-mode",
+                                    page: "Misc/Screen#display-mode",
                                     text: "Display Mode",
                                 },
                                 {
-                                    page: "misc/screen#rgb-settings",
+                                    page: "Misc/Screen#rgb-settings",
                                     text: "RGB Settings",
                                 },
                             ],
                         },
                         {
                             text: "Dolphin",
-                            page: "misc/dolphin",
+                            page: "Misc/Dolphin",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "misc/dolphin#dolphin-level",
+                                    page: "Misc/Dolphin#dolphin-level",
                                     text: "Dolphin Level",
                                 },
                                 {
-                                    page: "misc/dolphin#dolphin-xp",
+                                    page: "Misc/Dolphin#dolphin-xp",
                                     text: "Dolphin XP",
                                 },
                                 {
-                                    page: "misc/dolphin#dolphin-angry",
+                                    page: "Misc/Dolphin#dolphin-angry",
                                     text: "Dolphin Angry",
                                 },
                                 {
-                                    page: "misc/dolphin#butthurt-timer",
+                                    page: "Misc/Dolphin#butthurt-timer",
                                     text: "Butthurt Timer",
                                 },
                             ],
                         },
                         {
                             text: "Spoofing",
-                            page: "misc/spoofing",
+                            page: "Misc/Spoofing",
                             collapsed: true,
                             items: [
                                 {
-                                    page: "misc/spoofing#flipper-name",
+                                    page: "Misc/Spoofing#flipper-name",
                                     text: "Flipper Name",
                                 },
                                 {
-                                    page: "misc/spoofing#shell-color",
+                                    page: "Misc/Spoofing#shell-color",
                                     text: "Shell Color",
                                 },
                             ],
                         },
                         {
-                            page: "misc/vgm",
+                            page: "Misc/VGM",
                             text: "VGM Options",
                         },
                         {
-                            page: "misc/misc#momentum-intro",
+                            page: "Misc/index#momentum-intro",
                             text: "Momentum Intro",
                         },
                     ],

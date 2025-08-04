@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { MessageSchema } from ".vitepress/i18n";
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
@@ -11,6 +12,7 @@ import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
 import { formatDate } from "../date";
 import { STORAGE_KEYS } from "../types";
+
 import {
     bytesToSize,
     devMode,
@@ -445,7 +447,10 @@ onBeforeUnmount(() => {
                                     class="absolute inset-0 rounded-xl flex items-center justify-center z-50 min-h-0"
                                 >
                                     <div
-                                        v-if="updateStage !== 'update_stage_done' && updateStage !== 'update_stage_flipper_updating'"
+                                        v-if="
+                                            updateStage !== 'update_stage_done' &&
+                                            updateStage !== 'update_stage_flipper_updating'
+                                        "
                                         class="w-full"
                                         :class="
                                             isChangelogExpanded
@@ -472,7 +477,7 @@ onBeforeUnmount(() => {
                                                 >
                                                     {{
                                                         tr(
-                                                            updateStage,
+                                                            updateStage as keyof MessageSchema,
                                                             updateStageContext,
                                                         ) || tr("update_stage_updating")
                                                     }}
@@ -504,7 +509,9 @@ onBeforeUnmount(() => {
                                                 class="text-green-500"
                                             />
                                             <v-icon
-                                                v-else-if="updateStage === 'update_stage_flipper_updating'"
+                                                v-else-if="
+                                                    updateStage === 'update_stage_flipper_updating'
+                                                "
                                                 name="md-hourglasstop-round"
                                                 :scale="1.5"
                                                 class="text-yellow-500"
