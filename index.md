@@ -6,7 +6,7 @@ hero:
 
 features:
   - title: Asset Packs
-    details: Easily install of animations, icons and font themes, without recompiling. Pick from dozens of community packs, or make your own.
+    details: Easily install animations, icons and font themes, without recompiling. Pick from dozens of community packs, or make your own.
     icon:
       src: "/svg/palette.svg"
   - title: FindMy, Bad KB & BLE Spam
