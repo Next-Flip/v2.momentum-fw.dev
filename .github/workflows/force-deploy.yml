@@ -6,11 +6,16 @@ on:
     repository_dispatch:
         types: [force-deploy]
     workflow_dispatch:
+        inputs:
+            distinct_id:
 
 jobs:
     force-deploy:
         runs-on: ubuntu-latest
         steps:
+            - name: Distinct ID ${{ github.event.inputs.distinct_id }}
+              run: echo ${{ github.event.inputs.distinct_id }}
+
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
