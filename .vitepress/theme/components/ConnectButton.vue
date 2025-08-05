@@ -190,7 +190,8 @@ onMounted(() => {
                         >
                             {{
                                 flags.updateInProgress
-                                    ? tr(updateStage, updateStageContext) || tr("update_stage_updating_short")
+                                    ? tr(updateStage, updateStageContext) ||
+                                      tr("update_stage_updating_short")
                                     : getConnectionDisplay.text
                             }}
                         </span>
