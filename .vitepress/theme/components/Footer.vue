@@ -59,7 +59,7 @@ const navigationLinks = computed(() => [
     <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
         <div class="max-w-full mx-auto" :class="`py-16 pb-24 lg:pb-32 ${isWiki ? 'lg:px-0' : ''}`">
             <div
-                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl px-10 lg:px-16"
+                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl px-8 lg:px-16"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50">
                     <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">
@@ -78,7 +78,7 @@ const navigationLinks = computed(() => [
                             </a>
                             <button
                                 :aria-label="isLocked ? tr('theme_locked') : ''"
-                                class="lock-button opacity-0 group-hover/logo:opacity-100 transition-all duration-200 pl-0.5 p-1 rounded hover:bg-vp-c-default-soft text-vp-c-text-2 hover:text-vp-c-brand-1 text-vp-3/80 hover:text-vp-2"
+                                class="lock-button opacity-0 group-hover/logo:opacity-100 transition-all duration-200 pl-0.5 p-1 rounded text-vp-3/80 hover:!text-vp-2"
                                 @click="toggleLock"
                             >
                                 <v-icon :name="isLocked ? 'oi-lock' : 'oi-unlock'" scale="0.85" />
@@ -133,7 +133,7 @@ const navigationLinks = computed(() => [
 
                 <div
                     v-if="recentReleases.mainline.length > 0 || recentReleases.devbuilds.length > 0"
-                    :class="`grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-10 ${isWiki ? 'lg:gap-12' : 'lg:gap-20'}`"
+                    :class="`grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-8 ${isWiki ? 'lg:gap-12' : 'lg:gap-20'}`"
                 >
                     <div class="contents md:block md:space-y-6">
                         <FooterSection
@@ -161,13 +161,6 @@ const navigationLinks = computed(() => [
 <style scoped>
 .footer-logo {
     position: relative;
-}
-
-.lock-button {
-    transition:
-        opacity 0.2s ease-in-out,
-        background-color 0.15s ease-in-out,
-        color 0.15s ease-in-out;
 }
 
 .lock-button:hover {

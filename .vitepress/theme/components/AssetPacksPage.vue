@@ -4,7 +4,6 @@ import { packs } from "../../../_data/packs.ts";
 import { useI18n } from "../composables/useI18n";
 import type { AssetPack, AssetPackFile } from "../types";
 import { AssetPackEntry } from "../types.ts";
-import { formatDate } from "../date";
 
 import { useProxiedUrl } from "../composables/useProxiedUrl";
 import type { useSerialConnection } from "../composables/useSerialConnection";
@@ -154,6 +153,7 @@ onMounted(async () => {
 .asset-packs-container > * {
     position: relative;
     z-index: 2;
+    min-height: calc(100vh - var(--vp-nav-height));
 }
 
 @media (min-width: 768px) {

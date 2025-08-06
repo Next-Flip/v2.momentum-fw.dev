@@ -180,7 +180,7 @@ watch(
                 <img
                     :src="imageSrc"
                     :alt="selectedRelease?.version"
-                    class="w-full h-auto rounded-lg border !my-0 border-vp-divider/30 cursor-pointer"
+                    class="w-full h-auto rounded-lg border !my-0 border-vp-divider/30 cursor-pointer select-none"
                     @click="openImageInNewTab(selectedRelease?.version || '')"
                 />
             </div>

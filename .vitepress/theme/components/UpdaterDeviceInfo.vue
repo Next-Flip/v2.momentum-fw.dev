@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useScroll } from "@vueuse/core";
 import { computed, useTemplateRef } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
@@ -13,9 +12,8 @@ import ScreenDisplay from "./ScreenDisplay.vue";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
-const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const {
@@ -259,7 +257,7 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/85"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-vp-divider/70 lg:border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/85"
         :class="{
             '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
             'py-8 pb-12': !isConnected,
@@ -307,11 +305,11 @@ const deviceSections = computed(() => {
                                         <a
                                             :class="[
                                                 'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55',
-                                                'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50',
+                                                'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
                                                 { 'wiggle-loop': isInstallButtonHovered },
-                                                currentTheme === 'orange'
+                                                ifCurrentTheme(['orange'])
                                                     ? 'hover:text-black'
-                                                    : currentTheme === 'white'
+                                                    : ifCurrentTheme(['white'])
                                                       ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
                                                       : 'hover:text-white',
                                             ]"
@@ -325,18 +323,10 @@ const deviceSections = computed(() => {
                     </div>
                 </div>
 
-                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative pt-3">
-                    <div
-                        class="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-vp-dark/60 to-transparent pointer-events-none mr-4 opacity-0 transition-opacity duration-300"
-                        :class="{ 'opacity-100': !arrivedState.top }"
-                    ></div>
-                    <div
-                        class="absolute bottom-[57px] left-0 right-0 h-20 bg-gradient-to-t from-vp-dark/60 to-transparent pointer-events-none z-20 mx-2 mr-4 opacity-0 transition-opacity duration-300"
-                        :class="{ 'opacity-100': !arrivedState.bottom }"
-                    ></div>
+                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative pt-4">
                     <div
                         ref="el"
-                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[17px] mb-[7px] mr-[7px] pt-[12px] relative z-10"
+                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[17px] mr-[7px] pt-2 relative z-10"
                     >
                         <h2 class="text-base leading-3 uppercase font-semibold text-vp-1 mb-5">
                             {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
@@ -425,10 +415,10 @@ const deviceSections = computed(() => {
 .device-info-container:before {
     content: "";
     position: absolute;
-    top: -25%;
-    left: -28%;
-    width: 150%;
-    height: 150%;
+    top: 24%;
+    left: 18%;
+    width: 60%;
+    height: 60%;
     transform: rotate(-45deg);
     background-image: url("/bg/flipper.png");
     background-size: contain;
@@ -438,6 +428,15 @@ const deviceSections = computed(() => {
     filter: saturate(0);
     z-index: -1;
     transition: opacity 0.2s ease-in-out;
+}
+
+@media (min-width: 1024px) {
+    .device-info-container:before {
+        top: -25%;
+        left: -28%;
+        width: 150%;
+        height: 150%;
+    }
 }
 
 .dark .device-info-container:before {

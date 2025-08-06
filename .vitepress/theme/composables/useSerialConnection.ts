@@ -1,6 +1,7 @@
 import log from "loglevel";
 import semver from "semver";
 import { reactive, ref } from "vue";
+import type { ReleaseItem } from "../../../_data/releases";
 import {
     ConnectionState,
     InstallStatus,
@@ -16,11 +17,9 @@ import {
     type SerialConnectionData,
     type SerialPort,
 } from "../types";
-import { fetchFirmware, fetchRegions, getCurrentLocale, unpack } from "../util";
+import { fetchFirmware, fetchRegions, formatDuration, getCurrentLocale, unpack } from "../util";
 import { useProxiedUrl } from "./useProxiedUrl";
-
-import type { ReleaseItem } from "../../../_data/releases";
-import { useAutoconnectSetting } from "./useAutoconnectSetting";
+import { useSettings } from "./useSettings";
 
 const asyncSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -104,7 +103,7 @@ const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
 export const useSerialConnection = () => {
     log.setLevel("debug");
 
-    const { isAutoconnectEnabled } = useAutoconnectSetting();
+    const { isAutoconnectEnabled, isClearLogsEnabled } = useSettings();
     interface LogEntry {
         timestamp: Date;
         level: "info" | "warning" | "error" | "success" | "debug";
@@ -580,7 +579,9 @@ export const useSerialConnection = () => {
         connectionData.state = ConnectionState.CONNECTING;
         connectionData.error = undefined;
         flags.portSelectRequired = false;
-        clearLogs();
+        if (isClearLogsEnabled.value) {
+            clearLogs();
+        }
 
         try {
             flipper = await getFlipperModule();
@@ -1253,6 +1254,7 @@ export const useSerialConnection = () => {
             throw new Error("Device not connected or RPC not active");
         }
 
+        const uploadStartTime = performance.now();
         const flipperModule = await getFlipperModule();
 
         if (connectionData.deviceInfo?.hardware_region !== "0") {
@@ -1343,7 +1345,12 @@ export const useSerialConnection = () => {
         addLog("debug", "[Firmware] Loaded update manifest");
 
         setUpdateStage("update_stage_rebooting");
-        addLog("success", "[Firmware] Upload completed successfully. Rebooting...");
+        const uploadDuration = performance.now() - uploadStartTime;
+        const formattedDuration = formatDuration(uploadDuration);
+        addLog(
+            "success",
+            `[Firmware] Upload completed in ${formattedDuration} successfully. Rebooting...`,
+        );
         await flipperModule.commands.system.reboot(2);
         await asyncSleep(1000);
 
@@ -1444,7 +1451,6 @@ export const useSerialConnection = () => {
 
         try {
             await loadFirmware(release, uploadedFile);
-            addLog("success", "[Firmware] Firmware update completed successfully");
             return true;
         } catch (error) {
             addLog("error", `[Firmware] Firmware update failed: ${error}`);
@@ -1478,7 +1484,8 @@ export const useSerialConnection = () => {
 
     const testUpdateFirmware = async (
         release: ReleaseItem,
-        uploadedFile?: File,
+        uploadedFile?: File | null,
+        loop: boolean = false,
     ): Promise<boolean> => {
         if (!flags.connected || !flags.rpcActive) {
             addLog("warning", "[Test] Firmware update without device connection");
@@ -1506,7 +1513,6 @@ export const useSerialConnection = () => {
 
         try {
             await testLoadFirmware(release, uploadedFile);
-            addLog("success", "[Test] Firmware update completed successfully");
             return true;
         } catch (error) {
             addLog("error", `[Test] Firmware update failed: ${error}`);
@@ -1515,13 +1521,22 @@ export const useSerialConnection = () => {
             flags.updateInProgress = false;
             flags.progress = 0;
             flags.screenStreamPaused = false;
+            await asyncSleep(2000);
+            if (loop) {
+                await testUpdateFirmware(release, uploadedFile, true);
+            }
         }
     };
 
-    const testLoadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
+    const testLoadFirmware = async (
+        release: ReleaseItem,
+        uploadedFile?: File | null,
+    ): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Device not connected or RPC not active");
         }
+
+        const uploadStartTime = performance.now();
 
         if (connectionData.deviceInfo?.hardware_region !== "0") {
             setUpdateStage("update_stage_set_region");
@@ -1615,7 +1630,12 @@ export const useSerialConnection = () => {
         addLog("debug", "[Test] Loaded update manifest");
 
         setUpdateStage("update_stage_rebooting");
-        addLog("success", "[Test] Upload completed successfully. Rebooting...");
+        const uploadDuration = performance.now() - uploadStartTime;
+        const formattedDuration = formatDuration(uploadDuration);
+        addLog(
+            "success",
+            `[Test] Upload completed in ${formattedDuration} successfully. Rebooting...`,
+        );
         await asyncSleep(1000);
 
         setUpdateStage("update_stage_done");

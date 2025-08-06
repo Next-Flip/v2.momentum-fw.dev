@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useScroll, useWindowSize } from "@vueuse/core";
+import { useWindowSize } from "@vueuse/core";
 import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
@@ -9,7 +9,6 @@ import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
-const { arrivedState } = useScroll(el);
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
 
@@ -204,18 +203,9 @@ const releaseHref = computed(() => {
             </div>
 
             <div
-                class="absolute top-14 left-0 right-0 h-20 bg-gradient-to-b from-vp-elv/95 dark:from-vp-elv/90 to-transparent pointer-events-none z-[2] mr-4 opacity-0 transition-opacity duration-300"
-                :class="{ 'opacity-100': isAccessible && !arrivedState.top && !isClosed }"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-vp-elv/95 dark:from-vp-elv/90 to-transparent pointer-events-none z-[2] mr-4 opacity-0 transition-opacity duration-300"
-                :class="{ 'opacity-100': isAccessible && !arrivedState.bottom && !isClosed }"
-            ></div>
-
-            <div
                 v-if="isAccessible && !isClosed"
                 ref="el"
-                class="flex-1 overflow-y-auto px-4 my-[7px] sm:px-6 mr-[7px] relative transition-all duration-300 ease-in-out"
+                class="flex-1 overflow-y-auto px-4 sm:px-6 mr-[7px] relative transition-all duration-300 ease-in-out"
                 :class="{ 'px-8 pb-8': isExpanded }"
             >
                 <div class="prose prose-sm dark:prose-invert max-w-none text-vp-1 mb-6">
@@ -329,6 +319,11 @@ const releaseHref = computed(() => {
 .prose :deep(em) {
     color: var(--vp-c-text-2);
     font-style: italic;
+}
+
+.prose :deep(code) {
+    color: var(--vp-c-alternate-1);
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent);
 }
 
 .changelog-expanded .prose {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, useTemplateRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
@@ -13,9 +13,10 @@ import { supportsSerialPort } from "../util";
 
 import Tooltip from "./Tooltip.vue";
 
+const el = useTemplateRef<HTMLElement>("el");
 const { tr } = useI18n();
 const { dots } = useDots();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 interface Props {
     selectedChannel: "mainline" | "devbuild" | null;
@@ -176,7 +177,7 @@ const handleDownloadRelease = () => {
                                 :class="{ 'is-visible': isChannelDropdownOpen }"
                             >
                                 <div
-                                    class="flex flex-col overflow-hidden max-h-60 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    class="flex flex-col overflow-hidden max-h-60 overflow-y-auto my-[7px] rounded-[4px] bg-vp-soft-mute"
                                 >
                                     <span
                                         v-for="channel in channelOptions"
@@ -194,12 +195,12 @@ const handleDownloadRelease = () => {
                                         >
                                             <div class="flex flex-col min-w-0 flex-1">
                                                 <span
-                                                    class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis"
+                                                    class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis select-none"
                                                 >
                                                     {{ channel.label }}
                                                 </span>
                                                 <span
-                                                    class="text-xs text-vp-3 whitespace-nowrap overflow-hidden text-ellipsis"
+                                                    class="text-xs text-vp-3 whitespace-nowrap overflow-hidden text-ellipsis select-none"
                                                     :class="{
                                                         'text-vp-brand-1/60':
                                                             selectedChannel === channel.value,
@@ -255,7 +256,8 @@ const handleDownloadRelease = () => {
                                 :class="{ 'is-visible': isReleaseDropdownOpen }"
                             >
                                 <div
-                                    class="flex flex-col overflow-hidden max-h-[224px] pr-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    ref="el"
+                                    class="flex flex-col overflow-hidden max-h-[224px] pr-[7px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
@@ -271,7 +273,7 @@ const handleDownloadRelease = () => {
                                     >
                                         <div class="flex flex-row items-center gap-2 min-w-0">
                                             <span
-                                                class="font-medium text-vp-1 font-mono flex-shrink-0"
+                                                class="font-medium text-vp-1 font-mono flex-shrink-0 select-none"
                                                 :class="{
                                                     'text-vp-brand-1':
                                                         selectedRelease?.version ===
@@ -305,7 +307,7 @@ const handleDownloadRelease = () => {
                                             </Tooltip>
                                         </div>
                                         <span
-                                            class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono"
+                                            class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono select-none"
                                             :class="{
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.version === release.version,
@@ -390,14 +392,18 @@ const handleDownloadRelease = () => {
                     >
                         <button
                             :disabled="!canFlash"
-                            class="w-full py-3 rounded-full font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-150 tracking-tighter uppercase whitespace-nowrap"
+                            class="w-full py-3 rounded-full select-none font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-150 tracking-tighter uppercase whitespace-nowrap"
                             :class="
                                 canFlash
-                                    ? `cursor-pointer ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
+                                    ? `cursor-pointer ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
                             "
                             @click="handleFlashFirmware"
-                            @mouseenter="!connectionIsConnected && hostExpand()"
+                            @mouseenter="
+                                !connectionIsConnected &&
+                                connectionState !== 'connecting' &&
+                                hostExpand()
+                            "
                             @mouseleave="!canFlash && hostCollapse()"
                         >
                             {{
@@ -500,7 +506,7 @@ const handleDownloadRelease = () => {
     min-width: 100%;
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
-    padding: 7px;
+    padding: 0 7px 0 7px;
     background-color: var(--vp-c-bg-dark);
     box-shadow: var(--vp-shadow-3);
     backdrop-filter: blur(12px);

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useBgContainer } from "../composables/useBgContainer";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 
-const { currentTheme } = useThemeSwitcher();
 const { flags, isConnected } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const canvasRef = ref<HTMLCanvasElement | null>(null);
+const { bgContainerClasses, shouldUseBgContainer, shouldUseDarkImage } = useBgContainer();
 
 let retryTimeout: NodeJS.Timeout | null = null;
 let autoRetryInterval: NodeJS.Timeout | null = null;
@@ -161,24 +161,31 @@ onBeforeUnmount(() => {
 <template>
     <Transition name="slide-down" mode="out-in">
         <div v-if="isConnected" class="screen-display-container backdrop-blur-lg p-3 pb-0">
-            <div class="relative overflow-visible">
+            <div class="relative overflow-hidden rounded-md">
                 <div
                     class="absolute top-[-16px] left-[-16px] w-[calc(100%+32px)] h-[calc(100%+48px)] z-0 p-0 pointer-events-none"
                     aria-hidden="true"
                 ></div>
                 <div
-                    class="relative flex justify-center items-center min-h-[140px] bg-vp-bg dark:bg-flipper-fill rounded-md overflow-hidden p-3 z-4"
-                    :class="currentTheme === 'white' ? 'dark:bg-vp-neutral' : ''"
+                    class="relative flex justify-center items-center min-h-[140px] p-3 z-4"
+                    :class="[
+                        shouldUseBgContainer
+                            ? ['bg-vp-bg dark:bg-vp-neutral rounded-xl', ...bgContainerClasses]
+                            : 'bg-flipper-fill rounded-none',
+                    ]"
                 >
                     <canvas
                         ref="canvasRef"
                         :width="128 * (serialConnection?.screenScale?.value || 2)"
                         :height="64 * (serialConnection?.screenScale?.value || 2)"
-                        class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100"
+                        class="screen-canvas block w-full h-auto max-w-full aspect-[2/1] bg-vp-bg transition-opacity duration-200"
                         :class="{
-                            'opacity-30': !flags.screenStream,
+                            'opacity-25': !flags.screenStream,
+                            'saturate-0 contrast-200 brightness-[3]': shouldUseDarkImage,
+                            'dark:saturate-100 dark:contrast-100 dark:brightness-100':
+                                !shouldUseDarkImage,
                             'dark:bg-vp-bg dark:saturate-0 dark:contrast-200 dark:brightness-[3]':
-                                currentTheme === 'white',
+                                shouldUseDarkImage,
                         }"
                     />
 
@@ -192,7 +199,7 @@ onBeforeUnmount(() => {
                             class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
                         >
                             <div
-                                class="w-4 h-4 border-2 border-vp-brand-1 border-t-transparent rounded-full animate-spin"
+                                class="w-4 h-4 border-2 border-vp-1/80 border-t-transparent rounded-full animate-spin z-10"
                             ></div>
                         </div>
                     </div>

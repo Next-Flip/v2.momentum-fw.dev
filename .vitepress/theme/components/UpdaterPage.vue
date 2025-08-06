@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { MessageSchema } from ".vitepress/i18n";
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
@@ -25,7 +24,9 @@ import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
 import UpdaterControls from "./UpdaterControls.vue";
 import UpdaterDeviceInfo from "./UpdaterDeviceInfo.vue";
+import UpdaterGlow from "./UpdaterGlow.vue";
 import UpdaterLogs from "./UpdaterLogs.vue";
+import UpdaterOverlay from "./UpdaterOverlay.vue";
 
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
@@ -56,7 +57,8 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsOpen = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(devMode() || false);
+const testMode = ref(devMode() || false); // TEST
+const loopMode = ref(false); // TEST
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
@@ -66,9 +68,6 @@ const triggerLogsScroll = () => {
 provide("logsScrollTrigger", logsScrollTrigger);
 
 const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false);
-const updateStage = computed(() => serialConnection?.firmwareState.updateStage || "");
-const updateStageContext = computed(() => serialConnection?.firmwareState.updateStageContext || {});
-const updateProgress = computed(() => serialConnection?.flags.progress || 0);
 const isConnected = computed(() => connectionIsConnected.value);
 const isMatchingRelease = computed(() => {
     const deviceCommit = serialConnection?.connectionData.deviceInfo?.firmware_commit;
@@ -257,10 +256,34 @@ const handleFlashFirmware = async () => {
 
         let success = false;
         if (uploadedFile.value) {
-            success =
-                (await updateMethod?.(releaseToFlash as ReleaseItem, uploadedFile.value)) || false;
+            if (testMode.value) {
+                success =
+                    (await (updateMethod as typeof serialConnection.testUpdateFirmware)?.(
+                        releaseToFlash as ReleaseItem,
+                        uploadedFile.value,
+                        loopMode.value,
+                    )) || false;
+            } else {
+                success =
+                    (await (updateMethod as typeof serialConnection.updateFirmware)?.(
+                        releaseToFlash as ReleaseItem,
+                        uploadedFile.value,
+                    )) || false;
+            }
         } else {
-            success = (await updateMethod?.(releaseToFlash as ReleaseItem)) || false;
+            if (testMode.value) {
+                success =
+                    (await (updateMethod as typeof serialConnection.testUpdateFirmware)?.(
+                        releaseToFlash as ReleaseItem,
+                        null,
+                        loopMode.value,
+                    )) || false;
+            } else {
+                success =
+                    (await (updateMethod as typeof serialConnection.updateFirmware)?.(
+                        releaseToFlash as ReleaseItem,
+                    )) || false;
+            }
         }
 
         if (success) {
@@ -404,7 +427,11 @@ onBeforeUnmount(() => {
         :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
     >
         <div
-            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider backdrop-blur-sm bg-vp-dark/55"
+            class="absolute top-0 left-0 w-full h-[calc(var(--vp-nav-height)*2)] border-b border-vp-divider z-[-1]"
+        ></div>
+
+        <div
+            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider backdrop-blur-sm bg-vp-dark/95"
         >
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
                 <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
@@ -428,6 +455,8 @@ onBeforeUnmount(() => {
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
                     >
+                        <UpdaterGlow :show="showUpdateOverlay" />
+
                         <div
                             v-if="isOverDropZone"
                             class="absolute inset-0 bg-vp-dark/10 rounded-xl flex items-center justify-center"
@@ -437,92 +466,14 @@ onBeforeUnmount(() => {
                             v-if="!isChangelogExpanded"
                             class="relative flex flex-col z-10"
                             :class="{
-                                'min-h-[214px]': flags.updateInProgress,
+                                'min-h-[185px]': flags.updateInProgress,
                                 'border-vp-divider/50': isInstallButtonHovered,
                             }"
                         >
-                            <Transition name="overlay-fade">
-                                <div
-                                    v-if="showUpdateOverlay"
-                                    class="absolute inset-0 rounded-xl flex items-center justify-center z-50 min-h-0"
-                                >
-                                    <div
-                                        v-if="
-                                            updateStage !== 'update_stage_done' &&
-                                            updateStage !== 'update_stage_flipper_updating'
-                                        "
-                                        class="w-full"
-                                        :class="
-                                            isChangelogExpanded
-                                                ? 'py-6 px-28 min-h-[175px] flex items-center justify-center'
-                                                : 'py-28 mt-6 px-28'
-                                        "
-                                    >
-                                        <div class="flex flex-row items-start gap-5 w-full">
-                                            <div
-                                                class="relative w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
-                                            >
-                                                <div
-                                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-vp-brand-1 animate-spin"
-                                                ></div>
-                                                <v-icon
-                                                    name="pr-download"
-                                                    :scale="1.3"
-                                                    class="text-neutral-600"
-                                                />
-                                            </div>
-                                            <div class="flex flex-col gap-3.5 flex-1 min-w-0">
-                                                <p
-                                                    class="text-lg font-medium text-vp-1 whitespace-nowrap overflow-hidden text-ellipsis"
-                                                >
-                                                    {{
-                                                        tr(
-                                                            updateStage as keyof MessageSchema,
-                                                            updateStageContext,
-                                                        ) || tr("update_stage_updating")
-                                                    }}
-                                                </p>
-                                                <div class="w-full bg-vp-soft/80 rounded-full h-1">
-                                                    <div
-                                                        class="bg-vp-brand-2 h-1 rounded-full transition-all duration-100"
-                                                        :style="{
-                                                            width: `${updateProgress * 100}%`,
-                                                            boxShadow:
-                                                                updateProgress > 0
-                                                                    ? '0 0 8px 2px color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent)'
-                                                                    : '0 0 8px 2px rgba(0, 0, 0, 0.0)',
-                                                        }"
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div v-else class="flex flex-row items-center mt-[18px] mr-4">
-                                        <div
-                                            class="w-14 h-14 rounded-full flex items-center justify-center"
-                                        >
-                                            <v-icon
-                                                v-if="updateStage === 'update_stage_done'"
-                                                name="oi-check"
-                                                :scale="1.85"
-                                                class="text-green-500"
-                                            />
-                                            <v-icon
-                                                v-else-if="
-                                                    updateStage === 'update_stage_flipper_updating'
-                                                "
-                                                name="md-hourglasstop-round"
-                                                :scale="1.5"
-                                                class="text-yellow-500"
-                                            />
-                                        </div>
-                                        <p class="text-lg font-medium text-vp-1 text-center">
-                                            {{ tr(updateStage, updateStageContext) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </Transition>
+                            <UpdaterOverlay
+                                :show-update-overlay="showUpdateOverlay"
+                                :is-changelog-expanded="isChangelogExpanded"
+                            />
 
                             <Transition name="slide-up" mode="out-in">
                                 <div v-if="!showUpdateOverlay" class="flex flex-col">
@@ -737,7 +688,7 @@ onBeforeUnmount(() => {
                                         v-else-if="supportsSerialPort()"
                                         class="w-full border border-dashed border-vp-divider rounded-[10px] flex items-center justify-center cursor-pointer backdrop-blur-md relative z-10 p-px"
                                         :class="{
-                                            'border-vp-brand-1 bg-vp-brand-soft': isOverDropZone,
+                                            'border-vp-3/40 bg-vp-3/10': isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
                                                 flags.updateInProgress,
                                             'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/90 hover:border-vp-border/80':
@@ -746,7 +697,7 @@ onBeforeUnmount(() => {
                                         @click="handleFileUpload"
                                     >
                                         <div
-                                            class="flex flex-col items-center gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/70 w-full h-full pt-6 pb-7 px-6 rounded-[10px]"
+                                            class="flex flex-col items-center gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/80 w-full h-full pt-6 pb-7 px-6 rounded-lg"
                                         >
                                             <p class="text-sm text-vp-2">
                                                 {{
@@ -778,8 +729,9 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
-                            class="min-h-14 transition-opacity duration-200"
+                            class="min-h-14 transition-opacity duration-250"
                             :class="{
+                                'opacity-55 dark:opacity-65 hover:!opacity-100': showUpdateOverlay,
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
                                 'flex-1 min-h-0': !isChangelogClosed,
@@ -799,8 +751,9 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="supportsSerialPort()"
-                            class="min-h-14 transition-opacity duration-200"
+                            class="min-h-14 transition-opacity duration-250"
                             :class="{
+                                'opacity-55 dark:opacity-65 hover:!opacity-100': showUpdateOverlay,
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
                                 'flex-shrink-0': !isChangelogClosed,
@@ -881,21 +834,6 @@ onBeforeUnmount(() => {
     transform: translateY(-20px);
 }
 
-.overlay-fade-enter-active,
-.overlay-fade-leave-active {
-    transition: opacity 0.3s ease-in-out;
-}
-
-.overlay-fade-enter-from,
-.overlay-fade-leave-to {
-    opacity: 0;
-}
-
-.overlay-fade-enter-to,
-.overlay-fade-leave-from {
-    opacity: 1;
-}
-
 .fade-drop-enter-active,
 .fade-drop-leave-active {
     transition: all 0.4s ease-out;
@@ -920,4 +858,8 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(-10px);
 }
+
+/* .outer-border {
+    outline: 2px solid var(--vp-c-bg-dark);
+} */
 </style>

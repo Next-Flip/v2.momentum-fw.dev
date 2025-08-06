@@ -4,12 +4,14 @@ import { useRoute } from "vitepress";
 import { computed, onMounted, ref, watch } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
+import { useSettings } from "../composables/useSettings";
+import { useSharedHover } from "../composables/useSharedHover";
 import { formatDate } from "../date";
 import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
-import AutoconnectToggle from "./AutoconnectToggle.vue";
+import SettingsIcon from "./SettingsIcon.vue";
 import Tooltip from "./Tooltip.vue";
 
 const width = ref(1024);
@@ -37,6 +39,8 @@ const {
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
 const isAutoOpen = ref(false);
+const { isAutoconnectEnabled } = useSettings();
+const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 const { dots: connectingDots } = useDots();
 const { dots: hardwareNameDots } = useDots();
 const dotsState = computed(() => {
@@ -190,7 +194,7 @@ onMounted(() => {
                         >
                             {{
                                 flags.updateInProgress
-                                    ? tr(updateStage, updateStageContext) ||
+                                    ? tr(updateStage as keyof MessageSchema, updateStageContext) ||
                                       tr("update_stage_updating_short")
                                     : getConnectionDisplay.text
                             }}
@@ -328,7 +332,22 @@ onMounted(() => {
         </div>
 
         <div v-if="supportsSerialPort()" :class="isUpdatePage ? 'ml-8' : 'ml-3'">
-            <AutoconnectToggle />
+            <!-- <AutoconnectToggle /> -->
+            <Tooltip
+                :delay="400"
+                :z-index="9999"
+                :offset="13"
+                position="right"
+                :accept-hover="false"
+                :force-visible="isInstallButtonHovered && !isAutoconnectEnabled"
+            >
+                <SettingsIcon />
+                <template #content>{{
+                    isAutoconnectEnabled
+                        ? tr("connection_autoconnect_enabled")
+                        : tr("connection_autoconnect_disabled")
+                }}</template>
+            </Tooltip>
         </div>
     </div>
 </template>

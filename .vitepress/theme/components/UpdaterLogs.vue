@@ -258,7 +258,7 @@ onMounted(() => {
                     >
                         <div
                             ref="logContainer"
-                            class="pr-[7px] my-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
+                            class="pr-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
                             :class="{
                                 'h-48': props.changelogIsOpen,
                                 'flex-1 min-h-0': !props.changelogIsOpen,

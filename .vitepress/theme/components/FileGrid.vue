@@ -13,7 +13,7 @@ interface Props {
 
 defineProps<Props>();
 const { width } = useWindowSize();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 const getFileKey = (file: FirmwareFile) => {
     return "url" in file ? file.url : file.filename;
@@ -97,9 +97,9 @@ const getButtonScale = (file: FirmwareFile) => {
             <div
                 :class="[
                     'py-2 pr-2 text-vp-brand-1/60 saturate-[70%] text-sm font-medium rounded-md transition-all duration-75 flex items-center justify-center flex-shrink-0 select-none',
-                    currentTheme === 'orange'
+                    ifCurrentTheme(['orange'])
                         ? 'group-hover:text-black dark:group-hover:text-black'
-                        : currentTheme === 'white'
+                        : ifCurrentTheme(['white'])
                           ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                           : 'group-hover:text-white dark:group-hover:text-white',
                 ]"
@@ -111,9 +111,9 @@ const getButtonScale = (file: FirmwareFile) => {
                     :class="[
                         'font-normal text-vp-1 text-sm truncate whitespace-nowrap overflow-ellipsis select-none',
                         width <= 640 ? 'text-right' : 'text-left',
-                        currentTheme === 'orange'
+                        ifCurrentTheme(['orange'])
                             ? 'group-hover:text-black dark:group-hover:text-black'
-                            : currentTheme === 'white'
+                            : ifCurrentTheme(['white'])
                               ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                               : 'group-hover:text-white dark:group-hover:text-white',
                     ]"
@@ -125,9 +125,9 @@ const getButtonScale = (file: FirmwareFile) => {
                 <div
                     class="text-xs text-vp-brand-1/80 select-none font-mono whitespace-nowrap ml-auto"
                     :class="[
-                        currentTheme === 'orange'
+                        ifCurrentTheme(['orange'])
                             ? 'group-hover:text-black dark:group-hover:text-black'
-                            : currentTheme === 'white'
+                            : ifCurrentTheme(['white'])
                               ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                               : 'group-hover:text-white dark:group-hover:text-white',
                     ]"

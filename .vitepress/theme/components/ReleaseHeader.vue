@@ -147,7 +147,7 @@ const handleHeaderClick = () => {
             <Transition name="fade-dropdown">
                 <div
                     v-if="isDropdownOpen"
-                    class="lg:hidden absolute top-full left-0 w-full z-[1000] p-[7px] bg-vp-dark shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
+                    class="lg:hidden absolute top-full left-0 w-full z-[1000] px-[7px] bg-vp-dark shadow-[var(--vp-shadow-3)] backdrop-blur-md border-b border-vp-divider"
                 >
                     <div
                         class="bg-transparent transition-all duration-200 overflow-hidden max-h-[276px] flex flex-col w-full min-w-full"
@@ -155,7 +155,7 @@ const handleHeaderClick = () => {
                     >
                         <div
                             ref="dropdownMenuRef"
-                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute pr-[7px]"
+                            class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute pb-[7px] pr-[7px]"
                         >
                             <template
                                 v-for="(section, sectionIndex) in releaseSections"

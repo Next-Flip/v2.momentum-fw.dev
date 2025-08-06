@@ -204,8 +204,12 @@ export type MessageSchema = {
     connection_serial_not_supported: string;
     connection_connection_failed: string;
     connection_connection_timeout: string;
+    connection_autoconnect: string;
     connection_autoconnect_enabled: string;
     connection_autoconnect_disabled: string;
+    connection_clear_logs: string;
+    connection_screen_color: string;
+    connection_unplug_warning: string;
     missing: string;
     corrupt: string;
     installed: string;
