@@ -3,22 +3,33 @@ import { track } from "@vercel/analytics";
 import { useTimeAgo } from "@vueuse/core";
 import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
 
+import { formatDate } from "../date";
 import type { AssetPackStats } from "../types";
 import { ConnectionState } from "../types";
 import { downloadFile, shortenTimeString } from "../util";
-import { formatDate } from "../date";
 
+import { useBgContainer } from "../composables/useBgContainer";
 import { useDots } from "../composables/useDots";
 import { useGalleryState } from "../composables/useGalleryState";
 import { useI18n } from "../composables/useI18n";
 import { useImageCache } from "../composables/useImageCache";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useSettings } from "../composables/useSettings";
 import { useTempState } from "../composables/useTempState";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+
 import Tooltip from "./Tooltip.vue";
 
+const { screenColor } = useSettings();
 const { dots, setDelay } = useDots();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
+const {
+    bgContainerClasses,
+    shouldUseBgContainer,
+    hueRotationClass,
+    shouldUseHueRotation,
+    shouldUseDarkImage,
+} = useBgContainer();
 const { setGalleryIndex, getGalleryIndex, hasGalleryState } = useGalleryState();
 const { getCachedOrProxiedUrl } = useImageCache();
 const { tr } = useI18n();
@@ -284,6 +295,8 @@ const shortTimeAgo = computed(() => {
     return shortenTimeString(timeAgo.value);
 });
 
+// Removed checkThemeScreenColor - now using useBgContainer composable
+
 onMounted(() => {
     if (hasGalleryState(props.id) && allPreviewUrls.value.length > 0) {
         const savedIndex = getGalleryIndex(props.id);
@@ -327,12 +340,27 @@ onUnmounted(() => {
             >
                 <canvas
                     ref="shadowCanvas"
-                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-5 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65] saturate-0 dark:saturate-100"
-                    :class="currentTheme === 'white' ? '!saturate-0' : ''"
+                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-5 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65]"
+                    :class="[
+                        {
+                            'dark:saturate-0 dark:brightness-[0.95]':
+                                ifCurrentTheme(['white']) &&
+                                screenColor !== 'default' &&
+                                !imageError,
+                        },
+                        { 'saturate-0 brightness-[0.95]': screenColor === 'white' },
+                        !imageError && shouldUseHueRotation ? hueRotationClass : '',
+                    ]"
                 ></canvas>
             </div>
             <div
-                class="relative w-full pt-[50%] overflow-hidden rounded-[7px] z-4 shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
+                class="relative w-full pt-[50%] overflow-hidden rounded-[7px] z-4"
+                :class="[
+                    !imageError && shouldUseBgContainer ? bgContainerClasses : '',
+                    !imageError
+                        ? 'shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.1)]'
+                        : 'bg-vp-bg',
+                ]"
             >
                 <img
                     v-for="(url, index) in allPreviewUrls"
@@ -344,11 +372,12 @@ onUnmounted(() => {
                     "
                     :alt="`${name} - preview ${index + 1}`"
                     :class="[
-                        'cell-image absolute top-0 left-0 w-full h-full object-cover transition-all duration-300 rounded-[7px] opacity-0 saturate-0 contrast-200 brightness-[3] dark:saturate-100 dark:contrast-100 dark:brightness-100',
-                        currentTheme === 'white'
-                            ? '!saturate-0 dark:contrast-200 dark:brightness-[3]'
-                            : '',
+                        'cell-image absolute top-0 left-0 w-full h-full object-cover rounded-[7px] opacity-0 select-none',
                         {
+                            'saturate-0 contrast-200 brightness-[3]':
+                                !imageError && shouldUseDarkImage,
+                            'dark:saturate-100 dark:contrast-100 dark:brightness-100':
+                                !imageError && !shouldUseDarkImage,
                             'opacity-100 visible':
                                 index === currentImageIndex && loadedImages.has(index),
                         },
@@ -395,7 +424,7 @@ onUnmounted(() => {
                 </div>
                 <div
                     v-if="allPreviewUrls.length > 1"
-                    class="absolute bottom-[4px] left-1/2 -translate-x-1/2 z-6 flex justify-center items-center gap-[5px] opacity-100 xl:opacity-0 xl:invisible transition-opacity duration-200 group-hover:opacity-100 group-hover:visible rounded-[10px] bg-black/70 backdrop-blur p-[4px]"
+                    class="absolute bottom-[4px] left-1/2 -translate-x-1/2 flex justify-center items-center gap-[5px] opacity-100 xl:opacity-0 xl:invisible transition-opacity duration-200 group-hover:opacity-100 group-hover:visible rounded-[10px] bg-black/70 backdrop-blur p-[4px] z-10"
                 >
                     <button
                         v-for="(_, index) in allPreviewUrls"
@@ -423,7 +452,7 @@ onUnmounted(() => {
                                 rel="noopener noreferrer"
                                 class="hover:underline truncate block overflow-hidden text-ellipsis max-w-full"
                                 :class="
-                                    currentTheme === 'orange'
+                                    ifCurrentTheme(['orange'])
                                         ? 'text-vp-alternate-1 hover:text-vp-alternate-2'
                                         : 'text-vp-brand-1 hover:text-vp-brand-2'
                                 "
@@ -535,11 +564,11 @@ onUnmounted(() => {
                                 serialConnection.queueState.queue.some(
                                     (queuedPack) => queuedPack.id === props.id,
                                 ) || isBeingDeleted,
-                            'opacity-50': installed && !hasUpdate,
+                            'opacity-50 hover:opacity-100': installed && !hasUpdate,
                             'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3':
                                 installed && hasUpdate,
-                            'hover:text-black': currentTheme === 'orange',
-                            'hover:text-vp-neutral-inverse': currentTheme === 'white',
+                            'hover:text-black': ifCurrentTheme(['orange']),
+                            'hover:text-vp-neutral-inverse': ifCurrentTheme(['white']),
                         }"
                         :aria-label="getActionLabel"
                         download

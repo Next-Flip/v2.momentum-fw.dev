@@ -13,6 +13,7 @@ interface Props {
     offset?: number;
     zIndex?: number;
     disabled?: boolean;
+    acceptHover?: boolean;
     forceVisible?: boolean;
 }
 
@@ -25,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
     offset: 9,
     zIndex: 10,
     disabled: false,
+    acceptHover: true,
     forceVisible: false,
 });
 
@@ -42,6 +44,7 @@ const themeClass = computed(() => (props.theme !== "default" ? `tooltip-${props.
 const shouldShowTooltip = computed(() => props.forceVisible || isVisible.value);
 
 const showTooltip = () => {
+    if (!props.acceptHover) return;
     if (timeoutId.value) clearTimeout(timeoutId.value);
     timeoutId.value =
         typeof window !== "undefined"
@@ -55,6 +58,7 @@ const showTooltip = () => {
 };
 
 const hideTooltip = () => {
+    if (!props.acceptHover) return;
     if (timeoutId.value) clearTimeout(timeoutId.value);
     timeoutId.value =
         typeof window !== "undefined"

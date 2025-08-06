@@ -58,11 +58,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center p-4">
-        <div
-            v-if="!imageError"
-            class="w-32 flex items-center justify-center mb-4 opacity-20 dark:invert"
-        >
+    <div class="flex flex-col items-center justify-center mt-1.5">
+        <div v-if="!imageError" class="w-8 flex items-center justify-center opacity-75 dark:invert">
             <img
                 :src="currentImageSrc"
                 alt="Loading"

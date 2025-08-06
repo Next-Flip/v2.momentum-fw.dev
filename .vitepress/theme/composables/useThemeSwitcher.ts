@@ -58,6 +58,10 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
         { immediate: false },
     );
 
+    const ifCurrentTheme = (themes: LogoColor[]) => {
+        return themes.includes(currentTheme.value as LogoColor);
+    };
+
     const nextLogo = () => {
         if (!isLocked.value) {
             currentIndex.value = (currentIndex.value + 1) % logoColors.length;
@@ -119,6 +123,7 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
         currentTheme,
         currentThemeClass,
         isLocked,
+        ifCurrentTheme,
         nextLogo,
         previousLogo,
         toggleLock,

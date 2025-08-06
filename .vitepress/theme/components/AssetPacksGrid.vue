@@ -13,7 +13,7 @@ import AssetPacksControls from "./AssetPacksControls.vue";
 import ExtractNotice from "./ExtractNotice.vue";
 
 const { tr } = useI18n();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 interface Props {
     title?: string;
@@ -396,9 +396,9 @@ const filteredAssetPacks = computed(() => {
             <button
                 class="reset-button mt-6 bg-vp-dark/75 p-4 py-2 text-[14px] cursor-pointer transition-colors duration-100 text-vp-neutral rounded-full"
                 :class="
-                    currentTheme === 'orange'
+                    ifCurrentTheme(['orange'])
                         ? 'hover:text-black'
-                        : currentTheme === 'white'
+                        : ifCurrentTheme(['white'])
                           ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
                           : 'hover:text-white'
                 "
@@ -418,7 +418,7 @@ const filteredAssetPacks = computed(() => {
                 <button
                     class="bg-vp-3/20 text-vp-neutral px-4 py-2 rounded-full text-sm font-medium shadow-sm hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
                     :class="
-                        currentTheme === 'white'
+                        ifCurrentTheme(['white'])
                             ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
                             : 'hover:text-white'
                     "

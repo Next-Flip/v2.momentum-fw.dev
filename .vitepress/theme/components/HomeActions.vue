@@ -6,7 +6,7 @@ import { useDots } from "../composables/useDots";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 
 const { dots } = useDots();
-const { currentTheme } = useThemeSwitcher();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 const { deviceInfo, isConnected, isConnecting, versionInReleases, tr, getLocalizedPath } =
     useConnectionInfo();
@@ -100,8 +100,8 @@ const dynamicButtons = computed((): ActionButton[] => {
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest
-                            ? `border-vp-brand-2 dark:border-vp-brand-1 dark:hover:border-vp-brand-2 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
-                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/10 ${currentTheme === 'orange' ? 'hover:text-black' : currentTheme === 'white' ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
+                            ? `border-vp-brand-2 dark:border-vp-brand-1 dark:hover:border-vp-brand-2 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
+                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/10 ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
                         : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/10 text-vp-1 hover:text-white',
                 ]"
                 >{{ button.text }}</a

@@ -1,7 +1,7 @@
 import log from "loglevel";
 import messages, { SupportedLocales } from "../i18n/index.js";
 import { useI18n } from "./composables/useI18n";
-import type { RegionsData } from "./types";
+import type { LogoColor, RegionsData, ScreenColor } from "./types";
 // @ts-expect-error - pako is a global library
 import pako from "pako";
 // @ts-expect-error - untar is a global library
@@ -112,7 +112,7 @@ export const replaceIssuesAndMentions = (text: string): string => {
     result = result.replace(/#(\d+)/g, (_, issueNumber) =>
         a(
             `https://github.com/Next-Flip/Momentum-Firmware/issues/${issueNumber}`,
-            "text-vp-alternate-1 hover:text-vp-alternate-2",
+            "!text-vp-alternate-1 hover:!text-vp-alternate-2",
             `#${issueNumber}`,
         ),
     );
@@ -258,4 +258,72 @@ export const getCurrentLocale = (): SupportedLocales => {
     const potentialLocale = pathSegments[0];
     const supportedLocales = Object.keys(messages) as SupportedLocales[];
     return supportedLocales.includes(potentialLocale as SupportedLocales) ? (potentialLocale as SupportedLocales) : "en";
+};
+
+interface ThemeConfig {
+    hueRotation: string | null;
+    useDarkImage: boolean;
+    bgContainer: string | null;
+}
+
+type ThemeConfigMap = Record<LogoColor, Record<ScreenColor, ThemeConfig>>;
+
+// prettier-ignore
+const THEME_CONFIG: ThemeConfigMap = {
+    purp: {
+        primary: {  hueRotation: "hue-rotate-[216deg]", useDarkImage: true, bgContainer: "bg-container-primary" },
+        secondary: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-secondary" },
+        default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
+        white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
+    },
+    orange: {
+        primary: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-primary" },
+        secondary: {  hueRotation: "hue-rotate-[216deg]", useDarkImage: true, bgContainer: "bg-container-secondary" },
+        default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
+        white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
+    },
+    pink: {
+        primary: {  hueRotation: "hue-rotate-[310deg]", useDarkImage: true, bgContainer: "bg-container-primary" },
+        secondary: {  hueRotation: "hue-rotate-[216deg]", useDarkImage: true, bgContainer: "bg-container-secondary" },
+        default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
+        white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
+    },
+    white: {
+        primary: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-primary invert" },
+        secondary: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-secondary" },
+        default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
+        white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
+    },
+};
+
+const getThemeConfig = (theme: LogoColor, screenColor: ScreenColor): ThemeConfig => {
+    return THEME_CONFIG[theme]?.[screenColor] ?? { 
+        hueRotation: null, 
+        useDarkImage: false, 
+        bgContainer: null 
+    };
+};
+
+export const getHueRotation = (theme: LogoColor, screenColor: ScreenColor): string | null => {
+    return getThemeConfig(theme, screenColor).hueRotation;
+};
+
+export const shouldUseDarkImageStyling = (theme: LogoColor, screenColor: ScreenColor): boolean => {
+    return getThemeConfig(theme, screenColor).useDarkImage;
+};
+
+export const getBgContainerClass = (theme: LogoColor, screenColor: ScreenColor): string | null => {
+    return getThemeConfig(theme, screenColor).bgContainer;
+};
+
+export const formatDuration = (milliseconds: number): string => {
+    const seconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (minutes > 0) {
+        return `${minutes}min, ${remainingSeconds}s`;
+    } else {
+        return `${remainingSeconds}s`;
+    }
 };

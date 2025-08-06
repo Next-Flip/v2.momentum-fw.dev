@@ -6,6 +6,7 @@
     --mntm-purp-1: #5453db;
     --mntm-purp-2: #6a6adf;
     --mntm-purp-3: #4948d9;
+    --mntm-purp-4: #ababfb;
     --mntm-yellow-1: #ff9509;
     --mntm-yellow-2: #d07600;
     --mntm-yellow-3: #ff9509;
@@ -165,6 +166,12 @@
     color: black;
 }
 
+.theme-pink .logo {
+    filter: hue-rotate(95deg) saturate(200%) !important;
+}
+.theme-orange .logo {
+    filter: hue-rotate(153deg) saturate(200%) !important;
+}
 .theme-white .logo {
     filter: saturate(0) contrast(200) brightness(3) !important;
 }
@@ -181,6 +188,8 @@
     background: transparent;
     margin-right: 2px;
     z-index: 1000 !important;
+    margin-bottom: 7px !important;
+    margin-top: 7px !important;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
@@ -1061,4 +1070,89 @@ body[data-route*="/wiki"] {
 .theme-white .vp-doc :not(pre) > code {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
     color: var(--vp-c-brand-1) !important;
+}
+
+.bg-container {
+    position: relative;
+}
+
+.bg-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--vp-c-brand-1);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+.theme-purp .bg-container.bg-container-primary::after {
+    background-color: var(--mntm-purp-4);
+}
+.theme-purp.dark.bg-container.bg-container-primary::after {
+    background-color: var(--vp-c-brand-1);
+}
+
+.theme-orange .bg-container.bg-container-secondary::after {
+    background-color: var(--mntm-purp-4);
+}
+.theme-orange.dark.bg-container.bg-container-secondary::after {
+    background-color: var(--vp-c-brand-1);
+}
+
+.theme-pink .bg-container.bg-container-secondary::after {
+    background-color: var(--mntm-purp-4);
+}
+.theme-pink.dark.bg-container.bg-container-secondary::after {
+    background-color: var(--vp-c-brand-1);
+}
+
+.theme-white .bg-container.bg-container-primary::after {
+    background-color: var(--mntm-white-1);
+}
+.theme-white.dark.bg-container.bg-container-primary::after {
+    background-color: var(--vp-c-brand-1);
+}
+
+.theme-purp .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+.theme-purp.dark .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+
+.theme-orange .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+.theme-orange.dark .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+
+.theme-pink .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+.theme-pink.dark .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+
+.theme-white .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+.theme-white.dark .bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
+}
+
+.bg-container.bg-container-primary::after {
+    background-color: var(--vp-c-brand-1);
+}
+.bg-container.bg-container-secondary::after {
+    background-color: var(--vp-c-alternate-1);
+}
+.bg-container.bg-container-default::after {
+    background-color: var(--vp-c-flipper-fill);
+}
+.bg-container.bg-container-white::after {
+    background-color: var(--mntm-white-1);
 }
