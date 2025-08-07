@@ -59,7 +59,8 @@ const navigationLinks = computed(() => [
     <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
         <div class="max-w-full mx-auto" :class="`py-16 pb-24 lg:pb-32 ${isWiki ? 'lg:px-0' : ''}`">
             <div
-                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl px-8 lg:px-16"
+                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl"
+                :class="isWiki ? 'px-8 lg:pl-72 lg:pr-16' : 'px-8 lg:px-16'"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50">
                     <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">
@@ -100,16 +101,23 @@ const navigationLinks = computed(() => [
                         </p>
                     </div>
 
-                    <p class="text-xs text-vp-3 mt-2">
-                        <a
-                            href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"
-                        >
-                            GPL-3.0 © 2025 Next-Flip
-                        </a>
-                    </p>
+                    <div class="flex flex-row gap-1.5 mt-2 justify-start items-center leading-none">
+                        <p class="text-xs text-vp-3">
+                            <a
+                                href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"
+                            >
+                                GPL-3.0 © 2025 Next-Flip
+                            </a>
+                        </p>
+                        <img
+                            src="/svg/yapluv.png"
+                            alt="Yap"
+                            class="w-5 h-5 object-contain object-center cursor-pointer hover:scale-105 transition-transform duration-100"
+                        />
+                    </div>
 
                     <div
                         class="flex flex-row gap-1.5 sm:mt-auto mt-2 justify-start items-center leading-none"

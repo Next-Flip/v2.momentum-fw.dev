@@ -185,8 +185,11 @@ const releaseHref = computed(() => {
                         }}</template>
                     </Tooltip>
                     <button
-                        v-if="isAccessible && !isExpanded"
+                        v-if="isAccessible"
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
+                        :class="{
+                            'opacity-50 pointer-events-none hover:text-vp-3': isExpanded,
+                        }"
                         @click="handleToggleOpenClose"
                     >
                         <v-icon

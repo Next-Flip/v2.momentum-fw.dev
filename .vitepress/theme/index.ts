@@ -16,6 +16,7 @@ import ExtractNotice from "./components/ExtractNotice.vue";
 import Footer from "./components/Footer.vue";
 import HomeActions from "./components/HomeActions.vue";
 import ReleasesPage from "./components/ReleasesPage.vue";
+import ScreenColorImage from "./components/ScreenColorImage.vue";
 import SidebarSearch from "./components/SidebarSearch.vue";
 import UpdaterPage from "./components/UpdaterPage.vue";
 import { useSerialConnection } from "./composables/useSerialConnection";
@@ -63,5 +64,6 @@ export default {
         app.component("UpdaterPage", UpdaterPage as never);
         app.component("HomeActions", HomeActions as never);
         app.component("ReleasesPage", ReleasesPage as never);
+        app.component("ScreenColorImage", ScreenColorImage as never);
     },
 } satisfies Theme;

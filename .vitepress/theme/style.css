@@ -612,25 +612,29 @@ body:before {
     color: color-mix(in srgb, var(--vp-c-brand-1) 70%, transparent);
 }
 
-.dark .full-width-table .check {
+.dark .check {
     color: var(--vp-c-brand-1);
 }
-.theme-white.dark .full-width-table .check {
+.theme-white.dark .check {
     color: var(--vp-c-alternate-1);
 }
 
-.full-width-table .check-last {
+.check-last {
     font-weight: 600;
     color: var(--vp-c-brand-3);
 }
 
-.dark .full-width-table .check-last {
+.dark .check-last {
     font-weight: 600;
     color: var(--vp-c-alternate-1);
 }
 
-.theme-white.dark .full-width-table .check-last {
+.theme-white.dark .check-last {
     color: var(--vp-c-brand-1);
+}
+
+.x-dim {
+    opacity: 0.5;
 }
 
 .centered-content {
@@ -780,10 +784,10 @@ body[data-route*="/wiki"] {
 .curtain {
     background-color: transparent !important;
 }
-.aside-curtain {
+/* .aside-curtain {
     position: absolute !important;
     background: linear-gradient(transparent, var(--vp-c-bg-dark) 70%) !important;
-}
+} */
 
 .VPDoc {
     padding-bottom: 0 !important;
@@ -806,9 +810,9 @@ body[data-route*="/wiki"] {
         /* margin-bottom: 400px !important; */
     }
 
-    .VPSidebar #VPSidebarNav {
+    /* .VPSidebar #VPSidebarNav {
         padding-bottom: 400px !important;
-    }
+    } */
 }
 
 @media (max-width: 820px) {
@@ -833,7 +837,7 @@ body[data-route*="/wiki"] {
         var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + var(--vp-doc-top-height, 0px) +
             32px
     );
-    max-height: calc(100% - 289px);
+    /* max-height: calc(100% - 289px); */
 }
 
 .VPSidebar {
@@ -1151,7 +1155,7 @@ body[data-route*="/wiki"] {
     background-color: var(--vp-c-alternate-1);
 }
 .bg-container.bg-container-default::after {
-    background-color: var(--vp-c-flipper-fill);
+    background-color: #fe8a2b;
 }
 .bg-container.bg-container-white::after {
     background-color: var(--mntm-white-1);

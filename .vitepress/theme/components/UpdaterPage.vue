@@ -426,9 +426,7 @@ onBeforeUnmount(() => {
         class="relative w-full flex flex-col items-center lg:py-20 lg:px-5"
         :style="windowWidth >= 1024 ? 'height: calc(100vh - var(--vp-nav-height));' : ''"
     >
-        <div
-            class="absolute top-0 left-0 w-full h-[calc(var(--vp-nav-height)*2)] border-b border-vp-divider z-[-1]"
-        ></div>
+        <div class="absolute top-0 left-0 w-full h-[121px] border-b border-vp-divider z-[-1]"></div>
 
         <div
             class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider backdrop-blur-sm bg-vp-dark/95"
@@ -480,7 +478,7 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[5%]"
+                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[5%] h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"

@@ -35,7 +35,7 @@ function openSearch() {
 </script>
 
 <template>
-    <div v-if="isWiki" class="VPSidebarSearch">
+    <div v-if="isWiki" class="VPSidebarSearch mt-12 xl:mt-0">
         <div class="search-button-wrapper">
             <button
                 type="button"

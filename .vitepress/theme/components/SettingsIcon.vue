@@ -54,11 +54,8 @@ const handleButtonLeave = () => {
                             :callback="() => toggleBool('clearLogs')"
                         />
                     </div>
+                    <div class="h-px bg-vp-divider/70 mx-0" :class="{ 'mb-6': !isLocked }"></div>
                     <template v-if="isLocked">
-                        <div class="h-px bg-vp-divider/70 mx-0"></div>
-                        <!-- <span class="text-left text-[13px] ml-4 mt-2.5 text-vp-2 mr-6"
-                        >{{ tr("connection_screen_color") }}:</span
-                        > -->
                         <div class="menu-item my-1.5">
                             <ScreenColorSelector />
                         </div>
@@ -83,11 +80,6 @@ const handleButtonLeave = () => {
         padding 0.25s ease,
         margin 0.25s ease;
 }
-
-/* .hover-area.expanded {
-    padding: 20px 10px 50px 12px;
-    margin: -20px -10px -50px -12px;
-} */
 
 .VPFlyout {
     position: relative;
@@ -154,7 +146,6 @@ const handleButtonLeave = () => {
     border-radius: 4px;
     font-size: 13px;
     gap: 24px;
-    /* height: 34px; */
 }
 
 .menu-label {
