@@ -208,6 +208,7 @@ export type MessageSchema = {
     connection_autoconnect_enabled: string;
     connection_autoconnect_disabled: string;
     connection_clear_logs: string;
+    connection_verbose_logs: string;
     connection_screen_color: string;
     connection_unplug_warning: string;
     missing: string;
@@ -333,6 +334,7 @@ export type MessageSchema = {
     updater_flashing_unavailable: string;
     updater_serial_unsupported: string;
     updater_serial_unsupported_subtitle: string;
+    updater_resize_panels: string;
 };
 
 const messages = { en } as const;

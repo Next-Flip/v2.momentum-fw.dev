@@ -8,12 +8,15 @@ export function useSettings() {
     // prettier-ignore
     const clearLogsEnabled = useStorage(STORAGE_KEYS.CLEAR_LOGS, false, undefined, { initOnMounted: true });
     // prettier-ignore
+    const verboseLogsEnabled = useStorage(STORAGE_KEYS.VERBOSE_LOGS, false, undefined, { initOnMounted: true });
+    // prettier-ignore
     const screenColor = useStorage<ScreenColor>(STORAGE_KEYS.SCREEN_COLOR, "default", undefined, { initOnMounted: true });
 
     const getBool = (setting: BooleanSetting) => {
         const map = {
-            autoconnect: autoconnectEnabled,
+            autoConnect: autoconnectEnabled,
             clearLogs: clearLogsEnabled,
+            verboseLogs: verboseLogsEnabled,
         };
         return computed({
             get: () => map[setting].value,
@@ -25,16 +28,15 @@ export function useSettings() {
 
     const toggleBool = (setting: BooleanSetting) => {
         const map = {
-            autoconnect: autoconnectEnabled,
+            autoConnect: autoconnectEnabled,
             clearLogs: clearLogsEnabled,
+            verboseLogs: verboseLogsEnabled,
         };
         map[setting].value = !map[setting].value;
     };
 
-    const isAutoconnectEnabled = getBool("autoconnect");
-    const isClearLogsEnabled = getBool("clearLogs");
-    const toggleAutoconnect = () => toggleBool("autoconnect");
-    const toggleClearLogs = () => toggleBool("clearLogs");
+    const isSettingEnabled = (setting: BooleanSetting) => getBool(setting).value;
+    const toggleSetting = (setting: BooleanSetting) => toggleBool(setting);
 
     const currentScreenColor = computed({
         get: () => screenColor.value,
@@ -48,13 +50,12 @@ export function useSettings() {
     return {
         autoconnectEnabled,
         clearLogsEnabled,
+        verboseLogsEnabled,
         screenColor,
         getBool,
         toggleBool,
-        isAutoconnectEnabled,
-        isClearLogsEnabled,
-        toggleAutoconnect,
-        toggleClearLogs,
+        isSettingEnabled,
+        toggleSetting,
         currentScreenColor,
         getScreenColorOptions,
     };

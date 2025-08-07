@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
+import { useSerialConnection } from "../composables/useSerialConnection";
 import { useSettings } from "../composables/useSettings";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import type { ScreenColor } from "../types";
 
+const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const { currentScreenColor, getScreenColorOptions } = useSettings();
 const { currentTheme } = useThemeSwitcher();
 
@@ -14,6 +16,13 @@ const screenColorOptions = computed(() => {
         label: color.charAt(0).toUpperCase() + color.slice(1),
     }));
 });
+
+const handleScreenColorChange = (color: ScreenColor) => {
+    if (serialConnection) {
+        currentScreenColor.value = color;
+        serialConnection.addLog("info", `[Screen] Color changed to ${color}`);
+    }
+};
 
 const isSelected = (color: ScreenColor, option: ScreenColor) => {
     return match(color, option) && match(currentScreenColor.value, option);
@@ -48,7 +57,7 @@ const match = (color: ScreenColor, option: ScreenColor) => {
                         'white',
                     ),
                 }"
-                @click="currentScreenColor = option.value as ScreenColor"
+                @click="handleScreenColorChange(option.value as ScreenColor)"
             >
                 <div
                     class="w-2.5 h-2.5 rounded-full border border-vp-1/10 transition-all duration-200 group-hover:opacity-95 group-hover:scale-110"

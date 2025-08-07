@@ -24,6 +24,7 @@ interface Props {
     uploadedFile?: File | null;
     uploadedFileRelease?: ReleaseItem | null;
     changelogState?: string;
+    isLogsOpen?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
     uploadedFile: null,
     uploadedFileRelease: null,
     selectedRelease: null,
+    isLogsOpen: true,
 });
 
 const emit = defineEmits<{
@@ -100,14 +102,14 @@ const releaseHref = computed(() => {
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
             'h-auto': isClosed,
-            'flex flex-col h-full': !isClosed,
+            'flex flex-col h-full min-h-0': !isClosed,
         }"
     >
         <div
             class="border rounded-[10px] border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
             :class="{
-                'changelog-expanded mt-5': isExpanded,
-                'flex-1': !isClosed,
+                'changelog-expanded': isExpanded,
+                'flex-1 min-h-0': !isClosed,
                 'flex-shrink-0': isClosed,
             }"
         >
@@ -188,7 +190,8 @@ const releaseHref = computed(() => {
                         v-if="isAccessible"
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            'opacity-50 pointer-events-none hover:text-vp-3': isExpanded,
+                            'opacity-50 pointer-events-none hover:text-vp-3':
+                                isExpanded || !isLogsOpen,
                         }"
                         @click="handleToggleOpenClose"
                     >

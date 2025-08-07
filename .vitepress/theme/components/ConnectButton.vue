@@ -39,7 +39,7 @@ const {
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
 const isAutoOpen = ref(false);
-const { isAutoconnectEnabled } = useSettings();
+const { isSettingEnabled } = useSettings();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 const { dots: connectingDots } = useDots();
 const { dots: hardwareNameDots } = useDots();
@@ -339,11 +339,11 @@ onMounted(() => {
                 :offset="13"
                 position="right"
                 :accept-hover="false"
-                :force-visible="isInstallButtonHovered && !isAutoconnectEnabled"
+                :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
             >
                 <SettingsIcon />
                 <template #content>{{
-                    isAutoconnectEnabled
+                    isSettingEnabled("autoConnect")
                         ? tr("connection_autoconnect_enabled")
                         : tr("connection_autoconnect_disabled")
                 }}</template>

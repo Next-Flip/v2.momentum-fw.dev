@@ -7,25 +7,25 @@ import { useSettings } from "../composables/useSettings";
 import Toggle from "./Toggle.vue";
 
 const { tr } = useI18n();
-const { isAutoconnectEnabled, toggleAutoconnect } = useSettings();
+const { isSettingEnabled, toggleSetting } = useSettings();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const { handleConnect, connectionState } = useConnectionInfo();
 
 const toggleLabel = computed(() => {
-    return isAutoconnectEnabled.value
+    return isSettingEnabled("autoConnect")
         ? tr("connection_autoconnect_enabled")
         : tr("connection_autoconnect_disabled");
 });
 
 const toggleConnect = async () => {
-    toggleAutoconnect();
-    if (isAutoconnectEnabled.value && connectionState.value === "disconnected") {
+    toggleSetting("autoConnect");
+    if (isSettingEnabled("autoConnect") && connectionState.value === "disconnected") {
         await handleConnect();
     }
 };
 
 onMounted(async () => {
-    if (serialConnection && serialConnection.autoConnect && isAutoconnectEnabled.value) {
+    if (serialConnection && serialConnection.autoConnect && isSettingEnabled("autoConnect")) {
         await serialConnection.autoConnect();
     }
 });
@@ -33,10 +33,10 @@ onMounted(async () => {
 
 <template>
     <Toggle
-        icon-name="ri-refresh-line"
+        :icon-name="isSettingEnabled('autoConnect') ? 'oi-dash' : 'fa-regular-circle'"
         :scale="0.65"
         :label="toggleLabel"
-        :checked="isAutoconnectEnabled"
+        :checked="isSettingEnabled('autoConnect')"
         @toggle="toggleConnect"
     />
 </template>

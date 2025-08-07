@@ -6,6 +6,7 @@ import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, getReleaseByVersion, mainlineReleases } from "../../../_data/releases";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
+import { usePanelResize } from "../composables/usePanelResize";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
@@ -33,6 +34,17 @@ const { width: windowWidth } = useWindowSize();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
+const {
+    containerRef: panelContainerRef,
+    dividerRef,
+    isDragging,
+    topPanelHeight,
+    bottomPanelHeight,
+    topPanelHeightWhenBottomClosed,
+    bottomPanelHeightWhenTopClosed,
+    startDrag,
+} = usePanelResize({});
+
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<"mainline" | "devbuild" | null>(null);
 const { selectedRelease, selectRelease } = useReleaseNavigation({
@@ -57,8 +69,8 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsOpen = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(devMode() || false); // TEST
-const loopMode = ref(false); // TEST
+const testMode = ref(devMode() || false); // TEST: DONT leave this as true
+const loopMode = ref(false); // TEST: DONT leave this as true
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
@@ -407,6 +419,13 @@ const toggleChangelogExpand = () => {
     });
 };
 
+const isPanelClosed = () => {
+    if (isChangelogClosed.value && isLogsOpen.value) return true;
+    if (!isChangelogClosed.value && !isLogsOpen.value) return true;
+    if (isChangelogClosed.value && !isLogsOpen.value) return true;
+    return false;
+};
+
 onMounted(() => {
     if (changelogState.value === "expanded") {
         changelogState.value = "open";
@@ -448,7 +467,7 @@ onBeforeUnmount(() => {
 
                     <div
                         ref="dropZoneRef"
-                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 gap-y-5 overflow-hidden"
+                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 overflow-hidden"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
@@ -720,6 +739,9 @@ onBeforeUnmount(() => {
                                     <div
                                         v-if="!showUpdateOverlay"
                                         class="h-px bg-vp-divider w-auto mt-5 mx-5"
+                                        :class="{
+                                            'opacity-30': isOverDropZone,
+                                        }"
                                     ></div>
                                 </div>
                             </Transition>
@@ -727,42 +749,104 @@ onBeforeUnmount(() => {
 
                         <div
                             v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
-                            class="min-h-14 transition-opacity duration-250"
+                            ref="panelContainerRef"
+                            class="flex flex-col mt-5 transition-opacity duration-250 min-h-0 flex-1 overflow-hidden"
                             :class="{
-                                'opacity-55 dark:opacity-65 hover:!opacity-100': showUpdateOverlay,
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
-                                'flex-1 min-h-0': !isChangelogClosed,
-                                'flex-shrink-0': isChangelogClosed,
                             }"
                         >
-                            <UpdaterChangelog
-                                :show-update-overlay="showUpdateOverlay"
-                                :selected-release="currentChangelogRelease"
-                                :uploaded-file="uploadedFile"
-                                :uploaded-file-release="uploadedFileRelease"
-                                :changelog-state="supportsSerialPort() ? changelogState : 'open'"
-                                @toggle-open-close="toggleChangelogOpenClose"
-                                @toggle-expand="toggleChangelogExpand"
-                            />
-                        </div>
+                            <div
+                                class="min-h-14 flex flex-col"
+                                :class="{
+                                    'transition-all duration-200': !isDragging,
+                                    'flex-shrink-0': isChangelogClosed,
+                                    'min-h-0 overflow-hidden': !isChangelogClosed,
+                                    'opacity-55 dark:opacity-65 hover:!opacity-100':
+                                        showUpdateOverlay,
+                                    '!opacity-100': isDragging,
+                                }"
+                                :style="{
+                                    height: isChangelogClosed
+                                        ? '56px'
+                                        : isLogsOpen
+                                          ? topPanelHeight
+                                          : topPanelHeightWhenBottomClosed,
+                                }"
+                            >
+                                <UpdaterChangelog
+                                    :show-update-overlay="showUpdateOverlay"
+                                    :selected-release="currentChangelogRelease"
+                                    :uploaded-file="uploadedFile"
+                                    :uploaded-file-release="uploadedFileRelease"
+                                    :changelog-state="
+                                        supportsSerialPort() ? changelogState : 'open'
+                                    "
+                                    :is-logs-open="isLogsOpen"
+                                    @toggle-open-close="toggleChangelogOpenClose"
+                                    @toggle-expand="toggleChangelogExpand"
+                                />
+                            </div>
 
-                        <div
-                            v-if="supportsSerialPort()"
-                            class="min-h-14 transition-opacity duration-250"
-                            :class="{
-                                'opacity-55 dark:opacity-65 hover:!opacity-100': showUpdateOverlay,
-                                'opacity-50': isInstallButtonHovered,
-                                'opacity-30': isOverDropZone,
-                                'flex-shrink-0': !isChangelogClosed,
-                                'flex-1 min-h-0': isChangelogClosed,
-                            }"
-                        >
-                            <UpdaterLogs
-                                :is-open="isLogsOpen"
-                                :changelog-is-open="isChangelogOpen"
-                                @toggle="toggleLogs"
-                            />
+                            <div
+                                v-if="supportsSerialPort()"
+                                ref="dividerRef"
+                                class="flex flex-row h-5 w-full items-center justify-center relative px-10 cursor-row-resize select-none transition-all duration-200"
+                                :class="{
+                                    'opacity-0 pointer-events-none': isPanelClosed(),
+                                    'opacity-55 dark:opacity-65':
+                                        !isPanelClosed() && !showUpdateOverlay,
+                                }"
+                                tabindex="0"
+                                role="separator"
+                                :aria-label="tr('updater_resize_panels')"
+                                @mousedown="startDrag"
+                            >
+                                <div
+                                    class="flex flex-row items-center justify-center w-full h-full group"
+                                >
+                                    <div
+                                        class="h-px border-t border-dotted border-vp-divider w-auto flex-1 transition-colors duration-200"
+                                        :class="{
+                                            'border-vp-3/50 !border-solid': isDragging,
+                                        }"
+                                    ></div>
+                                    <div
+                                        class="h-[3px] bg-vp-border rounded-full w-10 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 transition-all duration-200 group-hover:bg-vp-brand-2"
+                                        :class="{
+                                            'bg-vp-brand-1 scale-110': isDragging,
+                                        }"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div
+                                v-if="supportsSerialPort()"
+                                class="min-h-14 flex flex-col"
+                                :class="{
+                                    'transition-all duration-200': !isDragging,
+                                    'flex-shrink-0': !isLogsOpen,
+                                    'min-h-0 overflow-hidden': isLogsOpen,
+                                    'opacity-55 dark:opacity-65 hover:!opacity-100':
+                                        showUpdateOverlay,
+                                    '!opacity-100': isDragging,
+                                }"
+                                :style="{
+                                    height: !isLogsOpen
+                                        ? '56px'
+                                        : isChangelogClosed
+                                          ? bottomPanelHeightWhenTopClosed
+                                          : bottomPanelHeight,
+                                }"
+                            >
+                                <UpdaterLogs
+                                    :is-open="isLogsOpen"
+                                    :is-changelog-open="isChangelogOpen"
+                                    :is-changelog-expanded="isChangelogExpanded"
+                                    :is-changelog-closed="isChangelogClosed"
+                                    @toggle="toggleLogs"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

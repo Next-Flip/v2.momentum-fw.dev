@@ -213,6 +213,7 @@ const messages: MessageSchema = {
     connection_autoconnect_enabled: "Auto Connect: ON",
     connection_autoconnect_disabled: "Auto Connect: OFF",
     connection_clear_logs: "Clear Logs",
+    connection_verbose_logs: "Verbose Logs",
     connection_screen_color: "Screen Color",
     connection_unplug_warning: "Don't unplug your Flipper!",
     missing: "Missing",
@@ -344,6 +345,7 @@ const messages: MessageSchema = {
     updater_serial_unsupported: "Unsupported Browser",
     updater_serial_unsupported_subtitle:
         "Your browser does not support serial communication. Use a Chromium-based browser like <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, or <a href='https://www.opera.com/download' target='_blank' rel='noopener'>Opera</a>.",
+    updater_resize_panels: "Resize panels",
 };
 
 export default messages;

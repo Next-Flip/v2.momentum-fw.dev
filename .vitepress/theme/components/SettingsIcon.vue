@@ -10,7 +10,7 @@ import Toggle from "./Toggle.vue";
 
 const { isLocked } = useThemeSwitcher();
 const { tr } = useI18n();
-const { isClearLogsEnabled, toggleBool } = useSettings();
+const { isSettingEnabled, toggleSetting } = useSettings();
 const flyoutOpen = ref(false);
 
 const handleButtonEnter = () => {
@@ -44,14 +44,28 @@ const handleButtonLeave = () => {
                         <span class="menu-label">{{ tr("connection_autoconnect") }}:</span>
                         <AutoconnectToggle />
                     </div>
+                    <div class="menu-item mx-3">
+                        <span class="menu-label">{{ tr("connection_verbose_logs") }}:</span>
+                        <Toggle
+                            :icon-name="
+                                isSettingEnabled('verboseLogs') ? 'oi-dash' : 'fa-regular-circle'
+                            "
+                            :scale="0.65"
+                            :label="tr('connection_verbose_logs')"
+                            :checked="isSettingEnabled('verboseLogs')"
+                            :callback="() => toggleSetting('verboseLogs')"
+                        />
+                    </div>
                     <div class="menu-item mb-2 mx-3">
                         <span class="menu-label">{{ tr("connection_clear_logs") }}:</span>
                         <Toggle
-                            icon-name="ri-refresh-line"
+                            :icon-name="
+                                isSettingEnabled('clearLogs') ? 'oi-dash' : 'fa-regular-circle'
+                            "
                             :scale="0.65"
                             :label="tr('connection_clear_logs')"
-                            :checked="isClearLogsEnabled"
-                            :callback="() => toggleBool('clearLogs')"
+                            :checked="isSettingEnabled('clearLogs')"
+                            :callback="() => toggleSetting('clearLogs')"
                         />
                     </div>
                     <div class="h-px bg-vp-divider/70 mx-0" :class="{ 'mb-6': !isLocked }"></div>
@@ -75,7 +89,6 @@ const handleButtonLeave = () => {
     position: relative;
     padding: 7px 0;
     margin: -7px 0;
-    /* background-color: rgba(255, 0, 0, 0.1); */
     transition:
         padding 0.25s ease,
         margin 0.25s ease;
@@ -135,7 +148,6 @@ const handleButtonLeave = () => {
 .menu-content {
     display: flex;
     flex-direction: column;
-    /* padding: 6px 0; */
 }
 
 .menu-item {

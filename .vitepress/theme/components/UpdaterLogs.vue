@@ -4,13 +4,16 @@ import { computed, inject, nextTick, onMounted, ref, watch, type Ref } from "vue
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useSettings } from "../composables/useSettings";
 import { formatDate } from "../date";
 
 import Tooltip from "./Tooltip.vue";
 
 interface Props {
     isOpen: boolean;
-    changelogIsOpen: boolean;
+    isChangelogOpen: boolean;
+    isChangelogExpanded: boolean;
+    isChangelogClosed: boolean;
 }
 
 const props = defineProps<Props>();
@@ -23,8 +26,17 @@ const { copyState } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const logsScrollTrigger = inject<Ref<number>>("logsScrollTrigger", ref(0));
 const { width: windowWidth } = useWindowSize();
+const { isSettingEnabled } = useSettings();
+const showVerboseLogs = computed(() => isSettingEnabled("verboseLogs"));
 
-const logs = computed(() => serialConnection?.logs || []);
+const logs = computed(() => {
+    if (!serialConnection?.logs) return [];
+    if (showVerboseLogs.value) {
+        return serialConnection.logs;
+    }
+    return serialConnection.logs.filter((log) => log.level !== "verbose");
+});
+
 const groupedLogs = computed(() => {
     const grouped: Array<{
         log: (typeof logs.value)[0];
@@ -107,7 +119,7 @@ watch(
         () => logs.value,
         () => props.isOpen,
         () => logsScrollTrigger.value,
-        () => props.changelogIsOpen,
+        () => props.isChangelogOpen,
     ],
     ([newLogs, isExpanded], [oldLogs, wasExpanded]) => {
         if (!isExpanded && newLogs.length > 0) {
@@ -138,18 +150,12 @@ onMounted(() => {
 
 <template>
     <div
-        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-[10px] border border-vp-divider"
+        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-[10px] border border-vp-divider h-full min-h-0"
         :class="{
-            'h-full': !props.changelogIsOpen && showLogs,
-            'border-b border-vp-divider': !props.changelogIsOpen && !showLogs,
+            'border-b border-vp-divider': !props.isChangelogOpen && !showLogs,
         }"
     >
-        <div
-            class="flex flex-col"
-            :class="{
-                'flex-1 min-h-0': !props.changelogIsOpen && showLogs,
-            }"
-        >
+        <div class="flex flex-col flex-1 min-h-0">
             <div
                 class="w-full flex items-center justify-between text-left px-4 pr-2 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
                 :class="{
@@ -225,7 +231,8 @@ onMounted(() => {
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            'opacity-50 !cursor-default': logs.length === 0,
+                            'opacity-50 !cursor-default pointer-events-none':
+                                logs.length === 0 || isChangelogClosed,
                             'opacity-100 hover:text-vp-brand-1 cursor-pointer': logs.length > 0,
                         }"
                         @click="handleToggle"
@@ -244,24 +251,13 @@ onMounted(() => {
             </div>
 
             <Transition name="logs-expand" mode="in-out">
-                <div
-                    v-if="showLogs"
-                    :class="{
-                        'flex-1 flex flex-col min-h-0': !props.changelogIsOpen,
-                    }"
-                >
-                    <div
-                        class="relative border-t border-vp-divider"
-                        :class="{
-                            'flex-1 flex flex-col min-h-0': !props.changelogIsOpen,
-                        }"
-                    >
+                <div v-if="showLogs" class="flex-1 flex flex-col min-h-0">
+                    <div class="relative border-t border-vp-divider flex-1 flex flex-col min-h-0">
                         <div
                             ref="logContainer"
                             class="pr-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
                             :class="{
-                                'h-48': props.changelogIsOpen,
-                                'flex-1 min-h-0': !props.changelogIsOpen,
+                                'flex-1 min-h-0': true,
                             }"
                         >
                             <div
@@ -307,7 +303,7 @@ onMounted(() => {
                                         }"
                                     ></div>
                                     <span
-                                        class="text-vp-3 flex-shrink-0 w-[62px] text-left h-min"
+                                        class="text-vp-3 flex-shrink-0 w-[60px] text-left h-min tracking-tight"
                                         :class="{
                                             'text-neutral-900 dark:text-yellow-400/60':
                                                 group.log.level === 'warning',
