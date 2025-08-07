@@ -13,7 +13,7 @@ const { site } = useData();
 const { tr } = useI18n();
 const { currentLogo, nextLogo, isLocked, toggleLock } = useThemeSwitcher();
 const route = useRoute();
-const isWiki = route.path.includes("/wiki");
+const isWiki = computed(() => route.path.includes("/wiki"));
 
 const isHovering = ref(false);
 const handleLogoHover = () => {
@@ -57,10 +57,10 @@ const navigationLinks = computed(() => [
 
 <template>
     <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
-        <div class="max-w-full mx-auto" :class="`py-16 pb-24 lg:pb-32 ${isWiki ? 'lg:px-0' : ''}`">
+        <div class="max-w-full mx-auto py-16 pb-24 lg:pb-32" :class="{ 'lg:px-0': isWiki }">
             <div
                 class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl"
-                :class="isWiki ? 'px-8 lg:pl-72 lg:pr-16' : 'px-8 lg:px-16'"
+                :class="[isWiki ? 'px-8 lg:pl-72 lg:pr-16' : 'px-8 lg:px-16']"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50">
                     <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">
@@ -141,7 +141,8 @@ const navigationLinks = computed(() => [
 
                 <div
                     v-if="recentReleases.mainline.length > 0 || recentReleases.devbuilds.length > 0"
-                    :class="`grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-8 ${isWiki ? 'lg:gap-12' : 'lg:gap-20'}`"
+                    class="grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-8"
+                    :class="isWiki ? 'lg:gap-12' : 'lg:gap-20'"
                 >
                     <div class="contents md:block md:space-y-6">
                         <FooterSection
