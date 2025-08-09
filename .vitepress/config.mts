@@ -54,6 +54,7 @@ export default defineConfig({
             level: [2, 3, 4, 5],
         },
     },
+    srcExclude: ["README.md"],
     ignoreDeadLinks: true,
     // title: "Momentum Firmware",
     // description: "Feature-rich, stable and customizable firmware for Flipper Zero",
