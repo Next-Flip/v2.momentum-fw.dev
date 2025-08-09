@@ -1,3 +1,33 @@
+---
+title: Dolphin
+description: "Settings for the Flipper Zero's dolphin"
+head:
+    - - meta
+      - name: "description"
+        content: "Settings for the Flipper Zero's dolphin"
+    - - meta
+      - property: "og:title"
+        content: "Dolphin | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Settings for the Flipper Zero's dolphin"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/dolphin.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Misc/Dolphin"
+    - - meta
+      - name: "twitter:title"
+        content: "Dolphin | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Settings for the Flipper Zero's dolphin"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/dolphin.png"
+---
+
 # Dolphin
 
 The Dolphin settings allow you to customize the stats and behavior of your Flipper Zero's dolphin. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > Dolphin`.

@@ -1,3 +1,33 @@
+---
+title: Community Asset Packs
+description: "List of community-created asset packs for Momentum Firmware"
+head:
+    - - meta
+      - name: "description"
+        content: "List of community-created asset packs for Momentum Firmware"
+    - - meta
+      - property: "og:title"
+        content: "Community Asset Packs | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "List of community-created asset packs for Momentum Firmware"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/community-asset-packs.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Assets/Community-Asset-Packs"
+    - - meta
+      - name: "twitter:title"
+        content: "Community Asset Packs | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "List of community-created asset packs for Momentum Firmware"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/community-asset-packs.png"
+---
+
 # Community Asset Packs
 
 <br/>

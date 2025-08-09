@@ -1,3 +1,33 @@
+---
+title: Protocols
+description: "Configuration of supported protocols (SubGHz and GPIO pins)"
+head:
+    - - meta
+      - name: "description"
+        content: "Configuration of supported protocols (SubGHz and GPIO pins)"
+    - - meta
+      - property: "og:title"
+        content: "Protocols | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Configuration of supported protocols (SubGHz and GPIO pins)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/protocols.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Protocols"
+    - - meta
+      - name: "twitter:title"
+        content: "Protocols | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Configuration of supported protocols (SubGHz and GPIO pins)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/protocols.png"
+---
+
 # Protocols
 
 The Protocols settings allow you to configure various communication protocols and hardware interfaces on your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Protocols`.

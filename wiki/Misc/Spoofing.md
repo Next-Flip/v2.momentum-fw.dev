@@ -1,3 +1,33 @@
+---
+title: Spoofing
+description: "Settings for the Flipper Zero's name and shell color"
+head:
+    - - meta
+      - name: "description"
+        content: "Settings for the Flipper Zero's name and shell color"
+    - - meta
+      - property: "og:title"
+        content: "Spoofing | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Settings for the Flipper Zero's name and shell color"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/spoofing.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Misc/Spoofing"
+    - - meta
+      - name: "twitter:title"
+        content: "Spoofing | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Settings for the Flipper Zero's name and shell color"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/spoofing.png"
+---
+
 # Spoofing
 
 The Spoofing settings allow you to customize your Flipper Zero's display name and shell color shown in the [Flipper app](https://github.com/flipperdevices/Flipper-iOS-App). These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > Spoofing`.

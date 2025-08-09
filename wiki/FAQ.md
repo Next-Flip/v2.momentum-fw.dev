@@ -1,4 +1,31 @@
 ---
+title: FAQ
+description: "Frequently asked questions and troubleshooting help"
+head:
+    - - meta
+      - name: "description"
+        content: "Frequently asked questions and troubleshooting help"
+    - - meta
+      - property: "og:title"
+        content: "FAQ | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Frequently asked questions and troubleshooting help"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/faq.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/FAQ"
+    - - meta
+      - name: "twitter:title"
+        content: "FAQ | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Frequently asked questions and troubleshooting help"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/faq.png"
 next:
     text: Installation
     link: /wiki/installation.md
@@ -16,6 +43,8 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 
 ## Table of Contents
 
+<div class="custom-toc">
+
 - [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
 - [Will I lose data installing a new version?](#will-i-lose-data-installing-a-new-version)
 - [Mainline release or dev build?](#mainline-release-or-dev-build)
@@ -23,6 +52,8 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 - [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
 - [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
 - [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
+
+</div>
 
 ## [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
 
@@ -102,3 +133,9 @@ More info for all these possible errors and what to do can be found in the [SubG
 ---
 
 <span id="format-warning"><sup>1. **WARNING**: Formatting the SD card deletes all the data on it and you'll need to install again. Refer to the [Backup methods](https://github.com/Next-Flip/Momentum-Firmware/wiki/Installation#back-up-your-data) before proceeding.</sup></span>
+
+<style>
+.custom-toc li a {
+  color: var(--vp-c-alternate-1);
+}
+</style>

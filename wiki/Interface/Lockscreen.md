@@ -1,3 +1,33 @@
+---
+title: Lockscreen
+description: "Security and display options for the lockscreen"
+head:
+    - - meta
+      - name: "description"
+        content: "Security and display options for the lockscreen"
+    - - meta
+      - property: "og:title"
+        content: "Lockscreen | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Security and display options for the lockscreen"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/lockscreen.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/Lockscreen"
+    - - meta
+      - name: "twitter:title"
+        content: "Lockscreen | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Security and display options for the lockscreen"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/lockscreen.png"
+---
+
 # Lockscreen
 
 The Lockscreen settings allow you to configure security and display options for your Flipper Zero's lock screen. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Lockscreen`.

@@ -1,3 +1,33 @@
+---
+title: Installation
+description: "Installation methods for Momentum Firmware on your Flipper Zero"
+head:
+    - - meta
+      - name: "description"
+        content: "Installation methods for Momentum Firmware on your Flipper Zero"
+    - - meta
+      - property: "og:title"
+        content: "Installation | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Installation methods for Momentum Firmware on your Flipper Zero"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/installation.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Installation"
+    - - meta
+      - name: "twitter:title"
+        content: "Installation | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Installation methods for Momentum Firmware on your Flipper Zero"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/installation.png"
+---
+
 # Installation
 
 This page covers the different methods for installing Momentum firmware on your Flipper Zero.

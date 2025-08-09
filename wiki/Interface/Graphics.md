@@ -1,3 +1,33 @@
+---
+title: Graphics
+description: "Settings for the current Asset Pack"
+head:
+    - - meta
+      - name: "description"
+        content: "Settings for the current Asset Pack"
+    - - meta
+      - property: "og:title"
+        content: "Graphics | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Settings for the current Asset Pack"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/graphics.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/Graphics"
+    - - meta
+      - name: "twitter:title"
+        content: "Graphics | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Settings for the current Asset Pack"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/graphics.png"
+---
+
 # Graphics
 
 The Graphics settings allow you to customize the visual appearance of your Flipper Zero through Asset Packs and animation behaviors. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Graphics`.

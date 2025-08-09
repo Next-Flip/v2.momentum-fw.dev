@@ -1,3 +1,33 @@
+---
+title: Main Menu
+description: "Customization of the main menu style and app selector"
+head:
+    - - meta
+      - name: "description"
+        content: "Customization of the main menu style and app selector"
+    - - meta
+      - property: "og:title"
+        content: "Main Menu | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Customization of the main menu style and app selector"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/mainmenu.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/Mainmenu"
+    - - meta
+      - name: "twitter:title"
+        content: "Main Menu | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Customization of the main menu style and app selector"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/mainmenu.png"
+---
+
 # Main Menu
 
 The Main Menu settings allow you to customize the appearance and functionality of your Flipper Zero's main menu. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Mainmenu`.

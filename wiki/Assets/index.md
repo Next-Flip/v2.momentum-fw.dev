@@ -1,5 +1,32 @@
 ---
+title: Asset Packs
+description: "Guide on what asset packs are and how to install or create them"
 prev: Installation
+head:
+    - - meta
+      - name: "description"
+        content: "Guide on what asset packs are and how to install or create them"
+    - - meta
+      - property: "og:title"
+        content: "Asset Packs | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Guide on what asset packs are and how to install or create them"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/assets.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Assets"
+    - - meta
+      - name: "twitter:title"
+        content: "Asset Packs | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Guide on what asset packs are and how to install or create them"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/assets.png"
 ---
 
 # What are Asset Packs?

@@ -58,7 +58,9 @@ const getItemText = (item: FooterItem) => {
                     ]"
                 >
                     <template v-if="type === 'release'">
-                        <span class="min-w-[68px] font-mono">{{ getItemText(item) }}</span>
+                        <span class="min-w-[68px] uppercase font-mono">{{
+                            getItemText(item)
+                        }}</span>
                         <span
                             class="text-vp-3 text-[11px] tracking-tighter text-right whitespace-nowrap font-mono"
                         >

@@ -1,3 +1,33 @@
+---
+title: SubGHz
+description: "Settings for the Flipper Zero's SubGHz radio"
+head:
+    - - meta
+      - name: "description"
+        content: "Settings for the Flipper Zero's SubGHz radio"
+    - - meta
+      - property: "og:title"
+        content: "SubGHz | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Settings for the Flipper Zero's SubGHz radio"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/subghz.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Protocols/SubGHz"
+    - - meta
+      - name: "twitter:title"
+        content: "SubGHz | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Settings for the Flipper Zero's SubGHz radio"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/subghz.png"
+---
+
 # SubGHz
 
 The SubGHz settings allow you to configure various options for the SubGHz radio module in your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Protocols > SubGHz`.

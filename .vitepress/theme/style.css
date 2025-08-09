@@ -64,6 +64,7 @@
     --vp-custom-block-tip-code-bg: var(--vp-c-brand-soft);
     --vp-shadow-3: 0 3px 10px rgba(0, 0, 0, 0.05);
     --mntm-footer-height: 289px;
+    --vp-local-search-highlight-bg: var(--vp-c-alternate-1);
 }
 
 .dark {
@@ -166,12 +167,6 @@
     color: black;
 }
 
-.theme-pink .logo {
-    filter: hue-rotate(95deg) saturate(200%) !important;
-}
-.theme-orange .logo {
-    filter: hue-rotate(153deg) saturate(200%) !important;
-}
 .theme-white .logo {
     filter: saturate(0) contrast(200) brightness(3) !important;
 }
@@ -258,7 +253,6 @@
 
 html {
     position: relative;
-    /* background-color: #ffffff; */
 }
 
 body {
@@ -354,11 +348,6 @@ body {
     }
 }
 
-/* .VPContent {
-    position: sticky !important;
-    top: 0 !important;
-} */
-
 .profile .org.link {
     display: none;
     color: var(--vp-c-brand-1) !important;
@@ -429,7 +418,7 @@ body {
 #ref3b,
 #ref4,
 #ref5 {
-    color: var(--vp-c-alternate-1);
+    color: var(--vp-c-brand-1);
 }
 
 .full-width-table {
@@ -501,12 +490,6 @@ body:before {
         top: 0;
     }
 }
-
-/* #VPSidebarNav,
-.VPDoc .content {
-    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 20%, transparent) !important;
-    backdrop-filter: blur(6px);
-} */
 
 .full-width-table .vp-doc table,
 .full-width-table table {
@@ -609,12 +592,9 @@ body:before {
 }
 
 .full-width-table .check {
-    color: color-mix(in srgb, var(--vp-c-brand-1) 70%, transparent);
+    color: color-mix(in srgb, var(--vp-c-brand-1) 90%, transparent);
 }
 
-.dark .check {
-    color: var(--vp-c-brand-1);
-}
 .theme-white.dark .check {
     color: var(--vp-c-alternate-1);
 }
@@ -624,9 +604,28 @@ body:before {
     color: var(--vp-c-brand-3);
 }
 
-.dark .check-last {
-    font-weight: 600;
-    color: var(--vp-c-alternate-1);
+.theme-pink .check {
+    color: color-mix(in srgb, var(--vp-c-alternate-1) 90%, transparent);
+}
+.theme-pink .check-last {
+    color: var(--vp-c-brand-1);
+}
+
+.theme-purp .check {
+    color: color-mix(in srgb, var(--vp-c-brand-1) 70%, transparent);
+}
+.theme-purp.dark .check {
+    color: color-mix(in srgb, var(--vp-c-alternate-1) 90%, transparent);
+}
+.theme-purp .check-last {
+    color: var(--vp-c-brand-1);
+}
+
+.theme-orange .check {
+    color: color-mix(in srgb, var(--vp-c-alternate-1) 90%, transparent);
+}
+.theme-orange .check-last {
+    color: var(--vp-c-brand-1);
 }
 
 .theme-white.dark .check-last {
@@ -733,7 +732,6 @@ body[data-route*="/wiki"] {
 
 .VPNavBar:not(.top) {
     background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
-    /* border-bottom: 1px solid var(--vp-c-divider) !important; */
     backdrop-filter: blur(8px) !important;
 }
 
@@ -742,11 +740,6 @@ body[data-route*="/wiki"] {
     background-color: transparent !important;
 }
 
-/* .VPLocalNav {
-    background-color: transparent !important;
-    border-bottom: none !important;
-} */
-
 @media (min-width: 960px) {
     .VPNavBar.top {
         background-color: transparent !important;
@@ -754,17 +747,12 @@ body[data-route*="/wiki"] {
     }
     .VPNavBar:not(.top) {
         background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
-        /* border-bottom: 1px solid var(--vp-c-divider) !important; */
         backdrop-filter: blur(8px) !important;
     }
     .VPNavBar .content-body {
         position: relative !important;
         background-color: transparent !important;
     }
-    /* .VPLocalNav {
-        background-color: transparent !important;
-        border-bottom: none !important;
-    } */
 }
 
 .vp-doc._wiki_Assets_Community-Asset-Packs p {
@@ -772,7 +760,6 @@ body[data-route*="/wiki"] {
     line-height: 25px;
 }
 
-/* align preview image to center of row */
 .vp-doc._wiki_Assets_Community-Asset-Packs img {
     margin-top: 10px;
 }
@@ -784,10 +771,6 @@ body[data-route*="/wiki"] {
 .curtain {
     background-color: transparent !important;
 }
-/* .aside-curtain {
-    position: absolute !important;
-    background: linear-gradient(transparent, var(--vp-c-bg-dark) 70%) !important;
-} */
 
 .VPDoc {
     padding-bottom: 0 !important;
@@ -803,16 +786,9 @@ body[data-route*="/wiki"] {
     }
     .VPSidebar {
         -ms-overflow-style: none;
-        /* position: sticky !important;
-        top: 0 !important; */
         scrollbar-width: none;
         background-color: transparent !important;
-        /* margin-bottom: 400px !important; */
     }
-
-    /* .VPSidebar #VPSidebarNav {
-        padding-bottom: 400px !important;
-    } */
 }
 
 @media (max-width: 820px) {
@@ -837,7 +813,6 @@ body[data-route*="/wiki"] {
         var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + var(--vp-doc-top-height, 0px) +
             32px
     );
-    /* max-height: calc(100% - 289px); */
 }
 
 .VPSidebar {
@@ -1059,16 +1034,8 @@ body[data-route*="/wiki"] {
 }
 
 .vp-doc :not(pre) > code {
-    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
-}
-
-.vp-doc :not(pre) > code {
     background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent) !important;
     color: var(--vp-c-alternate-1) !important;
-}
-.theme-purp .vp-doc :not(pre) > code {
-    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
-    color: var(--vp-c-brand-1) !important;
 }
 
 .theme-white .vp-doc :not(pre) > code {

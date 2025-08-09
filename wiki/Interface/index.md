@@ -1,3 +1,33 @@
+---
+title: Interface
+description: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
+head:
+    - - meta
+      - name: "description"
+        content: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
+    - - meta
+      - property: "og:title"
+        content: "Interface | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/interface.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface"
+    - - meta
+      - name: "twitter:title"
+        content: "Interface | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/interface.png"
+---
+
 # Interface
 
 The Interface settings allow you to customize the visual appearance and behavior of your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface`.

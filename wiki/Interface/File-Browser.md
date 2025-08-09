@@ -1,3 +1,33 @@
+---
+title: File Browser
+description: "Customization of the file browser (Archive)"
+head:
+    - - meta
+      - name: "description"
+        content: "Customization of the file browser (Archive)"
+    - - meta
+      - property: "og:title"
+        content: "File Browser | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Customization of the file browser (Archive)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/file-browser.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/File-Browser"
+    - - meta
+      - name: "twitter:title"
+        content: "File Browser | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Customization of the file browser (Archive)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/file-browser.png"
+---
+
 # File Browser
 
 The File Browser settings allow you to customize how files and folders are displayed and interacted with on your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > File Browser`.

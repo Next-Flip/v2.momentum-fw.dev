@@ -1,3 +1,33 @@
+---
+title: VGM
+description: "Customization of the VGM (Video Game Module)"
+head:
+    - - meta
+      - name: "description"
+        content: "Customization of the VGM (Video Game Module)"
+    - - meta
+      - property: "og:title"
+        content: "VGM | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Customization of the VGM (Video Game Module)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/vgm.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Misc/VGM"
+    - - meta
+      - name: "twitter:title"
+        content: "VGM | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Customization of the VGM (Video Game Module)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/vgm.png"
+---
+
 # Video Game Module (VGM)
 
 The VGM settings change the BG and FG colors used by the Official Flipper Zero [Video Game Module](https://shop.flipperzero.one/products/video-game-module-for-flipper-zero), after the dedicated RGB Firmware bundled with Momentum is installed to it. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > VGM`.

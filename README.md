@@ -1,3 +1,7 @@
+---
+search: false
+---
+
 # v2.momentum-fw.dev
 
 This repository contains the source for the Momentum Firmware website at [momentum-fw.dev](https://momentum-fw.dev). The site is built using VitePress with Vue 3 components and provides multilingual documentation, firmware update capabilities, release changelogs, and asset packs.

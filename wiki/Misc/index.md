@@ -1,3 +1,33 @@
+---
+title: Misc
+description: "Miscellaneous device personalization settings"
+head:
+    - - meta
+      - name: "description"
+        content: "Miscellaneous device personalization settings"
+    - - meta
+      - property: "og:title"
+        content: "Misc | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Miscellaneous device personalization settings"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/misc.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Misc"
+    - - meta
+      - name: "twitter:title"
+        content: "Misc | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Miscellaneous device personalization settings"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/misc.png"
+---
+
 # Misc
 
 The Miscellaneous settings provide additional customization options for various personalization features of your Flipper Zero. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc`.

@@ -1,3 +1,33 @@
+---
+title: GPIO
+description: "Assignment of GPIO pins for external connections"
+head:
+    - - meta
+      - name: "description"
+        content: "Assignment of GPIO pins for external connections"
+    - - meta
+      - property: "og:title"
+        content: "GPIO | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Assignment of GPIO pins for external connections"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/gpio.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Protocols/GPIO"
+    - - meta
+      - name: "twitter:title"
+        content: "GPIO | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Assignment of GPIO pins for external connections"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/gpio.png"
+---
+
 # GPIO Pins
 
 The GPIO settings allow you to configure pin assignments for various external protocols and connections. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Protocols > GPIO Pins`.

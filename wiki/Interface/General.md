@@ -1,3 +1,33 @@
+---
+title: General
+description: "General settings for the Flipper's look and feel"
+head:
+    - - meta
+      - name: "description"
+        content: "General settings for the Flipper's look and feel"
+    - - meta
+      - property: "og:title"
+        content: "General | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "General settings for the Flipper's look and feel"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/general.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/General"
+    - - meta
+      - name: "twitter:title"
+        content: "General | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "General settings for the Flipper's look and feel"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/general.png"
+---
+
 # General
 
 The General settings are preferences that apply generally to the flippers look and feel. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > General`.

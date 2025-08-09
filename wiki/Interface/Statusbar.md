@@ -1,3 +1,33 @@
+---
+title: Statusbar
+description: "Customization of the statusbar (Desktop and Lockscreen)"
+head:
+    - - meta
+      - name: "description"
+        content: "Customization of the statusbar (Desktop and Lockscreen)"
+    - - meta
+      - property: "og:title"
+        content: "Statusbar | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Customization of the statusbar (Desktop and Lockscreen)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/statusbar.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Interface/Statusbar"
+    - - meta
+      - name: "twitter:title"
+        content: "Statusbar | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Customization of the statusbar (Desktop and Lockscreen)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/statusbar.png"
+---
+
 # Statusbar
 
 The Statusbar settings allow you to customize the appearance of your Flipper Zero's status bar (Desktop and Lockscreen). These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Interface > Statusbar`.

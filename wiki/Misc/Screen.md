@@ -1,3 +1,33 @@
+---
+title: Screen
+description: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
+head:
+    - - meta
+      - name: "description"
+        content: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
+    - - meta
+      - property: "og:title"
+        content: "Screen | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/screen.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/Misc/Screen"
+    - - meta
+      - name: "twitter:title"
+        content: "Screen | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/screen.png"
+---
+
 # Screen
 
 The Screen settings allow you to customize the visual properties of your Flipper Zero display. These settings can be found by pressing `UP` on the Desktop and navigating to `MNTM > Misc > Screen`.

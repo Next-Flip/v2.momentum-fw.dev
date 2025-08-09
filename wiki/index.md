@@ -1,5 +1,31 @@
 ---
 title: Wiki
+description: "Comprehensive guide to the features and settings specific to Momentum Firmware"
+head:
+    - - meta
+      - name: "description"
+        content: "Comprehensive guide to the features and settings specific to Momentum Firmware"
+    - - meta
+      - property: "og:title"
+        content: "Wiki | Momentum Firmware"
+    - - meta
+      - property: "og:description"
+        content: "Comprehensive guide to the features and settings specific to Momentum Firmware"
+    # - - meta
+    #   - property: "og:image"
+    #     content: "https://momentum-fw.dev/og/wiki.png"
+    - - meta
+      - property: "og:url"
+        content: "https://momentum-fw.dev/wiki/"
+    - - meta
+      - name: "twitter:title"
+        content: "Wiki | Momentum Firmware"
+    - - meta
+      - name: "twitter:description"
+        content: "Comprehensive guide to the features and settings specific to Momentum Firmware"
+    # - - meta
+    #   - name: "twitter:image"
+    #     content: "https://momentum-fw.dev/og/wiki.png"
 next:
     text: Frequently Asked Questions
     link: /wiki/faq.md
@@ -22,7 +48,7 @@ next:
 
 # Momentum Firmware Wiki
 
-This is a comprehensive and explanatory guide to the features and settings specific to Momentum. Settings that are present in [OFW](https://github.com/flipperdevices/flipperzero-firmware) and remain *mostly* the same may not be mentioned here. Refer to the [Comparison table](#compare-to-other-firmware) for a detailed list of features and their individual pages.
+This is a comprehensive and explanatory guide to the features and settings specific to Momentum. Settings that are present in [OFW](https://github.com/flipperdevices/flipperzero-firmware) and remain _mostly_ the same may not be mentioned here. Refer to the [Comparison table](#compare-to-other-firmware) for a detailed list of features and their individual pages.
 
 ### Quick Links
 
@@ -51,7 +77,8 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 
 <div class="full-width-table">
 
-|Feature|[&nearr;&nbsp;OFW](https://github.com/flipperdevices/flipperzero-firmware)|[&nearr;&nbsp;RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[&nearr;&nbsp;Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
+<!-- prettier-ignore-start -->
+|Feature|[OFW](https://github.com/flipperdevices/flipperzero-firmware)|[RogueMaster](https://github.com/RogueMaster/flipperzero-firmware-wPlugins)|[Unleashed](https://github.com/DarkFlippers/unleashed-firmware)|Momentum|
 |-|:-:|:-:|:-:|:-:|
 |Stable Updates|<span class="check">&#10003;</span>|&#10007;|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
 |(Some) Rolling Code Support|&#10033;<sup><a href="#fn1" id="ref1">1</a></sup>|<span class="check">&#10003;</span>|<span class="check">&#10003;</span>|<span class="check-last">&#10003;</span>|
@@ -73,6 +100,7 @@ The goal of this firmware is to constantly push the bounds of what is possible w
 |Disk Image Management|&#10007;|<span class="check">&#10003;</span>|&#10007;|<span class="check-last">&#10003;</span>|
 |Improved Error Messages (Showing source path)|&#10007;|&#10007;|&#10007;|<span class="check-last">&#10003;</span>|
 |Preinstalled External Apps (As of 04.2025)|3|421|226 (with [e] pack)|183|
+<!-- prettier-ignore-end -->
 
 </div>
 
