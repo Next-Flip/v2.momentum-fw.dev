@@ -97,7 +97,7 @@ const showWarning = computed(() => {
                     <v-icon
                         v-else-if="updateStage === 'update_stage_flipper_updating'"
                         name="md-hourglasstop-twotone"
-                        :scale="1.5"
+                        :scale="1.35"
                         class="text-vp-neutral/75"
                     />
                 </div>

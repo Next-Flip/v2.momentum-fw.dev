@@ -117,9 +117,8 @@ const releaseHref = computed(() => {
                 class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-5 dropdown-button z-[3]"
                 :class="{
                     'is-active': isExpanded,
-                    'border-b border-vp-divider':
-                        (selectedRelease || uploadedFileRelease) && !isClosed,
-                    'bg-vp-dark': selectedRelease || uploadedFileRelease,
+                    'border-b border-vp-divider bg-vp-dark':
+                        ((selectedRelease && !uploadedFile) || uploadedFileRelease) && !isClosed,
                 }"
             >
                 <div class="flex items-center gap-2">

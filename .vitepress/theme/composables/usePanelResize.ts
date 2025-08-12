@@ -16,7 +16,7 @@ export function usePanelResize(options: PanelResizeOptions = {}) {
     const {
         defaultTopPercentage = 70,
         defaultBottomPercentage = 30,
-        minTopPercentage = 20,
+        minTopPercentage = 30,
         minBottomPercentage = 20,
         storageKey = STORAGE_KEYS.UPDATER_PANEL_SIZES,
         snapPoints = [50],

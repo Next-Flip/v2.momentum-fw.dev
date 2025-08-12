@@ -303,6 +303,7 @@ onMounted(() => {
                                         }"
                                     ></div>
                                     <span
+                                        :title="formatDate(group.log.timestamp, 'withTime')"
                                         class="text-vp-3 flex-shrink-0 w-[60px] text-left h-min tracking-tight"
                                         :class="{
                                             'text-neutral-900 dark:text-yellow-400/60':

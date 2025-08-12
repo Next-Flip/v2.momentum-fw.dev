@@ -233,7 +233,7 @@ const generateOrbs = (
         const duration = config.baseDuration + getRandom() * baseSpeed;
         const direction = getRandom() > config.directionThreshold ? "normal" : "reverse";
         const maxOpacity = config.opacityRange[0] + getRandom() * config.opacityRange[1];
-        const delay = getRandom() * 15;
+        const delay = getRandom() * 2;
         const id = `${type}-${i}-${currentKey}`;
 
         return {

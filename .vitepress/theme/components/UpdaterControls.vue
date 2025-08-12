@@ -135,6 +135,12 @@ const handleFlashFirmware = () => {
 const handleDownloadRelease = () => {
     emit("download-release");
 };
+
+const installTooltipContent = computed(() => {
+    if (connectionState.value === "error") return tr("connection_serial_busy");
+    if (isConnected.value && !canFlash.value) return tr("updater_flash_select_release_or_file");
+    return tr("updater_flash_button_disconnected");
+});
 </script>
 
 <template>
@@ -415,15 +421,7 @@ const handleDownloadRelease = () => {
                             }}
                         </button>
                         <template #content>
-                            {{
-                                connectionState === "disconnected"
-                                    ? supportsSerialPort()
-                                        ? tr("updater_flash_button_disconnected")
-                                        : tr("updater_serial_unsupported")
-                                    : connectionIsConnected && !canFlash
-                                      ? tr("updater_flash_select_release_or_file")
-                                      : ""
-                            }}
+                            {{ installTooltipContent }}
                         </template>
                     </Tooltip>
                 </div>

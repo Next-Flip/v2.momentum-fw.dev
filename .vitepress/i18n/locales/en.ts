@@ -203,7 +203,7 @@ const messages: MessageSchema = {
     connection_unable_to_extract: "Unable to flash asset packs",
     connection_unable_to_extract_desc:
         "{{version}} is unable to flash asset packs. Update to a compatible Momentum <a href='{{url}}'>release</a>.",
-    connection_serial_busy: "Serial port is busy",
+    connection_serial_busy: "Serial port is busy!",
     connection_rpc_failed: "RPC connection failed",
     connection_device_not_found: "Device not found",
     connection_serial_not_supported: "Serial not supported",

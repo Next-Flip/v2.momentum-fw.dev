@@ -692,7 +692,6 @@ export const useSerialConnection = () => {
             await updateFirmwareCapability();
 
             flipper.emitter.on("disconnect", () => {
-                addLog("info", "[Serial] Physical disconnect detected - disconnected");
                 resetFlagsAndState();
             });
 
@@ -1290,7 +1289,7 @@ export const useSerialConnection = () => {
         screenStreamRestartUnbind = null;
     };
 
-    const loadFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<void> => {
+    const loadFirmware = async (release?: ReleaseItem, uploadedFile?: File): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Flipper not connected or RPC not active");
         }
@@ -1319,6 +1318,9 @@ export const useSerialConnection = () => {
             console.log("uploaded files:", files);
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
+            if (!release) {
+                throw new Error("No release provided for firmware download");
+            }
             const firmwareUrl = getFirmwareDownloadUrl(release);
 
             if (!firmwareUrl) {
@@ -1477,7 +1479,7 @@ export const useSerialConnection = () => {
         }
     };
 
-    const updateFirmware = async (release: ReleaseItem, uploadedFile?: File): Promise<boolean> => {
+    const updateFirmware = async (release?: ReleaseItem, uploadedFile?: File): Promise<boolean> => {
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Flipper not connected or RPC not active");
         }
@@ -1543,7 +1545,7 @@ export const useSerialConnection = () => {
     };
 
     const testUpdateFirmware = async (
-        release: ReleaseItem,
+        release?: ReleaseItem,
         uploadedFile?: File | null,
         loop: boolean = false,
     ): Promise<boolean> => {
@@ -1591,7 +1593,7 @@ export const useSerialConnection = () => {
     };
 
     const testLoadFirmware = async (
-        release: ReleaseItem,
+        release?: ReleaseItem,
         uploadedFile?: File | null,
     ): Promise<void> => {
         if (!flags.connected || !flags.rpcActive) {
@@ -1626,6 +1628,9 @@ export const useSerialConnection = () => {
             addLog("debug", `[Test] Extracted ${files.length} files from uploaded file`);
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
+            if (!release) {
+                throw new Error("No release provided for test firmware download");
+            }
             const firmwareUrl = getFirmwareDownloadUrl(release);
 
             if (!firmwareUrl) {

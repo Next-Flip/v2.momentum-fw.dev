@@ -9,7 +9,9 @@ import { useI18n } from "../composables/useI18n";
 import { usePanelResize } from "../composables/usePanelResize";
 import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useSettings } from "../composables/useSettings";
 import { useSharedHover } from "../composables/useSharedHover";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 import { STORAGE_KEYS } from "../types";
 
@@ -33,6 +35,8 @@ const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
+const { currentTheme } = useThemeSwitcher();
+const { screenColor } = useSettings();
 
 const {
     containerRef: panelContainerRef,
@@ -253,54 +257,29 @@ const handleReleaseChange = (release: ReleaseItem) => {
 };
 
 const handleFlashFirmware = async () => {
-    const releaseToFlash = uploadedFile.value || uploadedFileRelease.value || selectedRelease.value;
-    if (!releaseToFlash || !serialConnection) {
+    if (!serialConnection) {
         logToSerial("error", "[Upload] No release to flash or serial connection");
         return;
     }
 
+    const releaseArg: ReleaseItem | undefined = uploadedFile.value
+        ? undefined
+        : uploadedFileRelease.value || selectedRelease.value || undefined;
+
+    if (!testMode.value && !isConnected.value) return;
+
     try {
-        const updateMethod = testMode.value
-            ? serialConnection.testUpdateFirmware
-            : serialConnection.updateFirmware;
-
-        if (!testMode.value && !isConnected.value) return;
-
-        let success = false;
-        if (uploadedFile.value) {
-            if (testMode.value) {
-                success =
-                    (await (updateMethod as typeof serialConnection.testUpdateFirmware)?.(
-                        releaseToFlash as ReleaseItem,
-                        uploadedFile.value,
-                        loopMode.value,
-                    )) || false;
-            } else {
-                success =
-                    (await (updateMethod as typeof serialConnection.updateFirmware)?.(
-                        releaseToFlash as ReleaseItem,
-                        uploadedFile.value,
-                    )) || false;
-            }
-        } else {
-            if (testMode.value) {
-                success =
-                    (await (updateMethod as typeof serialConnection.testUpdateFirmware)?.(
-                        releaseToFlash as ReleaseItem,
-                        null,
-                        loopMode.value,
-                    )) || false;
-            } else {
-                success =
-                    (await (updateMethod as typeof serialConnection.updateFirmware)?.(
-                        releaseToFlash as ReleaseItem,
-                    )) || false;
-            }
-        }
+        const uploadedForTest = uploadedFile.value ?? null;
+        const uploadedForUpdate = uploadedFile.value ?? undefined;
+        const success = testMode.value
+            ? await serialConnection.testUpdateFirmware(releaseArg, uploadedForTest, loopMode.value)
+            : await serialConnection.updateFirmware(releaseArg, uploadedForUpdate);
 
         if (success) {
             track("firmware_flash", {
-                version: (releaseToFlash as ReleaseItem).version,
+                version:
+                    releaseArg?.version || uploadedFile.value?.name.replace(".tgz", "") || "null",
+                theme: `${currentTheme.value}_${screenColor.value}`,
             });
         }
     } catch (error) {
@@ -448,7 +427,7 @@ onBeforeUnmount(() => {
         <div class="absolute top-0 left-0 w-full h-[121px] border-b border-vp-divider z-[-1]"></div>
 
         <div
-            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider backdrop-blur-sm bg-vp-dark/95"
+            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider bg-vp-dark"
         >
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
                 <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
@@ -497,7 +476,7 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease"
-                                            class="flex flex-row items-start md:items-center justify-start gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/[3%] dark:bg-yellow-900/[5%] h-10"
+                                            class="flex flex-row items-start md:items-center justify-center gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"
@@ -510,7 +489,7 @@ onBeforeUnmount(() => {
                                                 />
                                             </div>
                                             <span
-                                                class="text-xs text-vp-3 flex flex-col-reverse md:flex-row gap-2"
+                                                class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col-reverse md:flex-row gap-2"
                                             >
                                                 {{
                                                     uploadedFile
@@ -523,7 +502,7 @@ onBeforeUnmount(() => {
                                                 }}.
                                                 <div class="flex flex-row gap-px">
                                                     <a
-                                                        class="text-vp-2 hover:underline vp-external-link-icon"
+                                                        class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100"
                                                         :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion}`"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
@@ -703,7 +682,7 @@ onBeforeUnmount(() => {
 
                                     <div
                                         v-else-if="supportsSerialPort()"
-                                        class="w-full border border-dashed border-vp-divider rounded-[10px] flex items-center justify-center cursor-pointer backdrop-blur-md relative z-10 p-px"
+                                        class="w-full border border-dashed border-vp-divider rounded-[10px] flex items-center justify-center cursor-pointer relative z-10 p-px"
                                         :class="{
                                             'border-vp-3/40 bg-vp-3/10': isOverDropZone,
                                             'opacity-50 !cursor-not-allowed':
@@ -738,7 +717,7 @@ onBeforeUnmount(() => {
                                     />
                                     <div
                                         v-if="!showUpdateOverlay"
-                                        class="h-px bg-vp-divider w-auto mt-5 mx-5"
+                                        class="h-px bg-vp-3/25 w-auto mt-5 mx-5"
                                         :class="{
                                             'opacity-30': isOverDropZone,
                                         }"
@@ -793,7 +772,7 @@ onBeforeUnmount(() => {
                                 ref="dividerRef"
                                 class="flex flex-row h-5 w-full items-center justify-center relative px-10 cursor-row-resize select-none transition-all duration-200"
                                 :class="{
-                                    'opacity-0 pointer-events-none': isPanelClosed(),
+                                    'opacity-0 pointer-events-none h-6': isPanelClosed(),
                                     'opacity-55 dark:opacity-65':
                                         !isPanelClosed() && !showUpdateOverlay,
                                 }"
@@ -940,8 +919,4 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(-10px);
 }
-
-/* .outer-border {
-    outline: 2px solid var(--vp-c-bg-dark);
-} */
 </style>

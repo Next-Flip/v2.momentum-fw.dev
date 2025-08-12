@@ -409,14 +409,14 @@ const filteredAssetPacks = computed(() => {
         </div>
 
         <div
-            class="sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-6 max-w-[1200px] mx-auto pt-3 h-12"
+            class="sticky bottom-8 left-0 right-0 w-full lg:flex justify-center items-center z-10 fade-slide-up pt-3 h-12 pointer-events-none"
         >
             <div
                 v-if="isStuck"
-                class="hidden sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up max-w-[1200px] mx-auto pt-3"
+                class="hidden sticky bottom-5 left-0 right-0 w-full lg:flex justify-end items-center z-10 fade-slide-up px-7 pt-3"
             >
                 <button
-                    class="bg-vp-3/20 text-vp-neutral px-4 py-2 rounded-full text-sm font-medium shadow-sm hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap"
+                    class="bg-vp-divider text-vp-neutral px-4 py-2 rounded-full text-sm font-medium shadow-sm hover:bg-vp-brand-3 transition-colors duration-100 whitespace-nowrap pointer-events-auto"
                     :class="
                         ifCurrentTheme(['white'])
                             ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
