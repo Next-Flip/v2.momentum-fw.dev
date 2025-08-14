@@ -197,24 +197,22 @@ onMounted(() => {
                 <div class="flex items-center gap-1 flex-shrink-0">
                     <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
                         <button
-                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
+                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 max-w-8 min-w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100 box-border"
                             :class="{
-                                'scale-95': copyState.isPressed.value,
                                 'opacity-0': windowWidth > 1024,
                                 'group-hover:opacity-100': showButtons,
                             }"
                             :aria-label="tr('updater_clear_logs')"
                             @click="clearLogs"
                         >
-                            <v-icon name="pr-refresh" scale="0.9" />
+                            <v-icon name="pr-refresh" :scale="0.9" />
                         </button>
                         <template #content>{{ tr("updater_clear_logs") }}</template>
                     </Tooltip>
                     <Tooltip v-if="logs.length > 0" :delay="0" :z-index="9999">
                         <button
-                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100"
+                            class="!text-vp-3 hover:!text-vp-brand-1 transition-all duration-100 ease-out flex items-center justify-center w-8 max-w-8 min-w-8 h-8 rounded-lg cursor-pointer icon-button-opacity group-hover:opacity-100 box-border"
                             :class="{
-                                'scale-95': copyState.isPressed.value,
                                 'opacity-0': windowWidth > 1024,
                                 'group-hover:opacity-100': showButtons,
                             }"
@@ -224,7 +222,13 @@ onMounted(() => {
                             @mouseup="copyState.handleMouseUp"
                             @mouseleave="copyState.handleMouseLeave"
                         >
-                            <v-icon :name="copyState.currentIcon.value" scale="0.85" />
+                            <v-icon
+                                :class="{
+                                    'scale-95': copyState.isPressed.value,
+                                }"
+                                :name="copyState.currentIcon.value"
+                                :scale="copyState.currentIcon.value === 'oi-check' ? 0.95 : 0.85"
+                            />
                         </button>
                         <template #content>{{ copyState.currentText.value }}</template>
                     </Tooltip>

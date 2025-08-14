@@ -359,33 +359,43 @@ const deviceSections = computed(() => {
                         <div class="action-buttons px-5 lg:px-3">
                             <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
                                 <button
-                                    class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                    :class="{
-                                        'scale-95': copyState.isPressed.value,
-                                    }"
+                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :aria-label="copyState.currentText.value"
                                     @click="() => exportDeviceInfo('copy')"
                                     @mousedown="copyState.handleMouseDown"
                                     @mouseup="copyState.handleMouseUp"
                                     @mouseleave="copyState.handleMouseLeave"
                                 >
-                                    <v-icon :name="copyState.currentIcon.value" scale="0.8" />
+                                    <v-icon
+                                        :class="{
+                                            'scale-95': copyState.isPressed.value,
+                                        }"
+                                        :name="copyState.currentIcon.value"
+                                        :scale="
+                                            copyState.currentIcon.value === 'oi-check' ? 0.95 : 0.8
+                                        "
+                                    />
                                 </button>
                                 <template #content>{{ copyState.currentText.value }}</template>
                             </Tooltip>
                             <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
                                 <button
-                                    class="action-button export-button !w-min !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                    :class="{
-                                        'scale-95': saveState.isPressed.value,
-                                    }"
+                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
                                     :aria-label="saveState.currentText.value"
                                     @click="() => exportDeviceInfo('save')"
                                     @mousedown="saveState.handleMouseDown"
                                     @mouseup="saveState.handleMouseUp"
                                     @mouseleave="saveState.handleMouseLeave"
                                 >
-                                    <v-icon :name="saveState.currentIcon.value" scale="0.8" />
+                                    <v-icon
+                                        :class="{
+                                            'scale-95': saveState.isPressed.value,
+                                        }"
+                                        :name="saveState.currentIcon.value"
+                                        :scale="
+                                            saveState.currentIcon.value === 'oi-check' ? 0.95 : 0.8
+                                        "
+                                    />
                                 </button>
                                 <template #content>{{ saveState.currentText.value }}</template>
                             </Tooltip>
@@ -480,6 +490,16 @@ const deviceSections = computed(() => {
 
 .export-button {
     background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    padding: 0;
+    line-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    box-sizing: border-box;
 }
 
 .export-button:hover {

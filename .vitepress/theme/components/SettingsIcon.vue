@@ -68,12 +68,10 @@ const handleButtonLeave = () => {
                             :callback="() => toggleSetting('clearLogs')"
                         />
                     </div>
-                    <div class="h-px bg-vp-divider/70 mx-0" :class="{ 'mb-6': !isLocked }"></div>
-                    <template v-if="isLocked">
-                        <div class="menu-item my-1.5">
-                            <ScreenColorSelector />
-                        </div>
-                    </template>
+                    <div class="h-px bg-vp-divider/70 mx-0"></div>
+                    <div class="menu-item my-1.5">
+                        <ScreenColorSelector />
+                    </div>
                 </div>
             </div>
         </div>
