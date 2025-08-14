@@ -488,24 +488,6 @@ const deviceSections = computed(() => {
     @apply text-vp-brand-1 hover:text-vp-brand-2 hover:underline transition-colors duration-100 font-medium;
 }
 
-.export-button {
-    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
-    width: 40px !important;
-    min-width: 40px !important;
-    max-width: 40px !important;
-    padding: 0;
-    line-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 40px;
-    box-sizing: border-box;
-}
-
-.export-button:hover {
-    background-color: color-mix(in srgb, var(--vp-c-default-soft) 100%, transparent) !important;
-}
-
 .header-fade-enter-active,
 .header-fade-leave-active {
     transition: all 0.1s ease-in-out;
@@ -644,6 +626,22 @@ const deviceSections = computed(() => {
     min-width: 0;
     flex: 1;
     overflow: hidden;
+}
+
+.export-button {
+    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
+    width: 40px !important;
+    padding: 0;
+    line-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    box-sizing: border-box;
+}
+
+.export-button:hover {
+    background-color: color-mix(in srgb, var(--vp-c-default-soft) 100%, transparent) !important;
 }
 
 .action-buttons {
