@@ -196,7 +196,7 @@ ${previewUrl ? `<ScreenColorImage src="${previewUrl}" width="200"/>` : ""}
 
 #### <a href="${githubUrl}">${pack.name}</a>
 
-${pack.description} <a href="https://github.com/${pack.author}">${pack.author}</a>${dateStr ? ` (${dateStr})` : ""}
+${pack.description} <a href="https://github.com/${pack.author}" class="pack-author">${pack.author}</a>${dateStr ? ` (${dateStr})` : ""}
 
 ${statsLine}`;
             })

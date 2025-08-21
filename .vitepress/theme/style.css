@@ -773,10 +773,6 @@ body[data-route*="/wiki"] {
     line-height: 25px;
 }
 
-.vp-doc._wiki_Assets_Community-Asset-Packs img {
-    margin-top: 10px;
-}
-
 .lead {
     font-size: 16px !important;
 }
@@ -1142,4 +1138,11 @@ body[data-route*="/wiki"] {
 }
 .bg-container.bg-container-white::after {
     background-color: var(--mntm-white-1);
+}
+
+.pack-author {
+    color: var(--vp-c-alternate-1) !important;
+}
+.pack-author:hover {
+    color: var(--vp-c-alternate-2) !important;
 }
