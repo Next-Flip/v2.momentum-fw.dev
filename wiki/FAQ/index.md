@@ -13,7 +13,7 @@ head:
         content: "Frequently asked questions and troubleshooting help"
     # - - meta
     #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/faq.png"
+    #     content: "http://localhost:4173/og/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/FAQ"
@@ -25,7 +25,7 @@ head:
         content: "Frequently asked questions and troubleshooting help"
     # - - meta
     #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/faq.png"
+    #     content: "http://localhost:4173/og/og.png"
 next:
     text: Installation
     link: /wiki/installation.md
@@ -59,7 +59,7 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 
 The following are a few creators active all over the Flipper community, OFW and CFW. These content creators provide a wealth of ideas, tutorials, and inspiration for what you can do with your Flipper Zero. They cover everything from basic usage to advanced projects and hacks. And we appreciate their contributions!
 
-1. [Talking Sasquachv](https://www.youtube.com/@TalkingSasquach): He has made Flipper zero beginer tutorials on how to use and set up the Flipper and also on how to create your own animations for the Flipper (aka Asset Packs).
+1. [Talking Sasquach](https://www.youtube.com/@TalkingSasquach): He has made Flipper zero beginer tutorials on how to use and set up the Flipper and also on how to create your own animations for the Flipper (aka Asset Packs).
 
 2. [Derek Jamison](https://www.youtube.com/@MrDerekJamison): He is making videos on what you can do with the Flipper and how to program it to do cool things, such as running apps and experimenting with scripts.
 

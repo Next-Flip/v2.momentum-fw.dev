@@ -174,6 +174,19 @@
     filter: saturate(0) invert(1) contrast(200) brightness(3) !important;
 }
 
+.theme-white .banner {
+    display: block !important;
+}
+.theme-white .banner_dark {
+    display: none !important;
+}
+.theme-white.dark .banner {
+    display: block !important;
+}
+.theme-white.dark .banner_dark {
+    display: none !important;
+}
+
 .overflow-y-auto::-webkit-scrollbar {
     width: 5px;
     z-index: 1000 !important;
@@ -770,6 +783,9 @@ body[data-route*="/wiki"] {
 
 .curtain {
     background-color: transparent !important;
+}
+.aside-curtain {
+    background: linear-gradient(transparent, var(--vp-c-bg-dark) 70%) !important;
 }
 
 .VPDoc {

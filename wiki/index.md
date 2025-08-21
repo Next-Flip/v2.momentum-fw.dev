@@ -31,8 +31,8 @@ next:
     link: /wiki/faq.md
 ---
 
-<img src="/banners/wiki_light.png" alt="banner" class="dark:hidden" />
-<img src="/banners/wiki_dark.png" alt="banner" class="hidden dark:block" />
+<img src="/banners/wiki_light.png" alt="banner" class="dark:hidden banner" />
+<img src="/banners/wiki_dark.png" alt="banner" class="hidden dark:block banner_dark" />
 
 <!-- TODO: Commented out because we don't need the translations for now -->
 <!-- <div class="mntm custom-block"> -->

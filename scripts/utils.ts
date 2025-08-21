@@ -143,8 +143,76 @@ export const packs: AssetPackEntry[] = ${jsonToTypeScript(packs)};
         const packsPath = join(DIR_DATA, "./packs.ts");
         await fs.writeFile(packsPath, packsContent, "utf8");
         console.log(`  Generated packs.ts with ${packs.length} asset packs`);
+        await updateCommunityAssetPacksMarkdown(packs);
     } catch (error) {
         console.error("❌ Failed to generate packs data:", error);
+        throw error;
+    }
+}
+
+export async function updateCommunityAssetPacksMarkdown(packs: AssetPackEntry[]): Promise<void> {
+    try {
+        const markdownPath = resolve(__dirname, "../wiki/Assets/Community-Asset-Packs.md");
+        let content = await fs.readFile(markdownPath, "utf8");
+
+        const packEntries = packs
+            .map((pack) => {
+                const previewUrl =
+                    pack.preview_urls && pack.preview_urls.length > 0 ? pack.preview_urls[0] : "";
+
+                const githubUrl =
+                    pack.source_url ||
+                    `https://github.com/Next-Flip/Asset-Packs/tree/dev/${pack.id}`;
+
+                const dateStr = pack.stats.added
+                    ? new Date(pack.stats.added * 1000).toISOString().split("T")[0]
+                    : "";
+
+                const statsItems: string[] = [];
+                if (typeof pack.stats.packs === "number" && pack.stats.packs > 1) {
+                    statsItems.push(`Asset Packs: <b>${pack.stats.packs}</b>`);
+                }
+                if (pack.stats.anims) {
+                    statsItems.push(`Anims: <b>${pack.stats.anims}</b>`);
+                }
+                if (pack.stats.passport && pack.stats.passport.length > 0) {
+                    statsItems.push(`Passports: <b>${pack.stats.passport.length}</b>`);
+                }
+                if (pack.stats.icons) {
+                    statsItems.push(`Icons: <b>${pack.stats.icons}</b>`);
+                }
+                if (pack.stats.fonts && pack.stats.fonts.length > 0) {
+                    statsItems.push(`Fonts: <b>${pack.stats.fonts.length}</b>`);
+                }
+
+                const statsLine =
+                    statsItems.length > 0
+                        ? `<sub><i>${statsItems.join(" &nbsp;&nbsp; ")}</i></sub>`
+                        : "";
+
+                return `---
+
+${previewUrl ? `<ScreenColorImage src="${previewUrl}" width="200"/>` : ""}
+
+#### <a href="${githubUrl}">${pack.name}</a>
+
+${pack.description} <a href="https://github.com/${pack.author}">${pack.author}</a>${dateStr ? ` (${dateStr})` : ""}
+
+${statsLine}`;
+            })
+            .join("\n\n");
+
+        content = replaceTemplateSection(
+            content,
+            "<!-- COMMUNITY_PACKS_START -->",
+            "<!-- COMMUNITY_PACKS_END -->",
+            packEntries,
+        );
+
+        await fs.writeFile(markdownPath, content, "utf8");
+        console.log(`  Updated Community-Asset-Packs.md with ${packs.length} asset packs`);
+    } catch (error) {
+        console.error("❌ Failed to update Community Asset Packs markdown:", error);
         throw error;
     }
 }
