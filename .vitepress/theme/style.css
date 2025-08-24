@@ -158,13 +158,13 @@
 }
 
 .theme-white ::selection {
-    background-color: color-mix(in srgb, #000 100%, transparent);
-    color: white;
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 30%, transparent);
+    color: black;
 }
 
 .theme-white.dark ::selection {
-    background-color: color-mix(in srgb, var(--mntm-white-1) 100%, transparent);
-    color: black;
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 40%, transparent);
+    color: white;
 }
 
 .theme-white .logo {

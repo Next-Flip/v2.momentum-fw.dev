@@ -1,4 +1,4 @@
-// This file is edited in the prebuild step, do not remove the "LOCALE_*" comments.
+// This file is edited in the prebuild step, do not remove the "LOCALE_*" or "SEARCH_*" comments.
 
 import { defineConfig } from "vitepress";
 /* LOCALE_IMPORTS_START */
@@ -11,10 +11,11 @@ export default defineConfig({
         if (pageData.relativePath.startsWith("releases/") && pageData.params?.version) {
             const version = pageData.params.version;
             const isMainline = mainlineReleases.some((r) => r.version === version);
+            const displayVersion = version.toUpperCase();
 
-            pageData.title = `${version}`;
-            pageData.frontmatter.title = `${version} | Momentum Firmware`;
-            pageData.frontmatter.description = `Changelog and downloads for the ${version} ${isMainline ? "release" : "devbuild"}`;
+            pageData.title = `${displayVersion}`;
+            pageData.frontmatter.title = `${displayVersion} | Momentum Releases`;
+            pageData.frontmatter.description = `Changelog and downloads for the ${displayVersion} ${isMainline ? "release" : "devbuild"}`;
             pageData.frontmatter.ogImage = `/og/${version}.png`;
             pageData.frontmatter.ogUrl = `https://momentum-fw.dev/releases/${version}`;
         }
@@ -28,22 +29,80 @@ export default defineConfig({
         if (pageData.relativePath.startsWith("releases/") && pageData.params?.version) {
             const version = pageData.params.version;
             const isMainline = mainlineReleases.some((r) => r.version === version);
-            const description = `Changelog and downloads for the ${version} ${isMainline ? "release" : "devbuild"}`;
+            const displayVersion = version.toUpperCase();
+            const description = `Changelog and downloads for the ${displayVersion} ${isMainline ? "release" : "devbuild"}`;
             const ogImage = isMainline ? `/og/${version}.png` : `/og.png`; // TODO: Use either `/og/releases.png` or `/og/devbuild.png`.
+            const title = `${displayVersion} | ${isMainline ? "Mainline Release" : "Dev build"}`;
 
             head.push(
-                ["meta", { name: "title", content: `${version} | Momentum Firmware` }],
+                ["meta", { name: "title", content: title }],
                 ["meta", { name: "description", content: description }],
-                ["meta", { property: "og:title", content: `${version} | Momentum Firmware` }],
+                ["meta", { property: "og:title", content: title }],
                 ["meta", { property: "og:description", content: description }],
                 ["meta", { property: "og:image", content: `https://momentum-fw.dev${ogImage}` }],
                 [
                     "meta",
                     { property: "og:url", content: `https://momentum-fw.dev/releases/${version}` },
                 ],
-                ["meta", { name: "twitter:title", content: `${version} | Momentum Firmware` }],
+                ["meta", { name: "twitter:title", content: title }],
                 ["meta", { name: "twitter:description", content: description }],
                 ["meta", { name: "twitter:image", content: `https://momentum-fw.dev${ogImage}` }],
+            );
+        } else {
+            const frontmatter = pageData.frontmatter || {};
+            const headItems = frontmatter.head || [];
+            const hasOgImage = headItems.some(
+                (headItem: [string, Record<string, string>]) =>
+                    headItem?.[0] === "meta" &&
+                    headItem?.[1]?.property === "og:image" &&
+                    !headItem?.[1]?.content?.includes("#"),
+            );
+            const hasTwitterImage = headItems.some(
+                (headItem: [string, Record<string, string>]) =>
+                    headItem?.[0] === "meta" &&
+                    headItem?.[1]?.name === "twitter:image" &&
+                    !headItem?.[1]?.content?.includes("#"),
+            );
+
+            if (!hasOgImage) {
+                head.push([
+                    "meta",
+                    { property: "og:image", content: "https://momentum-fw.dev/og.png" },
+                ]);
+            }
+
+            if (!hasTwitterImage) {
+                head.push([
+                    "meta",
+                    { name: "twitter:image", content: "https://momentum-fw.dev/og.png" },
+                ]);
+            }
+
+            const title = frontmatter.title || "";
+            const description =
+                frontmatter.description ||
+                "Feature-rich, stable and customizable firmware for Flipper Zero";
+
+            head.push(
+                [
+                    "meta",
+                    {
+                        property: "og:title",
+                        content: `${title}${title ? " | " : ""}Momentum Firmware`,
+                    },
+                ],
+                ["meta", { property: "og:description", content: description }],
+                ["meta", { property: "og:type", content: "website" }],
+                ["meta", { property: "og:site_name", content: "momentum-fw.dev" }],
+                ["meta", { name: "twitter:card", content: "summary_large_image" }],
+                [
+                    "meta",
+                    {
+                        name: "twitter:title",
+                        content: `${title}${title ? " | " : ""}Momentum Firmware`,
+                    },
+                ],
+                ["meta", { name: "twitter:description", content: description }],
             );
         }
 
@@ -56,8 +115,6 @@ export default defineConfig({
     },
     srcExclude: ["README.md"],
     ignoreDeadLinks: true,
-    // title: "Momentum Firmware",
-    // description: "Feature-rich, stable and customizable firmware for Flipper Zero",
     locales: {
         /* LOCALE_CONFIGS_START */
         root: rootConfig,
@@ -75,13 +132,6 @@ export default defineConfig({
             { name: "theme-color", media: "(prefers-color-scheme: dark)", content: "#0f0f12" },
         ],
         ["meta", { name: "theme-color", content: "#ABABF5" }],
-        // [
-        //     "meta",
-        //     {
-        //         name: "description",
-        //         content: "Feature-rich, stable and customizable firmware for Flipper Zero",
-        //     },
-        // ],
         [
             "meta",
             {

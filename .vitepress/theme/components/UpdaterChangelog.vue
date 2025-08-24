@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { useWindowSize } from "@vueuse/core";
+import { useScroll, useWindowSize } from "@vueuse/core";
 import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
 import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
 
+import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth } = useWindowSize();
+const { arrivedState } = useScroll(el);
 
 const md = new MarkdownIt({
     html: true,
@@ -25,6 +27,7 @@ interface Props {
     uploadedFileRelease?: ReleaseItem | null;
     changelogState?: string;
     isLogsOpen?: boolean;
+    isNarrowViewport?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     uploadedFileRelease: null,
     selectedRelease: null,
     isLogsOpen: true,
+    isNarrowViewport: false,
 });
 
 const emit = defineEmits<{
@@ -44,6 +48,9 @@ const emit = defineEmits<{
 const isExpanded = computed(() => props.changelogState === "expanded");
 const isOpen = computed(() => props.changelogState === "open");
 const isClosed = computed(() => props.changelogState === "closed");
+const isMainline = computed(() => {
+    return props.selectedRelease?.version.includes("mntm");
+});
 
 const handleToggleOpenClose = () => {
     emit("toggle-open-close");
@@ -100,13 +107,15 @@ const releaseHref = computed(() => {
     <div
         class="changelog-content group mx-5"
         :class="{
-            'max-h-[calc(100vh-var(--vp-nav-height)-24px)]': windowWidth < 1024,
+            'max-h-[calc(100vh-var(--vp-nav-height)-24px)]':
+                windowWidth < 1024 && !isNarrowViewport,
+            'min-h-[300px]': windowWidth < 1024 && isNarrowViewport && !isClosed,
             'h-auto': isClosed,
             'flex flex-col h-full min-h-0': !isClosed,
         }"
     >
         <div
-            class="border rounded-[10px] border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
+            class="border rounded-lg border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
             :class="{
                 'changelog-expanded': isExpanded,
                 'flex-1 min-h-0': !isClosed,
@@ -114,7 +123,7 @@ const releaseHref = computed(() => {
             }"
         >
             <div
-                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-5 dropdown-button z-[3]"
+                class="flex items-center justify-between min-h-14 flex-shrink-0 px-4 pr-2 sm:pl-4 dropdown-button z-[3]"
                 :class="{
                     'is-active': isExpanded,
                     'border-b border-vp-divider bg-vp-dark':
@@ -122,30 +131,40 @@ const releaseHref = computed(() => {
                 }"
             >
                 <div class="flex items-center gap-2">
-                    <Tooltip
-                        v-if="displayVersion"
-                        :disabled="!shouldShowExternalLink"
-                        :delay="0"
-                        position="right"
-                    >
-                        <a
-                            v-if="shouldShowExternalLink"
-                            :href="releaseHref"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
-                        >
-                            {{ displayVersion }}
-                        </a>
-                        <template #content>
-                            {{ tr("updater_go_to_release") }}
-                        </template>
-                    </Tooltip>
                     <template v-if="displayVersion">
+                        <div
+                            class="flex items-center justify-center text-sm text-vp-2/80 rounded-md mt-0.5 mr-px"
+                            :aria-label="tr('releases_current_version')"
+                        >
+                            <v-icon
+                                :name="isMainline ? 'oi-tag' : 'oi-git-commit'"
+                                :aria-label="
+                                    isMainline ? tr('releases_mainline') : tr('releases_devbuild')
+                                "
+                                :title="
+                                    isMainline ? tr('releases_mainline') : tr('releases_devbuild')
+                                "
+                                :scale="isMainline ? 0.85 : 1"
+                            />
+                        </div>
+                        <Tooltip :disabled="!shouldShowExternalLink" :delay="0" position="right">
+                            <a
+                                v-if="shouldShowExternalLink"
+                                :href="releaseHref"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
+                            >
+                                {{ displayVersion }}
+                            </a>
+                            <template #content>
+                                {{ tr("updater_go_to_release") }}
+                            </template>
+                        </Tooltip>
                         <div
                             class="block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                         />
-                        <span class="text-[13px] font-normal text-vp-3 mt-px">
+                        <span class="text-[13px] font-normal text-vp-2/80 mt-px">
                             {{ tr("updater_changelog") }}
                         </span>
                     </template>
@@ -206,6 +225,14 @@ const releaseHref = computed(() => {
                     </button>
                 </div>
             </div>
+
+            <ScrollFade
+                :show="!arrivedState.top"
+                position="top"
+                class="mr-4 top-[56px]"
+                :opacity="40"
+            />
+            <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" :opacity="40" />
 
             <div
                 v-if="isAccessible && !isClosed"

@@ -2,8 +2,8 @@
 import { useWindowSize } from "@vueuse/core";
 import { computed } from "vue";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
-import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
+import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 
 import ReleaseContent from "./ReleaseContent.vue";
 import ReleaseItems from "./ReleaseItems.vue";
@@ -16,6 +16,7 @@ const { width } = useWindowSize();
 const { selectedRelease, selectRelease } = useReleaseNavigation({
     basePath: "/releases",
     useLocalStorage: false,
+    updatePageTitle: true,
     defaultFallback: () => (mainlineReleases.length > 0 ? mainlineReleases[0] : null),
 });
 

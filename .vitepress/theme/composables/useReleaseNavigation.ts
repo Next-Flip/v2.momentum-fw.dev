@@ -1,12 +1,14 @@
 import { useData } from "vitepress";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch, type Ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { getReleaseByVersion } from "../../../_data/releases";
+import { getReleaseByVersion, mainlineReleases } from "../../../_data/releases";
+import { useHead, type HeadConfig } from "./useHead";
 
 export interface ReleaseNavigationConfig {
     basePath: string;
     useLocalStorage?: boolean;
     useQueryParams?: boolean;
+    updatePageTitle?: boolean;
     storageKeys?: {
         selectedVersion?: string;
         selectedChannel?: string;
@@ -19,6 +21,41 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
     const { params } = useData();
     const selectedRelease = ref<ReleaseItem | null>(null);
     const isInitialLoad = ref(true);
+
+    const headConfig: Ref<HeadConfig> = ref({
+        title: "",
+        ogTitle: "",
+        ogDescription: "",
+        ogImage: "",
+        ogUrl: "",
+        twitterTitle: "",
+        twitterDescription: "",
+        twitterImage: "",
+    });
+
+    if (config.updatePageTitle) {
+        useHead(headConfig);
+    }
+
+    const updateHeadForRelease = (release: ReleaseItem) => {
+        if (!config.updatePageTitle) return;
+
+        const isMainline = mainlineReleases.some((r) => r.version === release.version);
+        const displayVersion = release.version.toUpperCase();
+        const title = `${displayVersion} | ${isMainline ? "Mainline Release" : "Dev build"}`;
+        const description = `Changelog and downloads for the ${displayVersion} ${isMainline ? "release" : "devbuild"}`;
+
+        headConfig.value = {
+            title,
+            ogTitle: title,
+            ogDescription: description,
+            ogImage: `https://momentum-fw.dev/og/${release.version}.png`,
+            ogUrl: `https://momentum-fw.dev/releases/${release.version}`,
+            twitterTitle: title,
+            twitterDescription: description,
+            twitterImage: `https://momentum-fw.dev/og/${release.version}.png`,
+        };
+    };
 
     const getVersionFromUrl = () => {
         if (config.useQueryParams) {
@@ -34,6 +71,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
 
     const selectRelease = (release: ReleaseItem) => {
         selectedRelease.value = release;
+        updateHeadForRelease(release);
 
         if (config.onReleaseChange) {
             config.onReleaseChange(release);
@@ -76,6 +114,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             const release = getReleaseByVersion(version);
             if (release) {
                 selectedRelease.value = release;
+                updateHeadForRelease(release);
                 if (config.onReleaseChange) {
                     config.onReleaseChange(release);
                 }
@@ -97,6 +136,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
                     const release = getReleaseByVersion(savedVersion);
                     if (release) {
                         selectedRelease.value = release;
+                        updateHeadForRelease(release);
                         if (config.onReleaseChange) {
                             config.onReleaseChange(release);
                         }
@@ -113,6 +153,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
             const defaultRelease = config.defaultFallback();
             if (defaultRelease) {
                 selectedRelease.value = defaultRelease;
+                updateHeadForRelease(defaultRelease);
                 if (config.onReleaseChange) {
                     config.onReleaseChange(defaultRelease);
                 }
@@ -134,6 +175,7 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
                     const release = getReleaseByVersion(newVersion);
                     if (release && release.version !== selectedRelease.value?.version) {
                         selectedRelease.value = release;
+                        updateHeadForRelease(release);
                         if (config.onReleaseChange) {
                             config.onReleaseChange(release);
                         }

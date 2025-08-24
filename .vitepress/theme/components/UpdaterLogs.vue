@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { useWindowSize } from "@vueuse/core";
-import { computed, inject, nextTick, onMounted, ref, watch, type Ref } from "vue";
+import { useScroll, useWindowSize } from "@vueuse/core";
+import { computed, inject, nextTick, onMounted, ref, useTemplateRef, watch, type Ref } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSettings } from "../composables/useSettings";
 import { formatDate } from "../date";
 
+import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
 interface Props {
@@ -14,6 +15,8 @@ interface Props {
     isChangelogOpen: boolean;
     isChangelogExpanded: boolean;
     isChangelogClosed: boolean;
+    isNarrowViewport?: boolean;
+    isSelectedOrUploadedFile: boolean;
 }
 
 const props = defineProps<Props>();
@@ -68,18 +71,10 @@ const groupedLogs = computed(() => {
     return grouped;
 });
 
-const lastStatusLog = computed(() => {
-    for (let i = logs.value.length - 1; i >= 0; i--) {
-        const log = logs.value[i];
-        if (log.level === "success") return null;
-        if (log.level === "error" || log.level === "warning") return log;
-    }
-    return null;
-});
-const hasStatus = computed(() => lastStatusLog.value !== null);
-const logContainer = ref<HTMLElement | null>(null);
+const logContainer = useTemplateRef<HTMLElement>("logContainer");
+const { arrivedState } = useScroll(logContainer);
 const autoScroll = ref(true);
-const showLogs = computed(() => (logs.value.length > 0 ? props.isOpen : false));
+const showLogs = computed(() => props.isOpen && logs.value.length > 0);
 const showButtons = computed(
     () => logs.value.length > 0 && (props.isOpen || windowWidth.value <= 1024),
 );
@@ -150,46 +145,36 @@ onMounted(() => {
 
 <template>
     <div
-        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-[10px] border border-vp-divider h-full min-h-0"
+        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-lg border border-vp-divider h-full min-h-0"
         :class="{
             'border-b border-vp-divider': !props.isChangelogOpen && !showLogs,
+            'min-h-[250px]': props.isNarrowViewport && showLogs,
         }"
     >
         <div class="flex flex-col flex-1 min-h-0">
             <div
-                class="w-full flex items-center justify-between text-left px-4 pr-2 sm:pl-5 min-h-14 bg-vp-dark dropdown-button relative"
+                class="w-full flex items-center justify-between text-left px-4 pr-2 sm:pl-4 min-h-14 bg-vp-dark dropdown-button relative"
                 :class="{
                     'is-active': showLogs,
                 }"
             >
                 <div class="flex flex-row items-center gap-2">
-                    <span
-                        v-if="hasStatus && logs.length > 0 && !showLogs"
-                        class="relative flex size-1.5 mt-0.5 mr-1"
+                    <div
+                        class="flex items-center justify-center text-sm text-vp-2/80 rounded-md mt-px mr-0.5 transition-opacity duration-200"
+                        :class="{
+                            'opacity-50': logs.length === 0,
+                        }"
+                        :aria-label="tr('updater_logs')"
+                        :title="tr('updater_logs')"
                     >
-                        <span
-                            class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                            :class="{
-                                'bg-red-500 border-red-500': lastStatusLog?.level === 'error',
-                                'bg-yellow-500 border-yellow-500':
-                                    lastStatusLog?.level === 'warning',
-                            }"
-                        ></span>
-                        <span
-                            class="relative inline-flex size-1.5 rounded-full transition-all duration-100 ease-in-out"
-                            :class="{
-                                'bg-red-500/90 border-red-500': lastStatusLog?.level === 'error',
-                                'bg-yellow-500/90 border-yellow-500':
-                                    lastStatusLog?.level === 'warning',
-                            }"
-                        ></span>
-                    </span>
+                        <v-icon name="fa-terminal" scale="0.85" />
+                    </div>
                     <h2 class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5">
                         {{ tr("updater_logs") }}
                     </h2>
                     <span
                         v-if="logs.length > 0"
-                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/70"
+                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 ml-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/70"
                     >
                         {{ groupedLogs.length }}
                     </span>
@@ -236,7 +221,7 @@ onMounted(() => {
                         class="rounded-lg transition-all duration-200 text-vp-3 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
                             'opacity-50 !cursor-default pointer-events-none':
-                                logs.length === 0 || isChangelogClosed,
+                                logs.length === 0 || isChangelogClosed || !isSelectedOrUploadedFile,
                             'opacity-100 hover:text-vp-brand-1 cursor-pointer': logs.length > 0,
                         }"
                         @click="handleToggle"
@@ -257,6 +242,12 @@ onMounted(() => {
             <Transition name="logs-expand" mode="in-out">
                 <div v-if="showLogs" class="flex-1 flex flex-col min-h-0">
                     <div class="relative border-t border-vp-divider flex-1 flex flex-col min-h-0">
+                        <ScrollFade
+                            :show="!arrivedState.top"
+                            position="top"
+                            :opacity="20"
+                            class="mr-4"
+                        />
                         <div
                             ref="logContainer"
                             class="pr-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"

@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
+import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
+import { computed, ref, useTemplateRef } from "vue";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { useSharedHover } from "../composables/useSharedHover";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 import type { DeviceInfo } from "../types";
+import { STORAGE_KEYS } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
 
 import ScreenDisplay from "./ScreenDisplay.vue";
+import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
+const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
 const { ifCurrentTheme } = useThemeSwitcher();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
+const { height: windowHeight } = useWindowSize();
+const isNarrowViewport = computed(() => windowHeight.value < 1024);
 
 const {
     flags,
@@ -33,6 +39,34 @@ const {
 } = useConnectionInfo();
 
 const isConnected = computed(() => connectionIsConnected.value);
+
+const activeTab = useStorage<"info" | "raw">(
+    STORAGE_KEYS.UPDATER_DEVICE_INFO_TAB,
+    "info",
+    undefined,
+    { initOnMounted: true },
+);
+const previousTab = ref<"info" | "raw">("info");
+
+const tabTransitionName = computed(() => {
+    if (previousTab.value === "info" && activeTab.value === "raw") {
+        return "tab-slide-right";
+    } else if (previousTab.value === "raw" && activeTab.value === "info") {
+        return "tab-slide-left";
+    }
+    return "tab-fade";
+});
+
+const handleTabChange = (newTab: "info" | "raw") => {
+    previousTab.value = activeTab.value;
+    activeTab.value = newTab;
+};
+
+const formatJsonDisplay = computed(() => {
+    if (!deviceInfo.value) return "{}";
+    return JSON.stringify(deviceInfo.value, null, 2);
+});
+
 const getConnectionDisplay = computed(() => {
     if (!supportsSerialPort()) {
         return {
@@ -257,7 +291,7 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl border-t border-b lg:border border-vp-divider/70 lg:border-transparent max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full overflow-hidden sticky top-[calc(var(--vp-nav-height)+24px)] transition-all duration-200 ease-in-out lg:py-0 bg-vp-dark/85"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full transition-all duration-100 ease-in-out lg:py-0 bg-vp-dark/85"
         :class="{
             '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
             'py-8 pb-12': !isConnected,
@@ -265,16 +299,87 @@ const deviceSections = computed(() => {
         :data-connected="isConnected"
         :data-hovered="isInstallButtonHovered"
     >
-        <div class="flex-shrink-0 hidden lg:block relative z-0">
-            <ScreenDisplay />
-        </div>
+        <Transition name="slide-down">
+            <div
+                v-if="isConnected"
+                key="connected-controls"
+                class="flex-shrink-0 hidden lg:block relative z-0"
+            >
+                <ScreenDisplay />
+
+                <div
+                    class="py-3 flex-shrink-0 bg-vp-dark dark:bg-vp-dark z-10"
+                    :class="{
+                        'sticky bottom-0': isNarrowViewport,
+                    }"
+                >
+                    <div class="action-buttons px-5 lg:px-3">
+                        <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
+                            <button
+                                class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
+                                :aria-label="copyState.currentText.value"
+                                @click="() => exportDeviceInfo('copy')"
+                                @mousedown="copyState.handleMouseDown"
+                                @mouseup="copyState.handleMouseUp"
+                                @mouseleave="copyState.handleMouseLeave"
+                            >
+                                <v-icon
+                                    :class="{
+                                        'scale-95': copyState.isPressed.value,
+                                    }"
+                                    :name="copyState.currentIcon.value"
+                                    :scale="copyState.currentIcon.value === 'oi-check' ? 0.95 : 0.8"
+                                />
+                            </button>
+                            <template #content>{{ copyState.currentText.value }}</template>
+                        </Tooltip>
+                        <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
+                            <button
+                                class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
+                                :aria-label="saveState.currentText.value"
+                                @click="() => exportDeviceInfo('save')"
+                                @mousedown="saveState.handleMouseDown"
+                                @mouseup="saveState.handleMouseUp"
+                                @mouseleave="saveState.handleMouseLeave"
+                            >
+                                <v-icon
+                                    :class="{
+                                        'scale-95': saveState.isPressed.value,
+                                    }"
+                                    :name="saveState.currentIcon.value"
+                                    :scale="saveState.currentIcon.value === 'oi-check' ? 0.95 : 0.8"
+                                />
+                            </button>
+                            <template #content>{{ saveState.currentText.value }}</template>
+                        </Tooltip>
+                        <button
+                            :aria-label="connectionTr('connection_disconnect')"
+                            :disabled="flags.updateInProgress"
+                            :class="[
+                                'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10 select-none',
+                                flags.updateInProgress &&
+                                    'opacity-40 !cursor-not-allowed !bg-vp-soft !text-vp-3/70 dark:!bg-vp-soft dark:!text-vp-3/70',
+                                !flags.updateInProgress &&
+                                    'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
+                            ]"
+                            @click="handleDisconnect"
+                        >
+                            {{ connectionTr("connection_disconnect") }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Transition>
 
         <div class="flex-1 flex flex-col min-h-0 transition-all duration-300 relative z-10">
             <Transition name="content-fade" mode="out-in">
                 <div
                     v-if="!isConnected"
                     key="disconnected"
-                    class="flex-1 flex items-center justify-center lg:pt-16 lg:pb-20 px-6"
+                    class="flex-1 flex items-center justify-center lg:py-6 px-6"
+                    :class="{
+                        'lg:pt-0': isNarrowViewport,
+                    }"
                 >
                     <div class="text-center">
                         <div class="flex flex-col items-center gap-1">
@@ -323,98 +428,106 @@ const deviceSections = computed(() => {
                     </div>
                 </div>
 
-                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative pt-4">
-                    <div
-                        ref="el"
-                        class="flex-1 min-h-0 overflow-y-auto pl-6 pr-[17px] mr-[7px] pt-2 relative z-10"
-                    >
-                        <h2 class="text-base leading-3 uppercase font-semibold text-vp-1 mb-5">
-                            {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
-                        </h2>
-                        <div class="flex flex-col space-y-0 pb-[7px]">
-                            <template v-for="section in deviceSections" :key="section.title">
-                                <div class="section-header">{{ section.title }}</div>
-                                <div
-                                    v-for="item in section.items"
-                                    :key="item.label"
-                                    class="menu-item"
-                                >
-                                    <span class="menu-label">{{ item.label }}</span>
-                                    <a
-                                        v-if="item.isLink"
-                                        class="menu-value vp-external-link-icon hover:underline"
-                                        :href="item.href as string"
-                                    >
-                                        {{ item.value }}
-                                    </a>
-                                    <span v-else class="menu-value">{{ item.value }}</span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div
-                        class="py-3 lg:border-t border-vp-divider flex-shrink-0 bg-vp-dark dark:bg-vp-dark"
-                    >
-                        <div class="action-buttons px-5 lg:px-3">
-                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
-                                <button
-                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                    :aria-label="copyState.currentText.value"
-                                    @click="() => exportDeviceInfo('copy')"
-                                    @mousedown="copyState.handleMouseDown"
-                                    @mouseup="copyState.handleMouseUp"
-                                    @mouseleave="copyState.handleMouseLeave"
-                                >
-                                    <v-icon
-                                        :class="{
-                                            'scale-95': copyState.isPressed.value,
-                                        }"
-                                        :name="copyState.currentIcon.value"
-                                        :scale="
-                                            copyState.currentIcon.value === 'oi-check' ? 0.95 : 0.8
-                                        "
-                                    />
-                                </button>
-                                <template #content>{{ copyState.currentText.value }}</template>
-                            </Tooltip>
-                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999">
-                                <button
-                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                    :aria-label="saveState.currentText.value"
-                                    @click="() => exportDeviceInfo('save')"
-                                    @mousedown="saveState.handleMouseDown"
-                                    @mouseup="saveState.handleMouseUp"
-                                    @mouseleave="saveState.handleMouseLeave"
-                                >
-                                    <v-icon
-                                        :class="{
-                                            'scale-95': saveState.isPressed.value,
-                                        }"
-                                        :name="saveState.currentIcon.value"
-                                        :scale="
-                                            saveState.currentIcon.value === 'oi-check' ? 0.95 : 0.8
-                                        "
-                                    />
-                                </button>
-                                <template #content>{{ saveState.currentText.value }}</template>
-                            </Tooltip>
-                            <button
-                                :aria-label="connectionTr('connection_disconnect')"
-                                :disabled="flags.updateInProgress"
-                                :class="[
-                                    'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10 select-none',
-                                    flags.updateInProgress &&
-                                        'opacity-40 !cursor-not-allowed !bg-vp-soft !text-vp-3/70 dark:!bg-vp-soft dark:!text-vp-3/70',
-                                    !flags.updateInProgress &&
-                                        'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
-                                ]"
-                                @click="handleDisconnect"
+                <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative">
+                    <div class="bg-vp-divider/30">
+                        <div class="flex flex-row gap-px">
+                            <div
+                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-10"
+                                :class="{
+                                    'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
+                                        activeTab === 'info',
+                                }"
+                                @click="handleTabChange('info')"
                             >
-                                {{ connectionTr("connection_disconnect") }}
-                            </button>
+                                <span
+                                    class="px-4 text-[12px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
+                                    :class="{
+                                        '!text-vp-neutral': activeTab === 'info',
+                                    }"
+                                >
+                                    {{ tr("updater_parsed_tab") }}
+                                </span>
+                            </div>
+                            <div
+                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-10"
+                                :class="{
+                                    'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
+                                        activeTab === 'raw',
+                                }"
+                                @click="handleTabChange('raw')"
+                            >
+                                <span
+                                    class="px-4 text-[12px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
+                                    :class="{
+                                        '!text-vp-neutral': activeTab === 'raw',
+                                    }"
+                                >
+                                    {{ tr("updater_raw_tab") }}
+                                </span>
+                            </div>
                         </div>
                     </div>
+                    <template v-if="!isNarrowViewport">
+                        <ScrollFade
+                            :show="!arrivedState.top"
+                            position="top"
+                            class="mr-4 top-[40px]"
+                        />
+                        <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" />
+                    </template>
+                    <Transition :name="tabTransitionName" mode="out-in">
+                        <div
+                            v-if="activeTab === 'info'"
+                            key="info"
+                            ref="el"
+                            class="pl-5 pr-[13px] mr-[7px] pt-2 pb-2 relative z-0 overflow-y-auto"
+                            :class="{
+                                'flex-1 min-h-0': !isNarrowViewport,
+                            }"
+                        >
+                            <h2
+                                class="text-base leading-3 uppercase font-semibold text-vp-1 mb-5 pt-4"
+                            >
+                                {{ deviceInfo?.hardware_name || tr("updater_device_info") }}
+                            </h2>
+                            <div class="flex flex-col space-y-0 pb-[7px]">
+                                <template v-for="section in deviceSections" :key="section.title">
+                                    <div class="section-header">{{ section.title }}</div>
+                                    <div
+                                        v-for="item in section.items"
+                                        :key="item.label"
+                                        class="menu-item"
+                                    >
+                                        <span class="menu-label">{{ item.label }}</span>
+                                        <a
+                                            v-if="item.isLink"
+                                            class="menu-value vp-external-link-icon hover:underline"
+                                            :href="item.href as string"
+                                        >
+                                            {{ item.value }}
+                                        </a>
+                                        <span v-else class="menu-value">{{ item.value }}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div
+                            v-else
+                            key="raw"
+                            ref="el"
+                            class="relative z-0 overflow-y-auto mr-[6px]"
+                            :class="{
+                                'flex-1 min-h-0': !isNarrowViewport,
+                            }"
+                        >
+                            <pre
+                                tabindex="0"
+                                class="text-xs text-start text-vp-1 font-mono whitespace-pre-wrap break-all p-4 m-0 outline-none"
+                                >{{ formatJsonDisplay }}</pre
+                            >
+                        </div>
+                    </Transition>
                 </div>
             </Transition>
         </div>
@@ -422,66 +535,29 @@ const deviceSections = computed(() => {
 </template>
 
 <style scoped>
-.device-info-container:before {
-    content: "";
-    position: absolute;
-    top: 24%;
-    left: 18%;
-    width: 60%;
-    height: 60%;
-    transform: rotate(-45deg);
-    background-image: url("/bg/flipper.png");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.04;
-    filter: saturate(0);
-    z-index: -1;
-    transition: opacity 0.2s ease-in-out;
+.slide-down-enter-active,
+.slide-down-leave-active {
+    transition: all 0.3s ease-out;
 }
 
-@media (min-width: 1024px) {
-    .device-info-container:before {
-        top: -25%;
-        left: -28%;
-        width: 150%;
-        height: 150%;
-    }
-}
-
-.dark .device-info-container:before {
-    mix-blend-mode: lighten;
-    opacity: 0.03;
-    filter: saturate(0) invert(1);
-}
-
-.device-info-container[data-connected="true"]:before {
+.slide-down-enter-from {
     opacity: 0;
+    transform: translateY(-10px);
 }
 
-.device-info-container[data-hovered="true"]:before {
-    opacity: 0.055;
-}
-.dark .device-info-container[data-hovered="true"]:before {
-    opacity: 0.035;
+.slide-down-enter-to {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.device-info-container:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--vp-c-brand-3);
+.slide-down-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.slide-down-leave-to {
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.device-info-container[data-hovered="true"]:after {
-    opacity: 0.01;
+    transform: translateY(-10px);
 }
 
 .subtitle :deep(a) {
@@ -508,6 +584,47 @@ const deviceSections = computed(() => {
 .content-fade-leave-to {
     opacity: 0;
     transform: translateY(10px);
+}
+
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+    transition: all 0.15s ease-in-out;
+}
+
+.tab-fade-enter-from,
+.tab-fade-leave-to {
+    opacity: 0;
+    transform: translateX(10px);
+}
+
+.tab-slide-right-enter-active,
+.tab-slide-right-leave-active {
+    transition: all 0.15s ease-in-out;
+}
+
+.tab-slide-right-enter-from {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.tab-slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.tab-slide-left-enter-active,
+.tab-slide-left-leave-active {
+    transition: all 0.15s ease-in-out;
+}
+
+.tab-slide-left-enter-from {
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.tab-slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(20px);
 }
 
 .tab-fade-enter-active,

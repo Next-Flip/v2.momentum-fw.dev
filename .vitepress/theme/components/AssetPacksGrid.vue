@@ -3,6 +3,7 @@ import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
 import { motion } from "motion-v";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useI18n } from "../composables/useI18n";
+import { useSticky } from "../composables/useSticky";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import type { AssetPack, FilterOption, SortDirection, SortField } from "../types";
 import { STORAGE_KEYS } from "../types";
@@ -33,7 +34,8 @@ const activeFilters = useStorage<FilterOption[]>(STORAGE_KEYS.ASSET_PACK_FILTERS
 
 const controlsContainerRef = ref<HTMLElement | null>(null);
 const containerRef = ref<HTMLElement | null>(null);
-const isStuck = ref(false);
+
+const { isStuck } = useSticky(controlsContainerRef);
 
 const width = ref(1024);
 const scrollY = ref(0);
@@ -67,12 +69,9 @@ onMounted(() => {
             },
         );
 
-        window.addEventListener("scroll", checkSticky);
-
         onBeforeUnmount(() => {
             stopWidthWatch();
             stopScrollWatch();
-            window.removeEventListener("scroll", checkSticky);
         });
     }
 });
@@ -226,16 +225,6 @@ const resetFilters = () => {
     nextTick(() => {
         scrollToTop();
     });
-};
-
-const checkSticky = () => {
-    if (!controlsContainerRef.value) return;
-    const navHeightString = getComputedStyle(document.documentElement)
-        .getPropertyValue("--vp-nav-height")
-        .trim();
-    const navHeight = parseFloat(navHeightString) || 0;
-    const rect = controlsContainerRef.value.getBoundingClientRect();
-    isStuck.value = rect.top <= navHeight;
 };
 
 const filteredAssetPacks = computed(() => {

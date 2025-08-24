@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { useWindowSize } from "@vueuse/core";
+import { useScroll, useWindowSize } from "@vueuse/core";
 import { computed, nextTick, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
+import { useSticky } from "../composables/useSticky";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate, formatTimestamp } from "../date";
 import { scrollToTop } from "../util";
 
+import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { width } = useWindowSize();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 interface Props {
     selectedRelease: ReleaseItem | null;
@@ -22,16 +26,21 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
     selectRelease: [release: ReleaseItem];
+    toggleContentFade: [contentFade: boolean];
 }>();
 
 const dropdownRef = ref<HTMLElement | null>(null);
 const dropdownMenuRef = ref<HTMLElement | null>(null);
+const headerRef = ref<HTMLElement | null>(null);
 const isDropdownOpen = ref(false);
+const { isStuck } = useSticky(headerRef);
+const { arrivedState } = useScroll(dropdownMenuRef);
 
 useClickOutside({
     element: dropdownRef,
     callback: () => {
         isDropdownOpen.value = false;
+        emit("toggleContentFade", false);
     },
 });
 
@@ -46,6 +55,7 @@ const releaseSections = computed(() => [
 
 const toggleDropdown = async () => {
     isDropdownOpen.value = !isDropdownOpen.value;
+    emit("toggleContentFade", isDropdownOpen.value);
 
     if (isDropdownOpen.value && props.selectedRelease) {
         await nextTick();
@@ -70,7 +80,12 @@ const scrollToSelectedRelease = () => {
 const selectRelease = (release: ReleaseItem) => {
     emit("selectRelease", release);
     isDropdownOpen.value = false;
+    emit("toggleContentFade", false);
 };
+
+const isMainline = computed(() => {
+    return props.selectedRelease?.version.includes("mntm");
+});
 
 const isSelected = (release: ReleaseItem) => {
     return props.selectedRelease?.version === release.version;
@@ -79,7 +94,7 @@ const isSelected = (release: ReleaseItem) => {
 const handleHeaderClick = () => {
     if (width.value < 1024) {
         toggleDropdown();
-    } else {
+    } else if (isStuck.value) {
         scrollToTop("smooth");
     }
 };
@@ -87,36 +102,35 @@ const handleHeaderClick = () => {
 
 <template>
     <div
+        ref="headerRef"
         class="flex flex-col pt-0 z-[2] sticky top-[47px] sm:top-11 lg:top-[64px] bg-vp-dark lg:bg-vp-dark/85 lg:backdrop-blur-md rounded-t-[10px] border-b border-vp-divider"
     >
         <div ref="dropdownRef" class="relative">
             <div
-                class="flex flex-row justify-between items-center overflow-hidden px-3 py-2 transition-all duration-200 sm:shadow-sm z-[1000] cursor-pointer min-h-14"
+                class="flex flex-row justify-between items-center overflow-hidden px-3 py-2 transition-all duration-200 sm:shadow-sm z-[1000] min-h-14"
                 :class="{
-                    'md:cursor-pointer': !isDropdownOpen,
+                    'lg:cursor-pointer': isStuck,
                     'sm:rounded-tl-lg sm:rounded-tr-lg': isDropdownOpen,
                 }"
                 @click="handleHeaderClick"
             >
-                <div class="flex flex-row ml-1.5 items-center gap-2">
+                <div class="flex flex-row items-center gap-1">
+                    <div
+                        class="flex items-center justify-center text-sm text-vp-2/80 rounded-md w-7"
+                        :aria-label="tr('releases_current_version')"
+                    >
+                        <v-icon
+                            :name="isMainline ? 'oi-tag' : 'oi-git-commit'"
+                            :aria-label="
+                                isMainline ? tr('releases_mainline') : tr('releases_devbuild')
+                            "
+                            :title="isMainline ? tr('releases_mainline') : tr('releases_devbuild')"
+                            :scale="isMainline ? 0.85 : 1"
+                        />
+                    </div>
                     <span class="text-lg leading-none font-semibold text-vp-1 uppercase font-mono">
                         {{ selectedRelease?.version }}
                     </span>
-                    <Tooltip
-                        v-if="props.isCurrentVersion"
-                        :delay="0"
-                        :position="'right'"
-                        :max-width="'320px'"
-                        :z-index="9999"
-                    >
-                        <div
-                            class="flex items-center text-sm text-vp-alternate-1 dark:text-vp-alternate-1 rounded-full bg-vp-alternate-1/10 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
-                            :aria-label="tr('releases_current_version')"
-                        >
-                            <v-icon name="oi-check" scale="0.65" />
-                        </div>
-                        <template #content>{{ tr("installed") }}</template>
-                    </Tooltip>
                     <div
                         class="lg:hidden flex items-center text-vp-3 transition-transform duration-200"
                         :class="{ 'rotate-180': isDropdownOpen }"
@@ -125,9 +139,35 @@ const handleHeaderClick = () => {
                     </div>
                 </div>
                 <div class="flex flex-row items-center gap-2">
-                    <Tooltip v-if="selectedRelease?.timestamp" position="left" :delay="0">
+                    <Tooltip
+                        v-if="props.isCurrentVersion"
+                        :delay="0"
+                        :offset="8"
+                        :position="'left'"
+                        :max-width="'320px'"
+                        :z-index="9999"
+                    >
                         <div
-                            class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm cursor-help tracking-wider"
+                            class="flex items-center text-sm rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
+                            :class="[
+                                ifCurrentTheme(['white'])
+                                    ? 'text-vp-brand-1 dark:text-vp-brand-1/60'
+                                    : 'text-vp-alternate-1 dark:text-vp-alternate-1',
+                            ]"
+                            :aria-label="tr('releases_current_version')"
+                        >
+                            <v-icon name="oi-check" scale="0.75" />
+                        </div>
+                        <template #content>{{ tr("releases_current_version") }}</template>
+                    </Tooltip>
+                    <Tooltip
+                        v-if="selectedRelease?.timestamp"
+                        position="left"
+                        :delay="0"
+                        :offset="8"
+                    >
+                        <div
+                            class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] hover:bg-vp-neutral/[2%] hover:border-vp-divider/90 px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm cursor-help tracking-wider transition-all duration-100"
                         >
                             <span>{{ formatDate(selectedRelease?.date || "", "fullYear") }}</span>
                         </div>
@@ -153,6 +193,13 @@ const handleHeaderClick = () => {
                         class="bg-transparent transition-all duration-200 overflow-hidden max-h-[276px] flex flex-col w-full min-w-full"
                         :class="{ 'is-visible': isDropdownOpen }"
                     >
+                        <ScrollFade
+                            :show="!arrivedState.top"
+                            position="top"
+                            offset="0"
+                            class="mr-4"
+                        />
+                        <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" />
                         <div
                             ref="dropdownMenuRef"
                             class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute pb-[7px] pr-[7px]"

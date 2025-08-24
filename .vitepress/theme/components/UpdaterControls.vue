@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useScroll } from "@vueuse/core";
 import { computed, inject, ref, useTemplateRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
@@ -11,9 +12,12 @@ import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 import { supportsSerialPort } from "../util";
 
+import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
 const el = useTemplateRef<HTMLElement>("el");
+const { arrivedState } = useScroll(el);
+
 const { tr } = useI18n();
 const { dots } = useDots();
 const { ifCurrentTheme } = useThemeSwitcher();
@@ -179,7 +183,7 @@ const installTooltipContent = computed(() => {
                             style="min-width: 100%; left: 0; right: auto"
                         >
                             <div
-                                class="dropdown-menu"
+                                class="dropdown-menu relative"
                                 :class="{ 'is-visible': isChannelDropdownOpen }"
                             >
                                 <div
@@ -257,13 +261,25 @@ const installTooltipContent = computed(() => {
                             class="dropdown-menu-container right-0"
                             style="min-width: 100%; right: 0; left: auto"
                         >
+                            <ScrollFade
+                                :show="!arrivedState.top"
+                                position="top"
+                                :opacity="30"
+                                class="mr-4 z-10"
+                            />
+                            <ScrollFade
+                                :show="!arrivedState.bottom"
+                                position="bottom"
+                                :opacity="30"
+                                class="mr-4 z-10"
+                            />
                             <div
                                 class="dropdown-menu"
                                 :class="{ 'is-visible': isReleaseDropdownOpen }"
                             >
                                 <div
                                     ref="el"
-                                    class="flex flex-col overflow-hidden max-h-[224px] pr-[7px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    class="flex flex-col overflow-hidden max-h-[238px] pr-[7px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
@@ -304,7 +320,12 @@ const installTooltipContent = computed(() => {
                                                 :z-index="9999"
                                             >
                                                 <div
-                                                    class="flex items-center text-sm text-vp-alternate-1 dark:text-vp-alternate-1 rounded-full bg-vp-alternate-1/10 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
+                                                    class="flex items-center text-sm rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
+                                                    :class="[
+                                                        ifCurrentTheme(['white'])
+                                                            ? 'text-vp-brand-1 dark:text-vp-brand-1/60'
+                                                            : 'text-vp-alternate-1 dark:text-vp-alternate-1',
+                                                    ]"
                                                     :aria-label="tr('releases_current_version')"
                                                 >
                                                     <v-icon name="oi-check" scale="0.60" />

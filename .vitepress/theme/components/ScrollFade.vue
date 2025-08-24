@@ -17,23 +17,15 @@ const props = withDefaults(
 );
 
 const isVisible = computed(() => props.show);
-
-const gradientClass = computed(() => {
-    const direction = props.position === "top" ? "b" : "t";
-    return `bg-gradient-to-${direction} from-${props.background}/${props.opacity} dark:from-${props.background}/${props.opacity} to-transparent`;
-});
-
-const positionClass = computed(() => {
-    return props.position === "top" ? `top-${props.offset}` : `bottom-${props.offset}`;
-});
 </script>
 
 <template>
     <div
         :class="[
-            'absolute left-0 right-0 h-20 pointer-events-none z-10 mr-4 opacity-0 transition-opacity duration-300',
-            gradientClass,
-            positionClass,
+            'absolute left-0 right-0 h-20 pointer-events-none select-none z-20 opacity-0 transition-opacity duration-300',
+            position === 'top'
+                ? `top-${offset} bg-gradient-to-b from-${background}/${opacity} dark:from-${background}/${opacity} to-transparent`
+                : `bottom-${offset} bg-gradient-to-t from-${background}/${opacity} dark:from-${background}/${opacity} to-transparent`,
             {
                 'opacity-100': isVisible,
             },

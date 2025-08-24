@@ -30,7 +30,10 @@ const parsedChangelog = computed(() => {
     const withGitHubLinks = replaceIssuesAndMentions(props.selectedRelease.changelog);
     return md.render(withGitHubLinks);
 });
+
 const devFilesOpen = ref(false);
+const dropdownOpen = ref(false);
+const contentFade = computed(() => devFilesOpen.value || dropdownOpen.value);
 
 const handleSelectRelease = (release: ReleaseItem) => {
     emit("selectRelease", release);
@@ -38,6 +41,10 @@ const handleSelectRelease = (release: ReleaseItem) => {
 
 const toggleDevFilesOpen = (open: boolean) => {
     devFilesOpen.value = open;
+};
+
+const toggleContentFade = (fade: boolean) => {
+    dropdownOpen.value = fade;
 };
 </script>
 
@@ -51,12 +58,13 @@ const toggleDevFilesOpen = (open: boolean) => {
                 :selected-release="selectedRelease"
                 :is-current-version="props.isCurrentVersion"
                 @select-release="handleSelectRelease"
+                @toggle-content-fade="toggleContentFade"
             />
 
             <div
                 v-if="selectedRelease.changelog"
                 class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6 opacity-100 transition-opacity duration-200"
-                :class="{ 'opacity-30': devFilesOpen }"
+                :class="{ 'opacity-30': contentFade }"
             >
                 <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6">
                     <span v-html="parsedChangelog"></span>
@@ -65,7 +73,7 @@ const toggleDevFilesOpen = (open: boolean) => {
 
             <div class="h-px border-b border-vp-neutral/35 w-auto mx-6 sm:mx-8"></div>
 
-            <div class="max-w-none files-container lg:sticky lg:bottom-0 -mt-24">
+            <div class="max-w-none files-container">
                 <ReleaseFiles
                     :selected-release="selectedRelease"
                     :is-current-version="props.isCurrentVersion"
@@ -94,6 +102,7 @@ const toggleDevFilesOpen = (open: boolean) => {
             color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 70%,
         color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
     );
+    margin-top: -96px;
 }
 
 .release-content {
@@ -109,6 +118,15 @@ const toggleDevFilesOpen = (open: boolean) => {
             color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
             color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
         );
+    }
+}
+
+@media (min-height: 1024px) {
+    @media (min-width: 1024px) {
+        .files-container {
+            position: sticky;
+            bottom: 0;
+        }
     }
 }
 

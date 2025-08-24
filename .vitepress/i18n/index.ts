@@ -38,6 +38,7 @@ export type MessageSchema = {
     return_to_top: string;
     copy: string;
     save: string;
+    refresh: string;
     copied: string;
     saved: string;
     theme_locked: string;
@@ -128,6 +129,7 @@ export type MessageSchema = {
     releases_description: string;
     releases_description_mobile: string;
     releases_mainline: string;
+    releases_devbuild: string;
     releases_devbuilds: string;
     releases_install: string;
     releases_reinstall: string;

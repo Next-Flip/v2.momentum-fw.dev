@@ -235,7 +235,7 @@ watch(
                     <div
                         class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
                     >
-                        <v-icon name="la-info-circle-solid" scale="0.9" />
+                        <v-icon name="md-infooutline-round" scale="0.9" />
                     </div>
                     <template #content>
                         <div

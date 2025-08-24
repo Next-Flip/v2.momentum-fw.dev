@@ -90,6 +90,15 @@ export default {
         "from-white/40", "via-emerald-200/25",
         "from-neutral-400/80", "via-neutral-300/60",
         "to-transparent",
+        // ScrollFade classes
+        "bg-gradient-to-t", "bg-gradient-to-b", "top-0", "bottom-0",
+        // ScrollFade background/opacity combinations
+        "from-vp-dark/20", "from-vp-dark/30", "from-vp-dark/40", "from-vp-dark/50", "from-vp-dark/60", "from-vp-dark/70", "from-vp-dark/80", "from-vp-dark/90",
+        "from-vp-soft/20", "from-vp-soft/30", "from-vp-soft/40", "from-vp-soft/50", "from-vp-soft/60", "from-vp-soft/70", "from-vp-soft/80", "from-vp-soft/90",
+        "from-vp-elv/20", "from-vp-elv/30", "from-vp-elv/40", "from-vp-elv/50", "from-vp-elv/60", "from-vp-elv/70", "from-vp-elv/80", "from-vp-elv/90",
+        "dark:from-vp-dark/20", "dark:from-vp-dark/30", "dark:from-vp-dark/40", "dark:from-vp-dark/50", "dark:from-vp-dark/60", "dark:from-vp-dark/70", "dark:from-vp-dark/80", "dark:from-vp-dark/90",
+        "dark:from-vp-soft/20", "dark:from-vp-soft/30", "dark:from-vp-soft/40", "dark:from-vp-soft/50", "dark:from-vp-soft/60", "dark:from-vp-soft/70", "dark:from-vp-soft/80", "dark:from-vp-soft/90",
+        "dark:from-vp-elv/20", "dark:from-vp-elv/30", "dark:from-vp-elv/40", "dark:from-vp-elv/50", "dark:from-vp-elv/60", "dark:from-vp-elv/70", "dark:from-vp-elv/80", "dark:from-vp-elv/90",
         // Blur classes
         "blur-xl",
         "blur-2xl",

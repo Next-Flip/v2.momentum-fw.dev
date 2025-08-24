@@ -96,12 +96,12 @@ const getButtonScale = (file: FirmwareFile) => {
         >
             <div
                 :class="[
-                    'py-2 pr-2 text-vp-brand-1/60 saturate-[70%] text-sm font-medium rounded-md transition-all duration-75 flex items-center justify-center flex-shrink-0 select-none',
+                    'py-2 pr-2 text-sm font-medium rounded-md transition-all duration-75 flex items-center justify-center flex-shrink-0 select-none',
                     ifCurrentTheme(['orange'])
-                        ? 'group-hover:text-black dark:group-hover:text-black'
+                        ? 'text-vp-brand-1 group-hover:text-black dark:group-hover:text-black'
                         : ifCurrentTheme(['white'])
-                          ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
-                          : 'group-hover:text-white dark:group-hover:text-white',
+                          ? 'text-vp-alternate-1 group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
+                          : 'text-vp-brand-1 group-hover:text-white dark:group-hover:text-white',
                 ]"
             >
                 <v-icon :name="getButtonIcon(file)" scale="0.9" />
@@ -123,13 +123,13 @@ const getButtonScale = (file: FirmwareFile) => {
                     {{ file.filename }}
                 </span>
                 <div
-                    class="text-xs text-vp-brand-1/80 select-none font-mono whitespace-nowrap ml-auto"
+                    class="text-xs select-none font-mono whitespace-nowrap ml-auto"
                     :class="[
                         ifCurrentTheme(['orange'])
-                            ? 'group-hover:text-black dark:group-hover:text-black'
+                            ? 'text-vp-brand-1 group-hover:text-black dark:group-hover:text-black'
                             : ifCurrentTheme(['white'])
-                              ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
-                              : 'group-hover:text-white dark:group-hover:text-white',
+                              ? 'text-vp-alternate-1 group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
+                              : 'text-vp-brand-1 group-hover:text-white dark:group-hover:text-white',
                     ]"
                 >
                     {{
