@@ -29,9 +29,7 @@ head:
 prev:
     text: "GPIO Pins"
     link: "/wiki/Protocols/GPIO"
-next:
-    text: "Screen"
-    link: "/wiki/Misc/Screen"
+next: false
 ---
 
 # Misc

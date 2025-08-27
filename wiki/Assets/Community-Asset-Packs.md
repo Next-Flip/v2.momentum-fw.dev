@@ -27,6 +27,9 @@ head:
     - - meta
       - name: "twitter:image"
         content: "https://momentum-fw.dev/og.png"
+prev:
+    text: What are Asset Packs?
+    link: /wiki/Assets
 ---
 
 # Community Asset Packs

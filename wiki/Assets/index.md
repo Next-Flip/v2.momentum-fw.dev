@@ -27,11 +27,11 @@ head:
       - name: "twitter:image"
         content: "https://momentum-fw.dev/og.png"
 prev:
-    text: Asset Packs
-    link: /wiki/Assets
+    text: Installation
+    link: /wiki/Installation
 next:
-    text: Momentum Settings
-    link: /wiki/Interface
+    text: Community Asset Packs
+    link: /wiki/Assets/Community-Asset-Packs
 ---
 
 # What are Asset Packs?

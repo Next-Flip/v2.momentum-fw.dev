@@ -27,8 +27,8 @@ head:
       - name: "twitter:image"
         content: "https://momentum-fw.dev/og.png"
 prev:
-    text: "Asset Packs"
-    link: "/wiki/Assets"
+    text: "Community Asset Packs"
+    link: "/wiki/Assets/Community-Asset-Packs"
 next:
     text: "Graphics"
     link: "/wiki/Interface/Graphics"

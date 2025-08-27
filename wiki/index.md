@@ -28,7 +28,7 @@ head:
         content: "https://momentum-fw.dev/og.png"
 next:
     text: Frequently Asked Questions
-    link: /wiki/faq.md
+    link: /wiki/FAQ
 ---
 
 <img src="/banners/wiki_light.png" alt="banner" class="dark:hidden banner" />
