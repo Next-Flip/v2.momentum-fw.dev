@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/screen.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Misc/Screen"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Settings for the Flipper Zero's screen (Display Mode, RGB Backlight, LCD LEDs, etc.)"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/screen.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Screen

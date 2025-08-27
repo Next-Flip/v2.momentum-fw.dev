@@ -60,7 +60,7 @@ const navigationLinks = computed(() => [
         <div class="max-w-full mx-auto py-16 pb-24 lg:pb-32" :class="{ 'lg:px-0': isWiki }">
             <div
                 class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl"
-                :class="[isWiki ? 'px-8 lg:pl-72' : 'px-8 lg:px-16']"
+                :class="[isWiki ? 'pl-8 pr-12 lg:pl-72' : 'px-8 lg:px-16']"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50">
                     <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">

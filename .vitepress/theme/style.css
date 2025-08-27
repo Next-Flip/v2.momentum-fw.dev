@@ -738,31 +738,49 @@ body[data-route*="/wiki"] {
     padding-bottom: 10px !important;
 }
 
-.VPNavBar.top {
+body[data-route^="/wiki"] .VPNavBar {
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
+    border-bottom: none !important;
+    backdrop-filter: blur(8px) !important;
+}
+body[data-route^="/wiki"] .VPNavBar .content-body {
+    background-color: transparent !important;
+    position: relative !important;
+}
+
+body:not([data-route^="/wiki"]) .VPNavBar.top {
     background-color: transparent !important;
     border-bottom: none !important;
 }
-
-.VPNavBar:not(.top) {
+body:not([data-route^="/wiki"]) .VPNavBar:not(.top) {
     background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
     backdrop-filter: blur(8px) !important;
 }
-
-.VPNavBar .content-body {
+body:not([data-route^="/wiki"]) .VPNavBar .content-body {
     position: relative !important;
     background-color: transparent !important;
 }
 
 @media (min-width: 960px) {
-    .VPNavBar.top {
+    body[data-route^="/wiki"] .VPNavBar {
+        background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
+        border-bottom: none !important;
+        backdrop-filter: blur(8px) !important;
+    }
+    body[data-route^="/wiki"] .VPNavBar .content-body {
+        background-color: transparent !important;
+        position: relative !important;
+    }
+
+    body:not([data-route^="/wiki"]) .VPNavBar.top {
         background-color: transparent !important;
         border-bottom: none !important;
     }
-    .VPNavBar:not(.top) {
+    body:not([data-route^="/wiki"]) .VPNavBar:not(.top) {
         background-color: color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) !important;
         backdrop-filter: blur(8px) !important;
     }
-    .VPNavBar .content-body {
+    body:not([data-route^="/wiki"]) .VPNavBar .content-body {
         position: relative !important;
         background-color: transparent !important;
     }
@@ -818,13 +836,12 @@ body[data-route*="/wiki"] {
 
 .aside {
     padding-left: 35px !important;
+    overflow: hidden !important;
 }
 
 .aside-container {
-    padding-top: calc(
-        var(--vp-nav-height) + var(--vp-layout-top-height, 0px) + var(--vp-doc-top-height, 0px) +
-            32px
-    );
+    overflow-y: auto !important;
+    height: 100% !important;
 }
 
 .VPSidebar {
@@ -1145,4 +1162,15 @@ body[data-route*="/wiki"] {
 }
 .pack-author:hover {
     color: var(--vp-c-alternate-2) !important;
+}
+
+.asset-pack-image-right {
+    float: right !important;
+    margin-left: 1rem !important;
+    clear: right !important;
+}
+
+.vp-doc hr {
+    clear: both !important;
+    margin-top: 1.5rem !important;
 }

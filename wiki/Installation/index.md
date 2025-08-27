@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Installation methods for Momentum Firmware on your Flipper Zero"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/installation.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Installation"
@@ -23,9 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Installation methods for Momentum Firmware on your Flipper Zero"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/installation.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: FAQ
+    link: /wiki/FAQ
+next:
+    text: Asset Packs
+    link: /wiki/Assets
 ---
 
 # Installation
@@ -33,17 +39,17 @@ head:
 This page covers the different methods for installing Momentum firmware on your Flipper Zero.
 
 > [!WARNING]
-> Make sure [qFlipper](https://github.com/qFlipper/qFlipper/releases) is closed when using [Web Updater](https://momentum-fw.dev/update/) or [Flipper Lab/App](https://lab.flipper.net/), and vice versa. Only use one installation method at a time.
+> Make sure [qFlipper](https://github.com/flipperdevices/qFlipper) is closed when using [Web Updater](https://momentum-fw.dev/update/) or [Flipper Lab/App](https://lab.flipper.net/), and vice versa. Only use one installation method at a time.
 
 ### Back up your data
 
 No, you will not lose any data installing Momentum or any other firmware on your Flipper Zero. Your data is stored *externally* on the `SD card`, not on the Flipper Zero's internal storage. However, it's always a good idea to back up your data before installing a new firmware, just in case.
 
 > [!CAUTION]
-> The `Backup` and `Restore` options in [qFlipper](https://github.com/qFlipper/qFlipper/releases)'s `Advanced Controls` tab DO NOT backup your saved files! They only backup the settings contained in the (hidden) `.int` folder. See below for viable alternatives to save what you actually care about.
+> The `Backup` and `Restore` options in [qFlipper](https://github.com/flipperdevices/qFlipper)'s `Advanced Controls` tab DO NOT backup your saved files! They only backup the settings contained in the (hidden) `.int` folder. See below for viable alternatives to save what you actually care about.
 
 There are multiple ways you could backup your important files from Flipper's SD card:
-1. Open [qFlipper](https://github.com/qFlipper/qFlipper/releases), switch to the `File manager` tab, go through folders manually and save files/folders you want to keep to your computer.
+1. Open [qFlipper](https://github.com/flipperdevices/qFlipper), switch to the `File manager` tab, go through folders manually and save files/folders you want to keep to your computer.
 2. Take out the SD card from Flipper, plug it into your computer, copy some/all files from the SD to the computer.
 3. Any other method of "imaging" the FatFs partition from the SD card (Google it!).
 

@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/interface.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Interface"
@@ -23,9 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/interface.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: "Asset Packs"
+    link: "/wiki/Assets"
+next:
+    text: "Graphics"
+    link: "/wiki/Interface/Graphics"
 ---
 
 # Interface

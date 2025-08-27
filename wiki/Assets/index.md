@@ -1,7 +1,6 @@
 ---
 title: Asset Packs
 description: "Guide on what asset packs are and how to install or create them"
-prev: Installation
 head:
     - - meta
       - name: "description"
@@ -12,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Guide on what asset packs are and how to install or create them"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/assets.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Assets"
@@ -24,9 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Guide on what asset packs are and how to install or create them"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/assets.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: Asset Packs
+    link: /wiki/Assets
+next:
+    text: Momentum Settings
+    link: /wiki/Interface
 ---
 
 # What are Asset Packs?
@@ -37,7 +42,7 @@ Asset Packs are a feature exclusive to Momentum Firmware (and its predecessor Xt
 
 Installing Asset Packs is quite easy and straightforward. First, make sure you're on an updated version of Momentum before you begin, Asset Packs were added in v40! Then, find some packs to install (we have a channel in our [Discord](https://discord.gg/afTC8Eenr4) where you can find some) or make your own (see below). Once you have some packs to install:
 
-1. Open [qFlipper](https://github.com/qFlipper/qFlipper/releases) and navigate to `SD Card` and into `asset_packs`; if you do not see this folder, try [reinstalling the firmware](Installation#Reinstalling-the-Firmware), or create it yourself.
+1. Open [qFlipper](https://github.com/flipperdevices/qFlipper) and navigate to `SD Card` and into `asset_packs`; if you do not see this folder, try [reinstalling the firmware](/wiki/Installation), or create it yourself.
 2. `SD/asset_packs` (or `/ext/asset_packs`) is where all Asset Packs are stored. Simply unzip your packs and upload the folders here.
 &nbsp;&nbsp;&nbsp;&nbsp;<sub>If you did this correctly, you should see `SD/asset_packs/PackName/Anims` and/or
 `SD/asset_packs/PackName/Icons`.</sub>
@@ -89,7 +94,7 @@ With icons there are quite a few differences and issues we had to solve. In part
 
 #### Static icons
 
-The `.bm` format does not include image width and height, with animations that is stored in `meta.txt`, so for static icons we made a special format: `.bmx`, which is `[ int32 width ] + [ int32 height ] + [ standard .bm pixel data ]`, but this is handled by the packer (see [below](#Cool-I-read-all-that-but-how-do-I-make-one)), so don't worry about it.
+The `.bm` format does not include image width and height, with animations that is stored in `meta.txt`, so for static icons we made a special format: `.bmx`, which is `[ int32 width ] + [ int32 height ] + [ standard .bm pixel data ]`, but this is handled by the packer (see [below](#cool-i-read-all-that-but-how-do-i-make-one)), so don't worry about it.
 
 #### Animated icons
 
@@ -128,7 +133,7 @@ SD/ (or /ext in File Browser)
 
 Which is the same you can find in the firmware source code, in [`assets/icons`](https://github.com/Next-Flip/Momentum-Firmware/tree/dev/assets/icons). The key differences/things to remember with the Asset Pack icon system are:
 
-- Not all icons are supported (see [below](#Not-all-icons-are-supported)).
+- Not all icons are supported (see below).
 - The pixel numbers in the filename are ignored, they are there purely because of the original Flipper icon names and for a hint as to how you should size your icons, but they are not enforced.
 - We kept the original naming scheme and file structure for compatibility, but the original setup is quite bad, so bear with us. Some icons in subfolders (like `SubGhz/Scanning_123x52`) are used in other unrelated apps/places.
 - Some icons in the official firmware have different versions with different numbers to indicate the flipper level they target. Since our system has so many levels, we decided to keep it simple and remove the level progression from icons. For example `Passport/passport_happy1_46x49` becomes `Passport/passport_happy_46x49` and `Animations/Levelup1_128x64` becomes `Animations/Levelup_128x64`.

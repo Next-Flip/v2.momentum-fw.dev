@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Security and display options for the lockscreen"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/lockscreen.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Interface/Lockscreen"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Security and display options for the lockscreen"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/lockscreen.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Lockscreen

@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Assignment of GPIO pins for external connections"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/gpio.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Protocols/GPIO"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Assignment of GPIO pins for external connections"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/gpio.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # GPIO Pins

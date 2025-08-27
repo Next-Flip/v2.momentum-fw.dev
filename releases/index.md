@@ -12,9 +12,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Read the changelogs and download the latest releases of Momentum Firmware"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/releases.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/releases"
@@ -24,9 +24,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Read the changelogs and download the latest releases of Momentum Firmware"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/releases.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 <ReleasesPage />

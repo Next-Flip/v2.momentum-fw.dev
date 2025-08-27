@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Customization of the main menu style and app selector"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/mainmenu.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Interface/Mainmenu"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Customization of the main menu style and app selector"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/mainmenu.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Main Menu

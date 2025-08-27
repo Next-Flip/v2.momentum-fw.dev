@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Settings for the Flipper Zero's SubGHz radio"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/subghz.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Protocols/SubGHz"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Settings for the Flipper Zero's SubGHz radio"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/subghz.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # SubGHz
@@ -61,9 +61,8 @@ Configure frequency hopping settings for SubGHz operation.
 
 ## [Bypass Region Lock](SubGHz#Bypass-Region-Lock)
 
-<!-- TODO: path wants "/wiki/..." because the markdown files are in the wiki folder. Move these out so the path is the same for this and github wiki. -->
 > [!WARNING]
-> Bypassing region lock may violate regulations in your area. Refer to [Sub-GHz says "Transmission is blocked"](/wiki/Frequently-Asked-Questions#sub-ghz-says-transmission-is-blocked) in the [FAQ](/wiki/Frequently-Asked-Questions) before enabling.
+> Bypassing region lock may violate regulations in your area. Refer to [Sub-GHz says "Transmission is blocked"](/wiki/FAQ#sub-ghz-says-transmission-is-blocked) in the [FAQ](/wiki/FAQ) before enabling.
 
 Toggle region lock bypass for SubGHz transmission.
 

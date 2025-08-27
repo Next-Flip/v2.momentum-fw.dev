@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Configuration of supported protocols (SubGHz and GPIO pins)"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/protocols.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Protocols"
@@ -23,9 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Configuration of supported protocols (SubGHz and GPIO pins)"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/protocols.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: "General"
+    link: "/wiki/Interface/General"
+next:
+    text: "SubGHz"
+    link: "/wiki/Protocols/SubGHz"
 ---
 
 # Protocols

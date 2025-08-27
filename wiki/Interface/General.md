@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "General settings for the Flipper's look and feel"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/general.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Interface/General"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "General settings for the Flipper's look and feel"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/general.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # General

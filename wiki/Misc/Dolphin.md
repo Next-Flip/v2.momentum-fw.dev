@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Settings for the Flipper Zero's dolphin"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/dolphin.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Misc/Dolphin"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Settings for the Flipper Zero's dolphin"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/dolphin.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Dolphin
@@ -42,7 +42,7 @@ These stats update as you interact with your Flipper Zero, but you can also adju
 
 Level of your Dolphin (Each level requires an increasing amount of XP).
 
-Dolphin level can affect which animations play from your current [Asset Pack](Graphics#Asset-Pack) unless [Unlock Anims](Graphics#Unlock-Anims) is enabled.
+Dolphin level can affect which animations play from your current [Asset Pack](/wiki/Interface/Graphics#asset-pack) unless [Unlock Anims](/wiki/Interface/Graphics#unlock-anims) is enabled.
 
 - Min: `1` <sup><em id="default"> Default </em></sup>
 - Max: `30`

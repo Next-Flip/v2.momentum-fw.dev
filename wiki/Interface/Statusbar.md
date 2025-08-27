@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Customization of the statusbar (Desktop and Lockscreen)"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/statusbar.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Interface/Statusbar"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Customization of the statusbar (Desktop and Lockscreen)"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/statusbar.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Statusbar

@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Frequently asked questions and troubleshooting help"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "http://localhost:4173/og/og.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/FAQ"
@@ -23,12 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Frequently asked questions and troubleshooting help"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "http://localhost:4173/og/og.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: Home
+    link: /wiki/
 next:
     text: Installation
-    link: /wiki/installation.md
+    link: /wiki/Installation
 ---
 
 # Frequently Asked Questions
@@ -48,7 +51,7 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 - [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
 - [Will I lose data installing a new version?](#will-i-lose-data-installing-a-new-version)
 - [Mainline release or dev build?](#mainline-release-or-dev-build)
-- [Flipper says "Update failed"?](#flipper-says-Update-failed)
+- [Flipper says "Update failed"?](#flipper-says-update-failed)
 - [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
 - [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
 - [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)

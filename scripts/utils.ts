@@ -192,7 +192,7 @@ export async function updateCommunityAssetPacksMarkdown(packs: AssetPackEntry[])
 
                 return `---
 
-${previewUrl ? `<ScreenColorImage src="${previewUrl}" width="200"/>` : ""}
+${previewUrl ? `<ScreenColorImage src="${previewUrl}" width="200" class="asset-pack-image-right"/>` : ""}
 
 #### <a href="${githubUrl}">${pack.name}</a>
 

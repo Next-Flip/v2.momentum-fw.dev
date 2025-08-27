@@ -93,8 +93,16 @@ const generateWikiSidebar = (
                                     text: "Asset Pack",
                                 },
                                 {
-                                    page: "Interface/Graphics#animation-settings",
-                                    text: "Animation Settings",
+                                    page: "Interface/Graphics#anim-speed",
+                                    text: "Anim Speed",
+                                },
+                                {
+                                    page: "Interface/Graphics#cycle-anims",
+                                    text: "Cycle Anims",
+                                },
+                                {
+                                    page: "Interface/Graphics#unlock-anims",
+                                    text: "Unlock Anims",
                                 },
                             ],
                         },
@@ -108,8 +116,20 @@ const generateWikiSidebar = (
                                     text: "Menu Style",
                                 },
                                 {
-                                    page: "Interface/Mainmenu#menu-management",
-                                    text: "Menu Management",
+                                    page: "Interface/Mainmenu#reset-menu",
+                                    text: "Reset Menu",
+                                },
+                                {
+                                    page: "Interface/Mainmenu#add-app",
+                                    text: "Add App",
+                                },
+                                {
+                                    page: "Interface/Mainmenu#move-app",
+                                    text: "Move App",
+                                },
+                                {
+                                    page: "Interface/Mainmenu#remove-app",
+                                    text: "Remove App",
                                 },
                             ],
                         },
@@ -120,11 +140,23 @@ const generateWikiSidebar = (
                             items: [
                                 {
                                     page: "Interface/Lockscreen#lock-on-boot",
-                                    text: "Security",
+                                    text: "Lock on Boot",
+                                },
+                                {
+                                    page: "Interface/Lockscreen#format-on-bad-pins",
+                                    text: "Format on Bad PINs",
                                 },
                                 {
                                     page: "Interface/Lockscreen#allow-usb-rpc-while-locked",
-                                    text: "RPC Access",
+                                    text: "Allow USB RPC",
+                                },
+                                {
+                                    page: "Interface/Lockscreen#allow-ble-rpc-while-locked",
+                                    text: "Allow BLE RPC",
+                                },
+                                {
+                                    page: "Interface/Lockscreen#allow-poweroff-while-locked",
+                                    text: "Allow Poweroff",
                                 },
                                 {
                                     page: "Interface/Lockscreen#lockscreen-elements",
@@ -166,7 +198,19 @@ const generateWikiSidebar = (
                             items: [
                                 {
                                     page: "Interface/File-Browser#display-options",
-                                    text: "Display Options",
+                                    text: "Folders Above Files",
+                                },
+                                {
+                                    page: "Interface/File-Browser#show-hidden-files",
+                                    text: "Show Hidden Files",
+                                },
+                                {
+                                    page: "Interface/File-Browser#show-internal-tab",
+                                    text: "Show Internal Tab",
+                                },
+                                {
+                                    page: "Interface/File-Browser#show-path",
+                                    text: "Show Path",
                                 },
                                 {
                                     page: "Interface/File-Browser#favorite-timeout",
@@ -206,8 +250,16 @@ const generateWikiSidebar = (
                             collapsed: true,
                             items: [
                                 {
-                                    page: "Protocols/SubGHz#subghz-freqs",
-                                    text: "SubGHz Freqs",
+                                    page: "Protocols/SubGHz#use-defaults",
+                                    text: "Use Defaults",
+                                },
+                                {
+                                    page: "Protocols/SubGHz#static-freqs",
+                                    text: "Static Freqs",
+                                },
+                                {
+                                    page: "Protocols/SubGHz#hopper-freqs",
+                                    text: "Hopper Freqs",
                                 },
                                 {
                                     page: "Protocols/SubGHz#bypass-region-lock",
@@ -259,12 +311,52 @@ const generateWikiSidebar = (
                             collapsed: true,
                             items: [
                                 {
-                                    page: "Misc/Screen#display-mode",
-                                    text: "Display Mode",
+                                    page: "Misc/Screen#dark-mode",
+                                    text: "Dark Mode",
+                                },
+                                {
+                                    page: "Misc/Screen#left-handed",
+                                    text: "Left Handed",
                                 },
                                 {
                                     page: "Misc/Screen#rgb-settings",
                                     text: "RGB Settings",
+                                    collapsed: true,
+                                    items: [
+                                        {
+                                            page: "Misc/Screen#rgb-backlight",
+                                            text: "RGB Backlight",
+                                        },
+                                        {
+                                            page: "Misc/Screen#lcd-led-1",
+                                            text: "LCD LED 1",
+                                        },
+
+                                        {
+                                            page: "Misc/Screen#lcd-led-3",
+                                            text: "LCD LED 3",
+                                        },
+
+                                        {
+                                            page: "Misc/Screen#rainbow-lcd",
+                                            text: "Rainbow LCD",
+                                        },
+
+                                        {
+                                            page: "Misc/Screen#rainbow-speed",
+                                            text: "Rainbow Speed",
+                                        },
+
+                                        {
+                                            page: "Misc/Screen#rainbow-interval",
+                                            text: "Rainbow Interval",
+                                        },
+
+                                        {
+                                            page: "Misc/Screen#rainbow-saturation",
+                                            text: "Rainbow Saturation",
+                                        },
+                                    ],
                                 },
                             ],
                         },
@@ -309,6 +401,17 @@ const generateWikiSidebar = (
                         {
                             page: "Misc/VGM",
                             text: "VGM Options",
+                            collapsed: true,
+                            items: [
+                                {
+                                    page: "Misc/VGM#install-rgb-firmware",
+                                    text: "Install RGB Firmware",
+                                },
+                                {
+                                    page: "Misc/VGM#foreground-background",
+                                    text: "Foreground & Background",
+                                },
+                            ],
                         },
                         {
                             page: "Misc/index#momentum-intro",

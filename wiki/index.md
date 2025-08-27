@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Comprehensive guide to the features and settings specific to Momentum Firmware"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/wiki.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Comprehensive guide to the features and settings specific to Momentum Firmware"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/wiki.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 next:
     text: Frequently Asked Questions
     link: /wiki/faq.md
@@ -52,18 +52,18 @@ This is a comprehensive and explanatory guide to the features and settings speci
 
 ### Quick Links
 
-- [`Installation Methods`](Installation.md): Different ways to install Momentum
-- [`Asset Packs Guide`](Assets/Asset-Packs.md): Guide on what asset packs are and how to install them
-- [`Community Asset Packs List`](Assets/Community-Asset-Packs.md): Full list of community made asset packs
-- [`Frequently Asked Questions`](FAQ.md): Most of the common issues and their solutions
+- [`Installation Methods`](Installation): Different ways to install Momentum
+- [`Asset Packs Guide`](Assets): Guide on what asset packs are and how to install them
+- [`Community Asset Packs List`](Assets/Community-Asset-Packs): Full list of community made asset packs
+- [`Frequently Asked Questions`](FAQ): Most of the common issues and their solutions
 
 ### Momentum Settings
 
 A run down of all the settings native to Momentum. These settings are found by pressing `UP` on the `Desktop` and opening the `MNTM` app (The **M** logo).
 
-- [`Interface`](Interface/Interface.md): Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)
-- [`Protocols`](Protocols/Protocols.md): Configuration of supported protocols (SubGHz and GPIO pins)
-- [`Misc`](Misc/Misc.md): Miscellaneous device identity settings
+- [`Interface`](Interface): Customization of the interface (Desktop, Main Menu, Lockscreen, etc.)
+- [`Protocols`](Protocols): Configuration of supported protocols (SubGHz and GPIO pins)
+- [`Misc`](Misc): Miscellaneous device identity settings
 
 ## Why Momentum?
 

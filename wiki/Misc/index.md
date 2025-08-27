@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Miscellaneous device personalization settings"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/misc.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Misc"
@@ -23,9 +23,15 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Miscellaneous device personalization settings"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/misc.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
+prev:
+    text: "GPIO Pins"
+    link: "/wiki/Protocols/GPIO"
+next:
+    text: "Screen"
+    link: "/wiki/Misc/Screen"
 ---
 
 # Misc

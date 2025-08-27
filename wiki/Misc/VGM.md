@@ -11,9 +11,9 @@ head:
     - - meta
       - property: "og:description"
         content: "Customization of the VGM (Video Game Module)"
-    # - - meta
-    #   - property: "og:image"
-    #     content: "https://momentum-fw.dev/og/vgm.png"
+    - - meta
+      - property: "og:image"
+        content: "https://momentum-fw.dev/og.png"
     - - meta
       - property: "og:url"
         content: "https://momentum-fw.dev/wiki/Misc/VGM"
@@ -23,9 +23,9 @@ head:
     - - meta
       - name: "twitter:description"
         content: "Customization of the VGM (Video Game Module)"
-    # - - meta
-    #   - name: "twitter:image"
-    #     content: "https://momentum-fw.dev/og/vgm.png"
+    - - meta
+      - name: "twitter:image"
+        content: "https://momentum-fw.dev/og.png"
 ---
 
 # Video Game Module (VGM)
