@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
                     v-if="shouldShowTooltip"
                     ref="tooltip"
                     :class="[
-                        'tooltip fixed z-10 backdrop-blur-md text-vp-1 border border-vp-divider rounded-md p-1.5 px-3 text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
+                        'tooltip fixed z-10 backdrop-blur-md !text-neutral-50 border dark:border-vp-divider border-neutral-800 rounded-md p-1.5 px-3 text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
                         position,
                         themeClass,
                     ]"
@@ -233,7 +233,7 @@ onBeforeUnmount(() => {
 
 .tooltip {
     box-shadow: var(--vp-shadow-3) !important;
-    background-color: color-mix(in srgb, var(--vp-c-neutral-inverse) 90%, transparent);
+    background-color: color-mix(in srgb, black 90%, transparent);
 }
 
 .tooltip-fade-enter-active,

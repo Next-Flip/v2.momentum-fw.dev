@@ -131,7 +131,7 @@ onMounted(() => {
             >
                 <span
                     :class="[
-                        'text-sm font-medium truncate text-left font-mono pointer-events-none whitespace-nowrap uppercase',
+                        'text-sm font-medium truncate text-left font-mono pointer-events-none whitespace-nowrap lowercase',
                         isSelected(release)
                             ? 'text-vp-brand-1'
                             : 'text-vp-2 group-hover:text-vp-brand-1',

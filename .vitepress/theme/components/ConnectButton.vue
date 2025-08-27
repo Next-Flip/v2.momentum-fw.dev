@@ -559,8 +559,8 @@ body[data-route*="/wiki"] {
     border: none;
     cursor: pointer;
     transition:
-        background-color 0.25s,
-        color 0.25s;
+        background-color 0.1s,
+        color 0.1s;
     width: 100%;
 }
 

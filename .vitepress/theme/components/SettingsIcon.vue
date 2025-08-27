@@ -2,13 +2,11 @@
 import { ref } from "vue";
 import { useI18n } from "../composables/useI18n";
 import { useSettings } from "../composables/useSettings";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
 import Toggle from "./Toggle.vue";
 
-const { isLocked } = useThemeSwitcher();
 const { tr } = useI18n();
 const { isSettingEnabled, toggleSetting } = useSettings();
 const flyoutOpen = ref(false);

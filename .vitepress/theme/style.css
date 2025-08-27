@@ -886,6 +886,10 @@ body[data-route*="/wiki"] {
     color: var(--vp-c-brand-1) !important;
 }
 
+.VPLink.link {
+    transition: background-color 0.1s !important;
+}
+
 .VPSidebarItem.level-1.is-active .text {
     color: var(--vp-c-brand-1) !important;
 }

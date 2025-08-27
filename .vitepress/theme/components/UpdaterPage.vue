@@ -2,8 +2,13 @@
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
-import type { ReleaseItem } from "../../../_data/releases";
-import { devbuildReleases, getReleaseByVersion, mainlineReleases } from "../../../_data/releases";
+import type { ReleaseChannel, ReleaseItem } from "../../../_data/releases";
+import {
+    branchReleases,
+    devbuildReleases,
+    getReleaseByVersion,
+    mainlineReleases,
+} from "../../../_data/releases";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import { usePanelResize } from "../composables/usePanelResize";
@@ -19,6 +24,7 @@ import {
     bytesToSize,
     devMode,
     downloadFile,
+    getFirmwareDownloadUrl,
     parseUploadedFileName,
     supportsSerialPort,
 } from "../util";
@@ -50,19 +56,17 @@ const {
 } = usePanelResize({});
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
-const selectedChannel = ref<"mainline" | "devbuild" | null>(null);
+const selectedChannel = ref<ReleaseChannel | null>(null);
+
 const { selectedRelease, selectRelease } = useReleaseNavigation({
     basePath: "/update",
     useQueryParams: true,
     storageKeys: {
         selectedVersion: STORAGE_KEYS.UPDATER_SELECTED_VERSION,
+        selectedChannel: STORAGE_KEYS.UPDATER_SELECTED_CHANNEL,
     },
-    onReleaseChange: (release: ReleaseItem) => {
-        if (mainlineReleases.includes(release)) {
-            selectedChannel.value = "mainline";
-        } else if (devbuildReleases.includes(release)) {
-            selectedChannel.value = "devbuild";
-        }
+    onChannelChange: (channel: ReleaseChannel) => {
+        selectedChannel.value = channel;
     },
 });
 
@@ -121,7 +125,11 @@ const currentDeviceVersion = computed(() => {
 
 const channelReleases = computed(() => {
     if (!selectedChannel.value) return [];
-    return selectedChannel.value === "mainline" ? mainlineReleases : devbuildReleases;
+    return selectedChannel.value === "mainline"
+        ? mainlineReleases
+        : selectedChannel.value === "devbuild"
+          ? devbuildReleases
+          : branchReleases;
 });
 
 const currentChangelogRelease = computed(() => {
@@ -133,15 +141,13 @@ watch(
     ([newChannel, newIsMatching], [oldChannel, oldIsMatching]) => {
         if (typeof window !== "undefined") {
             if (newChannel !== oldChannel) {
-                if (newChannel) {
-                    localStorage.setItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL, newChannel);
-                } else {
-                    localStorage.removeItem(STORAGE_KEYS.UPDATER_SELECTED_CHANNEL);
-                }
-
                 if (newChannel && selectedRelease.value) {
                     const currentChannelReleases =
-                        newChannel === "mainline" ? mainlineReleases : devbuildReleases;
+                        newChannel === "mainline"
+                            ? mainlineReleases
+                            : newChannel === "devbuild"
+                              ? devbuildReleases
+                              : branchReleases;
                     const releaseExists = currentChannelReleases.some(
                         (release) => release.version === selectedRelease.value?.version,
                     );
@@ -242,10 +248,16 @@ const { isOverDropZone: rawIsOverDropZone } = useDropZone(dropZoneRef, {
 });
 
 const isOverDropZone = computed(() => rawIsOverDropZone.value && !flags.value.updateInProgress);
+const isBranchRelease = computed(() => selectedChannel.value === "branch");
 
-const handleChannelChange = (channel: "mainline" | "devbuild") => {
+const handleChannelChange = (channel: ReleaseChannel) => {
     selectedChannel.value = channel;
-    const releases = channel === "mainline" ? mainlineReleases : devbuildReleases;
+    const releases =
+        channel === "mainline"
+            ? mainlineReleases
+            : channel === "devbuild"
+              ? devbuildReleases
+              : branchReleases;
     if (releases.length > 0) {
         selectRelease(releases[0]);
     } else {
@@ -295,36 +307,10 @@ const handleDownloadRelease = () => {
 
     if (firmwareUrl) {
         downloadFile(firmwareUrl);
-        logToSerial("info", `[Download] Downloading firmware: ${selectedRelease.value.version}`);
+        logToSerial("info", `[Download] Downloading firmware: ${firmwareUrl}`);
     } else {
         logToSerial("error", "[Download] No firmware download URL found for selected release");
     }
-};
-
-const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
-    if (!release.files) return null;
-
-    for (const file of release.files) {
-        if (
-            "url" in file &&
-            file.url &&
-            "filename" in file &&
-            file.filename?.includes("update-mntm-") &&
-            file.filename?.endsWith(".tgz")
-        ) {
-            return file.url;
-        }
-
-        if (
-            "filename" in file &&
-            file.filename?.includes("update-mntm-") &&
-            file.filename.endsWith(".tgz")
-        ) {
-            return `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
-        }
-    }
-
-    return null;
 };
 
 const handleFileUpload = () => {
@@ -547,10 +533,13 @@ onBeforeUnmount(() => {
                             />
 
                             <Transition name="slide-up" mode="out-in">
-                                <div v-if="!showUpdateOverlay" class="flex flex-col">
+                                <div
+                                    v-if="!showUpdateOverlay"
+                                    class="flex flex-col border-t lg:border-t-0 border-vp-divider"
+                                >
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
-                                            v-if="isMatchingRelease"
+                                            v-if="isMatchingRelease || isBranchRelease"
                                             class="flex flex-row items-start md:items-center justify-center gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
@@ -558,31 +547,58 @@ onBeforeUnmount(() => {
                                         >
                                             <div class="flex-shrink-0">
                                                 <v-icon
-                                                    name="ri-error-warning-line"
-                                                    scale="1.1"
-                                                    class="text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border border-yellow-800/25 rounded-full p-0.5 mt-0.5"
+                                                    :name="
+                                                        isBranchRelease
+                                                            ? 'md-warningamber-round'
+                                                            : 'ri-error-warning-line'
+                                                    "
+                                                    :scale="isBranchRelease ? 1.1 : 1.0"
+                                                    class="text-yellow-600 dark:text-yellow-500 p-0.5 mt-px"
                                                 />
                                             </div>
                                             <span
                                                 class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col-reverse md:flex-row gap-2"
                                             >
                                                 {{
-                                                    uploadedFile
-                                                        ? tr("updater_matching_release_warning", {
-                                                              type: tr("updater_upload_file"),
-                                                          })
-                                                        : tr("updater_matching_release_warning", {
-                                                              type: tr("updater_select_release"),
-                                                          })
-                                                }}.
+                                                    isMatchingRelease
+                                                        ? uploadedFile
+                                                            ? tr(
+                                                                  "updater_matching_release_warning",
+                                                                  {
+                                                                      type: tr(
+                                                                          "updater_upload_file",
+                                                                      ),
+                                                                  },
+                                                              )
+                                                            : tr(
+                                                                  "updater_matching_release_warning",
+                                                                  {
+                                                                      type: tr(
+                                                                          "updater_select_release",
+                                                                      ),
+                                                                  },
+                                                              )
+                                                        : isBranchRelease
+                                                          ? tr("updater_branch_warning")
+                                                          : ""
+                                                }}
                                                 <div class="flex flex-row gap-px">
                                                     <a
                                                         class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100 vp-external-link-icon"
-                                                        :href="`${getLocalizedPath('/releases')}/${currentDeviceVersion}`"
+                                                        :href="
+                                                            isBranchRelease
+                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/tree/${selectedRelease?.version}`
+                                                                : `${getLocalizedPath('/releases')}/${currentDeviceVersion}`
+                                                        "
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
-                                                        {{ currentDeviceVersion }}
+                                                        {{
+                                                            isBranchRelease
+                                                                ? selectedRelease?.version +
+                                                                  " (Github)"
+                                                                : currentDeviceVersion
+                                                        }}
                                                     </a>
                                                 </div>
                                             </span>
@@ -673,7 +689,7 @@ onBeforeUnmount(() => {
                                                 </div>
                                                 <template #content>
                                                     <div
-                                                        class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-center justify-center"
+                                                        class="prose prose-sm dark:prose-invert !text-white max-w-none text-center justify-center"
                                                     >
                                                         <span
                                                             v-html="

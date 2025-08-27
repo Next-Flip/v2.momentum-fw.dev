@@ -2,7 +2,7 @@
 import { useScroll, useWindowSize } from "@vueuse/core";
 import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
-import type { ReleaseItem } from "../../../_data/releases";
+import { branchReleases, type ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
 import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
 
@@ -80,9 +80,23 @@ const displayVersion = computed(() => {
     return release.version;
 });
 
+const isBranchRelease = computed(() => {
+    if (!displayRelease.value) return false;
+    return branchReleases.some((r) => r.version === displayRelease.value?.version);
+});
+
+function getIconContent(branch: string, mainline: string, commit: string): string {
+    if (isBranchRelease.value) return branch;
+    if (isMainline.value) return mainline;
+    return commit;
+}
+
 const parsedChangelog = computed(() => {
     if (!displayRelease.value?.changelog) return "";
-    const withGitHubLinks = replaceIssuesAndMentions(displayRelease.value.changelog);
+    const withGitHubLinks = replaceIssuesAndMentions(
+        displayRelease.value.changelog,
+        isBranchRelease.value,
+    );
     return md.render(withGitHubLinks);
 });
 
@@ -98,8 +112,20 @@ const shouldShowExternalLink = computed(() => {
 });
 
 const releaseHref = computed(() => {
+    if (isBranchRelease.value) {
+        return `https://github.com/Next-Flip/Momentum-Firmware/tree/${displayRelease.value?.version}`;
+    }
     if (!shouldShowExternalLink.value || !displayRelease.value) return "";
     return getLocalizedPath(`/releases/${displayRelease.value.version}`);
+});
+
+const expandDisabled = computed(() => {
+    return (
+        (!props.uploadedFileRelease && !props.selectedRelease) ||
+        isClosed.value ||
+        props.showUpdateOverlay ||
+        !!hasUploadedFileWithoutChangelog.value
+    );
 });
 </script>
 
@@ -137,14 +163,22 @@ const releaseHref = computed(() => {
                             :aria-label="tr('releases_current_version')"
                         >
                             <v-icon
-                                :name="isMainline ? 'oi-tag' : 'oi-git-commit'"
+                                :name="getIconContent('oi-git-branch', 'oi-tag', 'oi-git-commit')"
                                 :aria-label="
-                                    isMainline ? tr('releases_mainline') : tr('releases_devbuild')
+                                    getIconContent(
+                                        tr('updater_branch_label'),
+                                        tr('releases_mainline'),
+                                        tr('releases_devbuild'),
+                                    )
                                 "
                                 :title="
-                                    isMainline ? tr('releases_mainline') : tr('releases_devbuild')
+                                    getIconContent(
+                                        tr('updater_branch_label'),
+                                        tr('releases_mainline'),
+                                        tr('releases_devbuild'),
+                                    )
                                 "
-                                :scale="isMainline ? 0.85 : 1"
+                                :scale="isBranchRelease ? 0.9 : isMainline ? 0.85 : 1"
                             />
                         </div>
                         <Tooltip :disabled="!shouldShowExternalLink" :delay="0" position="right">
@@ -153,12 +187,16 @@ const releaseHref = computed(() => {
                                 :href="releaseHref"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-sm font-semibold text-vp-1 uppercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
+                                class="text-sm font-semibold text-vp-1 lowercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
                             >
                                 {{ displayVersion }}
                             </a>
                             <template #content>
-                                {{ tr("updater_go_to_release") }}
+                                {{
+                                    isBranchRelease
+                                        ? tr("updater_go_to_branch")
+                                        : tr("updater_go_to_release")
+                                }}
                             </template>
                         </Tooltip>
                         <div
@@ -170,15 +208,7 @@ const releaseHref = computed(() => {
                     </template>
                 </div>
                 <div v-if="supportsSerialPort()" class="flex items-center gap-1 flex-shrink-0">
-                    <Tooltip
-                        :delay="0"
-                        :z-index="9999"
-                        :disabled="
-                            (!uploadedFileRelease && !selectedRelease) ||
-                            isClosed ||
-                            showUpdateOverlay
-                        "
-                    >
+                    <Tooltip :delay="0" :z-index="9999" :disabled="!!expandDisabled">
                         <button
                             class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                             :class="{
@@ -191,6 +221,7 @@ const releaseHref = computed(() => {
                                     (!uploadedFileRelease && !selectedRelease && !isExpanded) ||
                                     isClosed,
                             }"
+                            :disabled="!!expandDisabled"
                             :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
                             @click="handleToggleExpand"
                         >
@@ -237,10 +268,17 @@ const releaseHref = computed(() => {
             <div
                 v-if="isAccessible && !isClosed"
                 ref="el"
-                class="flex-1 overflow-y-auto px-4 sm:px-6 mr-[7px] relative transition-all duration-300 ease-in-out"
-                :class="{ 'px-8 pb-8': isExpanded }"
+                class="flex-1 overflow-y-auto mr-[7px] relative"
+                :class="{
+                    'px-8 pb-8': isExpanded,
+                    'pt-4 px-4 sm:px-5': isBranchRelease,
+                    'px-4 sm:px-6': !isBranchRelease,
+                }"
             >
-                <div class="prose prose-sm dark:prose-invert max-w-none text-vp-1 mb-6">
+                <div
+                    class="prose prose-sm dark:prose-invert max-w-none text-vp-1 mb-5"
+                    :class="{ 'prose-branch': isBranchRelease }"
+                >
                     <div class="" v-html="parsedChangelog"></div>
                 </div>
             </div>
@@ -279,6 +317,11 @@ const releaseHref = computed(() => {
 </template>
 
 <style scoped>
+.prose-branch :deep(p) {
+    margin-top: 0.15rem !important;
+    margin-bottom: 0.15rem !important;
+}
+
 .prose :deep(h1),
 .prose :deep(h2),
 .prose :deep(h3),
@@ -344,7 +387,7 @@ const releaseHref = computed(() => {
 }
 
 .prose :deep(strong) {
-    color: var(--vp-c-text-1);
+    color: var(--vp-c-brand-1);
     font-weight: 600;
 }
 
@@ -353,9 +396,19 @@ const releaseHref = computed(() => {
     font-style: italic;
 }
 
+.prose-branch :deep(code) {
+    margin-right: 4px;
+}
+
 .prose :deep(code) {
+    font-size: 13px;
     color: var(--vp-c-alternate-1);
     background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent);
+}
+
+.prose :deep(code):before,
+.prose :deep(code):after {
+    content: "";
 }
 
 .changelog-expanded .prose {

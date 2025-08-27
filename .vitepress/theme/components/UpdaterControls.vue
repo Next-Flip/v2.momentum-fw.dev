@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useScroll } from "@vueuse/core";
 import { computed, inject, ref, useTemplateRef } from "vue";
-import type { ReleaseItem } from "../../../_data/releases";
+import { branchReleases, type ReleaseChannel, type ReleaseItem } from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
+import { useTempState } from "../composables/useTempState";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 import { supportsSerialPort } from "../util";
@@ -23,7 +24,7 @@ const { dots } = useDots();
 const { ifCurrentTheme } = useThemeSwitcher();
 
 interface Props {
-    selectedChannel: "mainline" | "devbuild" | null;
+    selectedChannel: ReleaseChannel | null;
     selectedRelease: ReleaseItem | null;
     channelReleases: ReleaseItem[];
     uploadedFile?: File | null;
@@ -33,6 +34,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const { isConnected: connectionIsConnected, connectionState, deviceInfo } = useConnectionInfo();
+
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 
 const {
@@ -41,13 +43,21 @@ const {
     isHovered: isInstallButtonHovered,
 } = useSharedHover("disabled-install-button");
 
+const downloadState = useTempState({
+    beforeIcon: "la-download-solid",
+    afterIcon: "oi-check",
+    beforeText: () => tr("updater_download_release"),
+    afterText: () => tr("updater_downloaded"),
+});
+
 const emit = defineEmits<{
-    "channel-change": [channel: "mainline" | "devbuild"];
+    "channel-change": [channel: ReleaseChannel];
     "release-change": [release: ReleaseItem];
     "flash-firmware": [];
     "download-release": [];
 }>();
 
+const isBranchRelease = computed(() => props.selectedChannel === "branch");
 const isConnected = computed(() => connectionIsConnected.value);
 const canFlash = computed(() => {
     if (!supportsSerialPort()) return false;
@@ -61,6 +71,8 @@ const channelDropdownRef = ref<HTMLElement | null>(null);
 const releaseDropdownRef = ref<HTMLElement | null>(null);
 const isChannelDropdownOpen = ref(false);
 const isReleaseDropdownOpen = ref(false);
+const hoveredReleaseIndex = ref<number | null>(null);
+const versionTextRefs = ref<(HTMLElement | null)[]>([]);
 
 useClickOutside([
     {
@@ -88,6 +100,15 @@ const channelOptions = computed(() => [
         label: tr("updater_development_label"),
         description: tr("updater_development_description"),
     },
+    ...(branchReleases.length > 0
+        ? [
+              {
+                  value: "branch",
+                  label: tr("updater_branch_label"),
+                  description: tr("updater_branch_description"),
+              },
+          ]
+        : []),
 ]);
 
 const channelLabel = computed(() => {
@@ -99,7 +120,13 @@ const channelLabel = computed(() => {
 const releaseLabel = computed(() => {
     if (!props.selectedRelease) return tr("updater_select_version");
     const release = props.selectedRelease;
-    return `${release.version} (${release.timestamp ? formatDate(release.timestamp, "short") : tr("updater_unknown_date")})`;
+    return `${release.version} (${
+        isBranchRelease.value
+            ? release.branch
+            : release.timestamp
+              ? formatDate(release.timestamp, "short")
+              : tr("updater_unknown_date")
+    })`;
 });
 
 const toggleChannelDropdown = () => {
@@ -122,7 +149,7 @@ const toggleReleaseDropdown = () => {
     }
 };
 
-const selectChannel = (channel: "mainline" | "devbuild") => {
+const selectChannel = (channel: ReleaseChannel) => {
     emit("channel-change", channel);
     isChannelDropdownOpen.value = false;
 };
@@ -137,6 +164,7 @@ const handleFlashFirmware = () => {
 };
 
 const handleDownloadRelease = () => {
+    downloadState.trigger();
     emit("download-release");
 };
 
@@ -145,6 +173,17 @@ const installTooltipContent = computed(() => {
     if (isConnected.value && !canFlash.value) return tr("updater_flash_select_release_or_file");
     return tr("updater_flash_button_disconnected");
 });
+
+const shouldScrollVersion = (index: number) => {
+    const textElement = versionTextRefs.value[index];
+    if (!textElement) return false;
+    return textElement.scrollWidth > textElement.clientWidth;
+};
+
+const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
+    if (!channel) return false;
+    return channel === "branch" && props.selectedRelease?.version === version;
+};
 </script>
 
 <template>
@@ -177,11 +216,7 @@ const installTooltipContent = computed(() => {
                         </div>
                     </button>
                     <Transition name="fade-dropdown">
-                        <div
-                            v-if="isChannelDropdownOpen"
-                            class="dropdown-menu-container left-0"
-                            style="min-width: 100%; left: 0; right: auto"
-                        >
+                        <div v-if="isChannelDropdownOpen" class="dropdown-menu-container left-0">
                             <div
                                 class="dropdown-menu relative"
                                 :class="{ 'is-visible': isChannelDropdownOpen }"
@@ -192,13 +227,12 @@ const installTooltipContent = computed(() => {
                                     <span
                                         v-for="channel in channelOptions"
                                         :key="channel.value"
-                                        class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
+                                        class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                         :class="{
                                             'is-selected': selectedChannel === channel.value,
+                                            'is-branch': channel.value === 'branch',
                                         }"
-                                        @click="
-                                            selectChannel(channel.value as 'mainline' | 'devbuild')
-                                        "
+                                        @click="selectChannel(channel.value as ReleaseChannel)"
                                     >
                                         <div
                                             class="flex flex-row items-center gap-3 min-w-0 flex-1"
@@ -214,10 +248,24 @@ const installTooltipContent = computed(() => {
                                                     :class="{
                                                         'text-vp-brand-1/60':
                                                             selectedChannel === channel.value,
+                                                        'text-yellow-700/80 dark:text-yellow-500/50':
+                                                            selectedChannel === channel.value &&
+                                                            channel.value === 'branch',
                                                     }"
                                                 >
                                                     {{ channel.description }}
                                                 </span>
+                                            </div>
+
+                                            <div
+                                                v-if="channel.value === 'branch'"
+                                                class="flex-shrink-0"
+                                            >
+                                                <v-icon
+                                                    name="md-warningamber-round"
+                                                    :scale="0.75"
+                                                    class="text-yellow-600 dark:text-yellow-500"
+                                                />
                                             </div>
                                         </div>
                                     </span>
@@ -232,7 +280,13 @@ const installTooltipContent = computed(() => {
                         class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
-                        {{ tr("updater_version_dropdown_label") }}
+                        {{
+                            tr(
+                                selectedChannel === "branch"
+                                    ? "updater_branch_dropdown_label"
+                                    : "updater_version_dropdown_label",
+                            )
+                        }}
                     </label>
                     <button
                         ref="releaseDropdownRef"
@@ -256,21 +310,17 @@ const installTooltipContent = computed(() => {
                         </div>
                     </button>
                     <Transition name="fade-dropdown">
-                        <div
-                            v-if="isReleaseDropdownOpen"
-                            class="dropdown-menu-container right-0"
-                            style="min-width: 100%; right: 0; left: auto"
-                        >
+                        <div v-if="isReleaseDropdownOpen" class="dropdown-menu-container right-0">
                             <ScrollFade
-                                :show="!arrivedState.top"
+                                :show="!arrivedState.top && selectedChannel !== 'branch'"
                                 position="top"
-                                :opacity="30"
+                                :opacity="40"
                                 class="mr-4 z-10"
                             />
                             <ScrollFade
-                                :show="!arrivedState.bottom"
+                                :show="!arrivedState.bottom && selectedChannel !== 'branch'"
                                 position="bottom"
-                                :opacity="30"
+                                :opacity="40"
                                 class="mr-4 z-10"
                             />
                             <div
@@ -279,31 +329,76 @@ const installTooltipContent = computed(() => {
                             >
                                 <div
                                     ref="el"
-                                    class="flex flex-col overflow-hidden max-h-[238px] pr-[7px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    class="flex flex-col overflow-hidden max-h-[238px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    :class="{ 'pr-[7px]': selectedChannel !== 'branch' }"
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
                                         :key="release.version"
-                                        class="dropdown-item flex flex-row min-h-7 items-center justify-between px-3 py-2 cursor-pointer transition-colors duration-100 w-full z-[5] text-[13px] overflow-hidden min-w-0"
+                                        class="dropdown-item flex flex-row min-h-8 max-h-8 items-center justify-between px-3 py-2 cursor-pointer w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                         :class="{
                                             'is-selected':
                                                 selectedRelease?.version === release.version,
                                             'rounded-t-[4px]': index === 0,
                                             'rounded-b-[4px]': index === channelReleases.length - 1,
+                                            '!bg-yellow-600/5 hover:!bg-yellow-500/10 is-branch':
+                                                isBranchSelected(selectedChannel, release.version),
                                         }"
                                         @click="selectRelease(release)"
+                                        @mouseenter="hoveredReleaseIndex = index"
+                                        @mouseleave="hoveredReleaseIndex = null"
                                     >
-                                        <div class="flex flex-row items-center gap-2 min-w-0">
-                                            <span
-                                                class="font-medium text-vp-1 font-mono flex-shrink-0 select-none"
-                                                :class="{
-                                                    'text-vp-brand-1':
-                                                        selectedRelease?.version ===
-                                                        release.version,
-                                                }"
-                                            >
-                                                {{ release.version }}
-                                            </span>
+                                        <div
+                                            class="flex flex-row items-center gap-2 min-w-0 flex-1"
+                                        >
+                                            <div class="flex-1 overflow-hidden relative min-w-0">
+                                                <div
+                                                    v-if="
+                                                        shouldScrollVersion(index) &&
+                                                        hoveredReleaseIndex === index
+                                                    "
+                                                    class="marquee relative w-full overflow-hidden"
+                                                >
+                                                    <span
+                                                        class="inline-block whitespace-nowrap pr-0 marquee-content font-normal text-vp-1 font-mono select-none"
+                                                        :class="{
+                                                            'text-vp-brand-1':
+                                                                selectedRelease?.version ===
+                                                                release.version,
+                                                            'text-yellow-700 dark:text-yellow-500':
+                                                                isBranchSelected(
+                                                                    selectedChannel,
+                                                                    release.version,
+                                                                ),
+                                                        }"
+                                                    >
+                                                        {{ release.version }}
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    v-else
+                                                    :ref="
+                                                        (el) => {
+                                                            if (el)
+                                                                versionTextRefs[index] =
+                                                                    el as HTMLElement;
+                                                        }
+                                                    "
+                                                    class="font-normal text-vp-1 font-mono select-none overflow-hidden text-ellipsis whitespace-nowrap block"
+                                                    :class="{
+                                                        'text-vp-brand-1':
+                                                            selectedRelease?.version ===
+                                                            release.version,
+                                                        'text-yellow-700 dark:text-yellow-500':
+                                                            isBranchSelected(
+                                                                selectedChannel,
+                                                                release.version,
+                                                            ),
+                                                    }"
+                                                >
+                                                    {{ release.version }}
+                                                </span>
+                                            </div>
                                             <Tooltip
                                                 v-if="
                                                     isConnected &&
@@ -316,7 +411,7 @@ const installTooltipContent = computed(() => {
                                                           release.version)
                                                 "
                                                 :delay="0"
-                                                :position="'right'"
+                                                :position="'top'"
                                                 :z-index="9999"
                                             >
                                                 <div
@@ -334,16 +429,23 @@ const installTooltipContent = computed(() => {
                                             </Tooltip>
                                         </div>
                                         <span
-                                            class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono select-none"
+                                            class="text-xs text-vp-3 ml-3 font-mono select-none overflow-hidden text-ellipsis whitespace-nowrap max-w-[80px]"
                                             :class="{
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.version === release.version,
+                                                'text-yellow-700/80 dark:text-yellow-500/60':
+                                                    isBranchSelected(
+                                                        selectedChannel,
+                                                        release.version,
+                                                    ),
                                             }"
                                         >
                                             {{
-                                                release.timestamp
-                                                    ? formatDate(release.timestamp, "fullYear")
-                                                    : tr("updater_unknown_date")
+                                                isBranchRelease
+                                                    ? release.branch
+                                                    : release.timestamp
+                                                      ? formatDate(release.timestamp, "fullYear")
+                                                      : tr("updater_unknown_date")
                                             }}
                                         </span>
                                     </div>
@@ -375,7 +477,7 @@ const installTooltipContent = computed(() => {
                         <div class="action w-10 z-[5]">
                             <button
                                 :disabled="!!uploadedFile || !selectedRelease"
-                                :aria-label="tr('download')"
+                                :aria-label="downloadState.currentText.value"
                                 class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
                                 :class="
                                     !uploadedFile && selectedRelease
@@ -383,9 +485,20 @@ const installTooltipContent = computed(() => {
                                         : 'text-vp-3 cursor-not-allowed opacity-50'
                                 "
                                 download
+                                @mousedown="downloadState.handleMouseDown"
+                                @mouseup="downloadState.handleMouseUp"
+                                @mouseleave="downloadState.handleMouseLeave"
                                 @click="handleDownloadRelease"
                             >
-                                <v-icon name="la-download-solid" :scale="1.1" />
+                                <v-icon
+                                    :class="{
+                                        'scale-95': downloadState.isPressed.value,
+                                    }"
+                                    :name="downloadState.currentIcon.value"
+                                    :scale="
+                                        downloadState.currentIcon.value === 'oi-check' ? 0.95 : 1.1
+                                    "
+                                />
                             </button>
                         </div>
                         <template #content>
@@ -403,8 +516,10 @@ const installTooltipContent = computed(() => {
                     :class="[
                         canFlash &&
                             !isMatchingRelease &&
+                            !isBranchRelease &&
                             '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
-                        isMatchingRelease &&
+                        canFlash &&
+                            (isMatchingRelease || isBranchRelease) &&
                             'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3',
                         isInstallButtonHovered && 'opacity-90 transition-all duration-200',
                     ]"
@@ -490,7 +605,7 @@ const installTooltipContent = computed(() => {
     font-size: 14px;
     color: var(--vp-c-text-1);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.1s;
     line-height: 1.6;
     min-height: 38px;
     gap: 10px;
@@ -521,8 +636,7 @@ const installTooltipContent = computed(() => {
     position: absolute;
     top: calc(100% + 5px);
     z-index: 10;
-    width: max-content;
-    min-width: 100%;
+    width: 100%;
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
     padding: 0 7px 0 7px;
@@ -544,7 +658,7 @@ const installTooltipContent = computed(() => {
 .dropdown-menu {
     background-color: transparent;
     transform: translateY(-8px);
-    transition: transform 0.2s ease;
+    transition: transform 0.1s ease;
     overflow: hidden;
     max-height: 250px;
     display: flex;
@@ -557,6 +671,14 @@ const installTooltipContent = computed(() => {
 
 .dropdown-item:hover {
     background-color: color-mix(in srgb, var(--vp-c-text-1) 5%, transparent);
+}
+
+.dropdown-item.is-branch:hover {
+    @apply bg-yellow-600/5;
+}
+
+.dark .dropdown-item.is-branch:hover {
+    @apply bg-yellow-500/10;
 }
 
 .dark .dropdown-item:hover {
@@ -572,6 +694,10 @@ const installTooltipContent = computed(() => {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 15%, transparent);
 }
 
+.dropdown-item.is-branch.is-selected {
+    @apply bg-yellow-600/5 text-yellow-700 dark:text-yellow-500 hover:bg-yellow-500/10;
+}
+
 .fade-dropdown-enter-active,
 .fade-dropdown-leave-active {
     transition: opacity 0.2s ease;
@@ -580,6 +706,22 @@ const installTooltipContent = computed(() => {
 .fade-dropdown-enter-from,
 .fade-dropdown-leave-to {
     opacity: 0;
+}
+
+.marquee-content {
+    animation: marquee 2.5s linear infinite alternate;
+}
+
+@keyframes marquee {
+    0%,
+    10% {
+        transform: translateX(0);
+    }
+
+    90%,
+    100% {
+        transform: translateX(-15%);
+    }
 }
 
 .download-button-small {
