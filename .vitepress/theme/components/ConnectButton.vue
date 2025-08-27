@@ -104,13 +104,13 @@ const handleMouse = (v: boolean) => {
     }
 };
 
-const { cmd_c } = useMagicKeys({
+const { cmd_enter } = useMagicKeys({
     passive: false,
     onEventFired(e) {
-        if (e.metaKey && e.key === "c" && e.type === "keyup") e.preventDefault();
+        if (e.metaKey && e.key === "enter" && e.type === "keyup") e.preventDefault();
     },
 });
-whenever(cmd_c, () => checkConnect());
+whenever(cmd_enter, () => checkConnect());
 
 watch(connectionState, (newState, oldState) => {
     if (newState === "connected" && oldState !== "connected") {
@@ -223,7 +223,7 @@ onMounted(() => {
                         >
                             <span class="DocSearch-Button-Keys"
                                 ><kbd class="DocSearch-Button-Key"></kbd
-                                ><kbd class="DocSearch-Button-Key">C</kbd></span
+                                ><kbd class="DocSearch-Button-Key">↵</kbd></span
                             >
                         </div>
                     </button>
