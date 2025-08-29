@@ -38,7 +38,7 @@ next:
 
 Asset Packs are a feature exclusive to Momentum Firmware (and its predecessor Xtreme Firmware) that allows you to load custom Animation and Icon sets without recompiling the firmware or messing with manifest.txt files (as a user). Here you can find info on how to install Asset Packs and also how to make your own.
 
-## How to install Asset Packs
+## [How to install Asset Packs](/wiki/Assets#how-to-install-asset-packs)
 
 Installing Asset Packs is quite easy and straightforward. First, make sure you're on an updated version of Momentum before you begin, Asset Packs were added in v40! Then, find some packs to install (we have a channel in our [Discord](https://discord.gg/afTC8Eenr4) where you can find some) or make your own (see below). Once you have some packs to install:
 
@@ -48,7 +48,7 @@ Installing Asset Packs is quite easy and straightforward. First, make sure you'r
 `SD/asset_packs/PackName/Icons`.</sub>
 3. Now simply open the Momentum Settings app (from the home screen press `UP` and then `Momentum Settings`) and select the asset pack you want. When you back out, Flipper will restart and your animations and icons will use the ones from the selected pack!
 
-## Create your own Asset Packs
+## [Create your own Asset Packs](/wiki/Assets#create-your-own-asset-packs)
 
 Before we begin, it's better to understand a little on how they work. Asset Packs are made of 2 parts: `Anims` and `Icons`.
 
@@ -142,7 +142,7 @@ This system supports **all** internal assets!
 
 <br>
 
-### Cool, I read all that, but how do I make one???
+## [Cool, I read all that, but how do I make one???](/wiki/Assets#cool-i-read-all-that-but-how-do-i-make-one)
 
 All the .bm and .bmx struggles are dealt with by the packer system, which is in `scripts/asset_packer.py`; when making your Asset Pack you will only be working with .png images and meta.txt/manifest.txt/frame_rate files. As explained above, packs are made of 2 parts, Anims and Icons, but you don't have to include both - if you only include Anims, then the default SFW Icons will be used, and viceversa. You have 2 options: make standalone Asset Packs (recommended), or build them along with the firmware.
 

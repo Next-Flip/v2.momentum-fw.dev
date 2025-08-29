@@ -43,19 +43,19 @@ The Interface settings allow you to customize the visual appearance and behavior
 Customize animations and visual themes through Asset Packs:
 
 - [`Asset Pack`](Graphics.md#asset-pack): Load custom animations, icons, and fonts
-- [`Animation Settings`](Graphics.md#animation-settings)
-  - [`Anim Speed`](Graphics.md#anim-speed): Control playback speed (25-300%)
-  - [`Cycle Anims`](Graphics.md#cycle-anims): Set animation change intervals
-  - [`Unlock Anims`](Graphics.md#unlock-anims): Toggle special unlock effects
+- [`Anim Speed`](Graphics.md#anim-speed): Control playback speed (25-300%)
+- [`Cycle Anims`](Graphics.md#cycle-anims): Set animation change intervals
+- [`Unlock Anims`](Graphics.md#unlock-anims): Toggle special unlock effects
 
 ## [Main Menu](Mainmenu.md)
 
 Configure your main menu appearance and content:
 
 - [`Menu Style`](Mainmenu.md#menu-style): Choose from 9 different menu layouts
-- [`Menu Management`](Mainmenu.md#menu-management)
-  - [`Reset Menu`](Mainmenu.md#reset-menu): Restore default configuration
-  - [`App Management`](Mainmenu.md#app-management): Add, remove, and arrange apps
+- [`Reset Menu`](Mainmenu.md#reset-menu): Restore default configuration
+- [`Add App`](Mainmenu.md#add-app): Add new items to your menu
+- [`Move App`](Mainmenu.md#move-app): Rearrange the order of apps in your menu
+- [`Remove App`](Mainmenu.md#remove-app): Delete apps from your menu
 
 ## [Lock Screen](Lockscreen.md)
 
@@ -67,6 +67,14 @@ Set up security and lock screen behavior:
 - [`Allow BLE RPC while locked`](Lockscreen.md#allow-ble-rpc-while-locked): Control Bluetooth connectivity while locked
 - [`Allow Poweroff`](Lockscreen.md#allow-poweroff): Control power options while locked
 - [`Lockscreen Elements`](Lockscreen.md#lockscreen-elements): Configure info and visual elements on the lockscreen
+    - [`Info`](Lockscreen.md#info): Configure info on the lockscreen
+        - [`Show Time`](Lockscreen.md#info): Toggle time display
+        - [`Show Seconds`](Lockscreen.md#info): Include seconds in time display
+        - [`Show Date`](Lockscreen.md#info): Display current date
+    - [`Visual`](Lockscreen.md#visual): Customize lockscreen appearance
+        - [`Show Statusbar`](Lockscreen.md#visual): Toggle visibility of entire statusbar
+        - [`Unlock Prompt`](Lockscreen.md#visual): Show the `Press UP to unlock!` prompt
+        - [`Transparent`](Lockscreen.md#visual): Allow asset pack animation visibility through lockscreen
 
 ## [Status Bar](Statusbar.md)
 

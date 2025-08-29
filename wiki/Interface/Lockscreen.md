@@ -67,11 +67,11 @@ Control power options while locked:
 - `OFF`: Prevent device shutdown
 - `ON`<sup><em id="default"> Default </em></sup>: Allow power off while locked
 
-## [Lockscreen Elements](Lockscreen#Lockscreen-Elements)
+## Lockscreen Elements
 
 <sup>`ON`/`OFF` Toggles</sup>
 
-### Info
+### [Info](Lockscreen#Info)
 
 Configure info on the lockscreen:
 
@@ -79,7 +79,7 @@ Configure info on the lockscreen:
 - `Show Seconds`: Include seconds in time display
 - `Show Date`: Display current date
 
-### Visual
+### [Visual](Lockscreen#Visual)
 
 Customize lockscreen appearance:
 

@@ -1066,9 +1066,27 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
     background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent) !important;
     color: var(--vp-c-alternate-1) !important;
 }
-
 .theme-white .vp-doc :not(pre) > code {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent) !important;
+    color: var(--vp-c-brand-1) !important;
+}
+.vp-doc a {
+    transition: color 0.1s ease;
+}
+.vp-doc a:has(> code) {
+    transition: text-decoration-color 0.1s ease;
+    text-decoration-color: var(--vp-c-alternate-1) !important;
+}
+.vp-doc a:has(> code):hover {
+    color: var(--vp-c-brand-1) !important;
+    text-decoration-color: var(--vp-c-brand-1) !important;
+}
+.vp-doc a > code {
+    transition: color 0.1s ease;
+    color: var(--vp-c-alternate-1) !important;
+    text-decoration-color: unset !important;
+}
+.vp-doc a > code:hover {
     color: var(--vp-c-brand-1) !important;
 }
 

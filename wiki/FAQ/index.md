@@ -1,6 +1,7 @@
 ---
 title: FAQ
 description: "Frequently asked questions and troubleshooting help"
+outline: [2, 2]
 head:
     - - meta
       - name: "description"
@@ -44,7 +45,9 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 
 </div>
 
-## Table of Contents
+---
+
+#### Table of Contents
 
 <div class="custom-toc">
 
