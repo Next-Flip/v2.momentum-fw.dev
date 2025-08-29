@@ -258,7 +258,7 @@ export type MessageSchema = {
     updater_keys_suffix: string;
     updater_firmware_section: string;
     updater_version_label: string;
-    updater_branch_label: string;
+    updater_firmware_branch_label: string;
     updater_build_date_label: string;
     updater_origin_label: string;
     updater_api_version_label: string;
@@ -297,6 +297,7 @@ export type MessageSchema = {
     updater_drop_file_browse: string;
     updater_file_example: string;
     updater_changelog: string;
+    updater_commits: string;
     updater_no_changes_found: string;
     updater_changelog_unavailable: string;
     updater_no_release_selected: string;
@@ -311,12 +312,17 @@ export type MessageSchema = {
     updater_flash_logs_appear: string;
     updater_channel_label: string;
     updater_version_dropdown_label: string;
+    updater_branch_dropdown_label: string;
     updater_select_channel: string;
     updater_select_version: string;
+    updater_select_branch: string;
     updater_mainline_label: string;
     updater_mainline_description: string;
     updater_development_label: string;
     updater_development_description: string;
+    updater_branch_label: string;
+    updater_branch_description: string;
+    updater_branch_warning: string;
     updater_unknown_date: string;
     updater_flash_button: string;
     updater_logger_initialized: string;
@@ -326,11 +332,13 @@ export type MessageSchema = {
     updater_flipper_not_connected_subtitle: string;
     updater_matching_release_warning: string;
     updater_download_release: string;
+    updater_downloaded: string;
     updater_flash_button_disconnected: string;
     updater_flash_select_release: string;
     updater_flash_select_release_or_file: string;
     updater_unavailable: string;
     updater_go_to_release: string;
+    updater_go_to_branch: string;
     updater_upload_file: string;
     updater_select_release: string;
     updater_flashing_unavailable: string;

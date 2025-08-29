@@ -18,8 +18,8 @@ interface DevbuildFile {
 
 export interface ReleaseItem {
     version: string;
-    branch: string;
-    date: string;
+    branch?: string;
+    date?: string;
     commit?: string;
     timestamp?: number;
     changelog?: string;
@@ -37,6 +37,17 @@ interface MainlineRelease {
     date: string;
     timestamp: number;
     files: MainlineFile[];
+}
+
+interface FirmwareChannel {
+    id: string;
+    title: string;
+    description: string;
+    versions: ReleaseItem[];
+}
+
+interface FirmwareDirectory {
+    channels: FirmwareChannel[];
 }
 
 function parseDateString(dateStr: string): number {
@@ -66,6 +77,32 @@ function parseDateString(dateStr: string): number {
         return Date.UTC(year, month, day, hour, minute) / 1000;
     }
     return 0;
+}
+
+async function fetchFirmwareDirectory(): Promise<FirmwareDirectory> {
+    try {
+        const data: FirmwareDirectory = await ofetch(
+            "https://up.momentum-fw.dev/firmware/directory.json",
+            {
+                timeout: 15000,
+                headers: {
+                    "User-Agent": "Momentum-Firmware-Website",
+                },
+            },
+        );
+
+        if (!data || !data.channels || !Array.isArray(data.channels)) {
+            throw new Error("❌ Invalid firmware directory structure received");
+        }
+
+        console.log(
+            `  Successfully fetched firmware directory with ${data.channels.length} channels`,
+        );
+        return data;
+    } catch (error) {
+        console.error("❌  Failed to fetch firmware directory:", error);
+        throw error;
+    }
 }
 
 async function fetchChangelogForVersion(version: string): Promise<string> {
@@ -461,9 +498,44 @@ export async function getReleaseAndDevbuilds() {
     }
 }
 
+async function getExtraBranches(
+    excludeBranches?: string[],
+): Promise<{ branchItems: ReleaseItem[] }> {
+    try {
+        const directory = await fetchFirmwareDirectory();
+        const branches = directory.channels.filter(
+            (branch) => !excludeBranches?.includes(branch.id),
+        );
+
+        const branchItems: ReleaseItem[] = [];
+        for (const branch of branches) {
+            const branchItem: ReleaseItem = {
+                // NOTE: yes these are backwards, makes things simpler in the updater controls
+                version: branch.id.replace("wip-", ""),
+                branch: branch.versions[0].version,
+                timestamp: branch.versions[0].timestamp,
+                changelog: branch.versions[0].changelog,
+                files: branch.versions[0].files,
+            };
+            branchItems.push(branchItem);
+        }
+        branchItems.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        console.log(
+            `  Found ${branchItems.length} extra branches: ${branchItems.map((item) => item.version).join(", ")}`,
+        );
+
+        return { branchItems };
+    } catch (error) {
+        console.error("❌ Failed to get extra branches:", error);
+        throw error;
+    }
+}
+
 async function updateReleases(
     mainlineItems: ReleaseItem[],
     devbuildItems: ReleaseItem[],
+    branchItems: ReleaseItem[],
 ): Promise<void> {
     console.log("Updating releases...");
 
@@ -474,12 +546,15 @@ async function updateReleases(
 
         const processedMainlineItems = mainlineItems.map((item) => ({ ...item }));
         const processedDevbuildItems = devbuildItems.map((item) => ({ ...item }));
+        const processedBranchItems = branchItems.map((item) => ({ ...item }));
 
         console.log(
             `  Processing ${processedMainlineItems.length} mainline items and ${processedDevbuildItems.length} devbuild items`,
         );
 
         const releasesContent = `${HEADER}
+
+export type ReleaseChannel = "mainline" | "devbuild" | "branch";
 
 export interface FirmwareFile {
     url: string;
@@ -501,8 +576,8 @@ export interface MainlineFile {
 
 export interface ReleaseItem {
     version: string;
-    branch: string;
-    date: string;
+    branch?: string;
+    date?: string;
     commit?: string;
     timestamp?: number;
     changelog?: string;
@@ -512,6 +587,8 @@ export interface ReleaseItem {
 export const mainlineReleases: ReleaseItem[] = ${jsonToTypeScript(processedMainlineItems)};
 
 export const devbuildReleases: ReleaseItem[] = ${jsonToTypeScript(processedDevbuildItems)};
+
+export const branchReleases: ReleaseItem[] = ${jsonToTypeScript(processedBranchItems)};
 
 // Filter releases for navigation: only latest mainline + recent devbuilds
 export function getRecentReleases() {
@@ -529,7 +606,9 @@ export function getRecentReleases() {
 export const recentReleases = getRecentReleases();
 
 export const getReleaseByVersion = (version: string) => {
-    return [...mainlineReleases, ...devbuildReleases].find((release) => release.version === version);
+    return [...mainlineReleases, ...devbuildReleases, ...branchReleases].find(
+        (release) => release.version === version,
+    );
 };
 `;
 
@@ -555,7 +634,9 @@ export async function fetchReleases() {
     console.log(`  Received ${mainlineItems.length} mainline releases`);
     console.log(`  Received ${devbuildItems.length} devbuild items`);
 
-    await updateReleases(mainlineItems, devbuildItems);
+    const { branchItems } = await getExtraBranches(["development", "release"]);
+
+    await updateReleases(mainlineItems, devbuildItems, branchItems);
 
     console.log("Releases generated successfully");
 }

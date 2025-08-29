@@ -1,22 +1,30 @@
 <script setup lang="ts">
 import { useWindowSize } from "@vueuse/core";
 import { ref } from "vue";
-import type { DevbuildFile, MainlineFile } from "../../../_data/releases";
+import type { DevbuildFile, FirmwareFile, MainlineFile } from "../../../_data/releases";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { downloadFile } from "../util";
 
-type FirmwareFile = DevbuildFile | MainlineFile;
+type File = FirmwareFile | DevbuildFile | MainlineFile;
 
 interface Props {
-    files: FirmwareFile[];
+    files: File[];
 }
 
 defineProps<Props>();
 const { width } = useWindowSize();
 const { ifCurrentTheme } = useThemeSwitcher();
 
-const getFileKey = (file: FirmwareFile) => {
-    return "url" in file ? file.url : file.filename;
+const getFileKey = (file: File) => {
+    return "url" in file ? file.url : "filename" in file ? file.filename : "";
+};
+
+const getFileName = (file: File) => {
+    return "filename" in file
+        ? file.filename
+        : "url" in file
+          ? file.url.split("/").pop() || ""
+          : "";
 };
 
 const buttonStates = ref<
@@ -30,7 +38,7 @@ const buttonStates = ref<
     >
 >({});
 
-const handleMouse = (file: FirmwareFile, action: "down" | "up" | "leave") => {
+const handleMouse = (file: File, action: "down" | "up" | "leave") => {
     const key = getFileKey(file);
     if (!buttonStates.value[key]) {
         buttonStates.value[key] = { isPressed: false, isSuccess: false };
@@ -43,13 +51,13 @@ const handleMouse = (file: FirmwareFile, action: "down" | "up" | "leave") => {
     }
 };
 
-const getDownloadUrl = (file: FirmwareFile) => {
+const getDownloadUrl = (file: File) => {
     return "url" in file
         ? file.url
         : `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
 };
 
-const handleDownload = (file: FirmwareFile) => {
+const handleDownload = (file: File) => {
     const key = getFileKey(file);
     if (!buttonStates.value[key]) {
         buttonStates.value[key] = { isPressed: false, isSuccess: false };
@@ -70,12 +78,12 @@ const handleDownload = (file: FirmwareFile) => {
     downloadFile(getDownloadUrl(file));
 };
 
-const getButtonIcon = (file: FirmwareFile) => {
+const getButtonIcon = (file: File) => {
     const key = getFileKey(file);
     return buttonStates.value[key]?.isSuccess ? "bi-check2" : "la-download-solid";
 };
 
-const getButtonScale = (file: FirmwareFile) => {
+const getButtonScale = (file: File) => {
     const key = getFileKey(file);
     return buttonStates.value[key]?.isPressed ? "scale-[0.99]" : "scale-100";
 };
@@ -85,18 +93,18 @@ const getButtonScale = (file: FirmwareFile) => {
     <div class="grid grid-cols-1 gap-3">
         <div
             v-for="file in files"
-            :key="'url' in file ? file.url : file.filename"
-            :aria-label="file.filename"
-            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-all duration-75 group cursor-pointer"
+            :key="getFileKey(file)"
+            :aria-label="getFileName(file)"
+            class="download-button flex items-center justify-between h-10 py-0.5 pl-2 pr-2.5 border border-vp-divider rounded-lg transition-transform duration-100 group cursor-pointer"
             :class="getButtonScale(file)"
-            @click="handleDownload(file)"
+            @click.stop="handleDownload(file)"
             @mousedown="handleMouse(file, 'down')"
             @mouseup="handleMouse(file, 'up')"
             @mouseleave="handleMouse(file, 'leave')"
         >
             <div
                 :class="[
-                    'py-2 pr-2 text-sm font-medium rounded-md transition-all duration-75 flex items-center justify-center flex-shrink-0 select-none',
+                    'py-2 pr-2 text-sm font-medium rounded-md flex items-center justify-center flex-shrink-0 select-none',
                     ifCurrentTheme(['orange'])
                         ? 'text-vp-brand-1 group-hover:text-black dark:group-hover:text-black'
                         : ifCurrentTheme(['white'])
@@ -118,9 +126,9 @@ const getButtonScale = (file: FirmwareFile) => {
                               : 'group-hover:text-white dark:group-hover:text-white',
                     ]"
                     :dir="width <= 640 ? 'rtl' : 'ltr'"
-                    :title="file.filename"
+                    :title="getFileName(file)"
                 >
-                    {{ file.filename }}
+                    {{ getFileName(file) }}
                 </span>
                 <div
                     class="text-xs select-none font-mono whitespace-nowrap ml-auto"

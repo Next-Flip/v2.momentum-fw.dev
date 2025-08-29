@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
 import type {
     DevbuildFile,
     FirmwareFile,
     MainlineFile,
     ReleaseItem,
 } from "../../../_data/releases";
-import { useClickOutside } from "../composables/useClickOutside";
 import { useI18n } from "../composables/useI18n";
 import { supportsSerialPort } from "../util";
 
@@ -26,17 +25,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     toggleDevFilesOpen: [devFilesOpen: boolean];
 }>();
-
-const devFilesRef = ref<HTMLElement | null>(null);
-
-useClickOutside({
-    element: devFilesRef,
-    callback: () => {
-        if (props.devFilesOpen) {
-            emit("toggleDevFilesOpen", false);
-        }
-    },
-});
 
 const installMethods = computed(() => [
     {
@@ -136,45 +124,38 @@ watch(
     <div v-if="selectedRelease?.files" class="relative px-6 sm:px-8 pt-32 pb-3">
         <div class="absolute inset-0 release-files-backdrop mb-3"></div>
         <div
-            class="relative z-10 flex flex-row justify-between items-end gap-1.5 pb-2 mb-3 border-b border-vp-divider"
+            class="relative z-10 flex flex-row justify-start items-center gap-1.5 pb-2 mb-3 border-b border-vp-divider"
         >
+            <div class="flex items-center justify-center text-sm text-vp-2/80">
+                <v-icon name="bi-file-earmark-zip" :scale="0.95" />
+            </div>
             <span
                 class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
                 >{{ tr("releases_files") }}</span
             >
-            <Transition
-                enter-active-class="transition-opacity duration-200 ease-in-out"
-                leave-active-class="transition-opacity duration-200 ease-in-out"
-                enter-from-class="opacity-0"
-                enter-to-class="opacity-100"
-                leave-from-class="opacity-100"
-                leave-to-class="opacity-0"
+            <div
+                class="flex items-center ml-auto opacity-0 transition-opacity duration-200 pointer-events-none select-none"
+                :class="{ 'opacity-100 pointer-events-auto': devFilesOpen }"
             >
-                <div v-if="devFilesOpen" class="flex items-center">
-                    <Tooltip :aria-label="tr('updater_close')" :delay="0" class="z-[1]">
-                        <button
-                            class="flex items-center justify-center text-vp-3/70 hover:text-vp-2 transition-colors duration-200 p-1 rounded cursor-pointer rotate-45"
-                            @click="emit('toggleDevFilesOpen', false)"
-                        >
-                            <v-icon name="hi-plus-sm" scale="1.1" />
-                        </button>
-                        <template #content>
-                            <span class="text-vp-1">{{ tr("updater_close") }}</span>
-                        </template>
-                    </Tooltip>
-                </div>
-            </Transition>
+                <Tooltip :aria-label="tr('updater_close')" :delay="0" class="z-[1]">
+                    <button
+                        class="flex items-center justify-center text-vp-3/70 hover:text-vp-2 transition-colors duration-200 p-1 rounded cursor-pointer rotate-45"
+                        @click="emit('toggleDevFilesOpen', false)"
+                    >
+                        <v-icon name="hi-plus-sm" scale="1.1" />
+                    </button>
+                    <template #content>
+                        <span class="text-neutral-50">{{ tr("updater_close") }}</span>
+                    </template>
+                </Tooltip>
+            </div>
         </div>
 
         <div v-if="categorizedFiles.regular.length > 0" class="relative z-10 mb-4">
-            <FileGrid :files="categorizedFiles.regular as any" />
+            <FileGrid :files="categorizedFiles.regular" />
         </div>
 
-        <div
-            v-if="categorizedFiles.development.length > 0"
-            ref="devFilesRef"
-            class="relative z-10 mt-3 mb-4"
-        >
+        <div v-if="categorizedFiles.development.length > 0" class="relative z-10 mt-3 mb-4">
             <button
                 class="flex gap-2 w-full text-left py-2 text-vp-2 hover:text-vp-1 items-center justify-start transition-colors duration-100 group"
                 @click="toggleDevelopmentSection"
@@ -239,7 +220,7 @@ watch(
                     </div>
                     <template #content>
                         <div
-                            class="prose prose-sm dark:prose-invert text-vp-1 max-w-none text-left justify-center"
+                            class="prose prose-sm dark:prose-invert !text-white max-w-none text-left justify-center"
                         >
                             <span
                                 v-html="
@@ -266,7 +247,7 @@ watch(
                         :href="method.href"
                         :target="method.isExternal ? '_blank' : undefined"
                         rel="noopener"
-                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-300 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
                         :class="[
                             method.show
                                 ? 'opacity-100 visible relative pointer-events-auto'

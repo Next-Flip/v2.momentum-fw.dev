@@ -2,7 +2,7 @@ import { onBeforeUnmount, onMounted, type Ref } from "vue";
 
 interface ClickOutsideTarget {
     element: Ref<HTMLElement | null>;
-    callback: () => void;
+    callback: (event?: MouseEvent) => void;
 }
 
 export function useClickOutside(targets: ClickOutsideTarget | ClickOutsideTarget[]) {
@@ -13,7 +13,7 @@ export function useClickOutside(targets: ClickOutsideTarget | ClickOutsideTarget
 
         for (const { element, callback } of targetArray) {
             if (element.value && !element.value.contains(target)) {
-                callback();
+                callback(event);
             }
         }
     };

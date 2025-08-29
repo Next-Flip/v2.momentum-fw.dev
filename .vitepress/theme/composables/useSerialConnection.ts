@@ -17,7 +17,14 @@ import {
     type SerialConnectionData,
     type SerialPort,
 } from "../types";
-import { fetchFirmware, fetchRegions, formatDuration, getCurrentLocale, unpack } from "../util";
+import {
+    fetchFirmware,
+    fetchRegions,
+    formatDuration,
+    getCurrentLocale,
+    getFirmwareDownloadUrl,
+    unpack,
+} from "../util";
 import { useProxiedUrl } from "./useProxiedUrl";
 import { useSettings } from "./useSettings";
 
@@ -72,32 +79,6 @@ const mapErrorToUserFriendly = (error: Error): string => {
     }
 
     return error.message;
-};
-
-const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
-    if (!release.files) return null;
-
-    for (const file of release.files) {
-        if (
-            "url" in file &&
-            file.url &&
-            "filename" in file &&
-            file.filename?.includes("update-mntm-") &&
-            file.filename?.endsWith(".tgz")
-        ) {
-            return file.url;
-        }
-
-        if (
-            "filename" in file &&
-            file.filename?.includes("update-mntm-") &&
-            file.filename.endsWith(".tgz")
-        ) {
-            return `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
-        }
-    }
-
-    return null;
 };
 
 export const useSerialConnection = () => {

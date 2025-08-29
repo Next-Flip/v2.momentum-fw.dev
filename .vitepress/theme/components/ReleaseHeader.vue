@@ -116,7 +116,7 @@ const handleHeaderClick = () => {
             >
                 <div class="flex flex-row items-center gap-1">
                     <div
-                        class="flex items-center justify-center text-sm text-vp-2/80 rounded-md w-7"
+                        class="flex items-center justify-center text-sm text-vp-2/80 rounded-md w-7 mt-px"
                         :aria-label="tr('releases_current_version')"
                     >
                         <v-icon
@@ -128,7 +128,9 @@ const handleHeaderClick = () => {
                             :scale="isMainline ? 0.85 : 1"
                         />
                     </div>
-                    <span class="text-lg leading-none font-semibold text-vp-1 uppercase font-mono">
+                    <span
+                        class="text-base leading-none font-semibold text-vp-1 lowercase font-mono"
+                    >
                         {{ selectedRelease?.version }}
                     </span>
                     <div

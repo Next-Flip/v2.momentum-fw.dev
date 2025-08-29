@@ -1,4 +1,5 @@
 import log from "loglevel";
+import type { ReleaseItem } from "scripts/releases.js";
 import messages, { SupportedLocales } from "../i18n/index.js";
 import { useI18n } from "./composables/useI18n";
 import type { LogoColor, RegionsData, ScreenColor } from "./types";
@@ -97,11 +98,19 @@ export const getRadioStackType = (radioStackType: string | number | undefined) =
     }
 };
 
-export const replaceIssuesAndMentions = (text: string): string => {
+export const replaceIssuesAndMentions = (text: string, isBranchRelease = false): string => {
     const a = (href: string, className: string, content: string) =>
-        `<a href="${href}" target="_blank" rel="noopener noreferrer" class="${className} font-bold transition-colors duration-200">${content}</a>`;
+        `<a href="${href}" target="_blank" rel="noopener noreferrer" class="${className} font-bold transition-colors duration-100 no-underline hover:underline">${content}</a>`;
 
-    let result = text.replace(/(?<![a-zA-Z])@([a-zA-Z0-9_-]+)/g, (_, username) =>
+    let result = text;
+
+    if (isBranchRelease) {
+        result = result.replace(/\\n/g, '\n')
+            .replace(/(\[`[a-f0-9]{8}`\])/g, '\n$1')
+            .replace(/^\n+/, '');
+    }
+
+    result = result.replace(/(?<![a-zA-Z])@([a-zA-Z0-9_-]+)/g, (_, username) =>
         a(
             `https://github.com/${username}`,
             "text-vp-brand-1 hover:text-vp-brand-2",
@@ -258,6 +267,45 @@ export const getCurrentLocale = (): SupportedLocales => {
     const potentialLocale = pathSegments[0];
     const supportedLocales = Object.keys(messages) as SupportedLocales[];
     return supportedLocales.includes(potentialLocale as SupportedLocales) ? (potentialLocale as SupportedLocales) : "en";
+};
+
+export const getFirmwareDownloadUrl = (release: ReleaseItem): string | null => {
+    if (!release.files) return null;
+
+    for (const file of release.files) {
+        // Handle branch files (url, type)
+        if (
+            "url" in file &&
+            file.url &&
+            "type" in file &&
+            file.type === "update_tgz" &&
+            file.url.includes("update-mntm-") &&
+            file.url.endsWith(".tgz")
+        ) {
+            return file.url;
+        }
+
+        // Handle mainline/devbuild files (filename)
+        if (
+            "url" in file &&
+            file.url &&
+            "filename" in file &&
+            file.filename?.includes("update-mntm-") &&
+            file.filename?.endsWith(".tgz")
+        ) {
+            return file.url;
+        }
+
+        if (
+            "filename" in file &&
+            file.filename?.includes("update-mntm-") &&
+            file.filename.endsWith(".tgz")
+        ) {
+            return `https://up.momentum-fw.dev/builds/firmware/dev/${file.filename}`;
+        }
+    }
+
+    return null;
 };
 
 interface ThemeConfig {

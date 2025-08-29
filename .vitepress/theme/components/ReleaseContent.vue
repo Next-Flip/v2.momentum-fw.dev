@@ -63,15 +63,15 @@ const toggleContentFade = (fade: boolean) => {
 
             <div
                 v-if="selectedRelease.changelog"
-                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6 opacity-100 transition-opacity duration-200"
-                :class="{ 'opacity-30': contentFade }"
+                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6"
             >
-                <div class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6">
+                <div
+                    class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6 transition-opacity duration-200 opacity-100"
+                    :class="{ 'opacity-40': contentFade }"
+                >
                     <span v-html="parsedChangelog"></span>
                 </div>
             </div>
-
-            <div class="h-px border-b border-vp-neutral/35 w-auto mx-6 sm:mx-8"></div>
 
             <div class="max-w-none files-container">
                 <ReleaseFiles
@@ -98,8 +98,7 @@ const toggleContentFade = (fade: boolean) => {
     background-image: linear-gradient(
         to top,
         color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
-        /* color-mix(in srgb, var(--vp-c-bg-dark) 98%, transparent) 50%, */
-            color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 70%,
+        color-mix(in srgb, var(--vp-c-bg-dark) 97%, transparent) 70%,
         color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
     );
     margin-top: -96px;
@@ -107,18 +106,7 @@ const toggleContentFade = (fade: boolean) => {
 
 .release-content {
     position: relative;
-    background-color: transparent;
-    backdrop-filter: blur(10px);
-}
-
-@media (min-width: 1024px) {
-    .release-content {
-        background-image: linear-gradient(
-            to bottom,
-            color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
-            color-mix(in srgb, var(--vp-c-text-1) 2%, transparent) 100%
-        );
-    }
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 70%, transparent);
 }
 
 @media (min-height: 1024px) {
@@ -128,14 +116,6 @@ const toggleContentFade = (fade: boolean) => {
             bottom: 0;
         }
     }
-}
-
-.dark .release-content {
-    background-image: linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--vp-c-text-1) 1%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
-    );
 }
 
 .release-date {

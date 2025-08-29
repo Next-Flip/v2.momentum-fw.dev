@@ -197,7 +197,7 @@ const deviceSections = computed(() => {
                     `${getLocalizedPath("/releases")}/${versionInReleases.value?.version || ""}`,
                     true,
                 ],
-                ["updater_branch_label", device.firmware_branch],
+                ["updater_firmware_branch_label", device.firmware_branch],
                 ["updater_build_date_label", formatBuildDate(device.firmware_build_date as string)],
                 ["updater_origin_label", device.firmware_origin_fork],
                 [
@@ -701,7 +701,7 @@ const deviceSections = computed(() => {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 15px 0 3px 0 !important;
-    padding-bottom: 5px;
+    padding-bottom: 4px;
     border-bottom: 1px solid var(--vp-c-divider);
 }
 
