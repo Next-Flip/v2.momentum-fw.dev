@@ -458,7 +458,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div
-        class="relative w-full flex flex-col items-center lg:py-14 lg:pb-28 lg:px-5 transition-colors duration-500"
+        class="relative w-full flex flex-col items-center lg:py-14 lg:px-5 transition-colors duration-500"
         :style="
             windowWidth >= 1024 && !isNarrowViewport
                 ? 'height: calc(100vh - var(--vp-nav-height));'
@@ -540,7 +540,7 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="isMatchingRelease || isBranchRelease"
-                                            class="flex flex-row items-start md:items-center justify-center gap-2 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 h-10"
+                                            class="flex flex-row items-start md:items-center justify-center gap-1 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"

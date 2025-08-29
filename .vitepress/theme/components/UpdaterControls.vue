@@ -492,7 +492,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                             >
                                 <v-icon
                                     :class="{
-                                        'scale-95': downloadState.isPressed.value,
+                                        'scale-90': downloadState.isPressed.value,
                                     }"
                                     :name="downloadState.currentIcon.value"
                                     :scale="

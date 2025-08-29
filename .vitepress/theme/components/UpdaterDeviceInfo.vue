@@ -293,8 +293,8 @@ const deviceSections = computed(() => {
     <div
         class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full transition-all duration-100 ease-in-out lg:py-0 bg-vp-dark/85"
         :class="{
-            '!border !border-vp-brand-1 box-border': isInstallButtonHovered,
-            'py-8 pb-12': !isConnected,
+            'py-8 pb-12 border border-transparent': !isConnected,
+            '!border !border-vp-brand-1 box-border': isInstallButtonHovered && !isConnected,
         }"
         :data-connected="isConnected"
         :data-hovered="isInstallButtonHovered"

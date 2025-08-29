@@ -544,12 +544,8 @@ async function updateReleases(
             throw new Error("❌ No mainline items provided for releases update");
         }
 
-        const processedMainlineItems = mainlineItems.map((item) => ({ ...item }));
-        const processedDevbuildItems = devbuildItems.map((item) => ({ ...item }));
-        const processedBranchItems = branchItems.map((item) => ({ ...item }));
-
         console.log(
-            `  Processing ${processedMainlineItems.length} mainline items and ${processedDevbuildItems.length} devbuild items`,
+            `  Processing ${mainlineItems.length} mainline items and ${devbuildItems.length} devbuild items`,
         );
 
         const releasesContent = `${HEADER}
@@ -584,11 +580,11 @@ export interface ReleaseItem {
     files?: FirmwareFile[] | DevbuildFile[] | MainlineFile[];
 }
 
-export const mainlineReleases: ReleaseItem[] = ${jsonToTypeScript(processedMainlineItems)};
+export const mainlineReleases: ReleaseItem[] = ${jsonToTypeScript(mainlineItems)};
 
-export const devbuildReleases: ReleaseItem[] = ${jsonToTypeScript(processedDevbuildItems)};
+export const devbuildReleases: ReleaseItem[] = ${jsonToTypeScript(devbuildItems)};
 
-export const branchReleases: ReleaseItem[] = ${jsonToTypeScript(processedBranchItems)};
+export const branchReleases: ReleaseItem[] = ${jsonToTypeScript(branchItems)};
 
 // Filter releases for navigation: only latest mainline + recent devbuilds
 export function getRecentReleases() {
@@ -634,9 +630,10 @@ export async function fetchReleases() {
     console.log(`  Received ${mainlineItems.length} mainline releases`);
     console.log(`  Received ${devbuildItems.length} devbuild items`);
 
-    const { branchItems } = await getExtraBranches(["development", "release"]);
+    // TODO: uncomment this to include extra branches
+    // const { branchItems } = await getExtraBranches(["development", "release"]);
 
-    await updateReleases(mainlineItems, devbuildItems, branchItems);
+    await updateReleases(mainlineItems, devbuildItems, []);
 
     console.log("Releases generated successfully");
 }
