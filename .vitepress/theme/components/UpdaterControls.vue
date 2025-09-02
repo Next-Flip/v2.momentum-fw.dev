@@ -44,7 +44,7 @@ const {
 } = useSharedHover("disabled-install-button");
 
 const downloadState = useTempState({
-    beforeIcon: "la-download-solid",
+    beforeIcon: "oi-download",
     afterIcon: "oi-check",
     beforeText: () => tr("updater_download_release"),
     afterText: () => tr("updater_downloaded"),
@@ -188,7 +188,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 
 <template>
     <div class="rounded-xl">
-        <div class="flex flex-col lg:flex-row gap-3 items-end">
+        <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 items-end">
             <div class="flex flex-row gap-3 items-end w-full">
                 <div class="relative flex-shrink-0">
                     <label
@@ -218,7 +218,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                     <Transition name="fade-dropdown">
                         <div v-if="isChannelDropdownOpen" class="dropdown-menu-container left-0">
                             <div
-                                class="dropdown-menu relative"
+                                class="dropdown-menu relative pr-[7px]"
                                 :class="{ 'is-visible': isChannelDropdownOpen }"
                             >
                                 <div
@@ -325,12 +325,14 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                             />
                             <div
                                 class="dropdown-menu"
-                                :class="{ 'is-visible': isReleaseDropdownOpen }"
+                                :class="{
+                                    'is-visible': isReleaseDropdownOpen,
+                                    'lg:pr-[7px]': selectedChannel === 'branch',
+                                }"
                             >
                                 <div
                                     ref="el"
-                                    class="flex flex-col overflow-hidden max-h-[238px] py-[7px] overflow-y-auto rounded-[4px] bg-vp-soft-mute"
-                                    :class="{ 'pr-[7px]': selectedChannel !== 'branch' }"
+                                    class="flex flex-col overflow-hidden max-h-[238px] py-[7px] pr-[7px] lg:pr-0 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
@@ -360,7 +362,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                     class="marquee relative w-full overflow-hidden"
                                                 >
                                                     <span
-                                                        class="inline-block whitespace-nowrap pr-0 marquee-content font-normal text-vp-1 font-mono select-none"
+                                                        class="inline-block whitespace-nowrap pr-0 marquee-content font-medium text-vp-1 select-none"
                                                         :class="{
                                                             'text-vp-brand-1':
                                                                 selectedRelease?.version ===
@@ -384,7 +386,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                                     el as HTMLElement;
                                                         }
                                                     "
-                                                    class="font-normal text-vp-1 font-mono select-none overflow-hidden text-ellipsis whitespace-nowrap block"
+                                                    class="font-medium text-vp-1 select-none overflow-hidden text-ellipsis whitespace-nowrap block"
                                                     :class="{
                                                         'text-vp-brand-1':
                                                             selectedRelease?.version ===
@@ -431,6 +433,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                         <span
                                             class="text-xs text-vp-3 ml-3 font-mono select-none overflow-hidden text-ellipsis whitespace-nowrap max-w-[80px]"
                                             :class="{
+                                                'tracking-tighter': selectedChannel !== 'branch',
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.version === release.version,
                                                 'text-yellow-700/80 dark:text-yellow-500/60':
@@ -481,7 +484,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                 class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
                                 :class="
                                     !uploadedFile && selectedRelease
-                                        ? 'text-vp-2 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
+                                        ? 'text-vp-2/80 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'
                                         : 'text-vp-3 cursor-not-allowed opacity-50'
                                 "
                                 download
@@ -498,6 +501,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                     :scale="
                                         downloadState.currentIcon.value === 'oi-check' ? 0.95 : 1.1
                                     "
+                                    class="!stroke-vp-dark !stroke-[0.25]"
                                 />
                             </button>
                         </div>
@@ -512,7 +516,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-150 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
+                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
                     :class="[
                         canFlash &&
                             !isMatchingRelease &&
@@ -535,11 +539,11 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                         <button
                             :disabled="!canFlash"
                             class="w-full py-3 rounded-full select-none font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-150 tracking-tighter uppercase whitespace-nowrap"
-                            :class="
+                            :class="[
                                 canFlash
                                     ? `cursor-pointer ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
-                                    : 'text-vp-3 cursor-not-allowed opacity-50 px-12'
-                            "
+                                    : 'text-vp-3 cursor-not-allowed opacity-50 px-12',
+                            ]"
                             @click="handleFlashFirmware"
                             @mouseenter="
                                 !connectionIsConnected &&
@@ -639,7 +643,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
     width: 100%;
     border: 1px solid var(--vp-c-divider);
     border-radius: 8px;
-    padding: 0 7px 0 7px;
+    padding: 0 0 0 7px;
     background-color: var(--vp-c-bg-dark);
     box-shadow: var(--vp-shadow-3);
     backdrop-filter: blur(12px);

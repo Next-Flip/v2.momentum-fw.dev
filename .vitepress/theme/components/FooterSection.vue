@@ -58,11 +58,9 @@ const getItemText = (item: FooterItem) => {
                     ]"
                 >
                     <template v-if="type === 'release'">
-                        <span class="min-w-[68px] lowercase font-mono">{{
-                            getItemText(item)
-                        }}</span>
+                        <span class="min-w-[68px] lowercase">{{ getItemText(item) }}</span>
                         <span
-                            class="text-vp-3 text-[11px] tracking-tighter text-right whitespace-nowrap font-mono"
+                            class="text-vp-3 text-[11px] text-right tracking-tighter whitespace-nowrap font-mono"
                         >
                             {{ formatDate(item.date || "", "short") }}
                         </span>

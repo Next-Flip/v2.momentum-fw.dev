@@ -145,7 +145,7 @@ onMounted(() => {
 
 <template>
     <div
-        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-5 rounded-lg border border-vp-divider h-full min-h-0"
+        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-3.5 sm:mx-5 rounded-lg border border-vp-divider h-full min-h-0"
         :class="{
             'border-b border-vp-divider': !props.isChangelogOpen && !showLogs,
             'min-h-[250px]': props.isNarrowViewport && showLogs,
@@ -220,7 +220,7 @@ onMounted(() => {
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            'opacity-50 !cursor-default pointer-events-none':
+                            '!hidden !cursor-default pointer-events-none':
                                 logs.length === 0 || isChangelogClosed || !isSelectedOrUploadedFile,
                             'opacity-100 hover:text-vp-brand-1 cursor-pointer': logs.length > 0,
                         }"
@@ -250,7 +250,7 @@ onMounted(() => {
                         />
                         <div
                             ref="logContainer"
-                            class="pr-[7px] mr-[7px] overflow-y-auto overflow-x-auto relative items-start justify-start flex"
+                            class="overflow-y-auto relative items-start justify-start flex"
                             :class="{
                                 'flex-1 min-h-0': true,
                             }"
@@ -271,11 +271,11 @@ onMounted(() => {
                                 </div>
                             </div>
 
-                            <div v-else class="flex flex-col space-y-px text-sm font-mono w-full">
+                            <div v-else class="flex flex-col space-y-0 text-sm font-mono w-full">
                                 <div
                                     v-for="(group, index) in groupedLogs"
                                     :key="index"
-                                    class="flex items-center gap-1 text-xs pl-2 min-h-5 justify-start relative"
+                                    class="flex items-start gap-1 text-xs pl-2 min-h-5 justify-start relative"
                                     :class="{
                                         'bg-[#FEF6D5] dark:bg-yellow-400/10':
                                             group.log.level === 'warning',
@@ -299,7 +299,7 @@ onMounted(() => {
                                     ></div>
                                     <span
                                         :title="formatDate(group.log.timestamp, 'withTime')"
-                                        class="text-vp-3 flex-shrink-0 w-[60px] text-left h-min tracking-tight"
+                                        class="text-vp-3 flex-shrink-0 w-[60px] text-left h-min tracking-tight leading-5"
                                         :class="{
                                             'text-neutral-900 dark:text-yellow-400/60':
                                                 group.log.level === 'warning',
@@ -312,7 +312,7 @@ onMounted(() => {
                                         {{ formatDate(group.log.timestamp, "timeOnly") }}
                                     </span>
                                     <span
-                                        class="text-vp-1 flex-1 min-w-0 text-left message-text whitespace-nowrap overflow-hidden text-ellipsis"
+                                        class="text-vp-1 flex-1 min-w-0 text-left message-text whitespace-pre-wrap leading-5"
                                         :class="{
                                             'text-neutral-950 dark:text-yellow-400/80':
                                                 group.log.level === 'warning',
@@ -326,7 +326,7 @@ onMounted(() => {
                                     </span>
                                     <span
                                         v-if="group.count > 1"
-                                        class="text-vp-3/50 flex-shrink-0 text-xs font-medium ml-1 px-1.5 py-0.5"
+                                        class="text-vp-3/50 flex-shrink-0 text-xs font-medium ml-1 px-1.5 leading-5"
                                     >
                                         {{ group.count }}
                                     </span>

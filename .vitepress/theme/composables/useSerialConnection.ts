@@ -180,7 +180,7 @@ export const useSerialConnection = () => {
             testUpdateFirmware: () => Promise.reject(new Error("Serial not available in SSR")),
             startScreenStream: () => Promise.reject(new Error("Serial not available in SSR")),
             stopScreenStream: () => Promise.reject(new Error("Serial not available in SSR")),
-            screenScale: { value: 2 },
+            screenScale: { value: 4 },
         };
     }
 

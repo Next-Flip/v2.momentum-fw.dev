@@ -12,9 +12,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("
 const { handleConnect, connectionState } = useConnectionInfo();
 
 const toggleLabel = computed(() => {
-    return isSettingEnabled("autoConnect")
-        ? tr("connection_autoconnect_enabled")
-        : tr("connection_autoconnect_disabled");
+    return isSettingEnabled("autoConnect") ? tr("on") : tr("off");
 });
 
 const toggleConnect = async () => {
@@ -36,6 +34,8 @@ onMounted(async () => {
         :icon-name="isSettingEnabled('autoConnect') ? 'oi-dash' : 'fa-regular-circle'"
         :scale="0.65"
         :label="toggleLabel"
+        :aria-label="toggleLabel"
+        :title="toggleLabel"
         :checked="isSettingEnabled('autoConnect')"
         @toggle="toggleConnect"
     />

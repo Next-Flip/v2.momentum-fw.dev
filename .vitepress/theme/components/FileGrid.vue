@@ -80,7 +80,7 @@ const handleDownload = (file: File) => {
 
 const getButtonIcon = (file: File) => {
     const key = getFileKey(file);
-    return buttonStates.value[key]?.isSuccess ? "bi-check2" : "la-download-solid";
+    return buttonStates.value[key]?.isSuccess ? "bi-check2" : "oi-download";
 };
 
 const getButtonScale = (file: File) => {

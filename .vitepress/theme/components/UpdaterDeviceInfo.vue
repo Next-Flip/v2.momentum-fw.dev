@@ -10,6 +10,7 @@ import type { DeviceInfo } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
 
+import { useTempState } from "../composables/useTempState";
 import ScreenDisplay from "./ScreenDisplay.vue";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
@@ -37,6 +38,40 @@ const {
     tr: connectionTr,
     getLocalizedPath,
 } = useConnectionInfo();
+
+const screenDisplayRef = ref<InstanceType<typeof ScreenDisplay> | null>(null);
+const screenShotState = useTempState({
+    beforeIcon: "md-photocameraback-outlined",
+    afterIcon: "oi-check",
+    beforeText: () => tr("updater_screenshot"),
+    afterText: () => tr("updater_screenshoted"),
+});
+
+const handleScreenshot = async () => {
+    if (screenDisplayRef.value) {
+        const success = await screenDisplayRef.value.downloadScreenshot();
+        if (success) {
+            screenShotState.trigger();
+        }
+    }
+};
+
+const getActionButtons = computed(() => {
+    return [
+        {
+            state: copyState,
+            action: () => exportDeviceInfo("copy"),
+        },
+        {
+            state: saveState,
+            action: () => exportDeviceInfo("save"),
+        },
+        {
+            state: screenShotState,
+            action: handleScreenshot,
+        },
+    ];
+});
 
 const isConnected = computed(() => connectionIsConnected.value);
 
@@ -293,19 +328,25 @@ const deviceSections = computed(() => {
     <div
         class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full transition-all duration-100 ease-in-out lg:py-0 bg-vp-dark/85"
         :class="{
-            'py-8 pb-12 border border-transparent': !isConnected,
-            '!border !border-vp-brand-1 box-border': isInstallButtonHovered && !isConnected,
+            'pt-14 lg:pt-8 lg:py-8 pb-12': !isConnected,
         }"
         :data-connected="isConnected"
         :data-hovered="isInstallButtonHovered"
     >
+        <div
+            v-if="!isConnected"
+            class="absolute inset-0 w-full h-full box-border border border-transparent transition-all duration-100 ease-in-out rounded-tl-xl rounded-bl-xl"
+            :class="{
+                'border-vp-brand-1': isInstallButtonHovered,
+            }"
+        ></div>
         <Transition name="slide-down">
             <div
                 v-if="isConnected"
                 key="connected-controls"
                 class="flex-shrink-0 hidden lg:block relative z-0"
             >
-                <ScreenDisplay />
+                <ScreenDisplay ref="screenDisplayRef" />
 
                 <div
                     class="py-3 flex-shrink-0 bg-vp-dark dark:bg-vp-dark z-10"
@@ -314,44 +355,34 @@ const deviceSections = computed(() => {
                     }"
                 >
                     <div class="action-buttons px-5 lg:px-3">
-                        <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
-                            <button
-                                class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                :aria-label="copyState.currentText.value"
-                                @click="() => exportDeviceInfo('copy')"
-                                @mousedown="copyState.handleMouseDown"
-                                @mouseup="copyState.handleMouseUp"
-                                @mouseleave="copyState.handleMouseLeave"
-                            >
-                                <v-icon
-                                    :class="{
-                                        'scale-95': copyState.isPressed.value,
-                                    }"
-                                    :name="copyState.currentIcon.value"
-                                    :scale="copyState.currentIcon.value === 'oi-check' ? 0.95 : 0.8"
-                                />
-                            </button>
-                            <template #content>{{ copyState.currentText.value }}</template>
-                        </Tooltip>
-                        <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
-                            <button
-                                class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                :aria-label="saveState.currentText.value"
-                                @click="() => exportDeviceInfo('save')"
-                                @mousedown="saveState.handleMouseDown"
-                                @mouseup="saveState.handleMouseUp"
-                                @mouseleave="saveState.handleMouseLeave"
-                            >
-                                <v-icon
-                                    :class="{
-                                        'scale-95': saveState.isPressed.value,
-                                    }"
-                                    :name="saveState.currentIcon.value"
-                                    :scale="saveState.currentIcon.value === 'oi-check' ? 0.95 : 0.8"
-                                />
-                            </button>
-                            <template #content>{{ saveState.currentText.value }}</template>
-                        </Tooltip>
+                        <template
+                            v-for="button in getActionButtons"
+                            :key="button.state.currentText.value"
+                        >
+                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
+                                <button
+                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
+                                    :aria-label="button.state.currentText.value"
+                                    @click="() => button.action()"
+                                    @mousedown="button.state.handleMouseDown"
+                                    @mouseup="button.state.handleMouseUp"
+                                    @mouseleave="button.state.handleMouseLeave"
+                                >
+                                    <v-icon
+                                        :class="{
+                                            'scale-95': button.state.isPressed.value,
+                                        }"
+                                        :name="button.state.currentIcon.value"
+                                        :scale="
+                                            button.state.currentIcon.value === 'oi-check'
+                                                ? 0.95
+                                                : 0.8
+                                        "
+                                    />
+                                </button>
+                                <template #content>{{ button.state.currentText.value }}</template>
+                            </Tooltip>
+                        </template>
                         <button
                             :aria-label="connectionTr('connection_disconnect')"
                             :disabled="flags.updateInProgress"
@@ -473,14 +504,19 @@ const deviceSections = computed(() => {
                             position="top"
                             class="mr-4 top-[40px]"
                         />
-                        <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" />
+                        <ScrollFade
+                            :show="!arrivedState.bottom"
+                            position="bottom"
+                            class="mr-4"
+                            :class="{ 'bottom-[18px]': activeTab === 'raw' }"
+                        />
                     </template>
                     <Transition :name="tabTransitionName" mode="out-in">
                         <div
                             v-if="activeTab === 'info'"
                             key="info"
                             ref="el"
-                            class="pl-5 pr-[13px] mr-[7px] pt-2 pb-2 relative z-0 overflow-y-auto"
+                            class="pl-5 pr-0.5 pt-2 pb-2 relative z-0 overflow-y-scroll"
                             :class="{
                                 'flex-1 min-h-0': !isNarrowViewport,
                             }"
@@ -516,14 +552,14 @@ const deviceSections = computed(() => {
                             v-else
                             key="raw"
                             ref="el"
-                            class="relative z-0 overflow-y-auto mr-[6px]"
+                            class="relative z-0 overflow-y-scroll overflow-x-scroll"
                             :class="{
                                 'flex-1 min-h-0': !isNarrowViewport,
                             }"
                         >
                             <pre
                                 tabindex="0"
-                                class="text-xs text-start text-vp-1 font-mono whitespace-pre-wrap break-all p-4 m-0 outline-none"
+                                class="text-xs text-start text-vp-1 font-mono whitespace-pre break-all p-4 m-0 outline-none"
                                 >{{ formatJsonDisplay }}</pre
                             >
                         </div>
@@ -746,8 +782,9 @@ const deviceSections = computed(() => {
 }
 
 .export-button {
-    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
-    width: 40px !important;
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 60%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--vp-c-divider) 50%, transparent);
+    width: 38px !important;
     padding: 0;
     line-height: 40px;
     display: inline-flex;
@@ -769,15 +806,13 @@ const deviceSections = computed(() => {
 
 .action-button {
     display: inline-block;
-    border-radius: 6px;
-    padding: 0 12px;
+    border-radius: 8px;
     line-height: 32px;
     font-size: 14px;
     font-weight: 500;
     color: var(--vp-c-text-1);
     white-space: nowrap;
     background: none;
-    border: none;
     cursor: pointer;
     transition:
         background-color 0.25s,

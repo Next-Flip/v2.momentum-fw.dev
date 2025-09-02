@@ -283,7 +283,7 @@ watch(
     <Transition name="orbs-fade">
         <div
             v-if="show"
-            class="orbs-container absolute inset-0 opacity-15 dark:opacity-[13%] pointer-events-none saturate-200"
+            class="orbs-container absolute inset-0 opacity-15 dark:opacity-[13%] pointer-events-none saturate-250"
         >
             <div
                 v-for="orb in randomOrbs"

@@ -1,6 +1,9 @@
 import en from "./locales/en";
 
 export type MessageSchema = {
+    here: string;
+    on: string;
+    off: string;
     site_description: string;
     by: string;
     asset_packs: string;
@@ -345,6 +348,8 @@ export type MessageSchema = {
     updater_serial_unsupported: string;
     updater_serial_unsupported_subtitle: string;
     updater_resize_panels: string;
+    updater_screenshot: string;
+    updater_screenshoted: string;
 };
 
 const messages = { en } as const;

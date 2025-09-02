@@ -1,6 +1,9 @@
 import type { MessageSchema } from "../index";
 
 const messages: MessageSchema = {
+    here: "here",
+    on: "On",
+    off: "Off",
     site_description: "Feature-rich, stable and customizable firmware for Flipper Zero",
     by: "by",
     asset_packs: "Asset Packs",
@@ -113,7 +116,7 @@ const messages: MessageSchema = {
     nav_wiki: "Wiki",
     nav_resources: "Resources",
     nav_web_updater: "Web Updater",
-    nav_recent: "Most Recent",
+    nav_recent: "Recent",
     nav_bug_report: "Bug Report",
 
     aside_title: "General Info",
@@ -298,12 +301,12 @@ const messages: MessageSchema = {
     updater_select_firmware: "Select Firmware",
     updater_or_install_from_file: "Or install from file",
     updater_install_from_file_tooltip:
-        "We recommend only flashing firmware from verified sources. You can get Momentum releases from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-alternate-1 hover:text-vp-alternate-2 underline transition-colors duration-100 font-medium'>{{text}}</a>.",
+        "We recommend only flashing firmware from verified sources. You can get Momentum releases from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 here-text underline transition-colors duration-100 font-medium'>{{text}}</a>.",
     updater_change_button: "Change",
     updater_remove_button: "Remove",
     updater_drop_file_here: "Drop .tgz here",
-    updater_drop_file_browse: "Drop file here or click to browse",
-    updater_file_example: "e.g. flipper-z-f7-update-*.tgz",
+    updater_drop_file_browse: "Drag & drop an update bundle, or click to upload",
+    updater_file_example: "e.g. flipper-z-f7-update-mntm-009.tgz",
     updater_changelog: "Changelog",
     updater_commits: "Commits",
     updater_no_changes_found: "No changes found",
@@ -357,6 +360,8 @@ const messages: MessageSchema = {
     updater_serial_unsupported_subtitle:
         "Your browser does not support serial communication. Use a Chromium-based browser like <a href='https://www.google.com/chrome/' target='_blank' rel='noopener'>Chrome</a>, <a href='https://www.microsoft.com/en-us/edge' target='_blank' rel='noopener'>Edge</a>, or <a href='https://www.opera.com/download' target='_blank' rel='noopener'>Opera</a>.",
     updater_resize_panels: "Resize panels",
+    updater_screenshot: "Screenshot",
+    updater_screenshoted: "Screenshot taken",
 };
 
 export default messages;

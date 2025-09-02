@@ -11,6 +11,7 @@ interface Props {
     hideDelay?: number;
     maxWidth?: string;
     offset?: number;
+    xPadding?: number;
     zIndex?: number;
     disabled?: boolean;
     acceptHover?: boolean;
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
     hideDelay: 0,
     maxWidth: "250px",
     offset: 9,
+    xPadding: 2.5,
     zIndex: 10,
     disabled: false,
     acceptHover: true,
@@ -204,7 +206,7 @@ onBeforeUnmount(() => {
                     v-if="shouldShowTooltip"
                     ref="tooltip"
                     :class="[
-                        'tooltip fixed z-10 backdrop-blur-md !text-neutral-50 border dark:border-vp-divider border-neutral-800 rounded-md p-1.5 px-3 text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full',
+                        `tooltip fixed z-10 backdrop-blur-md !text-neutral-50 border dark:border-vp-divider border-neutral-800 rounded-md p-1.5 px-${props.xPadding} text-[13px] box-border text-center whitespace-normal will-change-transform will-change-opacity max-w-full`,
                         position,
                         themeClass,
                     ]"

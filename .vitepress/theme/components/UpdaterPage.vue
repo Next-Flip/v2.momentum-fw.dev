@@ -446,6 +446,11 @@ onMounted(() => {
     if (isLogsOpen.value && !hasLogsContent.value && hasChangelogContent.value) {
         changelogState.value = "open";
     }
+
+    if (!supportsSerialPort()) {
+        changelogState.value = "open";
+        selectRelease(mainlineReleases[0]);
+    }
 });
 
 onBeforeUnmount(() => {
@@ -483,22 +488,22 @@ onBeforeUnmount(() => {
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
                 <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
                     <div
-                        class="device-info-wrapper flex flex-col w-full lg:w-[32%] h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start"
+                        class="device-info-wrapper flex flex-col w-full lg:w-[32%] h-fit lg:h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start"
                         :class="{
-                            'h-full': !isConnected,
-                            'h-screen': !isConnected && isNarrowViewport,
+                            'lg:h-full': !isConnected && supportsSerialPort(),
+                            'lg:h-screen': !isConnected && isNarrowViewport && supportsSerialPort(),
                         }"
                         :style="windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height));' : ''"
                         :data-connected="isConnected"
                         :data-hovered="isInstallButtonHovered"
                     >
-                        <div class="flex-shrink-0 h-full">
+                        <div class="flex-shrink-0 lg:h-full">
                             <UpdaterDeviceInfo />
                         </div>
                     </div>
 
                     <div
-                        class="w-px bg-vp-divider z-10"
+                        class="hidden lg:block w-px bg-vp-divider z-10"
                         :class="{
                             'h-full': !isNarrowViewport,
                             'min-h-screen': isNarrowViewport,
@@ -539,13 +544,19 @@ onBeforeUnmount(() => {
                                 >
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
-                                            v-if="isMatchingRelease || isBranchRelease"
-                                            class="flex flex-row items-start md:items-center justify-center gap-1 w-full py-1.5 px-2 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 h-10"
+                                            v-if="
+                                                (isMatchingRelease ||
+                                                    (isBranchRelease && !uploadedFile)) &&
+                                                supportsSerialPort()
+                                            "
+                                            class="flex flex-row items-center justify-center gap-2.5 lg:gap-1.5 w-full py-1.5 px-2.5 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 min-h-10 lg:h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"
                                         >
-                                            <div class="flex-shrink-0">
+                                            <div
+                                                class="flex-shrink-0 h-full flex items-center justify-center"
+                                            >
                                                 <v-icon
                                                     :name="
                                                         isBranchRelease
@@ -553,11 +564,11 @@ onBeforeUnmount(() => {
                                                             : 'ri-error-warning-line'
                                                     "
                                                     :scale="isBranchRelease ? 1.1 : 1.0"
-                                                    class="text-yellow-600 dark:text-yellow-500 p-0.5 mt-px"
+                                                    class="text-yellow-600 dark:text-yellow-500 p-0.5 mb-px"
                                                 />
                                             </div>
                                             <span
-                                                class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col-reverse md:flex-row gap-2"
+                                                class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col md:flex-row gap-1 lg:gap-1.5 pt-1 pb-1.5 lg:pt-0 lg:pb-0"
                                             >
                                                 {{
                                                     isMatchingRelease
@@ -595,8 +606,7 @@ onBeforeUnmount(() => {
                                                     >
                                                         {{
                                                             isBranchRelease
-                                                                ? selectedRelease?.version +
-                                                                  " (Github)"
+                                                                ? selectedRelease?.version
                                                                 : currentDeviceVersion
                                                         }}
                                                     </a>
@@ -606,7 +616,7 @@ onBeforeUnmount(() => {
                                     </Transition>
                                     <div
                                         v-if="!isChangelogExpanded"
-                                        class="flex-shrink-0 !z-10 transition-all duration-300 px-5"
+                                        class="flex-shrink-0 !z-10 transition-all duration-300 px-3.5 sm:px-5"
                                         :class="{
                                             'opacity-0': showUpdateOverlay,
                                             'h-0 overflow-hidden':
@@ -617,7 +627,8 @@ onBeforeUnmount(() => {
                                         }"
                                     >
                                         <h3
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-7"
+                                            v-if="supportsSerialPort()"
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-5"
                                             :class="{
                                                 'opacity-40 transition-opacity duration-200':
                                                     isInstallButtonHovered ||
@@ -652,165 +663,216 @@ onBeforeUnmount(() => {
                             </Transition>
 
                             <Transition name="slide-up" mode="out-in">
-                                <div
-                                    v-if="!isChangelogExpanded"
-                                    class="w-full relative flex-shrink-0 z-[1] transition-all duration-300 px-5"
-                                    :class="{
-                                        'opacity-50 transition-opacity duration-200':
-                                            isInstallButtonHovered,
-                                        'opacity-0': showUpdateOverlay,
-                                        'h-0 overflow-hidden':
-                                            showUpdateOverlay && isChangelogExpanded,
-                                        'opacity-90': isOverDropZone && !showUpdateOverlay,
-                                        'opacity-0 pointer-events-none':
-                                            showUpdateOverlay && !isChangelogExpanded,
-                                        'mb-0': supportsSerialPort(),
-                                    }"
-                                >
+                                <div v-if="!isChangelogExpanded">
                                     <div
-                                        v-if="supportsSerialPort()"
-                                        class="flex items-end justify-start gap-2 mb-5 mt-7"
+                                        v-if="!showUpdateOverlay && supportsSerialPort()"
+                                        class="h-px border-b border-solid border-vp-3/25 w-auto mt-5 mx-3.5 sm:mx-5"
+                                        :class="{
+                                            'opacity-30': isOverDropZone,
+                                        }"
+                                    ></div>
+                                    <div
+                                        class="flex flex-col items-start w-full relative flex-shrink-0 z-[1] transition-all duration-300 px-3.5 sm:px-5 pt-5 gap-y-5 gap-x-3"
+                                        :class="{
+                                            'opacity-50 transition-opacity duration-200':
+                                                isInstallButtonHovered,
+                                            'opacity-0': showUpdateOverlay,
+                                            'h-0 overflow-hidden':
+                                                showUpdateOverlay && isChangelogExpanded,
+                                            'opacity-90': isOverDropZone && !showUpdateOverlay,
+                                            'opacity-0 pointer-events-none':
+                                                showUpdateOverlay && !isChangelogExpanded,
+                                            'mb-0': supportsSerialPort(),
+                                        }"
                                     >
-                                        <div class="flex items-center justify-start gap-2">
-                                            <Tooltip
-                                                :aria-label="tr('releases_install')"
-                                                :delay="0"
-                                                :hide-delay="100"
-                                                :max-width="'315px'"
-                                                class="files-tooltip z-[1]"
-                                            >
-                                                <div
-                                                    class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
-                                                >
-                                                    <v-icon
-                                                        name="md-infooutline-round"
-                                                        scale="0.9"
-                                                    />
-                                                </div>
-                                                <template #content>
-                                                    <div
-                                                        class="prose prose-sm dark:prose-invert !text-white max-w-none text-center justify-center"
-                                                    >
-                                                        <span
-                                                            v-html="
-                                                                tr(
-                                                                    'updater_install_from_file_tooltip',
-                                                                    {
-                                                                        url: getLocalizedPath(
-                                                                            `/releases`,
-                                                                        ),
-                                                                        text: `here`,
-                                                                    },
-                                                                )
-                                                            "
-                                                        ></span>
-                                                    </div>
-                                                </template>
-                                            </Tooltip>
-                                            <h3
-                                                class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2"
-                                            >
-                                                {{ tr("updater_or_install_from_file") }}
-                                            </h3>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
                                         <div
-                                            class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-divider rounded-lg border-dashed"
-                                            :class="{ 'border-vp-3/65': isOverDropZone }"
+                                            v-if="supportsSerialPort()"
+                                            class="flex items-end justify-start gap-2"
                                         >
-                                            <div class="flex items-center gap-4">
-                                                <div
-                                                    class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
-                                                    :class="
-                                                        uploadedFileRelease && !isMatchingRelease
-                                                            ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/25'
-                                                            : 'text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/25'
-                                                    "
-                                                    :aria-label="tr('releases_current_version')"
+                                            <div class="flex items-center justify-start gap-2">
+                                                <Tooltip
+                                                    :aria-label="tr('releases_install')"
+                                                    :delay="0"
+                                                    :hide-delay="100"
+                                                    :max-width="'315px'"
+                                                    class="files-tooltip z-[1]"
                                                 >
-                                                    <v-icon
-                                                        name="bi-file-earmark-zip"
-                                                        scale="0.85"
-                                                    />
-                                                </div>
-                                                <div class="flex items-center gap-2">
-                                                    <div class="flex flex-col gap-0.5">
-                                                        <span class="text-sm font-medium text-vp-1">
-                                                            {{ uploadedFile.name }}
-                                                        </span>
+                                                    <div
+                                                        class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
+                                                    >
+                                                        <v-icon
+                                                            name="md-infooutline-round"
+                                                            scale="0.9"
+                                                        />
+                                                    </div>
+                                                    <template #content>
                                                         <div
-                                                            class="flex items-center gap-3 text-xs text-vp-3"
+                                                            class="prose prose-sm dark:prose-invert !text-white max-w-none text-center justify-center"
                                                         >
                                                             <span
-                                                                v-if="uploadedFileRelease?.version"
+                                                                v-html="
+                                                                    tr(
+                                                                        'updater_install_from_file_tooltip',
+                                                                        {
+                                                                            url: getLocalizedPath(
+                                                                                `/releases`,
+                                                                            ),
+                                                                            text: `here`,
+                                                                        },
+                                                                    )
+                                                                "
+                                                            ></span>
+                                                        </div>
+                                                    </template>
+                                                </Tooltip>
+                                                <h3
+                                                    class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2 whitespace-nowrap"
+                                                >
+                                                    {{ tr("updater_or_install_from_file") }}
+                                                </h3>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            v-if="supportsSerialPort() && uploadedFile"
+                                            class="w-full"
+                                        >
+                                            <div
+                                                class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-border/75 rounded-lg border-dashed"
+                                                :class="{ 'border-vp-3/65': isOverDropZone }"
+                                            >
+                                                <div class="flex items-center gap-4">
+                                                    <div
+                                                        class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
+                                                        :class="
+                                                            uploadedFileRelease &&
+                                                            !isMatchingRelease
+                                                                ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/15'
+                                                                : 'text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/15'
+                                                        "
+                                                        :aria-label="tr('releases_current_version')"
+                                                    >
+                                                        <v-icon
+                                                            name="bi-file-earmark-zip"
+                                                            scale="0.85"
+                                                        />
+                                                    </div>
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="flex flex-col gap-0.5">
+                                                            <span
+                                                                class="text-sm font-medium text-vp-1"
                                                             >
-                                                                {{ uploadedFileRelease?.version }}
+                                                                {{ uploadedFile.name }}
                                                             </span>
-                                                            <span>{{ displayFileSize }}</span>
-                                                            <span>{{ displayFileDate }}</span>
+                                                            <div
+                                                                class="flex items-center gap-1 text-xs text-vp-2/80 font-medium"
+                                                            >
+                                                                <span
+                                                                    v-if="
+                                                                        uploadedFileRelease?.version
+                                                                    "
+                                                                >
+                                                                    {{
+                                                                        uploadedFileRelease?.version
+                                                                    }}
+                                                                </span>
+                                                                <span
+                                                                    v-if="
+                                                                        uploadedFileRelease?.version
+                                                                    "
+                                                                    class="!text-vp-3/70 select-none"
+                                                                    >{{ "·" }}</span
+                                                                >
+                                                                <span>{{ displayFileSize }}</span>
+                                                                <span
+                                                                    class="!text-vp-3/70 select-none"
+                                                                    >{{ "·" }}</span
+                                                                >
+                                                                <span>{{ displayFileDate }}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <button
-                                                    class="px-3 py-[7px] text-xs font-medium !text-vp-2 hover:!text-vp-1 !bg-vp-3/10 hover:!bg-vp-3/25 dark:!bg-vp-3/10 dark:hover:!bg-vp-3/25 rounded-md transition-colors whitespace-nowrap"
-                                                    @click="handleFileUpload"
-                                                >
-                                                    {{ tr("updater_change_button") }}
-                                                </button>
-                                                <button
-                                                    class="px-3 py-[7px] text-xs font-medium !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-600/10 dark:hover:!bg-red-500/15 rounded-md transition-colors whitespace-nowrap"
-                                                    @click="clearUploadedFile"
-                                                >
-                                                    {{ tr("updater_remove_button") }}
-                                                </button>
+                                                <div class="flex items-center gap-3">
+                                                    <button
+                                                        class="px-3 py-[7px] text-xs font-medium !text-vp-2 hover:!text-vp-1 !bg-vp-3/10 hover:!bg-vp-3/25 dark:!bg-vp-3/10 dark:hover:!bg-vp-3/25 rounded-md transition-colors whitespace-nowrap select-none"
+                                                        @click="handleFileUpload"
+                                                    >
+                                                        {{ tr("updater_change_button") }}
+                                                    </button>
+                                                    <button
+                                                        class="px-3 py-[7px] text-xs font-medium !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-600/10 dark:hover:!bg-red-500/15 rounded-md transition-colors whitespace-nowrap select-none"
+                                                        @click="clearUploadedFile"
+                                                    >
+                                                        {{ tr("updater_remove_button") }}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div
-                                        v-else-if="supportsSerialPort()"
-                                        class="w-full border border-dashed border-vp-divider rounded-lg flex items-center justify-center cursor-pointer relative z-10 p-px"
-                                        :class="{
-                                            'border-vp-3/40 bg-vp-3/10': isOverDropZone,
-                                            'opacity-50 !cursor-not-allowed':
-                                                flags.updateInProgress,
-                                            'hover:bg-vp-soft/40 hover:dark:bg-vp-bg/90 hover:border-vp-border/80':
-                                                !flags.updateInProgress,
-                                        }"
-                                        @click="handleFileUpload"
-                                    >
                                         <div
-                                            class="flex flex-col items-center gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/80 w-full h-full pt-6 pb-7 px-6 rounded-lg"
+                                            v-else-if="supportsSerialPort()"
+                                            class="w-full border border-dashed border-vp-border/75 rounded-lg flex items-center justify-center cursor-pointer relative h-min lg:h-[72px] z-10 p-0.5 group transition-colors duration-100"
+                                            :class="{
+                                                'bg-vp-3/10 !border-vp-brand-1': isOverDropZone,
+                                                'opacity-50 !cursor-not-allowed':
+                                                    flags.updateInProgress,
+                                                'hover:bg-vp-brand-3/5 hover:dark:bg-vp-brand-3/5 hover:border-vp-brand-1':
+                                                    !flags.updateInProgress,
+                                            }"
+                                            @click="handleFileUpload"
                                         >
-                                            <p class="text-sm text-vp-2">
-                                                {{
-                                                    isOverDropZone
-                                                        ? tr("updater_drop_file_here")
-                                                        : tr("updater_drop_file_browse")
-                                                }}
-                                            </p>
-                                            <p class="text-xs text-vp-3">
-                                                {{ tr("updater_file_example") }}
-                                            </p>
+                                            <div
+                                                class="flex flex-col items-start gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/80 w-full h-full pt-4 pb-4 px-4 rounded-[5px]"
+                                            >
+                                                <div
+                                                    class="flex flex-row justify-start w-full items-center gap-4 -mt-px -ml-px"
+                                                >
+                                                    <div
+                                                        class="flex-shrink-0 text-vp-2/80 group-hover:text-vp-brand-3 group-hover:dark:text-vp-brand-1 transition-colors duration-200 mt-px"
+                                                    >
+                                                        <v-icon
+                                                            name="oi-upload"
+                                                            scale="1.2"
+                                                            class="!stroke-vp-dark !stroke-[0.25]"
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        class="flex flex-col items-start gap-0.5 -mt-px"
+                                                    >
+                                                        <p
+                                                            class="text-sm text-left text-vp-1 font-medium tracking-tight dark:font-normal"
+                                                        >
+                                                            {{
+                                                                isOverDropZone
+                                                                    ? tr("updater_drop_file_here")
+                                                                    : tr("updater_drop_file_browse")
+                                                            }}
+                                                        </p>
+                                                        <p
+                                                            class="text-xs text-left text-vp-2/80 font-medium dark:font-normal italic"
+                                                        >
+                                                            {{ tr("updater_file_example") }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <input
-                                        ref="fileInputRef"
-                                        type="file"
-                                        accept=".tgz"
-                                        class="hidden"
-                                        @change="handleFileChange"
-                                    />
+                                        <input
+                                            ref="fileInputRef"
+                                            type="file"
+                                            accept=".tgz"
+                                            class="hidden"
+                                            @change="handleFileChange"
+                                        />
+                                    </div>
                                     <div
                                         v-if="!showUpdateOverlay"
-                                        class="h-px bg-vp-3/25 w-auto mt-5 mx-5"
+                                        class="h-px border-b border-solid border-vp-3/25 w-auto mx-0 sm:mx-10"
                                         :class="{
                                             'opacity-30': isOverDropZone,
+                                            'mt-5': supportsSerialPort(),
                                         }"
                                     ></div>
                                 </div>
@@ -866,7 +928,7 @@ onBeforeUnmount(() => {
                             <div
                                 v-if="supportsSerialPort()"
                                 ref="dividerRef"
-                                class="flex flex-row min-h-5 w-full items-center justify-center relative px-10 cursor-row-resize select-none transition-all duration-200"
+                                class="flex flex-row min-h-5 w-full items-center justify-center relative px-7 lg:px-10 cursor-row-resize select-none transition-all duration-200"
                                 :class="{
                                     'opacity-55 dark:opacity-65':
                                         effectiveChangelogOpen && effectiveLogsOpen,
@@ -941,12 +1003,7 @@ onBeforeUnmount(() => {
     top: 24%;
     left: 18%;
     width: 60%;
-    height: 60%;
     transform: rotate(-45deg);
-    background-image: url("/bg/flipper.png");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
     opacity: 0.04;
     filter: saturate(0);
     z-index: 0;
@@ -955,6 +1012,10 @@ onBeforeUnmount(() => {
 
 @media (min-width: 1024px) {
     .device-info-wrapper:before {
+        background-image: url("/bg/flipper.png");
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
         top: -25%;
         left: -28%;
         width: 150%;

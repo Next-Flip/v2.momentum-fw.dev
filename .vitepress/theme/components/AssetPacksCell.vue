@@ -43,7 +43,7 @@ const loadedImages = ref<Set<number>>(new Set());
 const srcAlreadySet = ref<Set<number>>(new Set());
 
 const downloadState = useTempState({
-    beforeIcon: "la-download-solid",
+    beforeIcon: "oi-download",
     afterIcon: "bi-check2",
     beforeText: tr("download"),
     afterText: tr("saved"),
@@ -596,7 +596,6 @@ onUnmounted(() => {
                             <button
                                 :aria-label="downloadState.currentText.value"
                                 class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border text-vp-2 hover:text-vp-brand-1 select-none pointer-events-auto !z-[999]"
-                                :class="{ 'scale-95': downloadState.isPressed.value }"
                                 @click="
                                     () => {
                                         downloadState.trigger();
@@ -605,8 +604,18 @@ onUnmounted(() => {
                                 "
                                 @mousedown="downloadState.handleMouseDown"
                                 @mouseup="downloadState.handleMouseUp"
+                                @mouseleave="downloadState.handleMouseLeave"
                             >
-                                <v-icon :name="downloadState.currentIcon.value" :scale="1.1" />
+                                <v-icon
+                                    :class="{
+                                        'scale-90': downloadState.isPressed.value,
+                                    }"
+                                    :name="downloadState.currentIcon.value"
+                                    :scale="
+                                        downloadState.currentIcon.value === 'oi-check' ? 0.95 : 1.1
+                                    "
+                                    class="!stroke-vp-dark !stroke-[0.25]"
+                                />
                             </button>
                         </div>
                         <template #content>{{ downloadState.currentText.value }}</template>

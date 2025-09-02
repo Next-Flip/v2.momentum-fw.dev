@@ -45,12 +45,12 @@ const isCurrentVersion = computed(() => {
             >
                 {{ tr("releases_title") }}
             </h1>
-            <p class="text-sm lg:text-base font-medium text-vp-2 pt-3 leading-5 my-0 mx-auto px-3">
+            <p class="text-sm lg:text-base font-medium text-vp-2 pt-3 leading-5 my-0 mx-auto px-5">
                 {{ width < 640 ? tr("releases_description_mobile") : tr("releases_description") }}
             </p>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-3.5 sm:px-6">
             <div class="flex flex-row justify-center">
                 <aside
                     class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pr-[20px] pt-5 pb-8"

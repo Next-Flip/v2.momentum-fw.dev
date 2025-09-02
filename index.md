@@ -38,7 +38,7 @@ features:
           src: "/svg/js.svg"
 ---
 
-<div class="mntm-h2">Compare to other Firmware</div>
+<div class="mntm-h3">Compare to other Firmware</div>
 
 <div class="full-width-table">
 

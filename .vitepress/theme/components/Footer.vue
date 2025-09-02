@@ -57,9 +57,9 @@ const navigationLinks = computed(() => [
 
 <template>
     <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
-        <div class="max-w-full mx-auto py-16 pb-24 lg:pb-32" :class="{ 'lg:px-0': isWiki }">
+        <div class="max-w-full mx-auto py-16 pb-20 lg:pb-32" :class="{ 'lg:px-0': isWiki }">
             <div
-                class="flex flex-col sm:flex-row sm:justify-between gap-12 md:gap-8 mx-auto max-w-7xl"
+                class="flex flex-col-reverse lg: sm:flex-row sm:justify-between gap-16 md:gap-8 mx-auto max-w-7xl"
                 :class="[isWiki ? 'pl-8 pr-12 lg:pl-72' : 'px-8 lg:px-16']"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50">
@@ -101,7 +101,9 @@ const navigationLinks = computed(() => [
                         </p>
                     </div>
 
-                    <div class="flex flex-row gap-1.5 mt-2 justify-start items-center leading-none">
+                    <div
+                        class="flex flex-row gap-1.5 mt-3 lg:mt-2 justify-start items-center leading-none"
+                    >
                         <p class="text-xs text-vp-3">
                             <a
                                 href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
@@ -120,7 +122,7 @@ const navigationLinks = computed(() => [
                     </div>
 
                     <div
-                        class="flex flex-row gap-1.5 sm:mt-auto mt-2 justify-start items-center leading-none"
+                        class="flex flex-row gap-1.5 sm:mt-auto mt-3 justify-start items-center leading-none"
                     >
                         <p class="text-xs text-vp-3/50">
                             {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
@@ -204,7 +206,7 @@ footer:before {
 
 .dark footer:before {
     mix-blend-mode: screen;
-    opacity: 0.27;
+    opacity: 0.3;
     filter: saturate(0) invert(1);
 }
 </style>

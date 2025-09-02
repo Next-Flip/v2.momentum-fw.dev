@@ -63,7 +63,7 @@ const toggleContentFade = (fade: boolean) => {
 
             <div
                 v-if="selectedRelease.changelog"
-                class="release-content mb-10 px-6 sm:px-8 prose prose-gray dark:prose-invert max-w-full pt-6"
+                class="release-content mb-10 px-5 lg:px-8 prose prose-gray dark:prose-invert max-w-full pt-4 lg:pt-6"
             >
                 <div
                     class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6 transition-opacity duration-200 opacity-100"

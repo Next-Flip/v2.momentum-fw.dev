@@ -3,8 +3,9 @@ import { inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useBgContainer } from "../composables/useBgContainer";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import type { useSerialConnection } from "../composables/useSerialConnection";
+import { downloadFile } from "../util";
 
-const { flags, isConnected } = useConnectionInfo();
+const { flags, isConnected, deviceInfo } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const { bgContainerClasses, shouldUseBgContainer, shouldUseDarkImage } = useBgContainer();
@@ -109,6 +110,63 @@ const stopStream = async (force = false) => {
         }
     }
 };
+
+const takeScreenshot = async (): Promise<Blob | null> => {
+    if (typeof window === "undefined") return null;
+    if (!canvasRef.value) return null;
+    const ctx = canvasRef.value.getContext("2d");
+    if (!ctx) return null;
+
+    try {
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
+        if (!tempCtx) return null;
+
+        tempCanvas.width = 512;
+        tempCanvas.height = 256;
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(canvasRef.value, 0, 0, 512, 256);
+
+        return new Promise((resolve) => {
+            tempCanvas.toBlob(
+                (blob) => {
+                    resolve(blob);
+                },
+                "image/png",
+                1.0,
+            );
+        });
+    } catch (error) {
+        serialConnection?.addLog("error", `Failed to take screenshot: ${error}`);
+        return null;
+    }
+};
+
+const downloadScreenshot = async (filename: string = "flipper"): Promise<boolean> => {
+    const blob = await takeScreenshot();
+    if (!blob) return false;
+
+    try {
+        const url = URL.createObjectURL(blob);
+        const now = new Date();
+        const pad = (n: number) => n.toString().padStart(2, "0");
+        const formattedDate = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+        const formattedTime = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+        const file = `${deviceInfo.value?.hardware_name || filename}-${formattedDate}-${formattedTime}.png`;
+        downloadFile(url, file);
+        URL.revokeObjectURL(url);
+        serialConnection?.addLog("info", `[Screen] Downloaded screenshot: ${file}`);
+        return true;
+    } catch (error) {
+        serialConnection?.addLog("error", `Failed to download screenshot: ${error}`);
+        return false;
+    }
+};
+
+defineExpose({
+    takeScreenshot,
+    downloadScreenshot,
+});
 
 watch(
     [

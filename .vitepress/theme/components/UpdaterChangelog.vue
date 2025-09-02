@@ -131,7 +131,7 @@ const expandDisabled = computed(() => {
 
 <template>
     <div
-        class="changelog-content group mx-5"
+        class="changelog-content group mx-3.5 sm:mx-5"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]':
                 windowWidth < 1024 && !isNarrowViewport,
@@ -181,7 +181,12 @@ const expandDisabled = computed(() => {
                                 :scale="isBranchRelease ? 0.9 : isMainline ? 0.85 : 1"
                             />
                         </div>
-                        <Tooltip :disabled="!shouldShowExternalLink" :delay="0" position="right">
+                        <Tooltip
+                            :disabled="!shouldShowExternalLink"
+                            :delay="0"
+                            position="right"
+                            :x-padding="isBranchRelease ? 1.5 : 2.5"
+                        >
                             <a
                                 v-if="shouldShowExternalLink"
                                 :href="releaseHref"
@@ -192,11 +197,17 @@ const expandDisabled = computed(() => {
                                 {{ displayVersion }}
                             </a>
                             <template #content>
-                                {{
-                                    isBranchRelease
-                                        ? tr("updater_go_to_branch")
-                                        : tr("updater_go_to_release")
-                                }}
+                                <div v-if="isBranchRelease" class="-mb-px">
+                                    <v-icon
+                                        name="bi-github"
+                                        scale="1"
+                                        aria-label="GitHub"
+                                        title="GitHub"
+                                    />
+                                </div>
+                                <div v-else>
+                                    {{ tr("updater_go_to_release") }}
+                                </div>
                             </template>
                         </Tooltip>
                         <div
@@ -208,7 +219,11 @@ const expandDisabled = computed(() => {
                     </template>
                 </div>
                 <div v-if="supportsSerialPort()" class="flex items-center gap-1 flex-shrink-0">
-                    <Tooltip :delay="0" :z-index="9999" :disabled="!!expandDisabled">
+                    <Tooltip
+                        :delay="0"
+                        :z-index="9999"
+                        :disabled="!!expandDisabled || !supportsSerialPort()"
+                    >
                         <button
                             class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                             :class="{
@@ -239,7 +254,7 @@ const expandDisabled = computed(() => {
                         v-if="isAccessible"
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            'opacity-50 pointer-events-none hover:text-vp-3':
+                            '!hidden pointer-events-none hover:text-vp-3':
                                 isExpanded || !isLogsOpen,
                         }"
                         @click="handleToggleOpenClose"
@@ -268,7 +283,7 @@ const expandDisabled = computed(() => {
             <div
                 v-if="isAccessible && !isClosed"
                 ref="el"
-                class="flex-1 overflow-y-auto mr-[7px] relative"
+                class="flex-1 overflow-y-auto relative"
                 :class="{
                     'px-8 pb-8': isExpanded,
                     'pt-4 px-4 sm:px-5': isBranchRelease,

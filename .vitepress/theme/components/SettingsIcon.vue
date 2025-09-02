@@ -49,6 +49,8 @@ const handleButtonLeave = () => {
                                 isSettingEnabled('verboseLogs') ? 'oi-dash' : 'fa-regular-circle'
                             "
                             :scale="0.65"
+                            :aria-label="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
+                            :title="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
                             :label="tr('connection_verbose_logs')"
                             :checked="isSettingEnabled('verboseLogs')"
                             :callback="() => toggleSetting('verboseLogs')"
@@ -61,6 +63,8 @@ const handleButtonLeave = () => {
                                 isSettingEnabled('clearLogs') ? 'oi-dash' : 'fa-regular-circle'
                             "
                             :scale="0.65"
+                            :aria-label="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
+                            :title="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
                             :label="tr('connection_clear_logs')"
                             :checked="isSettingEnabled('clearLogs')"
                             :callback="() => toggleSetting('clearLogs')"

@@ -200,8 +200,14 @@ const handleHeaderClick = () => {
                             position="top"
                             offset="0"
                             class="mr-4"
+                            :opacity="40"
                         />
-                        <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" />
+                        <ScrollFade
+                            :show="!arrivedState.bottom"
+                            position="bottom"
+                            class="mr-4"
+                            :opacity="40"
+                        />
                         <div
                             ref="dropdownMenuRef"
                             class="flex flex-col overflow-hidden max-h-[300px] transition-all duration-200 overflow-y-auto rounded-[4px] bg-vp-soft-mute pb-[7px] pr-[7px]"
@@ -227,7 +233,7 @@ const handleHeaderClick = () => {
                                     @click="selectRelease(release)"
                                 >
                                     <span
-                                        class="font-medium text-vp-1 font-mono flex-shrink-0"
+                                        class="font-medium text-vp-1 text-left overflow-hidden text-ellipsis whitespace-nowrap flex-shrink-0"
                                         :class="{
                                             'text-vp-brand-1': isSelected(release),
                                         }"
@@ -235,7 +241,7 @@ const handleHeaderClick = () => {
                                         {{ release.version }}
                                     </span>
                                     <span
-                                        class="text-xs text-vp-3 ml-2 flex-shrink-0 font-mono"
+                                        class="text-xs text-vp-3 ml-3 flex-shrink-0 font-mono text-right tracking-tighter"
                                         :class="{
                                             'text-vp-brand-1/60': isSelected(release),
                                         }"
