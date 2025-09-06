@@ -25,7 +25,9 @@ import {
     devMode,
     downloadFile,
     getFirmwareDownloadUrl,
+    getPrNumber,
     parseUploadedFileName,
+    replacePrNumber,
     supportsSerialPort,
 } from "../util";
 
@@ -598,7 +600,7 @@ onBeforeUnmount(() => {
                                                         class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100 vp-external-link-icon"
                                                         :href="
                                                             isBranchRelease
-                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/tree/${selectedRelease?.version}`
+                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/pull/${getPrNumber(selectedRelease?.version)}`
                                                                 : `${getLocalizedPath('/releases')}/${currentDeviceVersion}`
                                                         "
                                                         target="_blank"
@@ -606,7 +608,9 @@ onBeforeUnmount(() => {
                                                     >
                                                         {{
                                                             isBranchRelease
-                                                                ? selectedRelease?.version
+                                                                ? replacePrNumber(
+                                                                      selectedRelease?.version,
+                                                                  )
                                                                 : currentDeviceVersion
                                                         }}
                                                     </a>

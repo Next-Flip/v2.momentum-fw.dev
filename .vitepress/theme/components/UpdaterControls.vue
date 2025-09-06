@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { useScroll } from "@vueuse/core";
-import { computed, inject, ref, useTemplateRef } from "vue";
-import { branchReleases, type ReleaseChannel, type ReleaseItem } from "../../../_data/releases";
+import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+import {
+    branchReleases,
+    devbuildReleases,
+    type ReleaseChannel,
+    type ReleaseItem,
+} from "../../../_data/releases";
 import { useClickOutside } from "../composables/useClickOutside";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
@@ -11,7 +16,7 @@ import { useSharedHover } from "../composables/useSharedHover";
 import { useTempState } from "../composables/useTempState";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
-import { supportsSerialPort } from "../util";
+import { replacePrNumber, supportsSerialPort } from "../util";
 
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
@@ -73,6 +78,9 @@ const isChannelDropdownOpen = ref(false);
 const isReleaseDropdownOpen = ref(false);
 const hoveredReleaseIndex = ref<number | null>(null);
 const versionTextRefs = ref<(HTMLElement | null)[]>([]);
+const releaseTextRef = ref<HTMLElement | null>(null);
+const isReleaseButtonHovered = ref(false);
+const releaseTextNeedsScroll = ref(false);
 
 useClickOutside([
     {
@@ -95,11 +103,15 @@ const channelOptions = computed(() => [
         label: tr("updater_mainline_label"),
         description: tr("updater_mainline_description"),
     },
-    {
-        value: "devbuild",
-        label: tr("updater_development_label"),
-        description: tr("updater_development_description"),
-    },
+    ...(devbuildReleases.length > 0
+        ? [
+              {
+                  value: "devbuild",
+                  label: tr("updater_development_label"),
+                  description: tr("updater_development_description"),
+              },
+          ]
+        : []),
     ...(branchReleases.length > 0
         ? [
               {
@@ -120,13 +132,15 @@ const channelLabel = computed(() => {
 const releaseLabel = computed(() => {
     if (!props.selectedRelease) return tr("updater_select_version");
     const release = props.selectedRelease;
-    return `${release.version} (${
-        isBranchRelease.value
-            ? release.branch
-            : release.timestamp
-              ? formatDate(release.timestamp, "short")
-              : tr("updater_unknown_date")
-    })`;
+    return replacePrNumber(
+        `${release.version} (${
+            isBranchRelease.value
+                ? release.branch
+                : release.timestamp
+                  ? formatDate(release.timestamp, "short")
+                  : tr("updater_unknown_date")
+        })`,
+    );
 });
 
 const toggleChannelDropdown = () => {
@@ -180,6 +194,33 @@ const shouldScrollVersion = (index: number) => {
     return textElement.scrollWidth > textElement.clientWidth;
 };
 
+const shouldScrollReleaseText = () => {
+    return releaseTextNeedsScroll.value;
+};
+
+const checkReleaseTextScroll = () => {
+    if (!releaseTextRef.value) {
+        releaseTextNeedsScroll.value = false;
+        return;
+    }
+    releaseTextNeedsScroll.value =
+        releaseTextRef.value.scrollWidth > releaseTextRef.value.clientWidth;
+};
+
+watch([releaseLabel, () => props.selectedRelease], () => {
+    nextTick(() => {
+        checkReleaseTextScroll();
+    });
+});
+
+watch(releaseTextRef, () => {
+    if (releaseTextRef.value) {
+        nextTick(() => {
+            checkReleaseTextScroll();
+        });
+    }
+});
+
 const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
     if (!channel) return false;
     return channel === "branch" && props.selectedRelease?.version === version;
@@ -189,8 +230,8 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 <template>
     <div class="rounded-xl">
         <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 items-end">
-            <div class="flex flex-row gap-3 items-end w-full">
-                <div class="relative flex-shrink-0">
+            <div class="flex flex-row gap-3 items-end w-full min-w-0 flex-1">
+                <div class="relative flex-shrink-0 max-w-[200px]">
                     <label
                         class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
@@ -199,14 +240,16 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                     </label>
                     <button
                         ref="channelDropdownRef"
-                        class="dropdown-button min-w-[160px] w-auto"
+                        class="dropdown-button min-w-[160px] max-w-[200px] w-auto"
                         :class="{
                             'is-active': isChannelDropdownOpen,
                             'opacity-50 cursor-not-allowed': uploadedFile || isInstallButtonHovered,
                         }"
                         @click="toggleChannelDropdown"
                     >
-                        <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
+                        <span
+                            class="block z-[5] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap select-none pointer-events-none"
+                        >
                             {{ channelLabel }}
                         </span>
                         <div
@@ -290,7 +333,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                     </label>
                     <button
                         ref="releaseDropdownRef"
-                        class="dropdown-button w-full"
+                        class="dropdown-button w-full min-w-0"
                         :class="{
                             'is-active': isReleaseDropdownOpen,
                             'opacity-50 cursor-not-allowed':
@@ -299,8 +342,27 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                 isInstallButtonHovered,
                         }"
                         @click="toggleReleaseDropdown"
+                        @mouseenter="isReleaseButtonHovered = true"
+                        @mouseleave="isReleaseButtonHovered = false"
                     >
-                        <span class="whitespace-nowrap overflow-hidden text-ellipsis block z-[5]">
+                        <div
+                            v-if="
+                                shouldScrollReleaseText() &&
+                                (isReleaseButtonHovered || isReleaseDropdownOpen)
+                            "
+                            class="marquee relative w-full overflow-hidden min-w-0 flex-1 pointer-events-none"
+                        >
+                            <span
+                                class="inline-block whitespace-nowrap pr-0 marquee-content z-[5] select-none"
+                            >
+                                {{ releaseLabel }}
+                            </span>
+                        </div>
+                        <span
+                            v-else
+                            ref="releaseTextRef"
+                            class="whitespace-nowrap overflow-hidden text-ellipsis text-left z-[5] flex-1 min-w-0 pointer-events-none select-none"
+                        >
                             {{ releaseLabel }}
                         </span>
                         <div
@@ -374,7 +436,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                                 ),
                                                         }"
                                                     >
-                                                        {{ release.version }}
+                                                        {{ replacePrNumber(release.version) }}
                                                     </span>
                                                 </div>
                                                 <span
@@ -398,7 +460,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                             ),
                                                     }"
                                                 >
-                                                    {{ release.version }}
+                                                    {{ replacePrNumber(release.version) }}
                                                 </span>
                                             </div>
                                             <Tooltip
@@ -459,7 +521,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
             </div>
 
-            <div class="flex flex-row gap-3 items-end w-full md:w-auto">
+            <div class="flex flex-row gap-3 items-end w-full lg:w-auto flex-shrink-0">
                 <div
                     class="hidden xl:block h-6 mb-2 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                     :class="{ 'opacity-60': isInstallButtonHovered }"
@@ -516,7 +578,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-36 flex-1 w-full"
+                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-32 w-full lg:w-auto"
                     :class="[
                         canFlash &&
                             !isMatchingRelease &&

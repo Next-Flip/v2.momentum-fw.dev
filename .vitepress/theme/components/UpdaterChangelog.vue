@@ -4,7 +4,12 @@ import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import { branchReleases, type ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables/useI18n";
-import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
+import {
+    getPrNumber,
+    replaceIssuesAndMentions,
+    replacePrNumber,
+    supportsSerialPort,
+} from "../util";
 
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
@@ -77,7 +82,7 @@ const displayVersion = computed(() => {
     const release = props.uploadedFileRelease || displayRelease.value;
     if (!release) return "";
 
-    return release.version;
+    return replacePrNumber(release.version);
 });
 
 const isBranchRelease = computed(() => {
@@ -113,7 +118,7 @@ const shouldShowExternalLink = computed(() => {
 
 const releaseHref = computed(() => {
     if (isBranchRelease.value) {
-        return `https://github.com/Next-Flip/Momentum-Firmware/tree/${displayRelease.value?.version}`;
+        return `https://github.com/Next-Flip/Momentum-Firmware/pull/${getPrNumber(displayRelease.value?.version)}`;
     }
     if (!shouldShowExternalLink.value || !displayRelease.value) return "";
     return getLocalizedPath(`/releases/${displayRelease.value.version}`);

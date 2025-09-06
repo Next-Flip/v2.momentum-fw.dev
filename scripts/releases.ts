@@ -511,7 +511,7 @@ async function getExtraBranches(
         for (const branch of branches) {
             const branchItem: ReleaseItem = {
                 // NOTE: yes these are backwards, makes things simpler in the updater controls
-                version: branch.id.replace("wip-", ""),
+                version: branch.id,
                 branch: branch.versions[0].version,
                 timestamp: branch.versions[0].timestamp,
                 changelog: branch.versions[0].changelog,
@@ -630,10 +630,9 @@ export async function fetchReleases() {
     console.log(`  Received ${mainlineItems.length} mainline releases`);
     console.log(`  Received ${devbuildItems.length} devbuild items`);
 
-    // TODO: uncomment this to include extra branches
-    // const { branchItems } = await getExtraBranches(["development", "release"]);
+    const { branchItems } = await getExtraBranches(["development", "release"]);
 
-    await updateReleases(mainlineItems, devbuildItems, []);
+    await updateReleases(mainlineItems, devbuildItems, branchItems);
 
     console.log("Releases generated successfully");
 }

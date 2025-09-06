@@ -335,7 +335,7 @@ const deviceSections = computed(() => {
     >
         <div
             v-if="!isConnected"
-            class="absolute inset-0 w-full h-full box-border border border-transparent transition-all duration-100 ease-in-out rounded-tl-xl rounded-bl-xl"
+            class="absolute inset-0 w-full h-full box-border border border-transparent transition-all duration-100 ease-in-out lg:rounded-tl-xl lg:rounded-bl-xl"
             :class="{
                 'border-vp-brand-1': isInstallButtonHovered,
             }"
