@@ -2,7 +2,7 @@ import { parse } from "node-html-parser";
 import { promises as fs } from "node:fs";
 import { ofetch } from "ofetch";
 import { join } from "path";
-import { DIR_DATA, HEADER, jsonToTypeScript } from "./utils";
+import { DIR_DATA, getPrNumber, HEADER, jsonToTypeScript, replacePrNumber } from "./utils";
 
 interface FirmwareFile {
     url: string;
@@ -21,6 +21,7 @@ export interface ReleaseItem {
     branch?: string;
     date?: string;
     commit?: string;
+    pr?: string;
     timestamp?: number;
     changelog?: string;
     files?: FirmwareFile[] | DevbuildFile[] | MainlineFile[];
@@ -511,8 +512,9 @@ async function getExtraBranches(
         for (const branch of branches) {
             const branchItem: ReleaseItem = {
                 // NOTE: yes these are backwards, makes things simpler in the updater controls
-                version: branch.id,
+                version: replacePrNumber(branch.id),
                 branch: branch.versions[0].version,
+                pr: getPrNumber(branch.id),
                 timestamp: branch.versions[0].timestamp,
                 changelog: branch.versions[0].changelog,
                 files: branch.versions[0].files,
@@ -575,6 +577,7 @@ export interface ReleaseItem {
     branch?: string;
     date?: string;
     commit?: string;
+    pr?: string;
     timestamp?: number;
     changelog?: string;
     files?: FirmwareFile[] | DevbuildFile[] | MainlineFile[];

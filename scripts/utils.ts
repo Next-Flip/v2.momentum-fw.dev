@@ -23,6 +23,14 @@ export function validateLocaleCode(localeCode: string): boolean {
     return /^[a-z]{2}$/.test(localeCode);
 }
 
+export const replacePrNumber = (text: string | undefined): string => {
+    return !text ? "" : text.replace(/^.*?:/, "");
+};
+
+export const getPrNumber = (text: string | undefined): string => {
+    return !text ? "" : text.match(/^pr(\d+):/i)?.[1] || "";
+};
+
 export function replaceTemplateSection(
     content: string,
     startComment: string,

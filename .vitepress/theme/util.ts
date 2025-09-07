@@ -129,14 +129,6 @@ export const replaceIssuesAndMentions = (text: string, isBranchRelease = false):
     return result;
 };
 
-export const replacePrNumber = (text: string | undefined): string => {
-    return !text ? "" : text.replace(/^.*?:/, "");
-}
-
-export const getPrNumber = (text: string | undefined): string => {
-    return !text ? "" : text.match(/^pr(\d+):/i)?.[1] || "";
-}
-
 export const shortenTimeString = (timeString: string): string => {
     const { tr } = useI18n();
 

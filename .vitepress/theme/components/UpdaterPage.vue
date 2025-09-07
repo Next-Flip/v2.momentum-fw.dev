@@ -25,9 +25,7 @@ import {
     devMode,
     downloadFile,
     getFirmwareDownloadUrl,
-    getPrNumber,
     parseUploadedFileName,
-    replacePrNumber,
     supportsSerialPort,
 } from "../util";
 
@@ -66,6 +64,9 @@ const { selectedRelease, selectRelease } = useReleaseNavigation({
     storageKeys: {
         selectedVersion: STORAGE_KEYS.UPDATER_SELECTED_VERSION,
         selectedChannel: STORAGE_KEYS.UPDATER_SELECTED_CHANNEL,
+    },
+    defaultFallback: () => {
+        return !supportsSerialPort() ? mainlineReleases[0] : null;
     },
     onChannelChange: (channel: ReleaseChannel) => {
         selectedChannel.value = channel;
@@ -451,7 +452,6 @@ onMounted(() => {
 
     if (!supportsSerialPort()) {
         changelogState.value = "open";
-        selectRelease(mainlineReleases[0]);
     }
 });
 
@@ -547,9 +547,8 @@ onBeforeUnmount(() => {
                                     <Transition name="fade-drop" mode="out-in">
                                         <div
                                             v-if="
-                                                (isMatchingRelease ||
-                                                    (isBranchRelease && !uploadedFile)) &&
-                                                supportsSerialPort()
+                                                isMatchingRelease ||
+                                                (isBranchRelease && !uploadedFile)
                                             "
                                             class="flex flex-row items-center justify-center gap-2.5 lg:gap-1.5 w-full py-1.5 px-2.5 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 min-h-10 lg:h-10"
                                             :class="{
@@ -600,7 +599,7 @@ onBeforeUnmount(() => {
                                                         class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100 vp-external-link-icon"
                                                         :href="
                                                             isBranchRelease
-                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/pull/${getPrNumber(selectedRelease?.version)}`
+                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/pull/${selectedRelease?.pr}`
                                                                 : `${getLocalizedPath('/releases')}/${currentDeviceVersion}`
                                                         "
                                                         target="_blank"
@@ -608,9 +607,7 @@ onBeforeUnmount(() => {
                                                     >
                                                         {{
                                                             isBranchRelease
-                                                                ? replacePrNumber(
-                                                                      selectedRelease?.version,
-                                                                  )
+                                                                ? selectedRelease?.version
                                                                 : currentDeviceVersion
                                                         }}
                                                     </a>

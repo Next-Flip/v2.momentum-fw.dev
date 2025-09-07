@@ -16,7 +16,7 @@ import { useSharedHover } from "../composables/useSharedHover";
 import { useTempState } from "../composables/useTempState";
 import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
-import { replacePrNumber, supportsSerialPort } from "../util";
+import { supportsSerialPort } from "../util";
 
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
@@ -132,15 +132,13 @@ const channelLabel = computed(() => {
 const releaseLabel = computed(() => {
     if (!props.selectedRelease) return tr("updater_select_version");
     const release = props.selectedRelease;
-    return replacePrNumber(
-        `${release.version} (${
-            isBranchRelease.value
-                ? release.branch
-                : release.timestamp
-                  ? formatDate(release.timestamp, "short")
-                  : tr("updater_unknown_date")
-        })`,
-    );
+    return `${release.version} (${
+        isBranchRelease.value
+            ? release.branch
+            : release.timestamp
+              ? formatDate(release.timestamp, "short")
+              : tr("updater_unknown_date")
+    })`;
 });
 
 const toggleChannelDropdown = () => {
@@ -436,7 +434,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                                 ),
                                                         }"
                                                     >
-                                                        {{ replacePrNumber(release.version) }}
+                                                        {{ release.version }}
                                                     </span>
                                                 </div>
                                                 <span
@@ -460,7 +458,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                             ),
                                                     }"
                                                 >
-                                                    {{ replacePrNumber(release.version) }}
+                                                    {{ release.version }}
                                                 </span>
                                             </div>
                                             <Tooltip
