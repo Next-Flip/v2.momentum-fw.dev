@@ -221,7 +221,17 @@ export interface FlipperModule {
     commands: FlipperCommands;
 }
 
-export const LOGO_COLORS = ["purp", "orange", "pink", "white"] as const;
+export interface LogEntry {
+    timestamp: Date;
+    level: "info" | "warning" | "error" | "success" | "debug" | "verbose";
+    message: string;
+}
+export interface LogGroup {
+    log: LogEntry;
+    count: number;
+    id: string;
+}
+export const LOGO_COLORS = ["purp", "orange", "pink", "white", "skyline"] as const;
 export type LogoColor = (typeof LOGO_COLORS)[number];
 
 export type SortField = "updatedDate" | "addedDate" | "name" | "author";

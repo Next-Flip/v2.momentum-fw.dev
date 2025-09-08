@@ -1,10 +1,11 @@
 import log from "loglevel";
 import semver from "semver";
-import { reactive, ref } from "vue";
+import { reactive, ref, shallowRef } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import {
     ConnectionState,
     InstallStatus,
+    LogEntry,
     type AssetPack,
     type ConnectionFlags,
     type DeviceInfo,
@@ -56,27 +57,15 @@ const mapErrorToUserFriendly = (error: Error): string => {
         message.includes("failed to open serial port") ||
         message.includes("failed to execute 'open' on 'serialport'") ||
         message.includes("serial port is busy")
-    ) {
+    )
         return "Serial port busy";
-    }
-    if (message.includes("could not start rpc session")) {
-        return "Couldn't start RPC session";
-    }
-    if (message.includes("no flipper found")) {
-        return "No Flipper found";
-    }
-    if (message.includes("serial not supported")) {
-        return "Serial not supported";
-    }
-    if (message.includes("connection failed") || message.includes("networkerror")) {
+    if (message.includes("could not start rpc session")) return "Couldn't start RPC session";
+    if (message.includes("no flipper found")) return "No Flipper found";
+    if (message.includes("serial not supported")) return "Serial not supported";
+    if (message.includes("connection failed") || message.includes("networkerror"))
         return "Connection failed";
-    }
-    if (message.includes("timeout")) {
-        return "Connection timeout";
-    }
-    if (error.message.length > 50) {
-        return error.message.substring(0, 47) + "...";
-    }
+    if (message.includes("timeout")) return "Connection timeout";
+    if (error.message.length > 50) return error.message.substring(0, 47) + "...";
 
     return error.message;
 };
@@ -85,25 +74,24 @@ export const useSerialConnection = () => {
     log.setLevel("debug");
 
     const { isSettingEnabled } = useSettings();
-    interface LogEntry {
-        timestamp: Date;
-        level: "info" | "warning" | "error" | "success" | "debug" | "verbose";
-        message: string;
-    }
 
-    const logs = reactive<LogEntry[]>([]);
+    const logs = shallowRef<LogEntry[]>([]);
     const MAX_LOGS = 500;
     const TRIM_LOGS_TO = 400;
 
     const addLog = (level: LogEntry["level"], message: string) => {
-        logs.push({
+        const newLog = {
             timestamp: new Date(),
             level,
             message,
-        });
+        };
 
-        if (logs.length > MAX_LOGS) {
-            logs.splice(0, logs.length - TRIM_LOGS_TO);
+        const newLogs = [...logs.value, newLog];
+
+        if (newLogs.length > MAX_LOGS) {
+            logs.value = newLogs.slice(-TRIM_LOGS_TO);
+        } else {
+            logs.value = newLogs;
         }
 
         switch (level) {
@@ -125,7 +113,7 @@ export const useSerialConnection = () => {
     };
 
     const clearLogs = () => {
-        logs.splice(0, logs.length);
+        logs.value = [];
     };
 
     if (typeof window === "undefined" || typeof navigator === "undefined" || !navigator.serial) {
@@ -173,7 +161,7 @@ export const useSerialConnection = () => {
             findKnownDevices: () => Promise.reject(new Error("Serial not available in SSR")),
             requestPort: () => Promise.reject(new Error("Serial not available in SSR")),
             loadInstalledPacks: () => Promise.reject(new Error("Serial not available in SSR")),
-            logs: reactive<LogEntry[]>([]),
+            logs: shallowRef<LogEntry[]>([]),
             addLog: () => {},
             clearLogs: () => {},
             testConnecting: () => Promise.reject(new Error("Serial not available in SSR")),

@@ -67,6 +67,18 @@ export default {
         "from-pink-400/65", "via-rose-300/40",
         "from-rose-400/60", "via-fuchsia-500/50",
         "from-fuchsia-400/65", "via-pink-500/45",
+        // Skyline theme glow orb gradient colors
+        "from-cyan-300/40", "via-indigo-400/25",
+        "from-green-400/45", "via-lime-300/30",
+        "from-emerald-400/45", "via-teal-300/25",
+        "from-white/40", "via-emerald-400/25",
+        "from-blue-300/45", "via-cyan-400/25",
+        "from-teal-400/40", "via-emerald-300/25",
+        "from-sky-400/40", "via-blue-300/25",
+        "from-white/30", "via-green-400/25",
+        "from-lime-400/45", "via-green-300/30",
+        // ScrollFade classes
+        "bg-gradient-to-t", "bg-gradient-to-b", "top-0", "bottom-0",
         // Additional pink blends
         "from-pink-400/50", "via-purple-400/30",
         "from-fuchsia-400/45", "via-blue-300/25",
@@ -153,6 +165,7 @@ export default {
                 "vp-gray-soft": "rgb(from var(--vp-c-bg-gray-soft) r g b / <alpha-value>)",
                 "vp-neutral": "rgb(from var(--vp-c-neutral) r g b / <alpha-value>)",
                 "vp-neutral-inverse": "rgb(from var(--vp-c-neutral-inverse) r g b / <alpha-value>)",
+                "vp-flipper-fill": "rgb(from var(--vp-c-flipper-fill) r g b / <alpha-value>)",
                 "flipper-fill": "#fe8a2b",
             },
             backgroundImage: {

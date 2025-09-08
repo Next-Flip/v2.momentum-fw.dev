@@ -345,7 +345,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div v-if="supportsSerialPort()" :class="isUpdatePage ? 'ml-8' : 'ml-3'">
+        <div v-if="supportsSerialPort()" :class="isUpdatePage ? 'ml-6' : 'ml-3'">
             <!-- <AutoconnectToggle /> -->
             <Tooltip
                 :delay="400"
@@ -525,8 +525,9 @@ body[data-route*="/wiki"] {
 }
 
 .export-button {
-    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 60%, transparent) !important;
-    width: 40px !important;
+    background-color: color-mix(in srgb, var(--vp-c-bg-dark) 60%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--vp-c-divider) 50%, transparent);
+    width: 38px !important;
     padding: 0;
     line-height: 40px;
     display: inline-flex;
@@ -548,19 +549,17 @@ body[data-route*="/wiki"] {
 
 .action-button {
     display: inline-block;
-    border-radius: 6px;
-    padding: 0 12px;
+    border-radius: 8px;
     line-height: 32px;
     font-size: 14px;
     font-weight: 500;
     color: var(--vp-c-text-1);
     white-space: nowrap;
     background: none;
-    border: none;
     cursor: pointer;
     transition:
-        background-color 0.1s,
-        color 0.1s;
+        background-color 0.25s,
+        color 0.25s;
     width: 100%;
 }
 

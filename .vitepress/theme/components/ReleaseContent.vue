@@ -69,7 +69,9 @@ const toggleContentFade = (fade: boolean) => {
                     class="prose prose-sm dark:prose-invert text-vp-1 max-w-full -mt-6 transition-opacity duration-200 opacity-100"
                     :class="{ 'opacity-40': contentFade }"
                 >
-                    <span v-html="parsedChangelog"></span>
+                    <Transition name="changelog-fade" mode="out-in">
+                        <span :key="selectedRelease.version" v-html="parsedChangelog"></span>
+                    </Transition>
                 </div>
             </div>
 

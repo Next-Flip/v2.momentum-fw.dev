@@ -479,6 +479,12 @@ watch(
     border-color: var(--vp-c-brand-1);
 }
 
+.theme-skyline .dropdown-item.is-selected .checkbox {
+    color: #000;
+    background-color: var(--vp-c-brand-1);
+    border-color: var(--vp-c-brand-1);
+}
+
 .theme-orange .dropdown-item.is-selected .checkbox {
     color: #000;
     background-color: var(--vp-c-brand-1);

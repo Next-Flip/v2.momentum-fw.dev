@@ -44,6 +44,9 @@ const match = (color: ScreenColor, option: ScreenColor) => {
                         option.value as ScreenColor,
                         'primary',
                     ),
+                    '!bg-white/10':
+                        isSelected(option.value as ScreenColor, 'primary') &&
+                        currentTheme === 'skyline',
                     '!bg-vp-alternate-1/10 hover:bg-vp-alternate-1/15': isSelected(
                         option.value as ScreenColor,
                         'secondary',
@@ -66,6 +69,8 @@ const match = (color: ScreenColor, option: ScreenColor) => {
                         'bg-vp-brand-1': match(option.value, 'primary'),
                         'bg-vp-brand-1 dark:invert':
                             match(option.value, 'primary') && currentTheme === 'white',
+                        '!bg-neutral-900 border-vp-1/5':
+                            match(option.value, 'primary') && currentTheme === 'skyline',
                         'bg-vp-alternate-1': match(option.value, 'secondary'),
                         'bg-flipper-fill': match(option.value, 'default'),
                         'bg-neutral-300 dark:bg-neutral-50': match(option.value, 'white'),

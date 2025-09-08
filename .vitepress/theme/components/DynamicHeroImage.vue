@@ -15,6 +15,8 @@ const heroImageSrc = computed(() => {
         return `/banners/logo_${isDark ? "dark" : "light"}_pink.png`;
     } else if (themeColor === "white") {
         return `/banners/logo_${isDark ? "dark" : "light"}_white.png`;
+    } else if (themeColor === "skyline") {
+        return `/banners/logo_${isDark ? "dark" : "light"}_skyline.png`;
     } else {
         return `/banners/logo_${isDark ? "dark" : "light"}.png`;
     }

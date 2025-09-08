@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from "vitepress";
 import { computed, onMounted } from "vue";
+import { useI18n } from "../composables/useI18n";
 
 const router = useRouter();
+const { tr } = useI18n();
 
 const isWiki = computed(() => {
     return router.route.path.includes("/wiki");
@@ -40,11 +42,13 @@ function openSearch() {
             <button
                 type="button"
                 class="DocSearch DocSearch-Button"
-                aria-label="Search"
+                :aria-label="tr('search_button_aria_label')"
                 @click="openSearch"
             >
                 <span class="DocSearch-Button-Container">
-                    <span class="DocSearch-Button-Placeholder">Search</span>
+                    <span class="DocSearch-Button-Placeholder">{{
+                        tr("search_button_aria_label")
+                    }}</span>
                 </span>
                 <div class="DocSearch-Button">
                     <kbd

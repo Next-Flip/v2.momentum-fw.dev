@@ -342,6 +342,12 @@ const THEME_CONFIG: ThemeConfigMap = {
         default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
         white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
     },
+    skyline: {
+        primary: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-primary invert" },
+        secondary: {  hueRotation: 'hue-rotate-[93deg]', useDarkImage: true, bgContainer: "bg-container-secondary" },
+        default: {  hueRotation: null, useDarkImage: false, bgContainer: null },
+        white: {  hueRotation: null, useDarkImage: true, bgContainer: "bg-container-white" },
+    },
 };
 
 const getThemeConfig = (theme: LogoColor, screenColor: ScreenColor): ThemeConfig => {

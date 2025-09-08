@@ -299,13 +299,15 @@ const filteredAssetPacks = computed(() => {
             >
                 {{ tr("asset_packs") }}
             </h1>
-            <p class="text-sm lg:text-base font-medium text-vp-2 pt-3 leading-5 my-0 mx-auto px-5">
+            <p
+                class="text-sm lg:text-base italic font-normal text-vp-2 pt-3 leading-5 my-0 mx-auto px-5"
+            >
                 {{ tr("pack_advert") }}
                 <a
                     href="https://github.com/Next-Flip/Asset-Packs"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-vp-brand-1 no-underline hover:underline hover:text-vp-brand-2 vp-external-link-icon"
+                    class="text-vp-brand-1 no-underline hover:underline hover:text-vp-brand-2 font-medium"
                     >Next-Flip/Asset-Packs</a
                 >
             </p>

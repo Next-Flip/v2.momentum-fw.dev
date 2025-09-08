@@ -5,8 +5,10 @@ import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useI18n } from "../composables/useI18n";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSettings } from "../composables/useSettings";
+import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 
+import type { LogEntry, LogGroup } from "../types";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -30,45 +32,47 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("
 const logsScrollTrigger = inject<Ref<number>>("logsScrollTrigger", ref(0));
 const { width: windowWidth } = useWindowSize();
 const { isSettingEnabled } = useSettings();
+const { ifCurrentTheme } = useThemeSwitcher();
 const showVerboseLogs = computed(() => isSettingEnabled("verboseLogs"));
 
 const logs = computed(() => {
     if (!serialConnection?.logs) return [];
+    const logsArray =
+        "value" in serialConnection.logs ? serialConnection.logs.value : serialConnection.logs;
     if (showVerboseLogs.value) {
-        return serialConnection.logs;
+        return logsArray;
     }
-    return serialConnection.logs.filter((log) => log.level !== "verbose");
+    return logsArray.filter((log: LogEntry) => log.level !== "verbose");
 });
 
 const groupedLogs = computed(() => {
-    const grouped: Array<{
-        log: (typeof logs.value)[0];
-        count: number;
-    }> = [];
+    if (!logs.value.length) return [];
+    const result: LogGroup[] = [];
 
     for (let i = 0; i < logs.value.length; i++) {
         const currentLog = logs.value[i];
 
         if (i > 0) {
             const previousLog = logs.value[i - 1];
-            const previousGrouped = grouped[grouped.length - 1];
+            const previousGroup = result[result.length - 1];
 
             if (
                 currentLog.message === previousLog.message &&
                 currentLog.level === previousLog.level
             ) {
-                previousGrouped.count++;
+                previousGroup.count++;
                 continue;
             }
         }
 
-        grouped.push({
+        result.push({
             log: currentLog,
             count: 1,
+            id: `${currentLog.timestamp.getTime()}-${i}`,
         });
     }
 
-    return grouped;
+    return result;
 });
 
 const logContainer = useTemplateRef<HTMLElement>("logContainer");
@@ -93,11 +97,14 @@ const clearLogs = () => {
 
 const handleToggle = () => {
     emit("toggle");
+    if (logs.value.length > 0) {
+        scrollToBottom();
+    }
 };
 
 const copyLogs = async () => {
     const logsString = logs.value
-        .map((log) => `${formatDate(log.timestamp, "withTime")} ${log.message}`)
+        .map((log: LogEntry) => `${formatDate(log.timestamp, "withTime")} ${log.message}`)
         .join("\n");
     try {
         if (navigator.clipboard) {
@@ -111,21 +118,22 @@ const copyLogs = async () => {
 
 watch(
     [
-        () => logs.value,
+        () => logs.value.length,
         () => props.isOpen,
         () => logsScrollTrigger.value,
         () => props.isChangelogOpen,
     ],
-    ([newLogs, isExpanded], [oldLogs, wasExpanded]) => {
-        if (!isExpanded && newLogs.length > 0) {
-            const latestLog = newLogs[newLogs.length - 1];
+    ([newLogsLength, isExpanded], [oldLogsLength, wasExpanded]) => {
+        if (!isExpanded && newLogsLength > 0) {
+            const latestLog = logs.value[logs.value.length - 1];
             if (latestLog.level === "error") {
                 emit("toggle");
             }
         }
 
         const shouldScroll =
-            autoScroll.value && (newLogs !== oldLogs || (isExpanded && !wasExpanded) || isExpanded);
+            autoScroll.value &&
+            (newLogsLength !== oldLogsLength || (isExpanded && !wasExpanded) || isExpanded);
 
         if (shouldScroll) {
             nextTick(() => {
@@ -133,12 +141,13 @@ watch(
             });
         }
     },
-    { deep: true },
 );
 
 onMounted(() => {
     if (logs.value.length > 0) {
-        scrollToBottom();
+        nextTick(() => {
+            scrollToBottom();
+        });
     }
 });
 </script>
@@ -149,6 +158,7 @@ onMounted(() => {
         :class="{
             'border-b border-vp-divider': !props.isChangelogOpen && !showLogs,
             'min-h-[250px]': props.isNarrowViewport && showLogs,
+            'bg-vp-dark dark:!bg-black': ifCurrentTheme(['skyline']),
         }"
     >
         <div class="flex flex-col flex-1 min-h-0">
@@ -162,14 +172,19 @@ onMounted(() => {
                     <div
                         class="flex items-center justify-center text-sm text-vp-2/80 rounded-md mt-px mr-0.5 transition-opacity duration-200"
                         :class="{
-                            'opacity-50': logs.length === 0,
+                            'opacity-50': logs.length === 0 || !showLogs,
                         }"
                         :aria-label="tr('updater_logs')"
                         :title="tr('updater_logs')"
                     >
                         <v-icon name="fa-terminal" scale="0.85" />
                     </div>
-                    <h2 class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5">
+                    <h2
+                        class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5"
+                        :class="{
+                            'opacity-50': !showLogs,
+                        }"
+                    >
                         {{ tr("updater_logs") }}
                     </h2>
                     <span
@@ -273,8 +288,9 @@ onMounted(() => {
 
                             <div v-else class="flex flex-col space-y-0 text-sm font-mono w-full">
                                 <div
-                                    v-for="(group, index) in groupedLogs"
-                                    :key="index"
+                                    v-for="group in groupedLogs"
+                                    :key="group.id"
+                                    v-memo="[group.count, group.log.level]"
                                     class="flex items-start gap-1 text-xs pl-2 min-h-5 justify-start relative"
                                     :class="{
                                         'bg-[#FEF6D5] dark:bg-yellow-400/10':

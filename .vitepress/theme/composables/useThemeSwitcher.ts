@@ -68,13 +68,6 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
         }
     };
 
-    const previousLogo = () => {
-        if (!isLocked.value) {
-            currentIndex.value =
-                currentIndex.value === 0 ? logoColors.length - 1 : currentIndex.value - 1;
-        }
-    };
-
     const toggleLock = () => {
         isLocked.value = !isLocked.value;
     };
@@ -125,7 +118,6 @@ export function useThemeSwitcher(basePath: string = "/logos/") {
         isLocked,
         ifCurrentTheme,
         nextLogo,
-        previousLogo,
         toggleLock,
         applyTheme,
     };

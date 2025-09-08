@@ -105,11 +105,12 @@ const getButtonScale = (file: File) => {
             <div
                 :class="[
                     'py-2 pr-2 text-sm font-medium rounded-md flex items-center justify-center flex-shrink-0 select-none',
-                    ifCurrentTheme(['orange'])
+                    ifCurrentTheme(['orange', 'skyline'])
                         ? 'text-vp-brand-1 group-hover:text-black dark:group-hover:text-black'
                         : ifCurrentTheme(['white'])
                           ? 'text-vp-alternate-1 group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                           : 'text-vp-brand-1 group-hover:text-white dark:group-hover:text-white',
+                    ifCurrentTheme(['skyline']) && 'group-hover:text-vp-neutral',
                 ]"
             >
                 <v-icon :name="getButtonIcon(file)" scale="0.9" />
@@ -119,11 +120,12 @@ const getButtonScale = (file: File) => {
                     :class="[
                         'font-normal text-vp-1 text-sm truncate whitespace-nowrap overflow-ellipsis select-none',
                         width <= 640 ? 'text-right' : 'text-left',
-                        ifCurrentTheme(['orange'])
+                        ifCurrentTheme(['orange', 'skyline'])
                             ? 'group-hover:text-black dark:group-hover:text-black'
                             : ifCurrentTheme(['white'])
                               ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                               : 'group-hover:text-white dark:group-hover:text-white',
+                        ifCurrentTheme(['skyline']) && 'group-hover:text-vp-neutral',
                     ]"
                     :dir="width <= 640 ? 'rtl' : 'ltr'"
                     :title="getFileName(file)"
@@ -131,13 +133,14 @@ const getButtonScale = (file: File) => {
                     {{ getFileName(file) }}
                 </span>
                 <div
-                    class="text-xs select-none font-mono whitespace-nowrap ml-auto"
+                    class="text-xs select-none font-mono whitespace-nowrap ml-auto group-hover:font-semibold"
                     :class="[
-                        ifCurrentTheme(['orange'])
+                        ifCurrentTheme(['orange', 'skyline'])
                             ? 'text-vp-brand-1 group-hover:text-black dark:group-hover:text-black'
                             : ifCurrentTheme(['white'])
                               ? 'text-vp-alternate-1 group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse'
                               : 'text-vp-brand-1 group-hover:text-white dark:group-hover:text-white',
+                        ifCurrentTheme(['skyline']) && 'group-hover:text-vp-neutral',
                     ]"
                 >
                     {{

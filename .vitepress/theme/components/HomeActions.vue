@@ -96,12 +96,12 @@ const dynamicButtons = computed((): ActionButton[] => {
                 :key="button.href"
                 :href="button.isLatest ? '#' : button.href"
                 :class="[
-                    'px-7 text-sm leading-9 font-semibold rounded-full border transition-all duration-100 bg-vp-dark/75 backdrop-blur-[1px]',
+                    'px-7 text-sm leading-9 font-semibold rounded-full border transition-all duration-150 bg-vp-dark/75 backdrop-blur-[1px]',
                     isConnecting ? 'w-[100px]' : '',
                     button.theme === 'brand'
                         ? button.isLatest
                             ? `border-vp-brand-2 dark:border-vp-brand-1 dark:hover:border-vp-brand-2 bg-vp-brand-2 hover:bg-vp-brand-3 text-vp-neutral ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
-                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/10 ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
+                            : `border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/10 ${ifCurrentTheme(['orange', 'skyline']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'}`
                         : 'border-vp-border hover:bg-vp-1 dark:hover:bg-vp-border hover:border-vp-3/10 text-vp-1 hover:text-white',
                 ]"
                 >{{ button.text }}</a

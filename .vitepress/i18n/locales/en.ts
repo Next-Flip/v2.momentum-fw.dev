@@ -224,6 +224,7 @@ const messages: MessageSchema = {
     missing: "Missing",
     corrupt: "Corrupt",
     installed: "Installed",
+    Discharging: "Discharging",
 
     update_stage_updating: "Updating...",
     update_stage_updating_short: "Updating",
@@ -304,7 +305,7 @@ const messages: MessageSchema = {
         "We recommend only flashing firmware from verified sources. You can get Momentum releases from <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-brand-1 hover:text-vp-brand-2 here-text underline transition-colors duration-100 font-medium'>{{text}}</a>.",
     updater_change_button: "Change",
     updater_remove_button: "Remove",
-    updater_drop_file_here: "Drop .tgz here",
+    updater_drop_file_here: "Drop .tgz here...",
     updater_drop_file_browse: "Drag & drop an update bundle, or click to upload",
     updater_file_example: "e.g. flipper-z-f7-update-mntm-009.tgz",
     updater_changelog: "Changelog",

@@ -133,6 +133,17 @@ const themePalettes: Record<string, ColorPalette[]> = {
         palette("sky-300/45", "pink-200/25", "transparent"),
         palette("lavender-300/45", "sky-200/25", "transparent"),
     ],
+    skyline: [
+        palette("cyan-300/40", "indigo-400/25", "transparent"),
+        palette("green-400/45", "lime-300/30", "transparent"),
+        palette("emerald-400/45", "teal-300/25", "transparent"),
+        palette("white/40", "emerald-400/25", "transparent"),
+        palette("blue-300/45", "cyan-400/25", "transparent"),
+        palette("teal-400/40", "emerald-300/25", "transparent"),
+        palette("sky-400/40", "blue-300/25", "transparent"),
+        palette("white/30", "green-400/25", "transparent"),
+        palette("lime-400/45", "green-300/30", "transparent"),
+    ],
     mini: [palette("neutral-400/80", "neutral-300/60", "transparent")],
 };
 // prettier-ignore
@@ -283,7 +294,7 @@ watch(
     <Transition name="orbs-fade">
         <div
             v-if="show"
-            class="orbs-container absolute inset-0 opacity-15 dark:opacity-[13%] pointer-events-none saturate-250"
+            class="orbs-container absolute inset-0 opacity-20 dark:opacity-[13%] pointer-events-none saturate-250"
         >
             <div
                 v-for="orb in randomOrbs"

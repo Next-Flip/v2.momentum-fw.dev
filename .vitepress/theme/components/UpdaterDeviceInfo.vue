@@ -249,7 +249,8 @@ const deviceSections = computed(() => {
                     "updater_databases_label",
                     device.storage_databases_present === "loading"
                         ? "..."
-                        : (device.storage_databases_present as string) || connectionTr("missing"),
+                        : tr(device.storage_databases_present as keyof typeof tr) ||
+                          connectionTr("missing"),
                 ],
             ],
         },
@@ -257,7 +258,10 @@ const deviceSections = computed(() => {
             title: tr("updater_power_section"),
             items: [
                 ["updater_charge_level_label", formatPercentage(device.charge_level as string)],
-                ["updater_charge_state_label", formatChargeState(device.charge_state as string)],
+                [
+                    "updater_charge_state_label",
+                    tr(formatChargeState(device.charge_state as string) as keyof typeof tr),
+                ],
                 ["updater_voltage_label", formatBatteryVoltage(device.battery_voltage as string)],
                 ["updater_temperature_label", formatTemperature(device.battery_temp as string)],
                 ["updater_health_label", formatPercentage(device.battery_health as string)],
@@ -445,7 +449,7 @@ const deviceSections = computed(() => {
                                                 { 'wiggle-loop': isInstallButtonHovered },
                                                 ifCurrentTheme(['orange'])
                                                     ? 'hover:text-black'
-                                                    : ifCurrentTheme(['white'])
+                                                    : ifCurrentTheme(['white', 'skyline'])
                                                       ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
                                                       : 'hover:text-white',
                                             ]"

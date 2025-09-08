@@ -13,6 +13,7 @@ import { useDots } from "../composables/useDots";
 import { useGalleryState } from "../composables/useGalleryState";
 import { useI18n } from "../composables/useI18n";
 import { useImageCache } from "../composables/useImageCache";
+import { usePressedState } from "../composables/usePressedState";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSettings } from "../composables/useSettings";
 import { useTempState } from "../composables/useTempState";
@@ -33,6 +34,7 @@ const {
 const { setGalleryIndex, getGalleryIndex, hasGalleryState } = useGalleryState();
 const { getCachedOrProxiedUrl } = useImageCache();
 const { tr } = useI18n();
+const installPressedState = usePressedState();
 const serialConnection = inject<ReturnType<typeof useSerialConnection>>("serialConnection")!;
 
 const shadowCanvas = ref<HTMLCanvasElement | null>(null);
@@ -295,8 +297,6 @@ const shortTimeAgo = computed(() => {
     return shortenTimeString(timeAgo.value);
 });
 
-// Removed checkThemeScreenColor - now using useBgContainer composable
-
 onMounted(() => {
     if (hasGalleryState(props.id) && allPreviewUrls.value.length > 0) {
         const savedIndex = getGalleryIndex(props.id);
@@ -340,13 +340,16 @@ onUnmounted(() => {
             >
                 <canvas
                     ref="shadowCanvas"
-                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-5 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65]"
+                    class="absolute top-0 left-0 w-full h-full object-cover rounded-[3px] blur-[14px] opacity-10 dark:opacity-25 brightness-[0.95] dark:brightness-[0.65]"
                     :class="[
                         {
                             'dark:saturate-0 dark:brightness-[0.95]':
-                                ifCurrentTheme(['white']) &&
-                                screenColor !== 'default' &&
-                                !imageError,
+                                (ifCurrentTheme(['white']) &&
+                                    screenColor !== 'default' &&
+                                    !imageError) ||
+                                (ifCurrentTheme(['skyline']) &&
+                                    screenColor === 'primary' &&
+                                    !imageError),
                         },
                         { 'saturate-0 brightness-[0.95]': screenColor === 'white' },
                         !imageError && shouldUseHueRotation ? hueRotationClass : '',
@@ -552,7 +555,7 @@ onUnmounted(() => {
             <div class="asset-pack-actions flex gap-2 justify-end">
                 <div v-if="downloadUrl" class="action flex-1 z-[5] cursor-pointer">
                     <a
-                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 hover:!border-vp-brand-2 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 text-vp-1 uppercase select-none pointer-events-auto z-10"
+                        class="inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-5 leading-10 border border-vp-brand-1 hover:!border-vp-brand-2 bg-transparent text-sm min-h-5 w-full items-center justify-center h-10 box-border hover:bg-vp-brand-3 text-vp-1 uppercase select-none pointer-events-auto z-10 shadow-grow"
                         :class="{
                             'tracking-widest':
                                 serialConnection.connectionData.state ===
@@ -568,7 +571,8 @@ onUnmounted(() => {
                             'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3':
                                 installed && hasUpdate,
                             'hover:text-black': ifCurrentTheme(['orange']),
-                            'hover:text-vp-neutral-inverse': ifCurrentTheme(['white']),
+                            'hover:text-vp-neutral-inverse': ifCurrentTheme(['white', 'skyline']),
+                            'scale-[0.98]': installPressedState.isPressed.value,
                         }"
                         :aria-label="getActionLabel"
                         download
@@ -577,6 +581,11 @@ onUnmounted(() => {
                                 serialConnection.flags.ableToExtract ? 'install' : 'download',
                             )
                         "
+                        @mousedown="installPressedState.handleMouseDown"
+                        @mouseup="installPressedState.handleMouseUp"
+                        @mouseleave="installPressedState.handleMouseLeave"
+                        @touchstart="installPressedState.handleTouchStart"
+                        @touchend="installPressedState.handleTouchEnd"
                         >{{ getActionLabel }}</a
                     >
                 </div>

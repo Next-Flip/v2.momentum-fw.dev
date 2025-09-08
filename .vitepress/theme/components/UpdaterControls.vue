@@ -11,6 +11,7 @@ import { useClickOutside } from "../composables/useClickOutside";
 import { useConnectionInfo } from "../composables/useConnectionInfo";
 import { useDots } from "../composables/useDots";
 import { useI18n } from "../composables/useI18n";
+import { usePressedState } from "../composables/usePressedState";
 import type { useSerialConnection } from "../composables/useSerialConnection";
 import { useSharedHover } from "../composables/useSharedHover";
 import { useTempState } from "../composables/useTempState";
@@ -27,6 +28,7 @@ const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
 const { dots } = useDots();
 const { ifCurrentTheme } = useThemeSwitcher();
+const installPressedState = usePressedState();
 
 interface Props {
     selectedChannel: ReleaseChannel | null;
@@ -231,7 +233,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
             <div class="flex flex-row gap-3 items-end w-full min-w-0 flex-1">
                 <div class="relative flex-shrink-0 max-w-[200px]">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
+                        class="block text-sm font-normal text-vp-2 mb-3"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_channel_label") }}
@@ -318,7 +320,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 
                 <div class="relative flex-1 min-w-0">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3 pointer-events-none select-none"
+                        class="block text-sm font-normal text-vp-2 mb-3"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{
@@ -576,17 +578,24 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-100 border border-vp-divider box-border mt-3 select-none min-w-32 w-full lg:w-auto"
+                    class="rounded-full transition-all duration-200 border border-vp-divider box-border mt-3 select-none min-w-32 w-full lg:w-auto group"
                     :class="[
                         canFlash &&
                             !isMatchingRelease &&
                             !isBranchRelease &&
-                            '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3',
+                            '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3 shadow-grow',
                         canFlash &&
                             (isMatchingRelease || isBranchRelease) &&
-                            'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-vp-brand-2 hover:!bg-vp-brand-3',
+                            'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-yellow-400 hover:!bg-yellow-400 dark:hover:!border-yellow-500 dark:hover:!bg-yellow-500 shadow-grow-yellow',
                         isInstallButtonHovered && 'opacity-90 transition-all duration-200',
+                        canFlash && 'cursor-pointer',
+                        installPressedState.isPressed.value && 'scale-[0.98]',
                     ]"
+                    @mousedown="installPressedState.handleMouseDown"
+                    @mouseup="installPressedState.handleMouseUp"
+                    @mouseleave="installPressedState.handleMouseLeave"
+                    @touchstart="installPressedState.handleTouchStart"
+                    @touchend="installPressedState.handleTouchEnd"
                 >
                     <Tooltip
                         :disabled="
@@ -601,8 +610,11 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                             class="w-full py-3 rounded-full select-none font-medium flex items-center justify-center gap-2 h-[40px] transition-all duration-150 tracking-tighter uppercase whitespace-nowrap"
                             :class="[
                                 canFlash
-                                    ? `cursor-pointer ${ifCurrentTheme(['orange']) ? 'hover:text-black' : ifCurrentTheme(['white']) ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse' : 'hover:text-white'} px-14`
+                                    ? `${ifCurrentTheme(['orange']) ? 'group-hover:text-black' : ifCurrentTheme(['white', 'skyline']) ? 'group-hover:text-vp-neutral-inverse dark:group-hover:text-vp-neutral-inverse' : 'group-hover:text-white'} px-14`
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12',
+                                canFlash &&
+                                    (isMatchingRelease || isBranchRelease) &&
+                                    'group-hover:!text-black',
                             ]"
                             @click="handleFlashFirmware"
                             @mouseenter="

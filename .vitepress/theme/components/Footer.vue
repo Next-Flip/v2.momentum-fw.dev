@@ -209,4 +209,9 @@ footer:before {
     opacity: 0.3;
     filter: saturate(0) invert(1);
 }
+
+.theme-skyline.dark footer:before {
+    opacity: 0.35;
+    filter: saturate(0) invert(1);
+}
 </style>

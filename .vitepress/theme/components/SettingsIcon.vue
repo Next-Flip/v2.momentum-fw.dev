@@ -23,7 +23,7 @@ const handleButtonLeave = () => {
 <template>
     <div class="settings-container">
         <div
-            class="hover-area VPFlyout"
+            class="hover-area VPFlyout group"
             :class="{ expanded: flyoutOpen }"
             @mouseenter="handleButtonEnter"
             @mouseleave="handleButtonLeave"
@@ -33,7 +33,11 @@ const handleButtonLeave = () => {
                 :class="{ '!text-vp-2': flyoutOpen }"
                 :aria-expanded="flyoutOpen"
             >
-                <v-icon name="oi-gear" scale="1" />
+                <v-icon
+                    name="oi-gear"
+                    scale="1"
+                    class="group-hover:rotate-90 transition-transform duration-200 ease-in"
+                />
             </button>
 
             <div class="menu">

@@ -294,7 +294,9 @@ const expandDisabled = computed(() => {
                     class="prose prose-sm dark:prose-invert max-w-none text-vp-1 mb-5"
                     :class="{ 'prose-branch': isBranchRelease }"
                 >
-                    <div class="" v-html="parsedChangelog"></div>
+                    <Transition name="changelog-fade" mode="out-in">
+                        <div :key="displayVersion" v-html="parsedChangelog"></div>
+                    </Transition>
                 </div>
             </div>
 

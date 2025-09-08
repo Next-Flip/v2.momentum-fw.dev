@@ -219,6 +219,7 @@ export type MessageSchema = {
     missing: string;
     corrupt: string;
     installed: string;
+    Discharging: string;
 
     update_stage_updating: string;
     update_stage_updating_short: string;

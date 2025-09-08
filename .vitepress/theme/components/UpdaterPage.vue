@@ -41,7 +41,7 @@ const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
-const { currentTheme } = useThemeSwitcher();
+const { currentTheme, ifCurrentTheme } = useThemeSwitcher();
 const { screenColor } = useSettings();
 
 const {
@@ -225,7 +225,7 @@ const processFile = (file: File, source: "uploaded" | "selected") => {
         uploadedFileRelease.value = null;
         logToSerial(
             "warning",
-            `[Upload] File ${action}: ${file.name} (could not parse version/commit)`,
+            `[Upload] File ${action}: \`${file.name}\` (could not parse version/commit)`,
         );
     }
 };
@@ -379,7 +379,7 @@ const hasChangelogContent = computed(() => {
     return !!(selectedRelease.value || uploadedFileRelease.value);
 });
 const hasLogsContent = computed(() => {
-    return !!(serialConnection?.logs && serialConnection.logs.length > 0);
+    return !!(serialConnection?.logs && serialConnection.logs.value.length > 0);
 });
 
 const effectiveLogsOpen = computed(() => {
@@ -825,6 +825,11 @@ onBeforeUnmount(() => {
                                         >
                                             <div
                                                 class="flex flex-col items-start gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/80 w-full h-full pt-4 pb-4 px-4 rounded-[5px]"
+                                                :class="{
+                                                    'dark:!bg-vp-bg/50': ifCurrentTheme([
+                                                        'skyline',
+                                                    ]),
+                                                }"
                                             >
                                                 <div
                                                     class="flex flex-row justify-start w-full items-center gap-4 -mt-px -ml-px"
@@ -835,7 +840,11 @@ onBeforeUnmount(() => {
                                                         <v-icon
                                                             name="oi-upload"
                                                             scale="1.2"
-                                                            class="!stroke-vp-dark !stroke-[0.25]"
+                                                            class="!stroke-vp-dark !stroke-[0.25] group-hover:scale-105 transition-transform duration-100 ease-in"
+                                                            :class="{
+                                                                'scale-105 text-vp-brand-3 dark:text-vp-brand-1':
+                                                                    isOverDropZone,
+                                                            }"
                                                         />
                                                     </div>
                                                     <div
