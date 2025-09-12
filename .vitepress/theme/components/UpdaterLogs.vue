@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { useScroll, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef, watch, type Ref } from "vue";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useI18n } from "../composables/useI18n";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useSettings } from "../composables/useSettings";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 
+import {
+    useConnectionInfo,
+    useI18n,
+    useSerialConnection,
+    useSettings,
+    useThemeSwitcher,
+} from "../composables";
 import type { LogEntry, LogGroup } from "../types";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
@@ -26,7 +28,7 @@ const emit = defineEmits<{
     toggle: [];
 }>();
 
-const { tr } = useI18n();
+const { tr, translateLog } = useI18n();
 const { copyState } = useConnectionInfo();
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const logsScrollTrigger = inject<Ref<number>>("logsScrollTrigger", ref(0));
@@ -104,7 +106,10 @@ const handleToggle = () => {
 
 const copyLogs = async () => {
     const logsString = logs.value
-        .map((log: LogEntry) => `${formatDate(log.timestamp, "withTime")} ${log.message}`)
+        .map(
+            (log: LogEntry) =>
+                `${formatDate(log.timestamp, "withTime")} ${translateLog(log.message)}`,
+        )
         .join("\n");
     try {
         if (navigator.clipboard) {
@@ -177,7 +182,7 @@ onMounted(() => {
                         :aria-label="tr('updater_logs')"
                         :title="tr('updater_logs')"
                     >
-                        <v-icon name="fa-terminal" scale="0.85" />
+                        <v-icon name="fa-terminal" scale="0.8" />
                     </div>
                     <h2
                         class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5"
@@ -286,7 +291,10 @@ onMounted(() => {
                                 </div>
                             </div>
 
-                            <div v-else class="flex flex-col space-y-0 text-sm font-mono w-full">
+                            <div
+                                v-else
+                                class="flex flex-col space-y-0 text-sm font-mono w-full prose dark:prose-invert"
+                            >
                                 <div
                                     v-for="group in groupedLogs"
                                     :key="group.id"
@@ -305,11 +313,11 @@ onMounted(() => {
                                     <div
                                         class="absolute left-0 top-0 h-full w-0.5"
                                         :class="{
-                                            'bg-yellow-300 dark:bg-yellow-600/50':
+                                            'bg-yellow-300 dark:bg-yellow-600/60':
                                                 group.log.level === 'warning',
-                                            'bg-red-300 dark:bg-red-600/50':
+                                            'bg-red-300 dark:bg-red-600/60':
                                                 group.log.level === 'error',
-                                            'bg-green-300 dark:bg-green-600/50':
+                                            'bg-green-300 dark:bg-green-600/60':
                                                 group.log.level === 'success',
                                         }"
                                     ></div>
@@ -338,7 +346,7 @@ onMounted(() => {
                                                 group.log.level === 'success',
                                         }"
                                     >
-                                        <span v-html="group.log.message"></span>
+                                        <span v-html="translateLog(group.log.message)"></span>
                                     </span>
                                     <span
                                         v-if="group.count > 1"
@@ -391,5 +399,47 @@ onMounted(() => {
         transform 100ms ease-out,
         background-color 100ms ease-out,
         color 100ms ease-out !important;
+}
+
+.prose {
+    max-width: none;
+}
+.prose :deep(code) {
+    font-size: 11px;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    color: var(--vp-c-alternate-1);
+    background-color: color-mix(in srgb, var(--vp-c-alternate-1) 10%, transparent);
+}
+.prose :deep(code.code-url) {
+    background-color: color-mix(in srgb, var(--vp-c-brand-1) 10%, transparent);
+}
+.theme-white .prose :deep(code) {
+    color: var(--vp-c-brand-1);
+}
+.theme-skyline .prose :deep(code.code-primary),
+.theme-white .prose :deep(code.code-primary) {
+    color: var(--vp-c-white);
+    background-color: var(--vp-c-black);
+}
+.prose :deep(code.code-primary) {
+    color: var(--vp-c-black);
+    background-color: var(--vp-c-brand-1);
+}
+.prose :deep(code.code-secondary) {
+    color: var(--vp-c-black);
+    background-color: var(--vp-c-alternate-1);
+}
+.prose :deep(code.code-default) {
+    color: var(--vp-c-black);
+    background-color: var(--vp-c-flipper-fill);
+}
+.prose :deep(code.code-white) {
+    color: var(--vp-c-black);
+    background-color: var(--vp-c-white);
+}
+.prose :deep(code):before,
+.prose :deep(code):after {
+    content: "";
 }
 </style>

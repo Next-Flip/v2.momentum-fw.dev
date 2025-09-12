@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
 import { computed, ref, useTemplateRef } from "vue";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useI18n } from "../composables/useI18n";
-import { useSharedHover } from "../composables/useSharedHover";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate } from "../date";
 import type { DeviceInfo } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { bytesToSize, supportsSerialPort } from "../util";
 
-import { useTempState } from "../composables/useTempState";
+import {
+    useConnectionInfo,
+    useI18n,
+    useSharedHover,
+    useTempState,
+    useThemeSwitcher,
+} from "../composables";
 import ScreenDisplay from "./ScreenDisplay.vue";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";

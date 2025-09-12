@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
 import { recentReleases } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
-import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useI18n, useSerialConnection } from "../composables";
 import { ConnectionState } from "../types";
 
 const { tr, getLocalizedPath } = useI18n();

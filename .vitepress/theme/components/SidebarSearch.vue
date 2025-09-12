@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vitepress";
 import { computed, onMounted } from "vue";
-import { useI18n } from "../composables/useI18n";
+import { useI18n } from "../composables";
 
 const router = useRouter();
 const { tr } = useI18n();

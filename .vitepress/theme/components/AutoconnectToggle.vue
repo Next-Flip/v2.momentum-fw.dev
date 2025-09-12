@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from "vue";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useI18n } from "../composables/useI18n";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useSettings } from "../composables/useSettings";
+import { useConnectionInfo, useI18n, useSerialConnection, useSettings } from "../composables";
 import Toggle from "./Toggle.vue";
 
 const { tr } = useI18n();

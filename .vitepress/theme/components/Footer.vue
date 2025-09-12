@@ -2,11 +2,10 @@
 import { useData, useRoute } from "vitepress";
 import { computed, ref } from "vue";
 import { recentReleases } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
 import { formatDate } from "../date";
 
 import { buildInfo } from "../../../_data/buildInfo";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useI18n, useThemeSwitcher } from "../composables";
 import FooterSection from "./FooterSection.vue";
 
 const { site } = useData();

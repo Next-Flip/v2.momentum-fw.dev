@@ -2,15 +2,12 @@
 import { useMagicKeys, useWindowSize, whenever } from "@vueuse/core";
 import { useRoute } from "vitepress";
 import { computed, onMounted, ref, watch } from "vue";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useDots } from "../composables/useDots";
-import { useSettings } from "../composables/useSettings";
-import { useSharedHover } from "../composables/useSharedHover";
 import { formatDate } from "../date";
 import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
+import { useConnectionInfo, useDots, useSettings, useSharedHover } from "../composables";
 import SettingsIcon from "./SettingsIcon.vue";
 import Tooltip from "./Tooltip.vue";
 

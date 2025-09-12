@@ -220,19 +220,19 @@ export const useSerialConnection = () => {
 
     navigator.serial.addEventListener("disconnect", () => {
         if (flags.connected) {
-            addLog("info", "[Serial] Physical disconnect detected - disconnected");
+            addLog("info", "[{{Serial}}] Physical disconnect detected - disconnected");
             resetFlagsAndState();
         }
     });
 
     navigator.serial.addEventListener("connect", () => {
         if (flags.connected) {
-            addLog("info", "[Serial] Flipper is already connected, skipping connection");
+            addLog("info", "[{{Serial}}] Flipper is already connected, skipping connection");
             return;
         }
 
         if (isSettingEnabled("autoConnect")) {
-            addLog("info", "[Serial] Autoconnect enabled, attempting auto-connect");
+            addLog("info", "[{{Serial}}] Autoconnect enabled, attempting auto-connect");
             autoConnect(1, 500);
         }
     });
@@ -266,7 +266,7 @@ export const useSerialConnection = () => {
     const performCleanup = async () => {
         const wasConnected = flags.connected;
         connectionData.state = ConnectionState.DISCONNECTING;
-        addLog("info", "[Serial] Starting cleanup process");
+        addLog("info", "[{{Serial}}] Starting cleanup process");
 
         try {
             if (flipper) {
@@ -283,7 +283,7 @@ export const useSerialConnection = () => {
                         new Promise((_, reject) =>
                             setTimeout(() => reject(new Error("timeout")), 2000),
                         ),
-                    ]).catch((error) => addLog("warning", `[Serial] stopRpc failed: ${error}`));
+                    ]).catch((error) => addLog("warning", `[{{Serial}}] stopRpc failed: ${error}`));
                     await asyncSleep(100);
                 }
 
@@ -292,7 +292,7 @@ export const useSerialConnection = () => {
                     new Promise((_, reject) =>
                         setTimeout(() => reject(new Error("timeout")), 2000),
                     ),
-                ]).catch((error) => addLog("warning", `[Serial] closeReader failed: ${error}`));
+                ]).catch((error) => addLog("warning", `[{{Serial}}] closeReader failed: ${error}`));
 
                 await asyncSleep(100);
 
@@ -301,7 +301,7 @@ export const useSerialConnection = () => {
                     new Promise((_, reject) =>
                         setTimeout(() => reject(new Error("timeout")), 2000),
                     ),
-                ]).catch((error) => addLog("warning", `[Serial] disconnect failed: ${error}`));
+                ]).catch((error) => addLog("warning", `[{{Serial}}] disconnect failed: ${error}`));
 
                 await asyncSleep(100);
 
@@ -320,7 +320,7 @@ export const useSerialConnection = () => {
                     ])) as { flushCommandQueue: () => void };
                     rpcModule.flushCommandQueue();
                 } catch (error) {
-                    addLog("warning", `[Serial] flush command queue failed: ${error}`);
+                    addLog("warning", `[{{Serial}}] flush command queue failed: ${error}`);
                 }
 
                 flipper = null;
@@ -335,17 +335,17 @@ export const useSerialConnection = () => {
                             if (port.writable?.locked) await port.writable.abort();
                             if (port.opened) await port.close();
                         } catch (error) {
-                            addLog("warning", `[Serial] Failed to close port: ${error}`);
+                            addLog("warning", `[{{Serial}}] Failed to close port: ${error}`);
                         }
                     }
                 }
             }
         } catch (error) {
-            addLog("error", `[Serial] Cleanup error: ${error}`);
+            addLog("error", `[{{Serial}}] Cleanup error: ${error}`);
         } finally {
             resetFlagsAndState();
             flipper = null;
-            addLog("info", "[Serial] Cleanup completed - disconnected");
+            addLog("info", "[{{Serial}}] Cleanup completed - disconnected");
         }
     };
 
@@ -360,7 +360,7 @@ export const useSerialConnection = () => {
 
         try {
             const flipperModule = await getFlipperModule();
-            addLog("verbose", "[RPC] Starting session with flipper");
+            addLog("verbose", "[{{RPC}}] Starting session with flipper");
             const ping = await flipperModule.commands.startRpcSession(flipperModule);
 
             if (!ping.resolved || ping.error) {
@@ -369,17 +369,17 @@ export const useSerialConnection = () => {
 
             flags.rpcActive = true;
             flags.rpcToggling = false;
-            addLog("success", "[Serial] RPC session started successfully");
+            addLog("success", "[{{Serial}}] RPC session started successfully");
         } catch (error) {
             flags.rpcToggling = false;
-            addLog("error", `[Serial] RPC session failed: ${error}`);
+            addLog("error", `[{{Serial}}] RPC session failed: ${error}`);
             throw error;
         }
     };
 
     const stopRpc = async () => {
         flags.rpcToggling = true;
-        addLog("debug", "[Serial] Stopping RPC session");
+        addLog("debug", "[{{Serial}}] Stopping RPC session");
 
         try {
             const flipperModule = await getFlipperModule();
@@ -387,10 +387,10 @@ export const useSerialConnection = () => {
             await flipperModule.commands.stopRpcSession();
             flags.rpcActive = false;
             flags.rpcToggling = false;
-            addLog("info", "[Serial] RPC session stopped");
+            addLog("info", "[{{Serial}}] RPC session stopped");
         } catch (error) {
             flags.rpcToggling = false;
-            addLog("warning", `[Serial] Warning: RPC session stop failed: ${error}`);
+            addLog("warning", `[{{Serial}}] Warning: RPC session stop failed: ${error}`);
         }
     };
 
@@ -437,8 +437,8 @@ export const useSerialConnection = () => {
             const currentLocale = getCurrentLocale();
             const localizedReleasesPath = `${currentLocale === "en" ? "" : "/" + currentLocale}/releases`;
             addLog(
-                "debug",
-                `[Misc] Current locale: ${currentLocale}, Localized releases path: ${localizedReleasesPath}`,
+                "verbose",
+                `[{{Misc}}] Current locale: <code>${currentLocale}</code>, Localized releases path: <code>${localizedReleasesPath}</code>`,
             );
 
             const commitLink = info.firmware_commit
@@ -449,13 +449,13 @@ export const useSerialConnection = () => {
                 : "???";
             addLog(
                 "info",
-                `[Serial] Flipper info loaded - ${info.hardware_name || "???"} (${info.firmware_version || "???"}, ${commitLink}, ${branchLink})`,
+                `[{{Serial}}] Flipper info loaded - ${info.hardware_name || "???"} (<code>${info.firmware_version || "???"}</code>, ${commitLink}, ${branchLink})`,
             );
             readStorageInfo();
 
             return info;
         } catch (error) {
-            addLog("error", `[Serial] Failed to read basic info: ${error}`);
+            addLog("error", `[{{Serial}}] Failed to read basic info: ${error}`);
             throw error;
         }
     };
@@ -476,26 +476,26 @@ export const useSerialConnection = () => {
                 updatedInfo.storage_sdcard_freeSpace = extInfo.freeSpace;
                 addLog(
                     "debug",
-                    `[Serial] SD card detected - ${Math.round(extInfo.freeSpace / 1024 / 1024)}MB free`,
+                    `[{{Serial}}] SD card detected - <code>${Math.round(extInfo.freeSpace / 1024 / 1024)}MB</code> free`,
                 );
             } else {
                 updatedInfo.storage_sdcard_present = "missing";
                 updatedInfo.storage_databases_present = "missing";
-                addLog("debug", "[Serial] No SD card detected");
+                addLog("debug", "[{{Serial}}] No SD card detected");
             }
         } catch (error) {
-            addLog("warning", `[Serial] Failed to read /ext storage info: ${error}`);
+            addLog("warning", `[{{Serial}}] Failed to read /ext storage info: ${error}`);
             updatedInfo.storage_sdcard_present = "missing";
             updatedInfo.storage_databases_present = "missing";
         }
 
         try {
-            addLog("verbose", "[Storage] Reading /int storage information");
+            addLog("verbose", "[{{Storage}}] Reading <code>/int</code> storage information");
             const intInfo = await flipper.commands.storage.info("/int");
             updatedInfo.storage_internal_totalSpace = intInfo.totalSpace;
             updatedInfo.storage_internal_freeSpace = intInfo.freeSpace;
         } catch (error) {
-            addLog("warning", `[Serial] Failed to read internal storage info: ${error}`);
+            addLog("warning", `[{{Serial}}] Failed to read internal storage info: ${error}`);
         }
 
         connectionData.deviceInfo = updatedInfo;
@@ -505,7 +505,7 @@ export const useSerialConnection = () => {
         try {
             const ports = await findKnownDevices();
             if (ports.length === 0) {
-                addLog("info", "[Serial] No known devices found, skipping auto-connect");
+                addLog("info", "[{{Serial}}] No known devices found, skipping auto-connect");
                 return false;
             }
         } catch {
@@ -527,24 +527,24 @@ export const useSerialConnection = () => {
                     errorMessage.includes("failed to execute 'open' on 'serialport'") ||
                     errorMessage.includes("serial port is busy")
                 ) {
-                    addLog("warning", `[Serial] Auto-connect stopped`);
+                    addLog("warning", `[{{Serial}}] Auto-connect stopped`);
                     return false;
                 }
 
                 addLog(
                     "warning",
-                    `[Serial] Auto-connect attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
+                    `[{{Serial}}] Auto-connect attempt ${attempt} failed: ${error instanceof Error ? error.message : error}`,
                 );
             }
             await asyncSleep(delayMs);
         }
-        addLog("error", `[Serial] Auto-connect failed after ${maxRetries} attempts`);
+        addLog("error", `[{{Serial}}] Auto-connect failed after ${maxRetries} attempts`);
         return false;
     };
 
     const connect = async () => {
         if (!flags.serialSupported) {
-            addLog("error", "[Serial] Web Serial API not supported in this browser");
+            addLog("error", "[{{Serial}}] Web Serial API not supported in this browser");
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = "Serial not supported";
             return;
@@ -571,12 +571,12 @@ export const useSerialConnection = () => {
                 try {
                     await flipper.closeReader();
                 } catch {
-                    addLog("debug", "[Serial] No existing reader to close");
+                    addLog("debug", "[{{Serial}}] No existing reader to close");
                 }
             } catch (error) {
                 addLog(
                     "debug",
-                    `[Serial] Proactive cleanup completed with some errors (normal): ${error}`,
+                    `[{{Serial}}] Proactive cleanup completed with some errors (normal): ${error}`,
                 );
             }
 
@@ -584,13 +584,13 @@ export const useSerialConnection = () => {
             let ports = await findKnownDevices();
 
             if (ports.length === 0) {
-                addLog("debug", "[Serial] No known devices found, requesting port selection");
+                addLog("debug", "[{{Serial}}] No known devices found, requesting port selection");
                 try {
                     await requestPort();
                     ports = await findKnownDevices();
                 } catch (error) {
                     if (error instanceof Error && error.message === "USER_CANCELED") {
-                        addLog("info", "[Serial] User canceled port selection");
+                        addLog("info", "[{{Serial}}] User canceled port selection");
                         connectionData.state = ConnectionState.DISCONNECTED;
                         connectionData.error = undefined;
                         return;
@@ -603,9 +603,9 @@ export const useSerialConnection = () => {
                 throw new Error("No known ports");
             }
 
-            addLog("debug", `[Serial] Found ${ports.length} device(s), attempting connection`);
+            addLog("debug", `[{{Serial}}] Found ${ports.length} device(s), attempting connection`);
             try {
-                addLog("verbose", "[Connection] Establishing serial connection");
+                addLog("verbose", "[{{Connection}}] Establishing serial connection");
                 await flipper.connect();
                 flags.connected = true;
             } catch (flipperError) {
@@ -614,17 +614,20 @@ export const useSerialConnection = () => {
                     (flipperError.message.includes("Cannot cancel a locked stream") ||
                         flipperError.message.includes("locked to a reader"))
                 ) {
-                    addLog("debug", "[Serial] Port locked, attempting recovery");
+                    addLog("debug", "[{{Serial}}] Port locked, attempting recovery");
                     try {
-                        addLog("verbose", "[Connection] Closing serial reader for recovery");
+                        addLog("verbose", "[{{Connection}}] Closing serial reader for recovery");
                         await flipper.closeReader();
                         await new Promise((resolve) => setTimeout(resolve, 1000));
-                        addLog("verbose", "[Connection] Reconnecting after recovery");
+                        addLog("verbose", "[{{Connection}}] Reconnecting after recovery");
                         await flipper.connect();
                         flags.connected = true;
-                        addLog("info", "[Serial] Physical connection established after recovery");
+                        addLog(
+                            "info",
+                            "[{{Serial}}] Physical connection established after recovery",
+                        );
                     } catch (retryError) {
-                        addLog("error", `[Serial] Retry failed: ${retryError}`);
+                        addLog("error", `[{{Serial}}] Retry failed: ${retryError}`);
                         throw new Error("Serial port is busy - please close other connections");
                     }
                 } else {
@@ -639,11 +642,11 @@ export const useSerialConnection = () => {
                     }, 5000);
                 });
 
-                addLog("verbose", "[RPC] Starting session after connection");
+                addLog("verbose", "[{{RPC}}] Starting session after connection");
                 await Promise.race([startRpc(), rpcTimeout]);
             } catch (rpcError) {
                 if (rpcError instanceof Error && rpcError.message === "RPC_TIMEOUT") {
-                    addLog("warning", "[Serial] RPC timeout - flipper appears to be locked");
+                    addLog("warning", "[{{Serial}}] RPC timeout - flipper appears to be locked");
                     resetFlagsAndState();
                     connectionData.state = ConnectionState.LOCKED;
                     connectionData.error =
@@ -653,7 +656,7 @@ export const useSerialConnection = () => {
                     throw rpcError;
                 }
             }
-            addLog("verbose", "[Flipper] Reading basic information");
+            addLog("verbose", "[{{Flipper}}] Reading basic information");
             await readBasicInfo();
             // small delay to not conflict the the storage info stuff before, causing either sdcard size not to load or installed packs not to load
             await asyncSleep(100);
@@ -667,7 +670,7 @@ export const useSerialConnection = () => {
             connectionData.state = ConnectionState.CONNECTED;
             addLog(
                 "success",
-                `[Serial] Hello ${connectionData.deviceInfo?.hardware_name}... you are connected!`,
+                `[{{Serial}}] Hello ${connectionData.deviceInfo?.hardware_name}... you are connected!`,
             );
         } catch (error) {
             flags.connected = false;
@@ -684,19 +687,19 @@ export const useSerialConnection = () => {
 
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = userFriendlyError;
-            addLog("error", `[Serial] Connection failed: ${userFriendlyError}`);
+            addLog("error", `[{{Serial}}] Connection failed: ${userFriendlyError}`);
             throw error;
         }
     };
 
     const disconnect = async () => {
-        addLog("verbose", "[Connection] Disconnecting and cleaning up");
+        addLog("verbose", "[{{Connection}}] Disconnecting and cleaning up");
         await performCleanup();
     };
 
     const installAssetPack = async (packUrl: string) => {
         if (!flags.connected || !flipper) {
-            addLog("error", "[Serial] Cannot install: flipper not connected");
+            addLog("error", "[{{Serial}}] Cannot install: flipper not connected");
             throw new Error("Flipper not connected");
         }
 
@@ -912,7 +915,7 @@ export const useSerialConnection = () => {
             if (!json.sha256 || !Array.isArray(json.folders)) {
                 addLog(
                     "warning",
-                    `[Serial] Invalid manifest format for ${path}: ${JSON.stringify({
+                    `[{{Serial}}] Invalid manifest format for ${path}: ${JSON.stringify({
                         hasSha256: !!json.sha256,
                         foldersIsArray: Array.isArray(json.folders),
                         json: json,
@@ -926,7 +929,7 @@ export const useSerialConnection = () => {
                 folders: json.folders,
             };
         } catch {
-            addLog("warning", `[Serial] Failed to load pack manifest: ${path}`);
+            addLog("warning", `[{{Serial}}] Failed to load pack manifest: ${path}`);
             return null;
         }
     };
@@ -940,13 +943,16 @@ export const useSerialConnection = () => {
         }
 
         if (loadingInstalledPacks) {
-            addLog("debug", "[Serial] Already loading installed packs, skipping duplicate call");
+            addLog(
+                "debug",
+                "[{{Serial}}] Already loading installed packs, skipping duplicate call",
+            );
             return connectionData.installedPacks;
         }
 
         loadingInstalledPacks = true;
         const installed: InstalledPacks = {};
-        addLog("debug", "[Serial] Loading installed asset packs");
+        addLog("debug", "[{{Serial}}] Loading installed asset packs");
 
         try {
             addLog(
@@ -976,15 +982,18 @@ export const useSerialConnection = () => {
 
             const packCount = Object.keys(installed).length;
             if (packCount > 0) {
-                addLog("info", `[Serial] Found ${packCount} installed asset pack(s)`);
+                addLog("info", `[{{Serial}}] Found ${packCount} installed asset pack(s)`);
             }
         } catch (error) {
             if (error === "ERROR_STORAGE_NOT_EXIST") {
-                addLog("debug", "[Serial] Asset packs directory not found (normal for first use)");
+                addLog(
+                    "debug",
+                    "[{{Serial}}] Asset packs directory not found (normal for first use)",
+                );
                 loadingInstalledPacks = false;
                 return {};
             }
-            addLog("warning", `[Serial] Failed to load installed packs: ${error}`);
+            addLog("warning", `[{{Serial}}] Failed to load installed packs: ${error}`);
             loadingInstalledPacks = false;
             return {};
         } finally {
@@ -1116,7 +1125,7 @@ export const useSerialConnection = () => {
 
             addLog(
                 "debug",
-                `[Serial] Extract capability: ${flags.ableToExtract ? "supported" : "not supported"} (version: ${version})`,
+                `[{{Serial}}] Extract capability: ${flags.ableToExtract ? "supported" : "not supported"} (version: <code>${version}</code>)`,
             );
         } catch (error) {
             addLog("warning", `[AssetPacks] Failed to check extract capability: ${error}`);
@@ -1137,7 +1146,7 @@ export const useSerialConnection = () => {
 
             addLog(
                 "debug",
-                `[Serial] Firmware update capability: ${flags.ableToUpdate ? "supported" : "not supported"} (version: ${version})`,
+                `[{{Serial}}] Firmware update capability: ${flags.ableToUpdate ? "supported" : "not supported"} (version: <code>${version}</code>)`,
             );
         } catch (error) {
             addLog("warning", `[Firmware] Failed to check firmware update capability: ${error}`);
@@ -1161,7 +1170,7 @@ export const useSerialConnection = () => {
 
         try {
             const flipperModule = await getFlipperModule();
-            addLog("verbose", "[Stream] Starting screen stream from flipper");
+            addLog("verbose", "[{{Stream}}] Starting screen stream from flipper");
             await flipperModule.commands.gui.startScreenStreamRequest();
 
             flags.screenStream = true;
@@ -1245,7 +1254,7 @@ export const useSerialConnection = () => {
         }
 
         const flipperModule = await getFlipperModule();
-        addLog("verbose", "[Stream] Stopping screen stream");
+        addLog("verbose", "[{{Stream}}] Stopping screen stream");
         await flipperModule.commands.gui.stopScreenStreamRequest();
 
         flags.screenStream = false;
@@ -1426,7 +1435,7 @@ export const useSerialConnection = () => {
             addLog("verbose", "[Region] Writing region data to flipper");
             await flipperModule.commands.storage.write("/int/.region_data", encoded);
 
-            addLog("info", `[Firmware] Set Sub-GHz region: ${regions.country}`);
+            addLog("info", `[Firmware] Set Sub-GHz region: <code>${regions.country}</code>`);
         } catch (error) {
             addLog("error", `[Firmware] Region provisioning failed: ${error}`);
             throw error;
@@ -1465,7 +1474,7 @@ export const useSerialConnection = () => {
         flags.screenStreamPaused = true;
         if (flags.screenStream) {
             try {
-                addLog("verbose", "[Stream] Stopping screen stream for firmware update");
+                addLog("verbose", "[{{Stream}}] Stopping screen stream for firmware update");
                 await stopScreenStream();
                 addLog("info", "[Firmware] Stopped screen stream for firmware update");
                 await asyncSleep(500);
@@ -1504,12 +1513,12 @@ export const useSerialConnection = () => {
             addLog("verbose", "[RPC] Restarting session");
             await startRpc();
             flags.restarting = false;
-            addLog("info", "[Serial] RPC connection restarted successfully");
+            addLog("info", "[{{Serial}}] RPC connection restarted successfully");
         }
     };
 
     const testConnecting = async () => {
-        addLog("verbose", "[Test] connection state change");
+        addLog("verbose", "[{{Test}}] connection state change");
         connectionData.state = ConnectionState.CONNECTING;
     };
 
@@ -1519,11 +1528,11 @@ export const useSerialConnection = () => {
         loop: boolean = false,
     ): Promise<boolean> => {
         if (!flags.connected || !flags.rpcActive) {
-            addLog("warning", "[Test] Firmware update without connection");
+            addLog("warning", "[{{Test}}] Firmware update without connection");
         }
 
         if (!flags.ableToUpdate) {
-            addLog("warning", "[Test] Firmware update on unsupported flipper");
+            addLog("warning", "[{{Test}}] Firmware update on unsupported flipper");
         }
 
         firmwareState.updateStage = "";
@@ -1535,19 +1544,19 @@ export const useSerialConnection = () => {
         if (flags.screenStream) {
             try {
                 await stopScreenStream();
-                addLog("info", "[Test] Stopped screen stream for firmware update");
+                addLog("info", "[{{Test}}] Stopped screen stream for firmware update");
                 await asyncSleep(500);
             } catch (error) {
-                addLog("warning", `[Test] Failed to stop screen stream: ${error}`);
+                addLog("warning", `[{{Test}}] Failed to stop screen stream: ${error}`);
             }
         }
 
         try {
-            addLog("verbose", "[Test] Loading test firmware");
+            addLog("verbose", "[{{Test}}] Loading test firmware");
             await testLoadFirmware(release, uploadedFile);
             return true;
         } catch (error) {
-            addLog("error", `[Test] Firmware update failed: ${error}`);
+            addLog("error", `[{{Test}}] Firmware update failed: ${error}`);
             throw error;
         } finally {
             flags.updateInProgress = false;
@@ -1555,7 +1564,7 @@ export const useSerialConnection = () => {
             flags.screenStreamPaused = false;
             await asyncSleep(2000);
             if (loop) {
-                addLog("verbose", "[Test] Continuing firmware test loop");
+                addLog("verbose", "[{{Test}}] Continuing firmware test loop");
                 await testUpdateFirmware(release, uploadedFile, true);
             }
         }
@@ -1574,18 +1583,18 @@ export const useSerialConnection = () => {
         if (connectionData.deviceInfo?.hardware_region !== "0") {
             setUpdateStage("update_stage_set_region");
             await asyncSleep(1000);
-            addLog("info", "[Test] Set Sub-GHz region: US");
+            addLog("info", "[{{Test}}] Set Sub-GHz region: <code>US</code>");
         }
 
         setUpdateStage("update_stage_downloading_firmware");
-        addLog("verbose", "[Test] firmware download");
+        addLog("verbose", "[{{Test}}] firmware download");
         await asyncSleep(1500);
 
         let files: { name: string; size: number }[] = [];
 
         if (uploadedFile) {
-            addLog("info", `[Test] Loading firmware from file: ${uploadedFile.name}`);
-            addLog("debug", `[Test] File size: ${uploadedFile.size} bytes`);
+            addLog("info", `[{{Test}}] Loading firmware from file: ${uploadedFile.name}`);
+            addLog("debug", `[{{Test}}] File size: ${uploadedFile.size} bytes`);
 
             files = [
                 { name: "update.fuf", size: 1024 },
@@ -1594,7 +1603,7 @@ export const useSerialConnection = () => {
                 { name: "scripts/update.sh", size: 256 },
                 { name: "assets/", size: 0 },
             ];
-            addLog("debug", `[Test] Extracted ${files.length} files from uploaded file`);
+            addLog("debug", `[{{Test}}] Extracted ${files.length} files from uploaded file`);
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
             if (!release) {
@@ -1608,7 +1617,7 @@ export const useSerialConnection = () => {
 
             addLog(
                 "info",
-                `[Test] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
+                `[{{Test}}] Downloading firmware from: <a href="${firmwareUrl}" target="_blank">${firmwareUrl}</a>`,
             );
 
             files = [
@@ -1619,7 +1628,7 @@ export const useSerialConnection = () => {
                 { name: "assets/", size: 0 },
             ];
 
-            addLog("debug", `[Test] Extracted ${files.length} files from download`);
+            addLog("debug", `[{{Test}}] Extracted ${files.length} files from download`);
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         }
 
@@ -1632,7 +1641,7 @@ export const useSerialConnection = () => {
                     name: `/ext/update/${file.name}`,
                 });
                 await asyncSleep(50);
-                addLog("debug", `[Test] Created directory: /ext/update/${file.name}`);
+                addLog("debug", `[{{Test}}] Created directory: /ext/update/${file.name}`);
             } else {
                 fileIndex++;
                 setUpdateStage("update_stage_uploading_file", {
@@ -1645,14 +1654,14 @@ export const useSerialConnection = () => {
                 const progressSteps = 20;
                 const stepDuration = uploadDuration / progressSteps;
 
-                addLog("verbose", `[Test] file upload progress: ${file.name}`);
+                addLog("verbose", `[{{Test}}] file upload progress: ${file.name}`);
                 for (let i = 0; i <= progressSteps; i++) {
                     const progress = i / progressSteps;
                     flags.progress = progress;
                     await asyncSleep(stepDuration);
                 }
 
-                addLog("debug", `[Test] Uploaded file: ${file.name}`);
+                addLog("debug", `[{{Test}}] Uploaded file: ${file.name}`);
 
                 flags.progress = 1;
                 await asyncSleep(100);
@@ -1665,21 +1674,21 @@ export const useSerialConnection = () => {
 
         setUpdateStage("update_stage_loading_manifest");
         await asyncSleep(500);
-        addLog("debug", "[Test] Loaded update manifest");
+        addLog("debug", "[{{Test}}] Loaded update manifest");
 
         setUpdateStage("update_stage_rebooting");
         const uploadDuration = performance.now() - uploadStartTime;
         const formattedDuration = formatDuration(uploadDuration);
         addLog(
             "success",
-            `[Test] Upload completed in ${formattedDuration} successfully. Rebooting...`,
+            `[{{Test}}] Upload completed in ${formattedDuration} successfully. Rebooting...`,
         );
         await asyncSleep(1000);
 
         setUpdateStage("update_stage_done");
         await asyncSleep(2000);
 
-        addLog("verbose", "[Test] flipper update stage");
+        addLog("verbose", "[{{Test}}] flipper update stage");
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
     };

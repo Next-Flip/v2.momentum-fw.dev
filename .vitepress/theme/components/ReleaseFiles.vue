@@ -6,7 +6,7 @@ import type {
     MainlineFile,
     ReleaseItem,
 } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
+import { useI18n } from "../composables";
 import { supportsSerialPort } from "../util";
 
 import FileGrid from "./FileGrid.vue";

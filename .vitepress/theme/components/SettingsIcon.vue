@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useI18n } from "../composables/useI18n";
-import { useSettings } from "../composables/useSettings";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
+import { useI18n, useSettings } from "../composables";
 import Toggle from "./Toggle.vue";
 
 const { tr } = useI18n();

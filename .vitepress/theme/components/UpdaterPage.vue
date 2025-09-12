@@ -9,17 +9,18 @@ import {
     getReleaseByVersion,
     mainlineReleases,
 } from "../../../_data/releases";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useI18n } from "../composables/useI18n";
-import { usePanelResize } from "../composables/usePanelResize";
-import { useReleaseNavigation } from "../composables/useReleaseNavigation";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useSettings } from "../composables/useSettings";
-import { useSharedHover } from "../composables/useSharedHover";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import {
+    useConnectionInfo,
+    useI18n,
+    usePanelResize,
+    useReleaseNavigation,
+    useSerialConnection,
+    useSettings,
+    useSharedHover,
+    useThemeSwitcher,
+} from "../composables";
 import { formatDate } from "../date";
 import { STORAGE_KEYS } from "../types";
-
 import {
     bytesToSize,
     devMode,
@@ -755,7 +756,7 @@ onBeforeUnmount(() => {
                                                     >
                                                         <v-icon
                                                             name="bi-file-earmark-zip"
-                                                            scale="0.85"
+                                                            scale="0.95"
                                                         />
                                                     </div>
                                                     <div class="flex items-center gap-2">
@@ -838,11 +839,15 @@ onBeforeUnmount(() => {
                                                         class="flex-shrink-0 text-vp-2/80 group-hover:text-vp-brand-3 group-hover:dark:text-vp-brand-1 transition-colors duration-200 mt-px"
                                                     >
                                                         <v-icon
-                                                            name="oi-upload"
+                                                            :name="
+                                                                isOverDropZone
+                                                                    ? 'bi-folder2-open'
+                                                                    : 'oi-upload'
+                                                            "
                                                             scale="1.2"
-                                                            class="!stroke-vp-dark !stroke-[0.25] group-hover:scale-105 transition-transform duration-100 ease-in"
+                                                            class="stroke-vp-dark stroke-[0.25] group-hover:scale-105 transition-transform duration-100 ease-in"
                                                             :class="{
-                                                                'scale-105 text-vp-brand-3 dark:text-vp-brand-1':
+                                                                'scale-105 text-vp-brand-3 dark:text-vp-brand-1 !stroke-0':
                                                                     isOverDropZone,
                                                             }"
                                                         />

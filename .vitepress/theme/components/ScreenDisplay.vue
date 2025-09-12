@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useBgContainer } from "../composables/useBgContainer";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useBgContainer, useConnectionInfo, useSerialConnection } from "../composables";
 import { downloadFile } from "../util";
 
 const { flags, isConnected, deviceInfo } = useConnectionInfo();
@@ -155,7 +153,7 @@ const downloadScreenshot = async (filename: string = "flipper"): Promise<boolean
         const file = `${deviceInfo.value?.hardware_name || filename}-${formattedDate}-${formattedTime}.png`;
         downloadFile(url, file);
         URL.revokeObjectURL(url);
-        serialConnection?.addLog("info", `[Screen] Downloaded screenshot: ${file}`);
+        serialConnection?.addLog("info", `[{{Screen}}] Downloaded screenshot: ${file}`);
         return true;
     } catch (error) {
         serialConnection?.addLog("error", `Failed to download screenshot: ${error}`);

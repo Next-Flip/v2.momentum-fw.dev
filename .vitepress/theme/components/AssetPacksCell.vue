@@ -8,16 +8,18 @@ import type { AssetPackStats } from "../types";
 import { ConnectionState } from "../types";
 import { downloadFile, shortenTimeString } from "../util";
 
-import { useBgContainer } from "../composables/useBgContainer";
-import { useDots } from "../composables/useDots";
-import { useGalleryState } from "../composables/useGalleryState";
-import { useI18n } from "../composables/useI18n";
-import { useImageCache } from "../composables/useImageCache";
-import { usePressedState } from "../composables/usePressedState";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useSettings } from "../composables/useSettings";
-import { useTempState } from "../composables/useTempState";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import {
+    useBgContainer,
+    useDots,
+    useGalleryState,
+    useI18n,
+    useImageCache,
+    usePressedState,
+    useSerialConnection,
+    useSettings,
+    useTempState,
+    useThemeSwitcher,
+} from "../composables";
 
 import Tooltip from "./Tooltip.vue";
 

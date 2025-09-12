@@ -7,15 +7,17 @@ import {
     type ReleaseChannel,
     type ReleaseItem,
 } from "../../../_data/releases";
-import { useClickOutside } from "../composables/useClickOutside";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useDots } from "../composables/useDots";
-import { useI18n } from "../composables/useI18n";
-import { usePressedState } from "../composables/usePressedState";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useSharedHover } from "../composables/useSharedHover";
-import { useTempState } from "../composables/useTempState";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import {
+    useClickOutside,
+    useConnectionInfo,
+    useDots,
+    useI18n,
+    usePressedState,
+    useSerialConnection,
+    useSharedHover,
+    useTempState,
+    useThemeSwitcher,
+} from "../composables";
 import { formatDate } from "../date";
 import { supportsSerialPort } from "../util";
 

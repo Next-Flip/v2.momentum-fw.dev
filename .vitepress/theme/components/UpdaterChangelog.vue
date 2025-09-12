@@ -3,9 +3,9 @@ import { useScroll, useWindowSize } from "@vueuse/core";
 import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import { branchReleases, type ReleaseItem } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
 import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
 
+import { useI18n } from "../composables";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -178,7 +178,7 @@ const expandDisabled = computed(() => {
                                         tr('releases_devbuild'),
                                     )
                                 "
-                                :scale="isBranchRelease ? 0.9 : isMainline ? 0.85 : 1"
+                                :scale="isBranchRelease ? 0.9 : isMainline ? 0.85 : 1.05"
                             />
                         </div>
                         <Tooltip
@@ -276,9 +276,9 @@ const expandDisabled = computed(() => {
                 :show="!arrivedState.top"
                 position="top"
                 class="mr-4 top-[56px]"
-                :opacity="40"
+                :opacity="30"
             />
-            <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" :opacity="40" />
+            <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" :opacity="30" />
 
             <div
                 v-if="isAccessible && !isClosed"

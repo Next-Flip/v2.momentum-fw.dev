@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watchEffect } from "vue";
 import { packs } from "../../../_data/packs.ts";
-import { useI18n } from "../composables/useI18n";
 import type { AssetPack, AssetPackFile } from "../types";
 import { AssetPackEntry } from "../types.ts";
 
-import { useProxiedUrl } from "../composables/useProxiedUrl";
-import type { useSerialConnection } from "../composables/useSerialConnection";
+import { useI18n, useProxiedUrl, useSerialConnection } from "../composables";
 import { ConnectionState } from "../types";
 import AssetPacksGrid from "./AssetPacksGrid.vue";
 

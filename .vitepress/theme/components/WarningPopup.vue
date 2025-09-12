@@ -2,7 +2,7 @@
 import { useStorage } from "@vueuse/core";
 import { useRoute } from "vitepress";
 import { computed, ref } from "vue";
-import { useI18n } from "../composables/useI18n";
+import { useI18n } from "../composables";
 
 const route = useRoute();
 const { tr } = useI18n();

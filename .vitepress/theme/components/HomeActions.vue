@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useDots } from "../composables/useDots";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useConnectionInfo, useDots, useThemeSwitcher } from "../composables";
 
 const { dots } = useDots();
 const { ifCurrentTheme } = useThemeSwitcher();

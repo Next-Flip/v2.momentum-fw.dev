@@ -2,6 +2,7 @@ export {
     BiCheck,
     BiCheck2,
     BiFileEarmarkZip,
+    BiFolder2Open,
     BiGithub,
     BiUsbSymbol,
     FaCircle,

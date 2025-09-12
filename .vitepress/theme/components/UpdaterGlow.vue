@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { buildInfo } from "../../../_data/buildInfo.ts";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useThemeSwitcher } from "../composables";
 
 const MathFloor = Math.floor;
 const MathRandom = Math.random;

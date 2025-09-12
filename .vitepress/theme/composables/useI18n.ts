@@ -55,6 +55,24 @@ export function useI18n() {
         });
     };
 
+    const interpolateBackup = (
+        message: string,
+        params?: Record<string, string | number>,
+    ): string => {
+        return message.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+            if (params && params[key] !== undefined) return params[key].toString();
+
+            const translatedKey = currentMessages.value[key as keyof MessageSchema];
+            if (translatedKey && translatedKey !== key) return translatedKey;
+
+            return key;
+        });
+    };
+
+    const translateLog = (message: string): string => {
+        return interpolateBackup(message);
+    };
+
     const t = (key: keyof MessageSchema, params?: Record<string, string | number>): string => {
         try {
             const message = currentMessages.value[key];
@@ -106,6 +124,7 @@ export function useI18n() {
         messages: currentMessages,
         t,
         tr: tr.value,
+        translateLog,
         isLocale,
         getLocalizedPath,
         supportedLocales: Object.keys(messages) as SupportedLocales[],

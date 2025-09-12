@@ -49,6 +49,16 @@ const messages: MessageSchema = {
     no_packs_found: "No asset packs found matching your criteria",
     reset_filters: "Reset Filters",
 
+    Misc: "Misc",
+    Serial: "Serial",
+    Flipper: "Flipper",
+    Storage: "Storage",
+    System: "System",
+    Connection: "Connection",
+    RPC: "RPC",
+    Stream: "Stream",
+    Test: "Test",
+
     home_changelog: "Changelog",
     home_up_to_date: "You're up to date!",
     home_update_to: "Update to",

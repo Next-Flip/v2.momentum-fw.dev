@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from "vue";
-import { useClickOutside } from "../composables/useClickOutside";
-import { useI18n } from "../composables/useI18n";
+import { useClickOutside, useI18n } from "../composables";
 import type { DropdownOption, FilterOption, SortDirection, SortField } from "../types";
 
 import Tooltip from "./Tooltip.vue";
@@ -178,7 +177,7 @@ watch(
 </script>
 
 <template>
-    <div class="grid grid-col-3 gap-2.5 flex-wrap w-full md:flex md:flex-nowrap md:items-center">
+    <div class="grid grid-cols-3 gap-2.5 flex-wrap w-full md:flex md:flex-nowrap md:items-center">
         <div class="flex-auto min-w-0 max-w-full">
             <div class="relative w-full flex items-center backdrop-blur">
                 <div class="absolute left-3 text-vp-3 flex items-center justify-center">
@@ -367,7 +366,7 @@ watch(
     font-size: 14px;
     color: var(--vp-c-text-1);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.1s;
     line-height: 1.6;
     min-height: 38px;
     gap: 10px;

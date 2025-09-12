@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { MessageSchema } from ".vitepress/i18n";
 import { computed, inject } from "vue";
-import { useI18n } from "../composables/useI18n";
-import type { useSerialConnection } from "../composables/useSerialConnection";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useI18n, useSerialConnection, useThemeSwitcher } from "../composables";
 
 const { ifCurrentTheme } = useThemeSwitcher();
 const { tr } = useI18n();

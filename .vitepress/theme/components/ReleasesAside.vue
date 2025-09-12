@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { devbuildReleases, mainlineReleases, type ReleaseItem } from "../../../_data/releases";
-import { useI18n } from "../composables/useI18n";
+import { useI18n } from "../composables";
 import { formatDate } from "../date";
 
 const { getLocalizedPath, tr } = useI18n();

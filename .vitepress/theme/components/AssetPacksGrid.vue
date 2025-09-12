@@ -2,13 +2,11 @@
 import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
 import { motion } from "motion-v";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useI18n } from "../composables/useI18n";
-import { useSticky } from "../composables/useSticky";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import type { AssetPack, FilterOption, SortDirection, SortField } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { scrollToTop } from "../util";
 
+import { useI18n, useSticky, useThemeSwitcher } from "../composables";
 import AssetPacksCell from "./AssetPacksCell.vue";
 import AssetPacksControls from "./AssetPacksControls.vue";
 import ExtractNotice from "./ExtractNotice.vue";

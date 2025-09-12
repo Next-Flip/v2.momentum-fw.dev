@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { useSerialConnection } from "../composables/useSerialConnection";
-import { useSettings } from "../composables/useSettings";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useSerialConnection, useSettings, useThemeSwitcher } from "../composables";
 import type { ScreenColor } from "../types";
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
@@ -20,7 +18,10 @@ const screenColorOptions = computed(() => {
 const handleScreenColorChange = (color: ScreenColor) => {
     if (serialConnection) {
         currentScreenColor.value = color;
-        serialConnection.addLog("info", `[Screen] Color changed to ${color}`);
+        serialConnection.addLog(
+            "info",
+            `[{{Screen}}] Color changed to <code class="code-${color}">${color}</code>`,
+        );
     }
 };
 

@@ -2,9 +2,8 @@
 import { useWindowSize } from "@vueuse/core";
 import { computed } from "vue";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
-import { useConnectionInfo } from "../composables/useConnectionInfo";
-import { useReleaseNavigation } from "../composables/useReleaseNavigation";
 
+import { useConnectionInfo, useReleaseNavigation } from "../composables";
 import ReleaseContent from "./ReleaseContent.vue";
 import ReleaseItems from "./ReleaseItems.vue";
 import ReleasesAside from "./ReleasesAside.vue";

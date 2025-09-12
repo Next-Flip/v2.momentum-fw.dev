@@ -49,6 +49,16 @@ export type MessageSchema = {
     no_packs_found: string;
     reset_filters: string;
 
+    Misc: string;
+    Serial: string;
+    Flipper: string;
+    Storage: string;
+    System: string;
+    Connection: string;
+    RPC: string;
+    Stream: string;
+    Test: string;
+
     home_changelog: string;
     home_up_to_date: string;
     home_update_to: string;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBgContainer } from "../composables/useBgContainer";
+import { useBgContainer } from "../composables";
 
 const props = withDefaults(
     defineProps<{

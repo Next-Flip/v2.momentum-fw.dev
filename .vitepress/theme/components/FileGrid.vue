@@ -2,7 +2,7 @@
 import { useWindowSize } from "@vueuse/core";
 import { ref } from "vue";
 import type { DevbuildFile, FirmwareFile, MainlineFile } from "../../../_data/releases";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
+import { useThemeSwitcher } from "../composables";
 import { downloadFile } from "../util";
 
 type File = FirmwareFile | DevbuildFile | MainlineFile;

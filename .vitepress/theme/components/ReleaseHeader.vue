@@ -3,13 +3,10 @@ import { useScroll, useWindowSize } from "@vueuse/core";
 import { computed, nextTick, ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import { devbuildReleases, mainlineReleases } from "../../../_data/releases";
-import { useClickOutside } from "../composables/useClickOutside";
-import { useI18n } from "../composables/useI18n";
-import { useSticky } from "../composables/useSticky";
-import { useThemeSwitcher } from "../composables/useThemeSwitcher";
 import { formatDate, formatTimestamp } from "../date";
 import { scrollToTop } from "../util";
 
+import { useClickOutside, useI18n, useSticky, useThemeSwitcher } from "../composables";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 

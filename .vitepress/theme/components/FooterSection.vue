@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useI18n } from "../composables/useI18n";
+import { useI18n } from "../composables";
 import { formatDate } from "../date";
 import { isExternalLink } from "../util";
 
