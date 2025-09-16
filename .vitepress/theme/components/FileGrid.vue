@@ -174,6 +174,6 @@ const getButtonScale = (file: File) => {
 }
 .dark .download-button:hover {
     background-color: var(--vp-c-brand-3) !important;
-    border-color: var(--vp-c-brand-3) !important;
+    border-color: color-mix(in srgb, var(--vp-c-brand-2) 60%, transparent) !important;
 }
 </style>

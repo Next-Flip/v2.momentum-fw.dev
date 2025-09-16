@@ -104,6 +104,8 @@ const toggleContentFade = (fade: boolean) => {
         color-mix(in srgb, var(--vp-c-bg-dark) 0%, transparent) 100%
     );
     margin-top: -96px;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .release-content {

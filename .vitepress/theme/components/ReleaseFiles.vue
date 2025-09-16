@@ -124,7 +124,7 @@ watch(
     <div v-if="selectedRelease?.files" class="relative px-3.5 lg:px-8 pt-32 pb-3">
         <div class="absolute inset-0 release-files-backdrop mb-3"></div>
         <div
-            class="relative z-[1] flex flex-row justify-start items-center gap-1.5 pb-2 mb-3 border-b border-vp-divider"
+            class="relative z-[1] flex flex-row justify-start items-center gap-1.5 pb-2 mb-3 border-b border-vp-divider pointer-events-auto"
         >
             <div class="flex items-center justify-center text-sm text-vp-2/80">
                 <v-icon name="bi-file-earmark-zip" :scale="0.95" />
@@ -151,11 +151,17 @@ watch(
             </div>
         </div>
 
-        <div v-if="categorizedFiles.regular.length > 0" class="relative z-[1] mb-4">
+        <div
+            v-if="categorizedFiles.regular.length > 0"
+            class="relative z-[1] mb-4 pointer-events-auto"
+        >
             <FileGrid :files="categorizedFiles.regular" />
         </div>
 
-        <div v-if="categorizedFiles.development.length > 0" class="relative z-[1] mt-3 mb-4">
+        <div
+            v-if="categorizedFiles.development.length > 0"
+            class="relative z-[1] mt-3 mb-4 pointer-events-auto"
+        >
             <button
                 class="flex gap-2 w-full text-left py-2 text-vp-2 hover:text-vp-1 items-center justify-start transition-colors duration-100 group"
                 @click="toggleDevelopmentSection"
@@ -203,7 +209,7 @@ watch(
         </div>
 
         <div
-            class="relative z-[1] flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4 pb-4"
+            class="relative z-[1] flex flex-row flex-wrap justify-start sm:justify-between items-start sm:items-center gap-1.5 border-t border-vp-divider pt-4 pb-4 pointer-events-auto"
         >
             <div class="flex flex-row gap-x-1.5 items-center text-sm mr-auto">
                 <Tooltip
