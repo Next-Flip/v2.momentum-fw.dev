@@ -31,6 +31,7 @@ async function sendRpcRequest () {
     if (!c.hasNext && c.requestType !== 'stopSession') {
       let buffer = new Uint8Array(0)
       const unbind = emitter.on('raw output', data => {
+        console.log("raw output", data)
         const newBuffer = new Uint8Array(buffer.length + data.length)
         newBuffer.set(buffer)
         newBuffer.set(data, buffer.length)
