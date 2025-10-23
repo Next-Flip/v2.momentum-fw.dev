@@ -2,5 +2,6 @@
     "buildCommand": "bun run build",
     "installCommand": "bun install",
     "outputDirectory": ".vitepress/dist",
-    "framework": "vitepress"
+    "framework": "vitepress",
+    "cleanUrls": true
 }
