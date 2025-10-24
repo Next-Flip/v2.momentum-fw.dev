@@ -449,9 +449,14 @@ onUnmounted(() => {
                 <div class="flex items-center gap-[10px] text-vp-2 w-full z-[5] text-[14px]">
                     <div class="flex items-center gap-[5px] min-w-0 max-w-full overflow-hidden">
                         <span class="shrink-0">{{ tr("by") }}</span>
-                        <Tooltip :delay="300" class="w-full max-w-full min-w-0 overflow-hidden">
+                        <Tooltip
+                            :disabled="!githubUrl || !author"
+                            :position="'right'"
+                            :x-padding="1.5"
+                            class="w-full max-w-full min-w-0 overflow-hidden"
+                        >
                             <a
-                                v-if="githubUrl"
+                                v-if="githubUrl && author"
                                 :href="githubUrl"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -464,11 +469,18 @@ onUnmounted(() => {
                                 >{{ author }}</a
                             >
                             <span
-                                v-else
+                                v-else-if="author"
                                 class="block overflow-hidden text-ellipsis truncate max-w-full whitespace-nowrap font-medium transition-colors duration-200"
                                 >{{ author }}</span
                             >
-                            <template #content>{{ author }}</template>
+                            <template #content>
+                                <v-icon
+                                    name="bi-github"
+                                    scale="1"
+                                    aria-label="GitHub"
+                                    title="GitHub"
+                                />
+                            </template>
                         </Tooltip>
                     </div>
                     <Tooltip v-if="shortTimeAgo" :delay="300" class="shrink-0">

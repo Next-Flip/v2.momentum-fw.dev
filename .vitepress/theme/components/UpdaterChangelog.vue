@@ -3,7 +3,12 @@ import { useScroll, useWindowSize } from "@vueuse/core";
 import MarkdownIt from "markdown-it";
 import { computed, useTemplateRef } from "vue";
 import { branchReleases, type ReleaseItem } from "../../../_data/releases";
-import { replaceIssuesAndMentions, supportsSerialPort } from "../util";
+import {
+    githubPullRequestUrl,
+    githubUrl,
+    replaceIssuesAndMentions,
+    supportsSerialPort,
+} from "../util";
 
 import { useI18n } from "../composables";
 import ScrollFade from "./ScrollFade.vue";
@@ -50,6 +55,9 @@ const isOpen = computed(() => props.changelogState === "open");
 const isClosed = computed(() => props.changelogState === "closed");
 const isMainline = computed(() => {
     return props.selectedRelease?.version.includes("mntm");
+});
+const isDevBuild = computed(() => {
+    return props.selectedRelease?.branch?.includes("dev");
 });
 
 const handleToggleOpenClose = () => {
@@ -113,7 +121,7 @@ const shouldShowExternalLink = computed(() => {
 
 const releaseHref = computed(() => {
     if (isBranchRelease.value) {
-        return `https://github.com/Next-Flip/Momentum-Firmware/pull/${displayRelease.value?.pr}`;
+        return githubPullRequestUrl(displayRelease.value?.pr || "");
     }
     if (!shouldShowExternalLink.value || !displayRelease.value) return "";
     return getLocalizedPath(`/releases/${displayRelease.value.version}`);
@@ -210,6 +218,21 @@ const expandDisabled = computed(() => {
                                 </div>
                             </template>
                         </Tooltip>
+                        <a
+                            v-if="shouldShowExternalLink && !isBranchRelease"
+                            class="inline-flex items-center justify-center w-4 h-4 ml-1 text-vp-2 hover:text-vp-1 transition-colors duration-100 mb-px github-icon-link"
+                            :href="`${githubUrl}/${isDevBuild ? 'blob' : 'releases/tag'}/${displayRelease?.version}${isDevBuild ? '/CHANGELOG.md' : ''}`"
+                            aria-label="GitHub"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            <v-icon
+                                name="bi-github"
+                                scale="1.0"
+                                class="github-icon"
+                                style="min-width: 18px; min-height: 18px; display: inline-block"
+                            />
+                        </a>
                         <div
                             class="block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                         />

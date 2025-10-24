@@ -94,20 +94,22 @@ export const useSerialConnection = () => {
             logs.value = newLogs;
         }
 
+        const cleanMessage = message.replace(/{{/g, "").replace(/}}/g, "");
+
         switch (level) {
             case "debug":
             case "verbose":
-                log.debug(message);
+                log.debug(cleanMessage);
                 break;
             case "info":
             case "success":
-                log.info(message);
+                log.info(cleanMessage);
                 break;
             case "warning":
-                log.warn(message);
+                log.warn(cleanMessage);
                 break;
             case "error":
-                log.error(message);
+                log.error(cleanMessage);
                 break;
         }
     };
@@ -220,7 +222,17 @@ export const useSerialConnection = () => {
 
     navigator.serial.addEventListener("disconnect", () => {
         if (flags.connected) {
-            addLog("info", "[{{Serial}}] Physical disconnect detected - disconnected");
+            const wasUpdating = flags.updateInProgress;
+
+            if (wasUpdating) {
+                addLog(
+                    "error",
+                    "[{{Serial}}] Firmware update interrupted by disconnect - avoid unplugging during file uploads and before the Flipper fully reboots",
+                );
+            } else {
+                addLog("info", "[{{Serial}}] Physical disconnect detected - disconnected");
+            }
+
             resetFlagsAndState();
         }
     });
@@ -247,6 +259,7 @@ export const useSerialConnection = () => {
         flags.ableToExtract = null;
         flags.ableToUpdate = null;
         flags.restarting = false;
+        flags.updateInProgress = false;
         flags.screenStream = false;
         flags.screenStreamPaused = false;
         connectionData.state = ConnectionState.DISCONNECTED;
@@ -255,11 +268,14 @@ export const useSerialConnection = () => {
         connectionData.installedPacks = {};
         queueState.queue = [];
         queueState.queueActions = [];
+
         if (queueState.fakeExtractProgress !== null) {
             clearInterval(queueState.fakeExtractProgress);
             queueState.fakeExtractProgress = null;
         }
 
+        firmwareState.updateStage = "";
+        firmwareState.updateStageContext = {};
         loadingInstalledPacks = false;
     };
 
@@ -670,7 +686,7 @@ export const useSerialConnection = () => {
             connectionData.state = ConnectionState.CONNECTED;
             addLog(
                 "success",
-                `[{{Serial}}] Hello ${connectionData.deviceInfo?.hardware_name}... you are connected!`,
+                `[{{Serial}}] Hello <code>${connectionData.deviceInfo?.hardware_name}</code>... you are connected!`,
             );
         } catch (error) {
             flags.connected = false;
@@ -1288,11 +1304,14 @@ export const useSerialConnection = () => {
         if (uploadedFile) {
             addLog("info", `[Firmware] Loading firmware from file: ${uploadedFile.name}`);
             const arrayBuffer = await uploadedFile.arrayBuffer();
-            addLog("debug", `[Firmware] File size: ${arrayBuffer.byteLength} bytes`);
+            addLog("debug", `[Firmware] File size: <code>${arrayBuffer.byteLength}</code> bytes`);
 
             addLog("verbose", "[Firmware] Unpacking uploaded firmware file");
             files = await unpack(arrayBuffer);
-            addLog("debug", `[Firmware] Extracted ${files.length} files from uploaded file`);
+            addLog(
+                "debug",
+                `[Firmware] Extracted <code>${files.length}</code> files from uploaded file`,
+            );
             console.log("uploaded files:", files);
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
@@ -1316,29 +1335,33 @@ export const useSerialConnection = () => {
                 files = await fetchFirmware(proxiedUrl);
             } catch {
                 addLog("warning", `[Firmware] Proxied URL failed, trying original URL`);
-                addLog("verbose", "[Download] Fetching firmware from original URL");
                 files = await fetchFirmware(firmwareUrl);
             }
 
-            addLog("debug", `[Firmware] Extracted ${files.length} files from download`);
+            addLog(
+                "debug",
+                `[Firmware] Extracted <code>${files.length}</code> files from download`,
+            );
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         }
 
-        addLog("verbose", "[Directory] Creating firmware update directory");
         await createUpdateDirectory(flipperModule);
 
         let path = "/ext/update/";
         let fileIndex = 0;
         for (const file of files) {
+            if (!flags.connected || !flags.rpcActive) {
+                throw new Error("Flipper disconnected during firmware update");
+            }
+
             if (file.size === 0) {
                 path = "/ext/update/" + file.name;
                 if (file.name.endsWith("/")) {
                     path = path.slice(0, -1);
                 }
                 setUpdateStage("update_stage_creating_directory", { name: path });
-                addLog("verbose", `[Directory] Creating firmware directory: ${path}`);
                 await flipperModule.commands.storage.mkdir(path);
-                addLog("debug", `[Firmware] Created directory: ${path}`);
+                addLog("debug", `[Firmware] Created directory: <code>${path}</code>`);
             } else {
                 fileIndex++;
                 setUpdateStage("update_stage_uploading_file", {
@@ -1354,10 +1377,9 @@ export const useSerialConnection = () => {
                     },
                 );
 
-                addLog("verbose", `[Transfer] Writing firmware file: ${file.name}`);
                 await flipperModule.commands.storage.write("/ext/update/" + file.name, file.buffer);
                 unbind();
-                addLog("debug", `[Firmware] Uploaded file: ${file.name}`);
+                addLog("debug", `[Firmware] Uploaded file: <code>${file.name}</code>`);
 
                 flags.progress = 1;
                 await asyncSleep(100);
@@ -1368,8 +1390,11 @@ export const useSerialConnection = () => {
 
         flags.progress = 0;
 
+        if (!flags.connected || !flags.rpcActive) {
+            throw new Error("Flipper disconnected during firmware update");
+        }
+
         setUpdateStage("update_stage_loading_manifest");
-        addLog("verbose", "[Firmware] Loading update manifest");
         await flipperModule.commands.system.update(path + "/update.fuf");
         addLog("debug", "[Firmware] Loaded update manifest");
 
@@ -1432,9 +1457,7 @@ export const useSerialConnection = () => {
             const message = PB.Region.create(options);
             const encoded = new Uint8Array(PB.Region.encodeDelimited(message).finish()).slice(1);
 
-            addLog("verbose", "[Region] Writing region data to flipper");
             await flipperModule.commands.storage.write("/int/.region_data", encoded);
-
             addLog("info", `[Firmware] Set Sub-GHz region: <code>${regions.country}</code>`);
         } catch (error) {
             addLog("error", `[Firmware] Region provisioning failed: ${error}`);
@@ -1451,9 +1474,8 @@ export const useSerialConnection = () => {
             if (errorStr !== "ERROR_STORAGE_NOT_EXIST") {
                 throw error;
             }
-            addLog("verbose", "[Directory] Creating update directory");
             await flipperModule.commands.storage.mkdir("/ext/update");
-            addLog("debug", "[Firmware] Created update directory");
+            addLog("debug", "[Firmware] Created update directory <code>/ext/update</code>");
         }
     };
 
@@ -1474,7 +1496,6 @@ export const useSerialConnection = () => {
         flags.screenStreamPaused = true;
         if (flags.screenStream) {
             try {
-                addLog("verbose", "[{{Stream}}] Stopping screen stream for firmware update");
                 await stopScreenStream();
                 addLog("info", "[Firmware] Stopped screen stream for firmware update");
                 await asyncSleep(500);
@@ -1488,7 +1509,9 @@ export const useSerialConnection = () => {
             await loadFirmware(release, uploadedFile);
             return true;
         } catch (error) {
-            addLog("error", `[Firmware] Firmware update failed: ${error}`);
+            if (error instanceof Error && !error.message.includes("disconnected")) {
+                addLog("error", `[Firmware] Firmware update failed: ${error}`);
+            }
             throw error;
         } finally {
             flags.updateInProgress = false;
@@ -1552,11 +1575,12 @@ export const useSerialConnection = () => {
         }
 
         try {
-            addLog("verbose", "[{{Test}}] Loading test firmware");
             await testLoadFirmware(release, uploadedFile);
             return true;
         } catch (error) {
-            addLog("error", `[{{Test}}] Firmware update failed: ${error}`);
+            if (error instanceof Error && !error.message.includes("disconnected")) {
+                addLog("error", `[{{Test}}] Test firmware update failed: ${error}`);
+            }
             throw error;
         } finally {
             flags.updateInProgress = false;
@@ -1587,14 +1611,13 @@ export const useSerialConnection = () => {
         }
 
         setUpdateStage("update_stage_downloading_firmware");
-        addLog("verbose", "[{{Test}}] firmware download");
         await asyncSleep(1500);
 
         let files: { name: string; size: number }[] = [];
 
         if (uploadedFile) {
-            addLog("info", `[{{Test}}] Loading firmware from file: ${uploadedFile.name}`);
-            addLog("debug", `[{{Test}}] File size: ${uploadedFile.size} bytes`);
+            addLog("info", `[{{Test}}] Loading firmware from file: \`${uploadedFile.name}\``);
+            addLog("debug", `[{{Test}}] File size: <code>${uploadedFile.size}</code> bytes`);
 
             files = [
                 { name: "update.fuf", size: 1024 },
@@ -1603,7 +1626,10 @@ export const useSerialConnection = () => {
                 { name: "scripts/update.sh", size: 256 },
                 { name: "assets/", size: 0 },
             ];
-            addLog("debug", `[{{Test}}] Extracted ${files.length} files from uploaded file`);
+            addLog(
+                "debug",
+                `[{{Test}}] Extracted <code>${files.length}</code> files from uploaded file`,
+            );
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         } else {
             if (!release) {
@@ -1628,7 +1654,10 @@ export const useSerialConnection = () => {
                 { name: "assets/", size: 0 },
             ];
 
-            addLog("debug", `[{{Test}}] Extracted ${files.length} files from download`);
+            addLog(
+                "debug",
+                `[{{Test}}] Extracted <code>${files.length}</code> files from download`,
+            );
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         }
 
@@ -1636,12 +1665,19 @@ export const useSerialConnection = () => {
 
         let fileIndex = 0;
         for (const file of files) {
+            if (!flags.connected || !flags.rpcActive) {
+                throw new Error("Flipper disconnected during test firmware update");
+            }
+
             if (file.size === 0) {
                 setUpdateStage("update_stage_creating_directory", {
                     name: `/ext/update/${file.name}`,
                 });
                 await asyncSleep(50);
-                addLog("debug", `[{{Test}}] Created directory: /ext/update/${file.name}`);
+                addLog(
+                    "debug",
+                    `[{{Test}}] Created directory: <code>/ext/update/${file.name}</code>`,
+                );
             } else {
                 fileIndex++;
                 setUpdateStage("update_stage_uploading_file", {
@@ -1654,14 +1690,16 @@ export const useSerialConnection = () => {
                 const progressSteps = 20;
                 const stepDuration = uploadDuration / progressSteps;
 
-                addLog("verbose", `[{{Test}}] file upload progress: ${file.name}`);
                 for (let i = 0; i <= progressSteps; i++) {
+                    if (!flags.connected || !flags.rpcActive) {
+                        throw new Error("Flipper disconnected during test firmware update");
+                    }
                     const progress = i / progressSteps;
                     flags.progress = progress;
                     await asyncSleep(stepDuration);
                 }
 
-                addLog("debug", `[{{Test}}] Uploaded file: ${file.name}`);
+                addLog("debug", `[{{Test}}] Uploaded file: <code>${file.name}</code>`);
 
                 flags.progress = 1;
                 await asyncSleep(100);
@@ -1671,6 +1709,10 @@ export const useSerialConnection = () => {
         }
 
         flags.progress = 0;
+
+        if (!flags.connected || !flags.rpcActive) {
+            throw new Error("Flipper disconnected during test firmware update");
+        }
 
         setUpdateStage("update_stage_loading_manifest");
         await asyncSleep(500);

@@ -8,6 +8,13 @@ import pako from "pako";
 // @ts-expect-error - untar is a global library
 import { untar } from "./flipper/untar/untar.js";
 
+export const githubUrl = "https://github.com/Next-Flip/Momentum-Firmware";
+export const githubBranchUrl = (branch: string) => `${githubUrl}/tree/${branch}`;
+export const githubCommitUrl = (commit: string) => `${githubUrl}/commit/${commit}`;
+export const githubPullRequestUrl = (pullRequest: string) => `${githubUrl}/pull/${pullRequest}`;
+export const githubBlobUrl = (blob: string) => `${githubUrl}/blob/${blob}`;
+export const githubTagUrl = (tag: string) => `${githubUrl}/releases/tag/${tag}`;
+
 export function supportsSerialPort(): boolean {
     return typeof window !== "undefined" && typeof navigator !== "undefined" && "serial" in navigator;
 }
@@ -120,7 +127,7 @@ export const replaceIssuesAndMentions = (text: string, isBranchRelease = false):
 
     result = result.replace(/#(\d+)/g, (_, issueNumber) =>
         a(
-            `https://github.com/Next-Flip/Momentum-Firmware/issues/${issueNumber}`,
+            `${githubUrl}/issues/${issueNumber}`,
             "!text-vp-alternate-1 hover:!text-vp-alternate-2",
             `#${issueNumber}`,
         ),
@@ -380,4 +387,16 @@ export const formatDuration = (milliseconds: number): string => {
     } else {
         return `${remainingSeconds}s`;
     }
+};
+
+export const stripHtmlFromLogs = (htmlString: string): string => {
+    return htmlString
+        .replace(/<code>(.*?)<\/code>/g, '$1')
+        .replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
 };

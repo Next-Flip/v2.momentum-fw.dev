@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import { devbuildReleases, mainlineReleases, type ReleaseItem } from "../../../_data/releases";
 import { useI18n } from "../composables";
 import { formatDate } from "../date";
+import { githubBranchUrl, githubTagUrl, githubUrl } from "../util";
 
 const { getLocalizedPath, tr } = useI18n();
 
@@ -45,14 +46,14 @@ const shouldShowImage = computed(() => {
 const infoItems = computed(() => [
     {
         href: getLocalizedPath(`/releases/${mainlineReleases[0]?.version}`),
-        link: `https://github.com/Next-Flip/Momentum-Firmware/releases/tag/${mainlineReleases[0]?.version}`,
+        link: githubTagUrl(mainlineReleases[0]?.version || ""),
         key: "aside_latest_release" as const,
         value: mainlineReleases[0]?.version,
         condition: mainlineReleases[0]?.version,
     },
     {
         href: getLocalizedPath(`/releases/${devbuildReleases[0]?.version}`),
-        link: `https://github.com/Next-Flip/Momentum-Firmware/tree/${devbuildReleases[0]?.commit}`,
+        link: githubBranchUrl(devbuildReleases[0]?.commit || ""),
         key: "aside_latest_devbuild" as const,
         value: devbuildReleases[0]?.version,
         condition: devbuildReleases[0]?.version,
@@ -74,7 +75,7 @@ const supportLinks = [
     },
     {
         key: "aside_issues_feature_requests" as const,
-        href: "https://github.com/Next-Flip/Momentum-Firmware/issues",
+        href: `${githubUrl}/issues`,
         external: true,
     },
     {

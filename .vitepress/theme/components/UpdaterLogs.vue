@@ -2,6 +2,7 @@
 import { useScroll, useWindowSize } from "@vueuse/core";
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef, watch, type Ref } from "vue";
 import { formatDate } from "../date";
+import { stripHtmlFromLogs } from "../util";
 
 import {
     useConnectionInfo,
@@ -108,7 +109,7 @@ const copyLogs = async () => {
     const logsString = logs.value
         .map(
             (log: LogEntry) =>
-                `${formatDate(log.timestamp, "withTime")} ${translateLog(log.message)}`,
+                `${formatDate(log.timestamp, "withTime")} ${stripHtmlFromLogs(translateLog(log.message))}`,
         )
         .join("\n");
     try {

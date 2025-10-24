@@ -337,6 +337,7 @@ export type MessageSchema = {
     updater_branch_label: string;
     updater_branch_description: string;
     updater_branch_warning: string;
+    updater_branch_matching_warning: string;
     updater_unknown_date: string;
     updater_flash_button: string;
     updater_logger_initialized: string;

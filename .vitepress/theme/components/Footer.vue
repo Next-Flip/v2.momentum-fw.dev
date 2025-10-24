@@ -6,6 +6,7 @@ import { formatDate } from "../date";
 
 import { buildInfo } from "../../../_data/buildInfo";
 import { useI18n, useThemeSwitcher } from "../composables";
+import { githubBlobUrl, githubUrl } from "../util";
 import FooterSection from "./FooterSection.vue";
 
 const { site } = useData();
@@ -34,7 +35,7 @@ const formattedLastUpdate = computed(() => {
 });
 
 const socialLinks = computed(() => [
-    { name: "Github", url: "https://github.com/Next-Flip/Momentum-Firmware" },
+    { name: "Github", url: githubUrl },
     { name: "Discord", url: "https://discord.gg/momentum" },
     { name: "X/Twitter", url: "https://x.com/FlipperMomentum" },
     { name: "Reddit", url: "https://www.reddit.com/r/flippermomentum/" },
@@ -48,7 +49,7 @@ const navigationLinks = computed(() => [
     { name: tr("nav_faq"), url: "/wiki/FAQ" },
     {
         name: tr("nav_report_a_bug"),
-        url: "https://github.com/Next-Flip/Momentum-Firmware/issues",
+        url: `${githubUrl}/issues`,
     },
     { name: tr("nav_donate"), url: "https://ko-fi.com/willyjl" },
 ]);
@@ -105,7 +106,7 @@ const navigationLinks = computed(() => [
                     >
                         <p class="text-xs text-vp-3">
                             <a
-                                href="https://github.com/Next-Flip/Momentum-Firmware/blob/dev/LICENSE"
+                                :href="`${githubBlobUrl('dev/LICENSE')}`"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"

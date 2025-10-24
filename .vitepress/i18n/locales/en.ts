@@ -345,8 +345,9 @@ const messages: MessageSchema = {
     updater_development_description: "Latest builds",
     updater_branch_label: "Branch",
     updater_branch_description: "Experimental",
-    updater_branch_warning:
-        "The selected branch is not a stable release. Flash only if you are certain!",
+    updater_branch_warning: "This branch is not a stable release. Proceed only if you're sure.",
+    updater_branch_matching_warning:
+        "This branch is not a stable release and is already installed. Reinstall only if you're sure.",
     updater_unknown_date: "Unknown date",
     updater_flash_button: "Install",
     updater_logger_initialized: "Logger initialized and ready",

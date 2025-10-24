@@ -378,13 +378,13 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                             <ScrollFade
                                 :show="!arrivedState.top && selectedChannel !== 'branch'"
                                 position="top"
-                                :opacity="40"
+                                :opacity="25"
                                 class="mr-4 z-10"
                             />
                             <ScrollFade
                                 :show="!arrivedState.bottom && selectedChannel !== 'branch'"
                                 position="bottom"
-                                :opacity="40"
+                                :opacity="25"
                                 class="mr-4 z-10"
                             />
                             <div

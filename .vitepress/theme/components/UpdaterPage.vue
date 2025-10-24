@@ -26,6 +26,7 @@ import {
     devMode,
     downloadFile,
     getFirmwareDownloadUrl,
+    githubPullRequestUrl,
     parseUploadedFileName,
     supportsSerialPort,
 } from "../util";
@@ -112,7 +113,8 @@ const isMatchingRelease = computed(() => {
         if (uploadedFile.value || uploadedFileRelease.value) return false;
 
         if (deviceVersion === "mntm-dev") {
-            return deviceCommit === selectedRelease.value.version;
+            const releaseCommit = selectedRelease.value.branch || selectedRelease.value.version;
+            return deviceCommit === releaseCommit;
         } else {
             return deviceVersion === selectedRelease.value.version;
         }
@@ -167,20 +169,34 @@ watch(
                 const deviceVersion = serialConnection?.connectionData.deviceInfo?.firmware_version;
                 if (deviceCommit || deviceVersion) {
                     let inner = "Selected firmware";
+                    let logType = "Release";
+
                     if (uploadedFile.value || uploadedFileRelease.value) {
                         inner = "Uploaded file";
+                        logType = "Upload";
+                    } else if (selectedChannel.value === "branch" && selectedRelease.value) {
+                        inner = "Selected firmware";
+                        logType = "Branch";
                     }
+
                     const logVersion =
                         deviceVersion === "mntm-dev"
                             ? "mntm-dev"
                             : `<a href="${getLocalizedPath("/releases")}/${deviceVersion}" target="_blank">${deviceVersion}</a>`;
                     const logCommit =
-                        deviceVersion === "mntm-dev"
+                        deviceVersion === "mntm-dev" && logType !== "Branch"
                             ? `<a href="${getLocalizedPath("/releases")}/${deviceCommit}" target="_blank">${deviceCommit}</a>`
-                            : deviceCommit;
+                            : `<a class="!no-underline">${deviceCommit}</a>`;
+                    const displayVersion =
+                        logType === "Branch" && selectedRelease.value
+                            ? selectedRelease.value.pr
+                                ? `<a href="${githubPullRequestUrl(selectedRelease.value.pr)}" target="_blank">${selectedRelease.value.version}</a>`
+                                : selectedRelease.value.version
+                            : logVersion;
+
                     logToSerial(
                         "warning",
-                        `[${inner === "Selected firmware" ? "Release" : "Upload"}] ${inner} matches current device firmware (${logVersion}, ${logCommit})`,
+                        `[${logType}] ${inner} matches current Flipper firmware (${displayVersion}, ${logCommit})`,
                     );
                 }
             }
@@ -300,7 +316,9 @@ const handleFlashFirmware = async () => {
             });
         }
     } catch (error) {
-        logToSerial("error", `[Upload] Flash failed: ${error}`);
+        if (error instanceof Error && !error.message.includes("disconnected")) {
+            logToSerial("error", `[Upload] Flash failed: ${error}`);
+        }
     }
 };
 
@@ -573,34 +591,40 @@ onBeforeUnmount(() => {
                                                 class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col md:flex-row gap-1 lg:gap-1.5 pt-1 pb-1.5 lg:pt-0 lg:pb-0"
                                             >
                                                 {{
-                                                    isMatchingRelease
-                                                        ? uploadedFile
-                                                            ? tr(
-                                                                  "updater_matching_release_warning",
-                                                                  {
-                                                                      type: tr(
-                                                                          "updater_upload_file",
-                                                                      ),
-                                                                  },
-                                                              )
-                                                            : tr(
-                                                                  "updater_matching_release_warning",
-                                                                  {
-                                                                      type: tr(
-                                                                          "updater_select_release",
-                                                                      ),
-                                                                  },
-                                                              )
-                                                        : isBranchRelease
-                                                          ? tr("updater_branch_warning")
-                                                          : ""
+                                                    isBranchRelease &&
+                                                    isMatchingRelease &&
+                                                    !uploadedFile
+                                                        ? tr("updater_branch_matching_warning")
+                                                        : isMatchingRelease
+                                                          ? uploadedFile
+                                                              ? tr(
+                                                                    "updater_matching_release_warning",
+                                                                    {
+                                                                        type: tr(
+                                                                            "updater_upload_file",
+                                                                        ),
+                                                                    },
+                                                                )
+                                                              : tr(
+                                                                    "updater_matching_release_warning",
+                                                                    {
+                                                                        type: tr(
+                                                                            "updater_select_release",
+                                                                        ),
+                                                                    },
+                                                                )
+                                                          : isBranchRelease
+                                                            ? tr("updater_branch_warning")
+                                                            : ""
                                                 }}
                                                 <div class="flex flex-row gap-px">
                                                     <a
                                                         class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100 vp-external-link-icon"
                                                         :href="
                                                             isBranchRelease
-                                                                ? `https://github.com/Next-Flip/Momentum-Firmware/pull/${selectedRelease?.pr}`
+                                                                ? githubPullRequestUrl(
+                                                                      selectedRelease?.pr || '',
+                                                                  )
                                                                 : `${getLocalizedPath('/releases')}/${currentDeviceVersion}`
                                                         "
                                                         target="_blank"
