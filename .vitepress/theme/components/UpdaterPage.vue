@@ -82,8 +82,8 @@ const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsOpen = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
-const testMode = ref(devMode() || false); // TEST: DONT leave this as true
-const loopMode = ref(false); // TEST: DONT leave this as true
+const testMode = ref(devMode() || false); // TEST: DO NOT leave this as true
+const loopMode = ref(false); // TEST: DO NOT leave this as true
 
 const logsScrollTrigger = ref(0);
 const triggerLogsScroll = () => {
@@ -113,7 +113,7 @@ const isMatchingRelease = computed(() => {
         if (uploadedFile.value || uploadedFileRelease.value) return false;
 
         if (deviceVersion === "mntm-dev") {
-            const releaseCommit = selectedRelease.value.branch || selectedRelease.value.version;
+            const releaseCommit = selectedRelease.value.version || selectedRelease.value.branch;
             return deviceCommit === releaseCommit;
         } else {
             return deviceVersion === selectedRelease.value.version;

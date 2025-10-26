@@ -39,7 +39,7 @@ const match = (color: ScreenColor, option: ScreenColor) => {
             <button
                 v-for="option in screenColorOptions"
                 :key="option.value"
-                class="w-full h-6 flex items-center justify-center box-content transition-all duration-200 hover:bg-vp-1/5 group"
+                class="w-full h-6 flex items-center justify-center box-content transition-all duration-100 hover:bg-vp-1/5 group"
                 :class="{
                     '!bg-vp-brand-1/10 hover:bg-vp-brand-1/15': isSelected(
                         option.value as ScreenColor,
@@ -64,7 +64,7 @@ const match = (color: ScreenColor, option: ScreenColor) => {
                 @click="handleScreenColorChange(option.value as ScreenColor)"
             >
                 <div
-                    class="w-2.5 h-2.5 rounded-full border border-vp-1/10 transition-all duration-200 group-hover:opacity-95 group-hover:scale-110"
+                    class="w-2.5 h-2.5 rounded-full border border-vp-1/10 transition-all duration-100 group-hover:opacity-95 group-hover:scale-110"
                     :class="{
                         '!opacity-100 !scale-110': isSelected(option.value, currentScreenColor),
                         'bg-vp-brand-1': match(option.value, 'primary'),

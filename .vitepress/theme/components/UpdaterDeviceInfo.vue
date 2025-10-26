@@ -469,7 +469,7 @@ const deviceSections = computed(() => {
                     <div class="bg-vp-divider/30">
                         <div class="flex flex-row gap-px">
                             <div
-                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-10"
+                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-[38px]"
                                 :class="{
                                     'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
                                         activeTab === 'info',
@@ -486,7 +486,7 @@ const deviceSections = computed(() => {
                                 </span>
                             </div>
                             <div
-                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-10"
+                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-[38px]"
                                 :class="{
                                     'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
                                         activeTab === 'raw',
@@ -508,12 +508,12 @@ const deviceSections = computed(() => {
                         <ScrollFade
                             :show="!arrivedState.top"
                             position="top"
-                            class="mr-4 top-[40px]"
+                            class="mr-4 top-[38px]"
                         />
                         <ScrollFade
                             :show="!arrivedState.bottom"
                             position="bottom"
-                            class="mr-4"
+                            class="mr-4 !h-40"
                             :class="{ 'bottom-[18px]': activeTab === 'raw' }"
                         />
                     </template>

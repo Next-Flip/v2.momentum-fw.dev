@@ -1406,12 +1406,12 @@ export const useSerialConnection = () => {
             `[Firmware] Upload completed in ${formattedDuration} successfully. Rebooting...`,
         );
         addLog("verbose", "[System] Rebooting flipper for firmware update");
+
+        flags.updateInProgress = false;
         await flipperModule.commands.system.reboot(2);
         await asyncSleep(1000);
-
         setUpdateStage("update_stage_done");
         await asyncSleep(2000);
-
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
     };
@@ -1725,11 +1725,11 @@ export const useSerialConnection = () => {
             "success",
             `[{{Test}}] Upload completed in ${formattedDuration} successfully. Rebooting...`,
         );
-        await asyncSleep(1000);
 
+        flags.updateInProgress = false;
+        await asyncSleep(1000);
         setUpdateStage("update_stage_done");
         await asyncSleep(2000);
-
         addLog("verbose", "[{{Test}}] flipper update stage");
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);

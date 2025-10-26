@@ -127,6 +127,9 @@ export default {
     ],
     theme: {
         extend: {
+            screens: {
+                xs: "580px",
+            },
             saturate: {
                 250: "250%",
                 300: "300%",

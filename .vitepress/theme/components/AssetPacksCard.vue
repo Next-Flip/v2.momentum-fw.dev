@@ -504,7 +504,7 @@ onUnmounted(() => {
                     </Tooltip>
                 </div>
                 <span
-                    class="text-[14px] text-vp-2 leading-[22px] z-[5] grow two-line-description"
+                    class="text-[14px] text-vp-2 leading-[22px] z-[5] grow xs:two-line-description"
                     >{{ description }}</span
                 >
                 <div

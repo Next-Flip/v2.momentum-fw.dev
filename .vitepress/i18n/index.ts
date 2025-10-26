@@ -20,6 +20,7 @@ export type MessageSchema = {
     Name: string;
     Author: string;
     Filter: string;
+    none: string;
     Packs: string;
     Anims: string;
     animations: string;

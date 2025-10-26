@@ -7,7 +7,7 @@ import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
-import { useConnectionInfo, useDots, useSettings, useSharedHover } from "../composables";
+import { useConnectionInfo, useDots } from "../composables";
 import SettingsIcon from "./SettingsIcon.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -36,8 +36,6 @@ const {
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
 const isAutoOpen = ref(false);
-const { isSettingEnabled } = useSettings();
-const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 const { dots: connectingDots } = useDots();
 const { dots: hardwareNameDots } = useDots();
 const dotsState = computed(() => {
@@ -141,9 +139,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex items-center mr-auto">
+    <div class="flex items-center mr-auto ml-8 gap-x-2">
+        <SettingsIcon />
+
         <div
-            :class="['VPFlyout ml-8', supportsSerialPort() && isUpdatePage && '!hidden']"
+            :class="['VPFlyout', supportsSerialPort() && isUpdatePage && '!hidden']"
             @mouseenter="handleMouse(true)"
             @mouseleave="handleMouse(false)"
         >
@@ -158,7 +158,7 @@ onMounted(() => {
                 >
                     <button
                         :class="[
-                            `connect-button shadow-sm rounded-lg group flex items-center pl-2.5 pr-2.5 h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                            `connect-button shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
                         ]"
                         type="button"
                         :aria-expanded="flyoutOpen"
@@ -341,25 +341,6 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-
-        <div v-if="supportsSerialPort()" :class="isUpdatePage ? 'ml-6' : 'ml-3'">
-            <!-- <AutoconnectToggle /> -->
-            <Tooltip
-                :delay="400"
-                :z-index="9999"
-                :offset="13"
-                position="right"
-                :accept-hover="false"
-                :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
-            >
-                <SettingsIcon />
-                <template #content>{{
-                    isSettingEnabled("autoConnect")
-                        ? tr("connection_autoconnect_enabled")
-                        : tr("connection_autoconnect_disabled")
-                }}</template>
-            </Tooltip>
-        </div>
     </div>
 </template>
 
@@ -425,24 +406,24 @@ body[data-route*="/wiki"] {
 .connect-button[aria-expanded="false"] + .menu {
     opacity: 0;
     visibility: hidden;
-    transform: translateY(0) translateX(calc(-50%));
+    transform: translateY(0) translateX(0);
 }
 
 .VPFlyout:hover .menu,
 .connect-button[aria-expanded="true"] + .menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) translateX(calc(-50%));
+    transform: translateY(0) translateX(0);
 }
 
 @media (min-width: 1024px) {
     .connect-button[aria-expanded="false"] + .menu {
-        transform: translateY(0) translateX(calc(-50%));
+        transform: translateY(0) translateX(0);
     }
 
     .VPFlyout:hover .menu,
     .connect-button[aria-expanded="true"] + .menu {
-        transform: translateY(0) translateX(calc(-50%));
+        transform: translateY(0) translateX(0);
     }
 }
 
@@ -466,8 +447,8 @@ body[data-route*="/wiki"] {
 
 @media (min-width: 1024px) {
     .menu {
-        left: 50%;
-        transform: translateX(calc(-50%));
+        left: 0;
+        transform: translateX(0);
         right: auto;
     }
 }

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useScroll, useStorage, useWindowSize } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 import { motion } from "motion-v";
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, ref } from "vue";
 import type { AssetPack, FilterOption, SortDirection, SortField } from "../types";
 import { STORAGE_KEYS } from "../types";
 import { scrollToTop } from "../util";
 
 import { useI18n, useSticky, useThemeSwitcher } from "../composables";
-import AssetPacksCell from "./AssetPacksCell.vue";
+import AssetPacksCard from "./AssetPacksCard.vue";
 import AssetPacksControls from "./AssetPacksControls.vue";
 import ExtractNotice from "./ExtractNotice.vue";
 
@@ -31,141 +31,25 @@ const sortDirection = useStorage<SortDirection>(STORAGE_KEYS.ASSET_PACK_SORT_DIR
 const activeFilters = useStorage<FilterOption[]>(STORAGE_KEYS.ASSET_PACK_FILTERS, []);
 
 const controlsContainerRef = ref<HTMLElement | null>(null);
-const containerRef = ref<HTMLElement | null>(null);
-
+const animationKey = ref(0);
 const { isStuck } = useSticky(controlsContainerRef);
-
-const width = ref(1024);
-const scrollY = ref(0);
-const prevScrollY = ref(0);
-const scrollDirection = ref<"up" | "down">("down");
-
-onMounted(() => {
-    if (typeof window !== "undefined") {
-        scrollToTop();
-
-        scrollY.value = 0;
-        prevScrollY.value = 0;
-        scrollDirection.value = "down";
-        const { width: windowWidth } = useWindowSize();
-        const { y: windowScrollY } = useScroll(window);
-        width.value = windowWidth.value;
-        scrollY.value = 0;
-
-        const stopWidthWatch = watch(
-            () => windowWidth.value,
-            (newWidth) => {
-                width.value = newWidth;
-            },
-        );
-
-        const stopScrollWatch = watch(
-            () => windowScrollY.value,
-            (newScrollY) => {
-                scrollY.value = newScrollY;
-                updateScrollDirection();
-            },
-        );
-
-        onBeforeUnmount(() => {
-            stopWidthWatch();
-            stopScrollWatch();
-        });
-    }
-});
-
-const responsiveConfig = computed(() => {
-    if (width.value >= 1280) return { itemsPerRow: 4, cellHeight: 345 }; // xl
-    if (width.value >= 1024) return { itemsPerRow: 3, cellHeight: 400 }; // lg
-    if (width.value >= 768) return { itemsPerRow: 2, cellHeight: 440 }; // md
-    return { itemsPerRow: 1, cellHeight: 400 }; // sm
-});
-
-const CELL_HEIGHT = computed(() => responsiveConfig.value.cellHeight);
-const ITEMS_PER_ROW = computed(() => responsiveConfig.value.itemsPerRow);
-const ROW_SPACING = 20;
-
-const rows = computed(() => {
-    const result = [];
-    const items = filteredAssetPacks.value;
-    if (!items) return [];
-
-    const perRow = ITEMS_PER_ROW.value;
-    for (let i = 0; i < items.length; i += perRow) {
-        result.push(items.slice(i, i + perRow));
-    }
-
-    return result;
-});
-
-const viewportInfo = computed(() => {
-    if (!containerRef.value)
-        return {
-            containerTop: 0,
-            viewportHeight: typeof window !== "undefined" ? window.innerHeight : 0,
-        };
-
-    const containerRect = containerRef.value.getBoundingClientRect();
-    return {
-        containerTop: containerRect.top,
-        viewportHeight: typeof window !== "undefined" ? window.innerHeight : 0,
-    };
-});
-
-const updateScrollDirection = () => {
-    const currentScrollY = scrollY.value;
-    if (currentScrollY > prevScrollY.value) {
-        scrollDirection.value = "down";
-    } else if (currentScrollY < prevScrollY.value) {
-        scrollDirection.value = "up";
-    }
-    prevScrollY.value = currentScrollY;
-};
-
-const visibleRowIndexes = computed(() => {
-    if (!rows.value || rows.value.length === 0) return [];
-
-    const { containerTop, viewportHeight } = viewportInfo.value;
-    const rowHeight = CELL_HEIGHT.value + ROW_SPACING;
-    const scrollPosition = scrollY.value;
-    const containerScrollPos = scrollPosition - containerTop;
-    const startIndex = Math.max(0, Math.floor(containerScrollPos / rowHeight));
-    const endIndex = Math.min(
-        rows.value.length - 1,
-        Math.ceil((containerScrollPos + viewportHeight) / rowHeight),
-    );
-
-    const indexes = [];
-    for (let i = startIndex; i <= endIndex; i++) {
-        indexes.push(i);
-    }
-
-    return indexes;
-});
 
 const hasUpdates = computed(() => {
     return !!props.assetPacks.find((pack) => pack.hasUpdate);
 });
 
-const getStaggeredVariant = (rowIndex: number, cellIndex: number) => {
-    const isScrollingDown = scrollDirection.value === "down";
-    const perRow = ITEMS_PER_ROW.value;
-
-    const adjustedCellIndex = isScrollingDown ? cellIndex : perRow - 1 - cellIndex;
-
+const getStaggeredVariant = (index: number) => {
     return {
         initial: {
             opacity: 0,
-            y: isScrollingDown ? 5 : -5,
-            x: isScrollingDown ? -5 : 5,
+            y: 20,
         },
         animate: {
             opacity: 1,
             y: 0,
-            x: 0,
             transition: {
-                duration: 0.3,
-                delay: 0.02 * rowIndex + 0.025 * adjustedCellIndex,
+                duration: 0.15,
+                delay: index * 0.05,
                 ease: [0.25, 0.1, 0.25, 1.0],
             },
         },
@@ -173,23 +57,22 @@ const getStaggeredVariant = (rowIndex: number, cellIndex: number) => {
 };
 
 const handleSearch = (query: string) => {
-    scrollDirection.value = "down";
     if (searchQuery.value !== query) {
+        animationKey.value++;
         nextTick(() => {
             scrollToTop();
         });
     }
-
     searchQuery.value = query;
 };
 
 const handleSort = (sort: string) => {
-    scrollDirection.value = "down";
     const [field, direction] = sort.split("-");
     const newSortField = (field as SortField) || "updatedDate";
     const newSortDirection = (direction as SortDirection) || "desc";
 
     if (sortField.value !== newSortField || sortDirection.value !== newSortDirection) {
+        animationKey.value++;
         nextTick(() => {
             scrollToTop();
         });
@@ -200,12 +83,12 @@ const handleSort = (sort: string) => {
 };
 
 const handleFilter = (filter: FilterOption[]) => {
-    scrollDirection.value = "down";
     const filtersChanged =
         activeFilters.value.length !== filter.length ||
         !activeFilters.value.every((f) => filter.includes(f));
 
     if (filtersChanged) {
+        animationKey.value++;
         nextTick(() => {
             scrollToTop();
         });
@@ -215,7 +98,7 @@ const handleFilter = (filter: FilterOption[]) => {
 };
 
 const resetFilters = () => {
-    scrollDirection.value = "down";
+    animationKey.value++;
     searchQuery.value = "";
     sortField.value = "updatedDate";
     sortDirection.value = "desc";
@@ -289,16 +172,16 @@ const filteredAssetPacks = computed(() => {
 </script>
 
 <template>
-    <div class="relative w-full pb-1 pt-8 lg:pt-16 lg:pb-8 px-0 items-center justify-center">
-        <div v-if="title || description" class="text-center z-[5] pb-5 lg:pb-9">
+    <div class="relative w-full pb-1 pt-12 md:pt-16 md:pb-8 px-0 items-center justify-center">
+        <div v-if="title || description" class="text-center z-[5] pb-10 md:pb-9">
             <h1
                 v-if="title"
-                class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight"
+                class="text-vp-1 text-center font-medium tracking-normal text-[32px] md:text-[40px] leading-8 md:leading-10 md:tracking-tight"
             >
                 {{ tr("asset_packs") }}
             </h1>
             <p
-                class="text-sm lg:text-base italic font-normal text-vp-2 pt-3 leading-5 my-0 mx-auto px-5"
+                class="text-sm md:text-base italic font-normal text-vp-2 pt-3 leading-5 my-0 mx-auto px-5"
             >
                 {{ tr("pack_advert") }}
                 <a
@@ -314,10 +197,10 @@ const filteredAssetPacks = computed(() => {
 
         <div
             ref="controlsContainerRef"
-            class="controls-container w-full sm:mb-4 lg:mb-10 justify-center items-center p-0 sticky top-[calc(var(--vp-nav-height)_-_17px)] lg:top-[var(--vp-nav-height)] z-[5] bg-transparent backdrop-filter-none box-shadow-none md:flex pt-2 pb-6 md:py-[10px] px-6 lg:px-[32px] md:margin-y-0 md:margin-x-auto"
+            class="controls-container w-full mb-5 md:mb-10 justify-center items-center p-0 sticky top-[calc(var(--vp-nav-height)_-_17px)] lg:top-[var(--vp-nav-height)] z-[5] bg-transparent backdrop-filter-none box-shadow-none md:flex py-[10px] px-6 lg:px-[32px] md:margin-y-0 md:margin-x-auto"
             :class="{ 'is-stuck': isStuck }"
         >
-            <div class="w-full max-w-[800px] mx-auto">
+            <div class="w-full max-w-[860px] mx-auto">
                 <AssetPacksControls
                     :initial-sort-field="sortField"
                     :initial-sort-direction="sortDirection"
@@ -330,53 +213,33 @@ const filteredAssetPacks = computed(() => {
             </div>
         </div>
 
-        <div ref="containerRef" class="max-w-[1200px] mx-auto my-0 px-[24px]">
+        <div class="max-w-[1200px] mx-auto my-0 px-[24px]">
             <div
-                class="grid-placeholder"
-                :style="{
-                    height:
-                        rows && rows.length
-                            ? `${rows.length * (CELL_HEIGHT + ROW_SPACING)}px`
-                            : '0px',
-                    position: 'relative',
-                }"
+                class="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 md:gap-5"
             >
-                <div
-                    v-for="index in visibleRowIndexes"
-                    :key="index"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 absolute w-full"
-                    :style="{
-                        transform: `translateY(${index * (CELL_HEIGHT + ROW_SPACING)}px)`,
-                        height: `${CELL_HEIGHT}px`,
-                        top: 0,
-                        left: 0,
-                    }"
+                <motion.div
+                    v-for="(pack, index) in filteredAssetPacks"
+                    :key="`${pack.id}-${animationKey}`"
+                    v-bind="getStaggeredVariant(index)"
                 >
-                    <motion.div
-                        v-for="(pack, cellIndex) in rows[index]"
-                        :key="pack.id"
-                        class="min-w-0"
-                        v-bind="getStaggeredVariant(index, cellIndex)"
-                    >
-                        <AssetPacksCell
-                            :id="pack.id"
-                            :name="pack.name"
-                            :author="pack.author"
-                            :description="pack.description"
-                            :image-url="pack.imageUrl"
-                            :preview-urls="pack.previewUrls"
-                            :download-url="pack.downloadUrl"
-                            :github-url="pack.githubUrl"
-                            :show-time-ago="sortField === 'addedDate' ? 'added' : 'updated'"
-                            :updated-timestamp="pack.updatedTimestamp"
-                            :added-timestamp="pack.addedTimestamp"
-                            :stats="pack.stats"
-                            :installed="pack.installed"
-                            :has-update="pack.hasUpdate"
-                            :tar-file="pack.tarFile"
-                        />
-                    </motion.div>
-                </div>
+                    <AssetPacksCard
+                        :id="pack.id"
+                        :name="pack.name"
+                        :author="pack.author"
+                        :description="pack.description"
+                        :image-url="pack.imageUrl"
+                        :preview-urls="pack.previewUrls"
+                        :download-url="pack.downloadUrl"
+                        :github-url="pack.githubUrl"
+                        :show-time-ago="sortField === 'addedDate' ? 'added' : 'updated'"
+                        :updated-timestamp="pack.updatedTimestamp"
+                        :added-timestamp="pack.addedTimestamp"
+                        :stats="pack.stats"
+                        :installed="pack.installed"
+                        :has-update="pack.hasUpdate"
+                        :tar-file="pack.tarFile"
+                    />
+                </motion.div>
             </div>
         </div>
 

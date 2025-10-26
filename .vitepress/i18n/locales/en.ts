@@ -20,6 +20,7 @@ const messages: MessageSchema = {
     Name: "Name",
     Author: "Author",
     Filter: "Filter",
+    none: "None",
     Packs: "Packs",
     Anims: "Anims",
     animations: "Animations",

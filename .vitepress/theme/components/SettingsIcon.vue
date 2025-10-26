@@ -1,34 +1,43 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { supportsSerialPort } from "../util";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
-import { useI18n, useSettings } from "../composables";
+import { useI18n, useSettings, useSharedHover } from "../composables";
 import Toggle from "./Toggle.vue";
+import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { isSettingEnabled, toggleSetting } = useSettings();
 const flyoutOpen = ref(false);
+const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const handleButtonEnter = () => {
     flyoutOpen.value = true;
 };
-
 const handleButtonLeave = () => {
     flyoutOpen.value = false;
 };
 </script>
 
 <template>
-    <div class="settings-container">
+    <Tooltip
+        :delay="400"
+        :z-index="9999"
+        :offset="13"
+        position="right"
+        :accept-hover="false"
+        :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
+    >
         <div
-            class="hover-area VPFlyout group"
-            :class="{ expanded: flyoutOpen }"
+            v-if="supportsSerialPort()"
+            class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group"
             @mouseenter="handleButtonEnter"
             @mouseleave="handleButtonLeave"
         >
             <button
-                class="transition-all duration-200 pl-0.5 p-1 rounded text-vp-3/80 hover:!text-vp-2"
+                class="transition-all duration-200 w-full h-full rounded text-vp-3/80 hover:!text-vp-2 !cursor-default group"
                 :class="{ '!text-vp-2': flyoutOpen }"
                 :aria-expanded="flyoutOpen"
             >
@@ -38,7 +47,6 @@ const handleButtonLeave = () => {
                     class="group-hover:rotate-90 transition-transform duration-200 ease-in"
                 />
             </button>
-
             <div class="menu">
                 <div class="menu-content">
                     <div class="menu-item mt-2 mx-3">
@@ -80,7 +88,12 @@ const handleButtonLeave = () => {
                 </div>
             </div>
         </div>
-    </div>
+        <template #content>{{
+            isSettingEnabled("autoConnect")
+                ? tr("connection_autoconnect_enabled")
+                : tr("connection_autoconnect_disabled")
+        }}</template>
+    </Tooltip>
 </template>
 
 <style scoped>
@@ -106,33 +119,23 @@ const handleButtonLeave = () => {
     transition: color 0.25s;
 }
 
-.VPFlyout button[aria-expanded="false"] + .menu {
+.VPFlyout:not(:hover) .menu {
     opacity: 0;
     visibility: hidden;
-    transform: translateY(0) translateX(calc(-50%));
+    transform: translateY(0) translateX(0);
 }
 
-.VPFlyout button[aria-expanded="true"] + .menu {
+.VPFlyout:hover .menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) translateX(calc(-50%));
-}
-
-@media (min-width: 1024px) {
-    .VPFlyout button[aria-expanded="false"] + .menu {
-        transform: translateY(0) translateX(calc(-50%));
-    }
-
-    .VPFlyout button[aria-expanded="true"] + .menu {
-        transform: translateY(0) translateX(calc(-50%));
-    }
+    transform: translateY(0) translateX(0);
 }
 
 .menu {
     position: absolute;
     top: calc(var(--vp-nav-height) / 2 + 15px);
-    left: 50%;
-    transform: translateX(calc(-50%));
+    left: 0;
+    transform: translateX(0);
     opacity: 0;
     visibility: hidden;
     transition:
