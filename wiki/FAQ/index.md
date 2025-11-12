@@ -56,6 +56,7 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 - [Mainline release or dev build?](#mainline-release-or-dev-build)
 - [Flipper says "Update failed"?](#flipper-says-update-failed)
 - [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
+- [The Flipper mobile app does not connect?](#the-flipper-mobile-app-does-not-connect)
 - [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
 - [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
 
@@ -112,6 +113,16 @@ If your Flipper is stuck in an infinite loop after updating, it may be due to a 
 2. Reinsert the SD card
 3. Navigate to and run `Settings > Storage > Format SD card` <sup><a href="#format-warning">1</a></sup>
 4. Reinstall Momentum from any of our [installation methods](https://github.com/Next-Flip/Momentum-Firmware/wiki/Installation)
+
+## [The Flipper mobile app does not connect?](#the-flipper-mobile-app-does-not-connect)
+
+Most custom firmwares, including Momentum, have a slightly different BLE configuration; if you had previously paired your Flipper to the mobile app or other devices with the Official firmware, you will need to forget and reconnect. It is **essential that you do this in all 3 places**:
+
+1. In the Flipper mobile app, scroll to the bottom of the main screen and click `Forget Flipper`
+2. In your phone's Bluetooth settings, find all saved devices related to flipper and forget/unpair them
+3. On the Flipper, navigate to `Settings > Bluetooth` and click `Unpair All Devices`
+
+After doing **all these 3 steps**, you can try connecting again. You need to connect from the Flipper mobile app, connecting from your phone's Bluetooth settings will not work (only things like the `BT Remote` and `Bad KB` apps connect from there).
 
 ## [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
 
