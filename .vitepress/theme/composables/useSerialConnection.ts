@@ -755,9 +755,9 @@ export const useSerialConnection = () => {
                 continue; // Cannot mkdir filesystems root, needs to be atleast fs root + 1 char
             }
             try {
-                addLog("verbose", `[Directory] Creating directory: ${full}`);
+                addLog("verbose", `[Directory] Creating directory: <code>${full}</code>`);
                 await flipper.commands.storage.mkdir(full);
-                addLog("debug", `[AssetPacks] storage.mkdir: ${full}`);
+                addLog("debug", `[AssetPacks] storage.mkdir: <code>${full}</code>`);
             } catch (error) {
                 addLog("warning", `[AssetPacks] storage.mkdir failed for ${full}: ${error}`);
             }
@@ -773,21 +773,27 @@ export const useSerialConnection = () => {
         for (const folder of installed.folders) {
             const packFolder = `${ASSET_PACKS_DIR}/${folder}`;
             try {
-                addLog("verbose", `[Cleanup] Removing pack folder: ${packFolder}`);
+                addLog("verbose", `[Cleanup] Removing pack folder: <code>${packFolder}</code>`);
                 await flipper.commands.storage.remove(packFolder, true);
-                addLog("debug", `[AssetPacks] storage.remove: ${packFolder}`);
+                addLog("debug", `[AssetPacks] storage.remove: <code>${packFolder}</code>`);
             } catch (error) {
-                addLog("warning", `[AssetPacks] storage.remove failed for ${packFolder}: ${error}`);
+                addLog(
+                    "warning",
+                    `[AssetPacks] storage.remove failed for <code>${packFolder}</code>: ${error}`,
+                );
             }
         }
 
         const manifestPath = `${ASSET_PACKS_MANIFESTS_DIR}/${pack.id}${ASSET_PACKS_MANIFESTS_EXT}`;
         try {
-            addLog("verbose", `[Cleanup] Removing pack manifest: ${manifestPath}`);
+            addLog("verbose", `[Cleanup] Removing pack manifest: <code>${manifestPath}</code>`);
             await flipper.commands.storage.remove(manifestPath, false);
-            addLog("debug", `[AssetPacks] storage.remove: ${manifestPath}`);
+            addLog("debug", `[AssetPacks] storage.remove: <code>${manifestPath}</code>`);
         } catch (error) {
-            addLog("warning", `[AssetPacks] storage.remove failed for ${manifestPath}: ${error}`);
+            addLog(
+                "warning",
+                `[AssetPacks] storage.remove failed for <code>${manifestPath}</code>: ${error}`,
+            );
         }
     };
 
@@ -800,7 +806,7 @@ export const useSerialConnection = () => {
         if (!packFile?.url || !packFile?.sha256) {
             addLog(
                 "error",
-                `[AssetPacks] Missing tarFile data for pack ${pack.id}: ${JSON.stringify(packFile)}`,
+                `[AssetPacks] Missing tarFile data for pack <code>${pack.id}</code>: ${JSON.stringify(packFile)}`,
             );
             throw new Error(`Pack ${pack.id} is missing required tarFile data`);
         }
@@ -833,7 +839,7 @@ export const useSerialConnection = () => {
             position += chunk.length;
         }
 
-        addLog("debug", `[AssetPacks] Downloaded pack from ${proxiedUrl}`);
+        addLog("debug", `[AssetPacks] Downloaded pack from <code>${proxiedUrl}</code>`);
         return chunksAll;
     };
 
@@ -853,10 +859,13 @@ export const useSerialConnection = () => {
 
         const start = performance.now();
         try {
-            addLog("verbose", `[Transfer] Writing pack data to flipper: ${tempFile}`);
+            addLog("verbose", `[Transfer] Writing pack data to flipper: <code>${tempFile}</code>`);
             await flipper.commands.storage.write(tempFile, packTar);
             const took = performance.now() - start;
-            addLog("debug", `[AssetPacks] storage.write: ${tempFile} took ${Math.round(took)}ms`);
+            addLog(
+                "debug",
+                `[AssetPacks] storage.write: <code>${tempFile}</code> took <code>${Math.round(took)}</code>ms`,
+            );
         } finally {
             unbind();
         }
@@ -881,13 +890,13 @@ export const useSerialConnection = () => {
         try {
             addLog(
                 "verbose",
-                `[Extract] Extracting pack archive: ${tempFile} to ${ASSET_PACKS_DIR}`,
+                `[Extract] Extracting pack archive: <code>${tempFile}</code> to <code>${ASSET_PACKS_DIR}</code>`,
             );
             await flipper.commands.storage.tarExtract(tempFile, ASSET_PACKS_DIR);
             took = performance.now() - start;
             addLog(
                 "debug",
-                `[AssetPacks] storage.tarExtract: ${tempFile} to ${ASSET_PACKS_DIR} took ${Math.round(took)}ms`,
+                `[AssetPacks] storage.tarExtract: <code>${tempFile}</code> to <code>${ASSET_PACKS_DIR}</code> took <code>${Math.round(took)}</code>ms`,
             );
         } finally {
             if (queueState.fakeExtractProgress !== null) {
@@ -909,12 +918,15 @@ export const useSerialConnection = () => {
         const manifestData = new TextEncoder().encode(JSON.stringify(manifest));
 
         try {
-            addLog("verbose", `[Manifest] Writing pack manifest: ${manifestPath}`);
+            addLog("verbose", `[Manifest] Writing pack manifest: <code>${manifestPath}</code>`);
             await flipper.commands.storage.write(manifestPath, manifestData);
-            addLog("debug", `[AssetPacks] storage.write: ${manifestPath}`);
+            addLog("debug", `[AssetPacks] storage.write: <code>${manifestPath}</code>`);
             connectionData.installedPacks[pack.id] = manifest;
         } catch (error) {
-            addLog("error", `[AssetPacks] storage.write failed for ${manifestPath}: ${error}`);
+            addLog(
+                "error",
+                `[AssetPacks] storage.write failed for <code>${manifestPath}</code>: ${error}`,
+            );
             throw error;
         }
     };
@@ -923,7 +935,7 @@ export const useSerialConnection = () => {
         if (!flipper) throw new Error("Flipper not connected");
 
         try {
-            addLog("verbose", `[Manifest] Reading pack manifest: ${path}`);
+            addLog("verbose", `[Manifest] Reading pack manifest: <code>${path}</code>`);
             const raw = await flipper.commands.storage.read(path);
             const text = new TextDecoder().decode(raw);
             const json = JSON.parse(text);
@@ -931,11 +943,13 @@ export const useSerialConnection = () => {
             if (!json.sha256 || !Array.isArray(json.folders)) {
                 addLog(
                     "warning",
-                    `[{{Serial}}] Invalid manifest format for ${path}: ${JSON.stringify({
-                        hasSha256: !!json.sha256,
-                        foldersIsArray: Array.isArray(json.folders),
-                        json: json,
-                    })}`,
+                    `[{{Serial}}] Invalid manifest format for <code>${path}</code>: ${JSON.stringify(
+                        {
+                            hasSha256: !!json.sha256,
+                            foldersIsArray: Array.isArray(json.folders),
+                            json: json,
+                        },
+                    )}`,
                 );
                 return null;
             }
@@ -945,7 +959,7 @@ export const useSerialConnection = () => {
                 folders: json.folders,
             };
         } catch {
-            addLog("warning", `[{{Serial}}] Failed to load pack manifest: ${path}`);
+            addLog("warning", `[{{Serial}}] Failed to load pack manifest: <code>${path}</code>`);
             return null;
         }
     };
@@ -973,7 +987,7 @@ export const useSerialConnection = () => {
         try {
             addLog(
                 "verbose",
-                `[Discovery] Listing installed pack manifests: ${ASSET_PACKS_MANIFESTS_DIR}`,
+                `[Discovery] Listing installed pack manifests: <code>${ASSET_PACKS_MANIFESTS_DIR}</code>`,
             );
             const manifests = await flipper.commands.storage.list(ASSET_PACKS_MANIFESTS_DIR);
 
@@ -987,7 +1001,7 @@ export const useSerialConnection = () => {
 
                 const packId = manifest.name.slice(0, -ASSET_PACKS_MANIFESTS_EXT.length);
 
-                addLog("verbose", `[Manifest] Loading pack manifest: ${packId}`);
+                addLog("verbose", `[Manifest] Loading pack manifest: <code>${packId}</code>`);
                 const manifestData = await loadPackManifest(
                     `${ASSET_PACKS_MANIFESTS_DIR}/${manifest.name}`,
                 );
@@ -998,7 +1012,10 @@ export const useSerialConnection = () => {
 
             const packCount = Object.keys(installed).length;
             if (packCount > 0) {
-                addLog("info", `[{{Serial}}] Found ${packCount} installed asset pack(s)`);
+                addLog(
+                    "info",
+                    `[{{Serial}}] Found <code>${packCount}</code> installed asset pack(s)`,
+                );
             }
         } catch (error) {
             if (error === "ERROR_STORAGE_NOT_EXIST") {
@@ -1030,19 +1047,19 @@ export const useSerialConnection = () => {
             flags.progress = progress / stepCount + (1 / stepCount) * step;
         };
 
-        addLog("info", `[AssetPacks] Starting installation of pack: ${pack.id}`);
+        addLog("info", `[AssetPacks] Starting installation of pack: <code>${pack.id}</code>`);
         flags.progress = 0;
         flags.installStatus = InstallStatus.LOADING;
         step++;
 
-        addLog("verbose", `[Download] Downloading asset pack: ${pack.id}`);
+        addLog("verbose", `[Download] Downloading asset pack: <code>${pack.id}</code>`);
         const packTar = await downloadPackWithProgress(pack, setProgress).catch((error) => {
             addLog("error", `[AssetPacks] ${error.toString()}`);
             throw new Error(error.toString());
         });
 
         flags.installStatus = InstallStatus.CLEANUP;
-        addLog("verbose", `[Cleanup] Removing old pack versions: ${pack.id}`);
+        addLog("verbose", `[Cleanup] Removing old pack versions: <code>${pack.id}</code>`);
         await removeOldPacks(pack);
 
         flags.installStatus = InstallStatus.COPYING;
@@ -1054,36 +1071,39 @@ export const useSerialConnection = () => {
         await mkdirParents(ASSET_PACKS_TEMP_PATH);
         const tempFile = `${ASSET_PACKS_TEMP_PATH}/${pack.id}.tar.gz`;
 
-        addLog("verbose", `[Transfer] Writing pack to flipper: ${tempFile}`);
+        addLog("verbose", `[Transfer] Writing pack to flipper: <code>${tempFile}</code>`);
         await writePackToDevice(tempFile, packTar, setProgress);
 
         flags.installStatus = InstallStatus.EXTRACT;
         step++;
 
-        addLog("verbose", `[Extract] Extracting pack on flipper: ${tempFile}`);
+        addLog("verbose", `[Extract] Extracting pack on flipper: <code>${tempFile}</code>`);
         await extractPackOnDevice(tempFile, setProgress);
 
         flags.installStatus = InstallStatus.CLEANUP;
         try {
-            addLog("verbose", `[Cleanup] Cleaning up temporary file: ${tempFile}`);
+            addLog("verbose", `[Cleanup] Cleaning up temporary file: <code>${tempFile}</code>`);
             await flipper.commands.storage.remove(tempFile, false);
-            addLog("debug", `[AssetPacks] storage.remove: ${tempFile}`);
+            addLog("debug", `[AssetPacks] storage.remove: <code>${tempFile}</code>`);
         } catch (error) {
-            addLog("warning", `[AssetPacks] storage.remove failed for ${tempFile}: ${error}`);
+            addLog(
+                "warning",
+                `[AssetPacks] storage.remove failed for <code>${tempFile}</code>: ${error}`,
+            );
         }
 
-        addLog("verbose", `[Manifest] Creating pack manifest: ${pack.id}`);
+        addLog("verbose", `[Manifest] Creating pack manifest: <code>${pack.id}</code>`);
         await createManifest(pack);
-        addLog("info", `[AssetPacks] Successfully installed pack: ${pack.id}`);
+        addLog("success", `[AssetPacks] Successfully installed pack: <code>${pack.id}</code>`);
     };
 
     const processRemovePack = async (pack: AssetPack): Promise<void> => {
-        addLog("info", `[AssetPacks] Removing pack: ${pack.id}`);
+        addLog("info", `[AssetPacks] Removing pack: <code>${pack.id}</code>`);
         flags.installStatus = InstallStatus.DELETING;
-        addLog("verbose", `[Cleanup] Removing pack: ${pack.id}`);
+        addLog("verbose", `[Cleanup] Removing pack: <code>${pack.id}</code>`);
         await removeOldPacks(pack);
         delete connectionData.installedPacks[pack.id];
-        addLog("info", `[AssetPacks] Successfully removed pack: ${pack.id}`);
+        addLog("success", `[AssetPacks] Successfully removed pack: <code>${pack.id}</code>`);
     };
 
     const enqueue = async (pack: AssetPack, action: "install" | "remove"): Promise<boolean> => {
@@ -1105,10 +1125,16 @@ export const useSerialConnection = () => {
                 const currentAction = queueState.queueActions[0];
 
                 if (currentAction === "remove") {
-                    addLog("verbose", `[Queue] Processing pack removal: ${currentPack.id}`);
+                    addLog(
+                        "verbose",
+                        `[Queue] Processing pack removal: <code>${currentPack.id}</code>`,
+                    );
                     await processRemovePack(currentPack);
                 } else if (currentAction === "install") {
-                    addLog("verbose", `[Queue] Processing pack installation: ${currentPack.id}`);
+                    addLog(
+                        "verbose",
+                        `[Queue] Processing pack installation: <code>${currentPack.id}</code>`,
+                    );
                     await processInstallPack(currentPack);
                 }
             } finally {
@@ -1536,7 +1562,7 @@ export const useSerialConnection = () => {
             addLog("verbose", "[RPC] Restarting session");
             await startRpc();
             flags.restarting = false;
-            addLog("info", "[{{Serial}}] RPC connection restarted successfully");
+            addLog("success", "[{{Serial}}] RPC connection restarted successfully");
         }
     };
 

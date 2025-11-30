@@ -446,7 +446,7 @@ const deviceSections = computed(() => {
                                     >
                                         <a
                                             :class="[
-                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55',
+                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55 shadow-grow',
                                                 'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
                                                 { 'wiggle-loop': isInstallButtonHovered },
                                                 ifCurrentTheme(['orange'])

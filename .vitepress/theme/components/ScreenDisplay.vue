@@ -54,6 +54,7 @@ const stopAutoRetry = () => {
 };
 
 const manualRestart = async () => {
+    if (flags.value.updateInProgress) return;
     await completeRestart();
 };
 
@@ -242,22 +243,8 @@ onBeforeUnmount(() => {
                         'dark:bg-vp-bg dark:saturate-0 dark:contrast-200 dark:brightness-[3]':
                             shouldUseDarkImage,
                     }"
-                />
-
-                <div
-                    v-if="!flags.screenStream"
-                    class="absolute inset-0 flex items-center justify-center cursor-pointer bg-black bg-opacity-10 hover:bg-opacity-20 transition-all duration-200 rounded-lg"
-                    title="Click to retry screen stream"
                     @click="manualRestart"
-                >
-                    <div
-                        class="p-1 bg-white/80 dark:bg-black/50 rounded-full flex items-center justify-center"
-                    >
-                        <div
-                            class="w-4 h-4 border-2 border-vp-1/80 border-t-transparent rounded-full animate-spin z-10"
-                        ></div>
-                    </div>
-                </div>
+                />
             </div>
         </div>
     </div>

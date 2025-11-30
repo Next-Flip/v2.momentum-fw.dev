@@ -80,7 +80,7 @@ const handleDownload = (file: File) => {
 
 const getButtonIcon = (file: File) => {
     const key = getFileKey(file);
-    return buttonStates.value[key]?.isSuccess ? "bi-check2" : "oi-download";
+    return buttonStates.value[key]?.isSuccess ? "bi-check2" : "bi-file-earmark-zip";
 };
 
 const getButtonScale = (file: File) => {
@@ -145,6 +145,7 @@ const getButtonScale = (file: File) => {
                 >
                     {{
                         [
+                            // "sha256" in file ? file.sha256 : "",
                             "type" in file ? file.type : "",
                             "size" in file ? file.size : "",
                             "target" in file ? file.target : "",

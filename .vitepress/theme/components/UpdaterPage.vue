@@ -908,10 +908,9 @@ onBeforeUnmount(() => {
                                     </div>
                                     <div
                                         v-if="!showUpdateOverlay"
-                                        class="h-px border-b border-solid border-vp-3/25 w-auto mx-0 sm:mx-10"
+                                        class="h-px border-b border-solid border-vp-3/25 w-auto mx-0 sm:mx-10 mt-5"
                                         :class="{
                                             'opacity-30': isOverDropZone,
-                                            'mt-5': supportsSerialPort(),
                                         }"
                                     ></div>
                                 </div>

@@ -127,7 +127,7 @@ watch(
             class="relative z-[1] flex flex-row justify-start items-center gap-1.5 pb-2 mb-3 border-b border-vp-divider pointer-events-auto"
         >
             <div class="flex items-center justify-center text-sm text-vp-2/80">
-                <v-icon name="bi-file-earmark-zip" :scale="0.95" />
+                <v-icon name="oi-download" :scale="0.95" />
             </div>
             <span
                 class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"

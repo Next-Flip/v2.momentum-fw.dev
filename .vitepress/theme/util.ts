@@ -383,9 +383,9 @@ export const formatDuration = (milliseconds: number): string => {
     const remainingSeconds = seconds % 60;
 
     if (minutes > 0) {
-        return `${minutes}min, ${remainingSeconds}s`;
+        return `<code>${minutes}</code>min, <code>${remainingSeconds}</code>s`;
     } else {
-        return `${remainingSeconds}s`;
+        return `<code>${remainingSeconds}</code>s`;
     }
 };
 

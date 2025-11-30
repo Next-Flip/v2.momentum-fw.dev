@@ -4,14 +4,12 @@ import { supportsSerialPort } from "../util";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
-import { useI18n, useSettings, useSharedHover } from "../composables";
+import { useI18n, useSettings } from "../composables";
 import Toggle from "./Toggle.vue";
-import Tooltip from "./Tooltip.vue";
 
 const { tr } = useI18n();
 const { isSettingEnabled, toggleSetting } = useSettings();
 const flyoutOpen = ref(false);
-const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
 const handleButtonEnter = () => {
     flyoutOpen.value = true;
@@ -22,78 +20,62 @@ const handleButtonLeave = () => {
 </script>
 
 <template>
-    <Tooltip
-        :delay="400"
-        :z-index="9999"
-        :offset="13"
-        position="right"
-        :accept-hover="false"
-        :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
+    <div
+        v-if="supportsSerialPort()"
+        class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group"
+        @mouseenter="handleButtonEnter"
+        @mouseleave="handleButtonLeave"
     >
-        <div
-            v-if="supportsSerialPort()"
-            class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group"
-            @mouseenter="handleButtonEnter"
-            @mouseleave="handleButtonLeave"
+        <button
+            class="transition-all duration-200 w-full h-full rounded text-vp-3/80 hover:!text-vp-2 !cursor-default group"
+            :class="{ '!text-vp-2': flyoutOpen }"
+            :aria-expanded="flyoutOpen"
         >
-            <button
-                class="transition-all duration-200 w-full h-full rounded text-vp-3/80 hover:!text-vp-2 !cursor-default group"
-                :class="{ '!text-vp-2': flyoutOpen }"
-                :aria-expanded="flyoutOpen"
-            >
-                <v-icon
-                    name="oi-gear"
-                    scale="1"
-                    class="group-hover:rotate-90 transition-transform duration-200 ease-in"
-                />
-            </button>
-            <div class="menu">
-                <div class="menu-content">
-                    <div class="menu-item mt-2 mx-3">
-                        <span class="menu-label">{{ tr("connection_autoconnect") }}:</span>
-                        <AutoconnectToggle />
-                    </div>
-                    <div class="menu-item mx-3">
-                        <span class="menu-label">{{ tr("connection_verbose_logs") }}:</span>
-                        <Toggle
-                            :icon-name="
-                                isSettingEnabled('verboseLogs') ? 'oi-dash' : 'fa-regular-circle'
-                            "
-                            :scale="0.65"
-                            :aria-label="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
-                            :title="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
-                            :label="tr('connection_verbose_logs')"
-                            :checked="isSettingEnabled('verboseLogs')"
-                            :callback="() => toggleSetting('verboseLogs')"
-                        />
-                    </div>
-                    <div class="menu-item mb-2 mx-3">
-                        <span class="menu-label">{{ tr("connection_clear_logs") }}:</span>
-                        <Toggle
-                            :icon-name="
-                                isSettingEnabled('clearLogs') ? 'oi-dash' : 'fa-regular-circle'
-                            "
-                            :scale="0.65"
-                            :aria-label="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
-                            :title="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
-                            :label="tr('connection_clear_logs')"
-                            :checked="isSettingEnabled('clearLogs')"
-                            :callback="() => toggleSetting('clearLogs')"
-                        />
-                    </div>
-                    <div class="h-px bg-vp-divider/70 mx-0"></div>
-                    <div class="menu-item my-1.5">
-                        <ScreenColorSelector />
-                    </div>
+            <v-icon
+                name="oi-gear"
+                scale="1"
+                class="group-hover:rotate-90 transition-transform duration-200 ease-in"
+            />
+        </button>
+        <div class="menu">
+            <div class="menu-content">
+                <div class="menu-item mt-2 mx-3">
+                    <span class="menu-label">{{ tr("connection_autoconnect") }}:</span>
+                    <AutoconnectToggle />
+                </div>
+                <div class="menu-item mx-3">
+                    <span class="menu-label">{{ tr("connection_verbose_logs") }}:</span>
+                    <Toggle
+                        :icon-name="
+                            isSettingEnabled('verboseLogs') ? 'oi-dash' : 'fa-regular-circle'
+                        "
+                        :scale="0.65"
+                        :aria-label="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
+                        :title="tr(isSettingEnabled('verboseLogs') ? 'on' : 'off')"
+                        :label="tr('connection_verbose_logs')"
+                        :checked="isSettingEnabled('verboseLogs')"
+                        :callback="() => toggleSetting('verboseLogs')"
+                    />
+                </div>
+                <div class="menu-item mb-2 mx-3">
+                    <span class="menu-label">{{ tr("connection_clear_logs") }}:</span>
+                    <Toggle
+                        :icon-name="isSettingEnabled('clearLogs') ? 'oi-dash' : 'fa-regular-circle'"
+                        :scale="0.65"
+                        :aria-label="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
+                        :title="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
+                        :label="tr('connection_clear_logs')"
+                        :checked="isSettingEnabled('clearLogs')"
+                        :callback="() => toggleSetting('clearLogs')"
+                    />
+                </div>
+                <div class="h-px bg-vp-divider/70 mx-0"></div>
+                <div class="menu-item my-1.5">
+                    <ScreenColorSelector />
                 </div>
             </div>
         </div>
-        <template #content>{{
-            isSettingEnabled("autoConnect")
-                ? tr("connection_autoconnect_enabled")
-                : tr("connection_autoconnect_disabled")
-        }}</template>
-    </Tooltip>
+    </div>
 </template>
 
 <style scoped>
