@@ -194,7 +194,7 @@ export async function fetchFirmware(url: string) {
         throw new Error("fetchFirmware is not available during SSR");
     }
 
-    const buffer = await fetch(url)
+    const buffer = await fetch(url, { cache: 'reload' })
         .then(async response => {
             if (response.status >= 400) {
                 throw new Error('Failed to fetch resources (' + response.status + ')');
@@ -399,4 +399,8 @@ export const stripHtmlFromLogs = (htmlString: string): string => {
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'");
+};
+
+export const replaceIn = (str: string, search: string, replace: string): string => {
+    return str.split(search).join(replace);
 };

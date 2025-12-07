@@ -28,6 +28,7 @@ import {
     getFirmwareDownloadUrl,
     githubPullRequestUrl,
     parseUploadedFileName,
+    replaceIn,
     supportsSerialPort,
 } from "../util";
 
@@ -301,24 +302,17 @@ const handleFlashFirmware = async () => {
 
     if (!testMode.value && !isConnected.value) return;
 
-    try {
-        const uploadedForTest = uploadedFile.value ?? null;
-        const uploadedForUpdate = uploadedFile.value ?? undefined;
-        const success = testMode.value
-            ? await serialConnection.testUpdateFirmware(releaseArg, uploadedForTest, loopMode.value)
-            : await serialConnection.updateFirmware(releaseArg, uploadedForUpdate);
+    const uploadedForTest = uploadedFile.value ?? null;
+    const uploadedForUpdate = uploadedFile.value ?? undefined;
+    const success = testMode.value
+        ? await serialConnection.testUpdateFirmware(releaseArg, uploadedForTest, loopMode.value)
+        : await serialConnection.updateFirmware(releaseArg, uploadedForUpdate);
 
-        if (success) {
-            track("firmware_flash", {
-                version:
-                    releaseArg?.version || uploadedFile.value?.name.replace(".tgz", "") || "null",
-                theme: `${currentTheme.value}_${screenColor.value}`,
-            });
-        }
-    } catch (error) {
-        if (error instanceof Error && !error.message.includes("disconnected")) {
-            logToSerial("error", `[Upload] Flash failed: ${error}`);
-        }
+    if (success) {
+        track("firmware_flash", {
+            version: releaseArg?.version || uploadedFile.value?.name.replace(".tgz", "") || "null",
+            theme: `${currentTheme.value}_${screenColor.value}`,
+        });
     }
 };
 
@@ -329,7 +323,10 @@ const handleDownloadRelease = () => {
 
     if (firmwareUrl) {
         downloadFile(firmwareUrl);
-        logToSerial("info", `[Download] Downloading firmware: ${firmwareUrl}`);
+        logToSerial(
+            "info",
+            `[Download] Downloading firmware tgz: <a href="${firmwareUrl}" target="_blank">${replaceIn(firmwareUrl, "https://up.momentum-fw.dev/builds/firmware", "")}</a>`,
+        );
     } else {
         logToSerial("error", "[Download] No firmware download URL found for selected release");
     }

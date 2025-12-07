@@ -24,6 +24,7 @@ import {
     formatDuration,
     getCurrentLocale,
     getFirmwareDownloadUrl,
+    replaceIn,
     unpack,
 } from "../util";
 import { useProxiedUrl } from "./useProxiedUrl";
@@ -1345,24 +1346,15 @@ export const useSerialConnection = () => {
                 throw new Error("No release provided for firmware download");
             }
             const firmwareUrl = getFirmwareDownloadUrl(release);
-
             if (!firmwareUrl) {
                 throw new Error(`No firmware URL found for release: ${release.version}`);
             }
 
-            const proxiedUrl = useProxiedUrl(firmwareUrl);
             addLog(
-                "info",
-                `[Firmware] Downloading firmware from: <a href="${proxiedUrl}" target="_blank">${proxiedUrl}</a>`,
+                "verbose",
+                `[Firmware] Fetching firmware: <a href="${firmwareUrl}" target="_blank">${replaceIn(firmwareUrl, "https://up.momentum-fw.dev/builds/firmware", "")}</a>`,
             );
-
-            try {
-                addLog("verbose", "[Download] Fetching firmware from proxied URL");
-                files = await fetchFirmware(proxiedUrl);
-            } catch {
-                addLog("warning", `[Firmware] Proxied URL failed, trying original URL`);
-                files = await fetchFirmware(firmwareUrl);
-            }
+            files = await fetchFirmware(firmwareUrl);
 
             addLog(
                 "debug",
