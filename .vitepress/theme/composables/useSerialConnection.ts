@@ -571,9 +571,6 @@ export const useSerialConnection = () => {
         connectionData.state = ConnectionState.CONNECTING;
         connectionData.error = undefined;
         flags.portSelectRequired = false;
-        if (isSettingEnabled("clearLogs")) {
-            clearLogs();
-        }
 
         try {
             flipper = await getFlipperModule();

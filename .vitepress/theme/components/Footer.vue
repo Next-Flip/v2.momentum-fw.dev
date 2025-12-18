@@ -62,8 +62,8 @@ const navigationLinks = computed(() => [
                 class="flex flex-col-reverse lg: sm:flex-row sm:justify-between gap-16 md:gap-8 mx-auto max-w-7xl"
                 :class="[isWiki ? 'pl-8 pr-12 lg:pl-72' : 'px-8 lg:px-16']"
             >
-                <div class="lg:max-w-md flex flex-col justify-start z-50">
-                    <div class="flex flex-col pl-3.5 -ml-3.5 group/logo pt-3.5 -mt-3.5">
+                <div class="lg:max-w-md flex flex-col justify-start z-50 group/logo">
+                    <div class="flex flex-col pl-3.5 -ml-3.5 pt-3.5 -mt-3.5">
                         <div class="flex flex-row items-center gap-3 pb-3.5">
                             <a
                                 href="/"

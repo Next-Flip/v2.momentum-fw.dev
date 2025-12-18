@@ -252,7 +252,7 @@ export interface DropdownOption {
 export type ScreenColor = "primary" | "secondary" | "default" | "white";
 export const SCREEN_COLORS: ScreenColor[] = ["primary", "secondary", "default", "white"];
 
-export type BooleanSetting = "autoConnect" | "clearLogs" | "verboseLogs";
+export type BooleanSetting = "autoConnect" | "verboseLogs";
 
 export const STORAGE_KEYS = {
     ASSET_PACK_SORT_FIELD: "momentum-asset-packs_sort-field",
@@ -264,7 +264,6 @@ export const STORAGE_KEYS = {
     UPDATER_SELECTED_VERSION: "momentum-updater_selected_version",
     UPDATER_DEVICE_INFO_TAB: "momentum-updater_device-info-tab",
     AUTO_CONNECT: "momentum-autoconnect-enabled",
-    CLEAR_LOGS: "momentum-clear-logs",
     VERBOSE_LOGS: "momentum-verbose-logs",
     SCREEN_COLOR: "momentum-screen-color",
     THEME_LOCKED: "momentum-theme-locked",

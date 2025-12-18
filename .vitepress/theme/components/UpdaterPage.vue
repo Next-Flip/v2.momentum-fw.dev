@@ -566,7 +566,7 @@ onBeforeUnmount(() => {
                                                 isMatchingRelease ||
                                                 (isBranchRelease && !uploadedFile)
                                             "
-                                            class="flex flex-row items-center justify-center gap-2.5 lg:gap-1.5 w-full py-1.5 px-2.5 lg:mb-0 border-b border-vp-divider bg-yellow-300/10 dark:bg-yellow-900/5 min-h-10 lg:h-10"
+                                            class="flex flex-row items-center justify-center gap-2.5 lg:gap-1.5 w-full py-1.5 px-2.5 lg:mb-0 border-b border-vp-divider bg-yellow-300/15 dark:bg-yellow-800/5 min-h-10 lg:h-10"
                                             :class="{
                                                 'opacity-40': isOverDropZone,
                                             }"

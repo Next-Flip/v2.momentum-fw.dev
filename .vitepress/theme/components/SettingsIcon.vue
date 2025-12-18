@@ -22,7 +22,7 @@ const handleButtonLeave = () => {
 <template>
     <div
         v-if="supportsSerialPort()"
-        class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group"
+        class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group bg-vp-dark"
         @mouseenter="handleButtonEnter"
         @mouseleave="handleButtonLeave"
     >
@@ -57,19 +57,7 @@ const handleButtonLeave = () => {
                         :callback="() => toggleSetting('verboseLogs')"
                     />
                 </div>
-                <div class="menu-item mb-2 mx-3">
-                    <span class="menu-label">{{ tr("connection_clear_logs") }}:</span>
-                    <Toggle
-                        :icon-name="isSettingEnabled('clearLogs') ? 'oi-dash' : 'fa-regular-circle'"
-                        :scale="0.65"
-                        :aria-label="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
-                        :title="tr(isSettingEnabled('clearLogs') ? 'on' : 'off')"
-                        :label="tr('connection_clear_logs')"
-                        :checked="isSettingEnabled('clearLogs')"
-                        :callback="() => toggleSetting('clearLogs')"
-                    />
-                </div>
-                <div class="h-px bg-vp-divider/70 mx-0"></div>
+                <div class="h-px bg-vp-divider/70 mx-0 mt-2"></div>
                 <div class="menu-item my-1.5">
                     <ScreenColorSelector />
                 </div>

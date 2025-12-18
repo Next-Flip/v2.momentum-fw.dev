@@ -436,6 +436,14 @@ body {
 .DocSearch {
     --docsearch-primary-color: var(--vp-c-brand-1) !important;
 }
+.DocSearch.DocSearch-Button {
+    transition:
+        border-color 0.1s,
+        color 0.1s !important;
+}
+.DocSearch-Button .DocSearch-Button-Placeholder {
+    margin-top: 0 !important;
+}
 
 .search-bar {
     border-radius: 8px !important;
@@ -1115,6 +1123,26 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
     transform: rotate(180deg);
 }
 
+#required {
+    opacity: 1;
+}
+#required::before {
+    content: "Required";
+    color: var(--vp-c-brand-1);
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+#optional {
+    opacity: 0.6;
+}
+#optional::before {
+    content: "Optional";
+    font-size: 10px;
+    font-weight: 500;
+    margin-right: 4px;
+}
 #default {
     opacity: 0.6;
 }
@@ -1279,4 +1307,8 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
 .changelog-fade-enter-from,
 .changelog-fade-leave-to {
     opacity: 0;
+}
+
+.vp-doc span.lang {
+    display: none;
 }

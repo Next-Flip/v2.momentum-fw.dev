@@ -169,7 +169,7 @@ onMounted(() => {
                     >
                         <button
                             :class="[
-                                `connect-button shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
                             ]"
                             type="button"
                             :aria-expanded="flyoutOpen"

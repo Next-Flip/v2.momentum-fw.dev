@@ -223,7 +223,6 @@ export type MessageSchema = {
     connection_autoconnect: string;
     connection_autoconnect_enabled: string;
     connection_autoconnect_disabled: string;
-    connection_clear_logs: string;
     connection_verbose_logs: string;
     connection_screen_color: string;
     connection_unplug_warning: string;

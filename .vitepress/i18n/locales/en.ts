@@ -228,7 +228,6 @@ const messages: MessageSchema = {
     connection_autoconnect: "Auto Connect",
     connection_autoconnect_enabled: "Auto Connect: ON",
     connection_autoconnect_disabled: "Auto Connect: OFF",
-    connection_clear_logs: "Clear Logs",
     connection_verbose_logs: "Verbose Logs",
     connection_screen_color: "Screen Color",
     connection_unplug_warning: "Don't unplug your Flipper!",
@@ -346,7 +345,7 @@ const messages: MessageSchema = {
     updater_development_description: "Latest builds",
     updater_branch_label: "Branch",
     updater_branch_description: "Experimental",
-    updater_branch_warning: "This branch is not a stable release. Proceed only if you're sure.",
+    updater_branch_warning: "This branch is not a stable release. Proceed at your own risk.",
     updater_branch_matching_warning:
         "This branch is not a stable release and is already installed. Reinstall only if you're sure.",
     updater_unknown_date: "Unknown date",

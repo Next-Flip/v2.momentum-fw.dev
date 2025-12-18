@@ -6,8 +6,6 @@ export function useSettings() {
     // prettier-ignore
     const autoconnectEnabled = useStorage(STORAGE_KEYS.AUTO_CONNECT, true, undefined, { initOnMounted: true });
     // prettier-ignore
-    const clearLogsEnabled = useStorage(STORAGE_KEYS.CLEAR_LOGS, false, undefined, { initOnMounted: true });
-    // prettier-ignore
     const verboseLogsEnabled = useStorage(STORAGE_KEYS.VERBOSE_LOGS, false, undefined, { initOnMounted: true });
     // prettier-ignore
     const screenColor = useStorage<ScreenColor>(STORAGE_KEYS.SCREEN_COLOR, "default", undefined, { initOnMounted: true });
@@ -15,7 +13,6 @@ export function useSettings() {
     const getBool = (setting: BooleanSetting) => {
         const map = {
             autoConnect: autoconnectEnabled,
-            clearLogs: clearLogsEnabled,
             verboseLogs: verboseLogsEnabled,
         };
         return computed({
@@ -29,7 +26,6 @@ export function useSettings() {
     const toggleBool = (setting: BooleanSetting) => {
         const map = {
             autoConnect: autoconnectEnabled,
-            clearLogs: clearLogsEnabled,
             verboseLogs: verboseLogsEnabled,
         };
         map[setting].value = !map[setting].value;
@@ -49,7 +45,6 @@ export function useSettings() {
 
     return {
         autoconnectEnabled,
-        clearLogsEnabled,
         verboseLogsEnabled,
         screenColor,
         getBool,
