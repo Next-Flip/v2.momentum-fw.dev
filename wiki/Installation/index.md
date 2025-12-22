@@ -57,9 +57,7 @@ There are multiple ways you could backup your important files from Flipper's SD 
 
 There are 4 methods to install Momentum. We recommend using the **Web Updater**, but you can choose whichever method you prefer.
 
-### [Web Updater (Browser)](Installation#Web-Updater-Browser)
-
-The simplest method for installing Momentum firmware:
+### [Web Updater](Installation#Web-Updater-Browser)
 
 1. Open the [Web Updater](https://momentum-fw.dev/update)
 2. Click `Connect` and select your Flipper from the list
@@ -67,11 +65,9 @@ The simplest method for installing Momentum firmware:
 
 ---
 
-### [Flipper Lab/App (Browser/Mobile)](Installation#Flipper-LabApp-BrowserMobile)
+### [Flipper Lab/App](Installation#Flipper-LabApp-BrowserMobile)
 
-Install directly from your browser or mobile device:
-
-#### Desktop
+#### Browser
 
 1. Open the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
 2. Click the `☁️ Flipper Lab/App (chrome/mobile)` link

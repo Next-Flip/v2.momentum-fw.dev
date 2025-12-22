@@ -51,7 +51,7 @@ Installing Asset Packs is quite easy and straightforward. First, make sure you'r
 `SD/asset_packs/PackName/Icons`.</sub>
 3. Now simply open the Momentum Settings app (from the home screen press `UP` and then `Momentum Settings`) and select the asset pack you want. When you back out, Flipper will restart and your animations and icons will use the ones from the selected pack!
 
-## [Create your own Asset Packs](/wiki/Assets#create-your-own-asset-packs)
+## [How Asset Packs Work](/wiki/Assets#how-asset-packs-work)
 
 Before we begin, it's better to understand a little on how they work. Asset Packs are made of 2 parts: `Anims` and `Icons`.
 
@@ -213,11 +213,11 @@ Which is the same you can find in the firmware source code, in [`assets/icons`](
 
 This system supports **all** internal assets!
 
-## [Cool, I read all that, but how do I make one???](/wiki/Assets#cool-i-read-all-that-but-how-do-i-make-one)
+## [Create your own Asset Packs](/wiki/Assets#create-your-own-asset-packs)
 
 All the .bm and .bmx struggles are dealt with by the packer system, which is in `scripts/asset_packer.py`; when making your Asset Pack you will only be working with .png images and meta.txt/manifest.txt/frame_rate files. As explained above, packs are made of 2 parts, Anims and Icons, but you don't have to include both - if you only include Anims, then the default SFW Icons will be used, and viceversa. You have 2 options: make standalone Asset Packs (recommended), or build them along with the firmware.
 
-### Software Recommendations
+### Recommended Software
 
 Before creating your Asset Pack, you'll need pixel art software. Popular choices include:
 
@@ -239,7 +239,7 @@ Several tools can compile your PNG frames to Flipper's `.bm` format:
 > [!WARNING]
 > Avoid using `img2fbm` - it's unreliable and can create corrupt frames.
 
-#### Standalone Asset Packs
+#### Standalone Packs
 
 - (First time only) Install Python (3.10 recommended, but not required), then open a terminal/console and run `pip3 install Pillow heatshrink2`.
 - Make a NEW folder anywhere on your system where you'll put all your source asset packs. If you're not sure, the Desktop is always a good place, so make the NEW folder there.
@@ -262,7 +262,7 @@ Several tools can compile your PNG frames to Flipper's `.bm` format:
 - Now upload the packed packs from that folder onto your flipper in `SD/asset_packs`.
 - Done! Just select it from the Momentum Settings app now. And if you're generous share your (packed) asset pack in #asset-packs on discord.
 
-#### Building with Firmware
+#### Build with Firmware
 
 - Follow the steps above, but use `assets/packs` as your source packs folder.
 - Packing is integrated with fbt, so just run `./fbt flash_usb_full` or `./fbt updater_package` to compile the firmware, pack the packs and update your Flipper.

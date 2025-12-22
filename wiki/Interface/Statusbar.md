@@ -92,39 +92,39 @@ Toggle visibility of status icons:
 </tr>
 <tr>
     <td><b>SD Card Mounted</b><br>SD card is properly mounted</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/63cbd6f9-311b-47d8-98be-5635c59ff3cc" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/63cbd6f9-311b-47d8-98be-5635c59ff3cc" width="100"/></td>
 </tr>
 <tr>
     <td><b>SD Card Fail</b><br>Not mounted · NoFS · Not accessible · Internal Error </td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/bfa0d5d7-2509-4b07-8582-d55b32bf47c8" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/bfa0d5d7-2509-4b07-8582-d55b32bf47c8" width="100"/></td>
 </tr>
 <tr>
     <td><b>Rpc Active (USB)</b><br>Remote Procedure Protocol connection active</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/29b34e79-b951-4721-9b9e-9765ccd0d12a" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/29b34e79-b951-4721-9b9e-9765ccd0d12a" width="100"/></td>
 </tr>
 <tr>
     <td><b>Muted</b><br>Stealth mode enabled (sound off)</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/b9444b75-99f4-4721-a3f9-63037413e870" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/b9444b75-99f4-4721-a3f9-63037413e870" width="100"/></td>
 </tr>
 <tr>
     <td><b>Hidden Window</b><br>A notification requires attention</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/85153ccf-cdda-45a7-ae5c-4c6f3d3acb8d" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/85153ccf-cdda-45a7-ae5c-4c6f3d3acb8d" width="100"/></td>
 </tr>
 <tr>
     <td><b>EXP Module Connected</b><br>External module connected via UART</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/3e5036fe-0122-4172-bfda-52f5fdad6381" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/3e5036fe-0122-4172-bfda-52f5fdad6381" width="100"/></td>
 </tr>
 <tr>
     <td><b>Bluetooth Idle</b><br>Bluetooth in advertising state</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/3952090a-bc7f-491c-800a-31a4c93194f8" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/3952090a-bc7f-491c-800a-31a4c93194f8" width="100"/></td>
 </tr>
 <tr>
     <td><b>Bluetooth Connected</b><br>Successful BT connection to device</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/2f28f74b-ad79-462a-9377-83ce0396574f" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/2f28f74b-ad79-462a-9377-83ce0396574f" width="100"/></td>
 </tr>
 <tr>
     <td><b>BLE Beacon</b><br>Bluetooth Low Energy beacon active</td>
-    <td><ScreenColorImage src="https://github.com/user-attachments/assets/ece52169-e235-4d30-8f4e-0cb3a909b4b9" height="43"/></td>
+    <td><ScreenColorImage src="https://github.com/user-attachments/assets/ece52169-e235-4d30-8f4e-0cb3a909b4b9" width="100"/></td>
 </tr>
 </table>
 

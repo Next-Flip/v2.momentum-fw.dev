@@ -37,7 +37,20 @@ next:
 
 # Frequently Asked Questions
 
-<br/>
+---
+
+#### Table of Contents
+
+<div class="custom-toc">
+
+- [What can I do with my Flipper?](#what-can-i-do-with-my-flipper)
+- [Will updating erase my data?](#will-updating-erase-my-data)
+- [Mainline release or dev build?](#mainline-release-or-dev-build)
+- [Flipper says "Update failed"?](#flipper-says-update-failed)
+- [Update stuck in "infinite loop"](#update-stuck-in-infinite-loop)
+- [Mobile app doesn't connect?](#mobile-app-doesnt-connect)
+- ["Transmission is blocked"?](#transmission-is-blocked)
+- [Forgot my PIN, can I reset it?](#forgot-pin-can-i-reset-it)
 
 <div class="mntm custom-block">
 
@@ -45,24 +58,9 @@ If a question you have is not here yet, you can check the [faq](https://discord.
 
 </div>
 
----
-
-#### Table of Contents
-
-<div class="custom-toc">
-
-- [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
-- [Will I lose data installing a new version?](#will-i-lose-data-installing-a-new-version)
-- [Mainline release or dev build?](#mainline-release-or-dev-build)
-- [Flipper says "Update failed"?](#flipper-says-update-failed)
-- [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
-- [The Flipper mobile app does not connect?](#the-flipper-mobile-app-does-not-connect)
-- [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
-- [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
-
 </div>
 
-## [What can I do with my Flipper? Ideas?](#what-can-i-do-with-my-flipper-ideas)
+## [What can I do with my Flipper?](#what-can-i-do-with-my-flipper)
 
 The following are a few creators active all over the Flipper community, OFW and CFW. These content creators provide a wealth of ideas, tutorials, and inspiration for what you can do with your Flipper Zero. They cover everything from basic usage to advanced projects and hacks. And we appreciate their contributions!
 
@@ -76,7 +74,7 @@ The following are a few creators active all over the Flipper community, OFW and 
 
 This should give you enough ideas to get you started with the Flipper and give you inspiration to make and even contribute to the community. You can also take a look around our [Discord](https://discord.gg/momentum) as there are always people sharing personal projects and getting help.
 
-## [Will I lose data installing a new version?](#will-i-lose-data-installing-a-new-version)
+## [Will updating erase my data?](#will-updating-erase-my-data)
 
 No, the firmware is installed to the Flipper's internal storage and all your data is external on the SD card. Your data is unaffected by updates.
 
@@ -88,7 +86,7 @@ If you are unsure, or want to update less often, the [Mainline release](https://
 
 Release pings for both can be found in these Discord channels: [`#mainline-releases`](https://discord.com/channels/1211622338198765599/1213549820271132802) · [`#dev-builds`](https://discord.com/channels/1211622338198765599/1213020009153167390).
 
-## [Flipper says "Update failed"?](#flipper-says-Update-failed)
+## [Flipper says "Update failed"?](#flipper-says-update-failed)
 
 Most installation errors stem from unsupported, low quality or incorrectly formatted SD cards. If you are formatting on your pc rather than the Flipper, make sure to use either `exFAT` or `FAT32`.
 
@@ -105,7 +103,7 @@ Most installation errors stem from unsupported, low quality or incorrectly forma
 2. Open `Settings > Storage`
 3. Click `Format SD card` <sup><a href="#format-warning">1</a></sup>
 
-## [Stuck in "infinite loop" after updating](#stuck-in-infinite-loop-after-updating)
+## [Update stuck in "infinite loop"](#update-stuck-in-infinite-loop)
 
 If your Flipper is stuck in an infinite loop after updating, it may be due to a corrupted SD card or an incompatible files due to a previous installation of another firmware. The bug is still not very well understood at this time, but a simple reformatting should do the trick.
 
@@ -114,7 +112,7 @@ If your Flipper is stuck in an infinite loop after updating, it may be due to a 
 3. Navigate to and run `Settings > Storage > Format SD card` <sup><a href="#format-warning">1</a></sup>
 4. Reinstall Momentum from any of our [installation methods](https://github.com/Next-Flip/Momentum-Firmware/wiki/Installation)
 
-## [The Flipper mobile app does not connect?](#the-flipper-mobile-app-does-not-connect)
+## [Mobile app doesn't connect?](#mobile-app-doesnt-connect)
 
 Most custom firmwares, including Momentum, have a slightly different BLE configuration; if you had previously paired your Flipper to the mobile app or other devices with the Official firmware, you will need to forget and reconnect. It is **essential that you do this in all 3 places**:
 
@@ -124,7 +122,7 @@ Most custom firmwares, including Momentum, have a slightly different BLE configu
 
 After doing **all these 3 steps**, you can try connecting again. You need to connect from the Flipper mobile app, connecting from your phone's Bluetooth settings will not work (only things like the `BT Remote` and `Bad KB` apps connect from there).
 
-## [Sub-GHz says "Transmission is blocked"?](#sub-ghz-says-transmission-is-blocked)
+## ["Transmission is blocked"?](#transmission-is-blocked)
 
 This error has multiple variations, and you should look closely at which error message exactly you are getting:
 
@@ -142,7 +140,7 @@ This error has multiple variations, and you should look closely at which error m
 
 More info for all these possible errors and what to do can be found in the [SubGHzBypass&Extend documentaton](https://github.com/Next-Flip/Momentum-Firmware/blob/dev/documentation/SubGHzBypass%26Extend.md).
 
-## [I forgot my PIN, how do I reset it?](#i-forgot-my-pin-how-do-i-reset-it)
+## [Forgot my PIN, can I reset it?](#forgot-my-pin-can-i-reset-it)
 
 1. Hold `UP` + `BACK` together for 30 seconds
 2. Once your Flipper's screen says `PIN and Factory Reset`, follow the instructions on the screen!

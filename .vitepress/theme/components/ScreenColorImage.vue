@@ -9,7 +9,7 @@ const props = withDefaults(
     }>(),
     {
         alt: "",
-        width: "200",
+        width: "300",
     },
 );
 
@@ -25,6 +25,7 @@ const { shouldUseBgContainer, bgContainerClasses, shouldUseDarkImage } = useBgCo
             :src="props.src"
             :alt="props.alt"
             :width="props.width"
+            style="image-rendering: pixelated, crisp-edges"
             class="block"
             :class="{
                 'saturate-0 contrast-200 brightness-[3]': shouldUseDarkImage,

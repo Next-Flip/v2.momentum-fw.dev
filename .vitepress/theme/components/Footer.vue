@@ -13,7 +13,7 @@ const { site } = useData();
 const { tr } = useI18n();
 const { currentLogo, nextLogo, isLocked, toggleLock } = useThemeSwitcher();
 const route = useRoute();
-const isWiki = computed(() => route.path.includes("/wiki"));
+const isWiki = computed(() => route.path.includes("wiki"));
 
 const isHovering = ref(false);
 const handleLogoHover = () => {
@@ -56,11 +56,14 @@ const navigationLinks = computed(() => [
 </script>
 
 <template>
-    <footer class="footer pt-6" :style="{ '--footer-bg-width': '1152px' }">
-        <div class="max-w-full mx-auto py-16 pb-20 lg:pb-32" :class="{ 'lg:px-0': isWiki }">
+    <footer
+        class="footer pt-6 sm:pt-10 xl:pt-0 max-w-3xl mx-auto lg:max-w-full w-full relative"
+        :style="{ '--footer-bg-width': '1152px' }"
+    >
+        <div class="max-w-full mx-auto pb-16 sm:pb-20 xl:pb-32" :class="isWiki ? 'py-0' : 'py-16'">
             <div
-                class="flex flex-col-reverse lg: sm:flex-row sm:justify-between gap-16 md:gap-8 mx-auto max-w-7xl"
-                :class="[isWiki ? 'pl-8 pr-12 lg:pl-72' : 'px-8 lg:px-16']"
+                class="flex flex-col-reverse xl:flex-row xl:justify-between gap-16 mx-auto max-w-7xl"
+                :class="isWiki ? '2xl:pl-[71px] sm:px-8' : 'lg:pl-16 sm:px-16'"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50 group/logo">
                     <div class="flex flex-col pl-3.5 -ml-3.5 pt-3.5 -mt-3.5">
@@ -122,7 +125,7 @@ const navigationLinks = computed(() => [
                     </div>
 
                     <div
-                        class="flex flex-row gap-1.5 sm:mt-auto mt-3 justify-start items-center leading-none"
+                        class="flex flex-row gap-1.5 mt-3 sm:mt-10 xl:mt-auto justify-start items-center leading-none"
                     >
                         <p class="text-xs text-vp-3/50">
                             {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
@@ -143,8 +146,7 @@ const navigationLinks = computed(() => [
 
                 <div
                     v-if="recentReleases.mainline.length > 0 || recentReleases.devbuilds.length > 0"
-                    class="grid grid-cols-2 grid-rows-[auto_auto] justify-between gap-y-10 md:flex md:flex-row gap-8"
-                    :class="isWiki ? 'lg:gap-12' : 'lg:gap-20'"
+                    class="grid grid-cols-2 grid-rows-[auto_auto] justify-start gap-y-10 md:flex md:flex-row gap-24 xl:gap-20"
                 >
                     <div class="contents md:block md:space-y-6">
                         <FooterSection
@@ -180,38 +182,5 @@ const navigationLinks = computed(() => [
 
 footer {
     position: relative;
-}
-
-footer:before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%) scaleX(-1);
-    bottom: 0;
-    width: 100%;
-    height: 50vw;
-    min-height: 400px;
-    max-height: 800px;
-    max-width: 1536px;
-    background-image: url("/bg/006-line.png");
-    background-size: cover;
-    background-position: bottom center;
-    background-repeat: no-repeat;
-    opacity: 0.4;
-    filter: saturate(0);
-    mix-blend-mode: multiply;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.dark footer:before {
-    mix-blend-mode: screen;
-    opacity: 0.3;
-    filter: saturate(0) invert(1);
-}
-
-.theme-skyline.dark footer:before {
-    opacity: 0.35;
-    filter: saturate(0) invert(1);
 }
 </style>

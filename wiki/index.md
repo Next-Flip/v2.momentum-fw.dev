@@ -71,7 +71,7 @@ Momentum is a based on the [Official Firmware](https://github.com/flipperdevices
 
 The goal of this firmware is to constantly push the bounds of what is possible with Flipper Zero, driving the innovation of many new groundbreaking features, while maintaining the easiest and most customizable user experience of any firmware. Fixing bugs promptly and ensuring a stable and compatible system is also of our utmost importance.
 
-### Compare to other Firmware
+### Compare to others
 
 <br/>
 
