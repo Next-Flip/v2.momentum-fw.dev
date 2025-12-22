@@ -48,9 +48,9 @@ next:
 - [Mainline release or dev build?](#mainline-release-or-dev-build)
 - [Flipper says "Update failed"?](#flipper-says-update-failed)
 - [Update stuck in "infinite loop"](#update-stuck-in-infinite-loop)
-- [Mobile app doesn't connect?](#mobile-app-doesnt-connect)
+- [Mobile app doesn't connect?](#mobile-app-doesn-t-connect)
 - ["Transmission is blocked"?](#transmission-is-blocked)
-- [Forgot my PIN, can I reset it?](#forgot-pin-can-i-reset-it)
+- [Forgot my PIN, can I reset it?](#forgot-my-pin-can-i-reset-it)
 
 <div class="mntm custom-block">
 
@@ -112,7 +112,7 @@ If your Flipper is stuck in an infinite loop after updating, it may be due to a 
 3. Navigate to and run `Settings > Storage > Format SD card` <sup><a href="#format-warning">1</a></sup>
 4. Reinstall Momentum from any of our [installation methods](https://github.com/Next-Flip/Momentum-Firmware/wiki/Installation)
 
-## [Mobile app doesn't connect?](#mobile-app-doesnt-connect)
+## [Mobile app doesn't connect?](#mobile-app-doesn-t-connect)
 
 Most custom firmwares, including Momentum, have a slightly different BLE configuration; if you had previously paired your Flipper to the mobile app or other devices with the Official firmware, you will need to forget and reconnect. It is **essential that you do this in all 3 places**:
 
