@@ -39,6 +39,7 @@ import UpdaterDeviceInfo from "./UpdaterDeviceInfo.vue";
 import UpdaterGlow from "./UpdaterGlow.vue";
 import UpdaterLogs from "./UpdaterLogs.vue";
 import UpdaterOverlay from "./UpdaterOverlay.vue";
+import UpdaterWarning from "./UpdaterWarning.vue";
 
 const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth, height: windowHeight } = useWindowSize();
@@ -96,6 +97,8 @@ provide("logsScrollTrigger", logsScrollTrigger);
 const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false);
 const isConnected = computed(() => connectionIsConnected.value);
 const isNarrowViewport = computed(() => windowHeight.value < 1024);
+const isBranchRelease = computed(() => selectedChannel.value === "branch");
+
 const isMatchingRelease = computed(() => {
     const deviceCommit = serialConnection?.connectionData.deviceInfo?.firmware_commit;
     if (!deviceCommit) return false;
@@ -122,12 +125,6 @@ const isMatchingRelease = computed(() => {
     }
 
     return false;
-});
-
-const currentDeviceVersion = computed(() => {
-    return serialConnection?.connectionData.deviceInfo?.firmware_version === "mntm-dev"
-        ? serialConnection?.connectionData.deviceInfo?.firmware_commit
-        : serialConnection?.connectionData.deviceInfo?.firmware_version;
 });
 
 const channelReleases = computed(() => {
@@ -269,7 +266,6 @@ const { isOverDropZone: rawIsOverDropZone } = useDropZone(dropZoneRef, {
 });
 
 const isOverDropZone = computed(() => rawIsOverDropZone.value && !flags.value.updateInProgress);
-const isBranchRelease = computed(() => selectedChannel.value === "branch");
 
 const handleChannelChange = (channel: ReleaseChannel) => {
     selectedChannel.value = channel;
@@ -560,83 +556,13 @@ onBeforeUnmount(() => {
                                     v-if="!showUpdateOverlay"
                                     class="flex flex-col border-t lg:border-t-0 border-vp-divider"
                                 >
-                                    <Transition name="fade-drop" mode="out-in">
-                                        <div
-                                            v-if="
-                                                isMatchingRelease ||
-                                                (isBranchRelease && !uploadedFile)
-                                            "
-                                            class="flex flex-row items-center justify-center gap-2.5 lg:gap-1.5 w-full py-1.5 px-2.5 lg:mb-0 border-b border-vp-divider bg-yellow-300/15 dark:bg-yellow-800/5 min-h-10 lg:h-10"
-                                            :class="{
-                                                'opacity-40': isOverDropZone,
-                                            }"
-                                        >
-                                            <div
-                                                class="flex-shrink-0 h-full flex items-center justify-center"
-                                            >
-                                                <v-icon
-                                                    :name="
-                                                        isBranchRelease
-                                                            ? 'md-warningamber-round'
-                                                            : 'ri-error-warning-line'
-                                                    "
-                                                    :scale="isBranchRelease ? 1.1 : 1.0"
-                                                    class="text-yellow-600 dark:text-yellow-500 p-0.5 mb-px"
-                                                />
-                                            </div>
-                                            <span
-                                                class="text-xs font-medium text-yellow-700 dark:text-yellow-500 flex flex-col md:flex-row gap-1 lg:gap-1.5 pt-1 pb-1.5 lg:pt-0 lg:pb-0"
-                                            >
-                                                {{
-                                                    isBranchRelease &&
-                                                    isMatchingRelease &&
-                                                    !uploadedFile
-                                                        ? tr("updater_branch_matching_warning")
-                                                        : isMatchingRelease
-                                                          ? uploadedFile
-                                                              ? tr(
-                                                                    "updater_matching_release_warning",
-                                                                    {
-                                                                        type: tr(
-                                                                            "updater_upload_file",
-                                                                        ),
-                                                                    },
-                                                                )
-                                                              : tr(
-                                                                    "updater_matching_release_warning",
-                                                                    {
-                                                                        type: tr(
-                                                                            "updater_select_release",
-                                                                        ),
-                                                                    },
-                                                                )
-                                                          : isBranchRelease
-                                                            ? tr("updater_branch_warning")
-                                                            : ""
-                                                }}
-                                                <div class="flex flex-row gap-px">
-                                                    <a
-                                                        class="font-medium text-yellow-950/90 dark:text-yellow-100/90 hover:underline underline underline-offset-4 dark:decoration-yellow-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 dark:hover:decoration-yellow-200/40 transition-all duration-100 vp-external-link-icon"
-                                                        :href="
-                                                            isBranchRelease
-                                                                ? githubPullRequestUrl(
-                                                                      selectedRelease?.pr || '',
-                                                                  )
-                                                                : `${getLocalizedPath('/releases')}/${currentDeviceVersion}`
-                                                        "
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                    >
-                                                        {{
-                                                            isBranchRelease
-                                                                ? selectedRelease?.version
-                                                                : currentDeviceVersion
-                                                        }}
-                                                    </a>
-                                                </div>
-                                            </span>
-                                        </div>
-                                    </Transition>
+                                    <UpdaterWarning
+                                        :is-over-drop-zone="isOverDropZone"
+                                        :is-branch-release="isBranchRelease"
+                                        :uploaded-file="uploadedFile"
+                                        :selected-release="selectedRelease"
+                                        :is-matching-release="isMatchingRelease"
+                                    />
                                     <div
                                         v-if="!isChangelogExpanded"
                                         class="flex-shrink-0 !z-10 transition-all duration-300 px-3.5 sm:px-5"
@@ -674,7 +600,6 @@ onBeforeUnmount(() => {
                                                 :channel-releases="channelReleases"
                                                 :uploaded-file="uploadedFile"
                                                 :test-mode="testMode"
-                                                :is-matching-release="isMatchingRelease"
                                                 @channel-change="handleChannelChange"
                                                 @release-change="handleReleaseChange"
                                                 @flash-firmware="handleFlashFirmware"
@@ -768,8 +693,7 @@ onBeforeUnmount(() => {
                                                     <div
                                                         class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
                                                         :class="
-                                                            uploadedFileRelease &&
-                                                            !isMatchingRelease
+                                                            uploadedFileRelease
                                                                 ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/15'
                                                                 : 'text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/15'
                                                         "

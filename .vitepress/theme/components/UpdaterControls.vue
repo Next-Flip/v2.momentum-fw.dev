@@ -293,7 +293,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                     :class="{
                                                         'text-vp-brand-1/60':
                                                             selectedChannel === channel.value,
-                                                        'text-yellow-700/80 dark:text-yellow-500/50':
+                                                        'text-orange-700/80 dark:text-orange-500/50':
                                                             selectedChannel === channel.value &&
                                                             channel.value === 'branch',
                                                     }"
@@ -309,7 +309,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 <v-icon
                                                     name="md-warningamber-round"
                                                     :scale="0.75"
-                                                    class="text-yellow-600 dark:text-yellow-500"
+                                                    class="text-orange-600 dark:text-orange-500"
                                                 />
                                             </div>
                                         </div>
@@ -407,7 +407,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 selectedRelease?.version === release.version,
                                             'rounded-t-[4px]': index === 0,
                                             'rounded-b-[4px]': index === channelReleases.length - 1,
-                                            '!bg-yellow-600/5 hover:!bg-yellow-500/10 is-branch':
+                                            '!bg-orange-600/5 hover:!bg-orange-500/10 is-branch':
                                                 isBranchSelected(selectedChannel, release.version),
                                         }"
                                         @click="selectRelease(release)"
@@ -431,7 +431,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                             'text-vp-brand-1':
                                                                 selectedRelease?.version ===
                                                                 release.version,
-                                                            'text-yellow-700 dark:text-yellow-500':
+                                                            'text-orange-700 dark:text-orange-500':
                                                                 isBranchSelected(
                                                                     selectedChannel,
                                                                     release.version,
@@ -455,7 +455,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                         'text-vp-brand-1':
                                                             selectedRelease?.version ===
                                                             release.version,
-                                                        'text-yellow-700 dark:text-yellow-500':
+                                                        'text-orange-700 dark:text-orange-500':
                                                             isBranchSelected(
                                                                 selectedChannel,
                                                                 release.version,
@@ -500,7 +500,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 'tracking-tighter': selectedChannel !== 'branch',
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.version === release.version,
-                                                'text-yellow-700/80 dark:text-yellow-500/60':
+                                                'text-orange-700/80 dark:text-orange-500/60':
                                                     isBranchSelected(
                                                         selectedChannel,
                                                         release.version,
@@ -752,11 +752,11 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 }
 
 .dropdown-item.is-branch:hover {
-    @apply bg-yellow-600/5;
+    @apply bg-orange-600/5;
 }
 
 .dark .dropdown-item.is-branch:hover {
-    @apply bg-yellow-500/10;
+    @apply bg-orange-500/10;
 }
 
 .dark .dropdown-item:hover {
@@ -773,7 +773,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 }
 
 .dropdown-item.is-branch.is-selected {
-    @apply bg-yellow-600/5 text-yellow-700 dark:text-yellow-500 hover:bg-yellow-500/10;
+    @apply bg-orange-600/5 text-orange-700 dark:text-orange-500 hover:bg-orange-500/10;
 }
 
 .fade-dropdown-enter-active,
