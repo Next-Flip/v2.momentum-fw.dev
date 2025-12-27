@@ -209,7 +209,7 @@ watch(
                         type="text"
                         name="search-input"
                         :placeholder="tr('search_placeholder')"
-                        class="search-input w-full py-2 pr-4 pl-9 rounded-lg border bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] text-vp-1 text-sm transition-all duration-100 ease-in-out leading-6 min-h-[38px]"
+                        class="search-input w-full py-2 pr-4 pl-9 rounded-lg border bg-[color-mix(in_srgb,var(--vp-c-bg-elv)_95%,transparent)] text-vp-1 text-sm transition-all duration-100 ease-in-out leading-6 min-h-[38px] [&::placeholder]:select-none"
                         :aria-label="tr('search_placeholder')"
                         @input="emitSearch"
                     />
@@ -535,6 +535,7 @@ watch(
     line-height: 1.6;
     min-height: 38px;
     overflow: hidden;
+    user-select: none;
 }
 
 .marquee-content {

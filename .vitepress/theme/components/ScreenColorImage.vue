@@ -26,7 +26,7 @@ const { shouldUseBgContainer, bgContainerClasses, shouldUseDarkImage } = useBgCo
             :alt="props.alt"
             :width="props.width"
             style="image-rendering: pixelated, crisp-edges"
-            class="block"
+            class="block select-none"
             :class="{
                 'saturate-0 contrast-200 brightness-[3]': shouldUseDarkImage,
                 'dark:saturate-100 dark:contrast-100 dark:brightness-100': !shouldUseDarkImage,

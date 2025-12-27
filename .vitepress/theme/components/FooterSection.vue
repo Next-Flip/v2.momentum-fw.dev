@@ -41,7 +41,7 @@ const getItemText = (item: FooterItem) => {
 <template v-if="items.length > 0">
     <div>
         <h3
-            class="text-xs font-semibold text-vp-1 uppercase tracking-wider mb-2 text-left w-min whitespace-nowrap"
+            class="text-xs font-semibold text-vp-1 uppercase tracking-wider mb-2 text-left w-min whitespace-nowrap select-none"
         >
             {{ title }}
         </h3>
@@ -52,7 +52,7 @@ const getItemText = (item: FooterItem) => {
                     :target="isExternalLink(getItemUrl(item)) ? '_blank' : undefined"
                     :rel="isExternalLink(getItemUrl(item)) ? 'noopener noreferrer' : undefined"
                     :class="[
-                        'text-[13px] text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 flex items-center min-h-[1.25rem] leading-6 whitespace-nowrap overflow-hidden text-ellipsis',
+                        'text-[13px] text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 flex items-center min-h-[1.25rem] leading-6 whitespace-nowrap overflow-hidden text-ellipsis select-none',
                         type === 'release' ? 'gap-2' : '',
                         isExternalLink(getItemUrl(item)) ? 'vp-external-link-icon' : '',
                     ]"

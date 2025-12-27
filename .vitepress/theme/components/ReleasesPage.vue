@@ -38,7 +38,7 @@ const isCurrentVersion = computed(() => {
 
 <template>
     <div class="relative w-full py-12 pb-8 pt-0 px-0 items-center justify-center">
-        <div class="text-center z-[5] pb-8 pt-8 sm:py-10 lg:py-16">
+        <div class="text-center z-[5] pb-8 pt-8 sm:py-10 lg:py-16 select-none">
             <h1
                 class="text-vp-1 text-center font-medium tracking-normal text-[32px] lg:text-[40px] leading-8 lg:leading-10 lg:tracking-tight"
             >

@@ -1403,8 +1403,6 @@ export const useSerialConnection = () => {
             }
         }
 
-        flags.progress = 0;
-
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Flipper disconnected during firmware update");
         }
@@ -1412,23 +1410,23 @@ export const useSerialConnection = () => {
         setUpdateStage("update_stage_loading_manifest");
         await flipperModule.commands.system.update(path + "/update.fuf");
         addLog("debug", "[Firmware] Loaded update manifest");
+        flags.progress = 1;
 
         setUpdateStage("update_stage_rebooting");
         const uploadDuration = performance.now() - uploadStartTime;
         const formattedDuration = formatDuration(uploadDuration);
+
+        await asyncSleep(1000);
+        setUpdateStage("update_stage_done");
         addLog(
             "success",
             `[Firmware] Upload completed in ${formattedDuration} successfully. Rebooting...`,
         );
-        addLog("verbose", "[System] Rebooting flipper for firmware update");
-
-        flags.updateInProgress = false;
-        await flipperModule.commands.system.reboot(2);
-        await asyncSleep(1000);
-        setUpdateStage("update_stage_done");
         await asyncSleep(2000);
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
+        flags.updateInProgress = false;
+        await flipperModule.commands.system.reboot(2);
     };
 
     const provisionRegion = async (flipperModule: FlipperModule): Promise<void> => {
@@ -1577,8 +1575,8 @@ export const useSerialConnection = () => {
         firmwareState.updateStageContext = {};
         flags.updateInProgress = true;
         flags.progress = 0;
-
         flags.screenStreamPaused = true;
+
         if (flags.screenStream) {
             try {
                 await stopScreenStream();
@@ -1701,7 +1699,7 @@ export const useSerialConnection = () => {
                     name: file.name.split("/").pop() || file.name,
                 });
 
-                const uploadDuration = Math.max(500, Math.min(3000, file.size / 1000)); // 500ms to 3s based on file size
+                const uploadDuration = Math.max(1000, Math.min(5000, file.size / 1000)); // 1s to 5s based on file size
                 const progressSteps = 20;
                 const stepDuration = uploadDuration / progressSteps;
 
@@ -1723,8 +1721,6 @@ export const useSerialConnection = () => {
             }
         }
 
-        flags.progress = 0;
-
         if (!flags.connected || !flags.rpcActive) {
             throw new Error("Flipper disconnected during test firmware update");
         }
@@ -1732,22 +1728,22 @@ export const useSerialConnection = () => {
         setUpdateStage("update_stage_loading_manifest");
         await asyncSleep(500);
         addLog("debug", "[{{Test}}] Loaded update manifest");
+        flags.progress = 1;
 
         setUpdateStage("update_stage_rebooting");
         const uploadDuration = performance.now() - uploadStartTime;
         const formattedDuration = formatDuration(uploadDuration);
+
+        await asyncSleep(1000);
+        setUpdateStage("update_stage_done");
         addLog(
             "success",
             `[{{Test}}] Upload completed in ${formattedDuration} successfully. Rebooting...`,
         );
-
-        flags.updateInProgress = false;
-        await asyncSleep(1000);
-        setUpdateStage("update_stage_done");
         await asyncSleep(2000);
-        addLog("verbose", "[{{Test}}] flipper update stage");
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
+        flags.updateInProgress = false;
     };
 
     return {

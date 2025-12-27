@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div v-if="isConnected" class="screen-display-container backdrop-blur-lg p-3 pb-0">
+    <div v-if="isConnected" class="screen-display-container p-3 pb-0">
         <div class="relative overflow-hidden rounded-md">
             <div
                 class="absolute top-[-16px] left-[-16px] w-[calc(100%+32px)] h-[calc(100%+48px)] z-0 p-0 pointer-events-none"

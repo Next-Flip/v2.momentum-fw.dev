@@ -153,16 +153,16 @@ const ANIMATIONS = [
 
 const ORB_CONFIGS: Record<string, OrbConfig> = {
     large: {
-        count: [4, 3],
+        count: [10, 3],
         size: [280, 120],
         blur: ["blur-xl", "blur-2xl"],
-        position: { top: [-20, 40], right: [-5, 90] },
-        baseDuration: 12,
-        directionThreshold: 0.3,
-        opacityRange: [0.7, 0.2],
+        position: { top: [-15, 40], right: [-10, 95] },
+        baseDuration: 13,
+        directionThreshold: 0.35,
+        opacityRange: [0.75, 0.2],
     },
     medium: {
-        count: [5, 3],
+        count: [11, 4],
         size: [180, 100],
         blur: "blur-xl",
         position: { top: [-20, 40], right: [5, 80] },
@@ -171,16 +171,16 @@ const ORB_CONFIGS: Record<string, OrbConfig> = {
         opacityRange: [0.7, 0.25],
     },
     small: {
-        count: [9, 3],
+        count: [15, 3],
         size: [80, 100],
         blur: ["blur-lg", "blur-md"],
         position: { top: [-20, 40], right: [10, 75] },
         baseDuration: 10,
-        directionThreshold: 0.5,
-        opacityRange: [0.65, 0.3],
+        directionThreshold: 0.56,
+        opacityRange: [0.7, 0.3],
     },
     mini: {
-        count: [4, 1],
+        count: [8, 3],
         size: [15, 15],
         blur: "blur-md",
         position: { top: [0, 20], right: [-10, 85] },
@@ -294,19 +294,26 @@ watch(
     <Transition name="orbs-fade">
         <div
             v-if="show"
-            class="orbs-container absolute inset-0 opacity-20 dark:opacity-[13%] pointer-events-none saturate-250"
+            class="orbs-container fixed inset-0 opacity-25 dark:opacity-[17%] pointer-events-none saturate-250 flex items-start justify-center"
+            :style="{ top: 'var(--vp-nav-height)' }"
         >
-            <div
-                v-for="orb in randomOrbs"
-                :key="orb.id"
-                class="absolute rounded-full bg-gradient-radial orb"
-                :class="`${orb.classes} ${orb.animationClass}`"
-                :style="orb.cssVars"
-            ></div>
+            <div class="relative w-full max-w-6xl h-full">
+                <div
+                    v-for="orb in randomOrbs"
+                    :key="orb.id"
+                    class="absolute rounded-full bg-gradient-radial orb"
+                    :class="`${orb.classes} ${orb.animationClass}`"
+                    :style="orb.cssVars"
+                ></div>
+            </div>
         </div>
     </Transition>
 
-    <div v-if="show" class="absolute inset-0 pointer-events-none z-0 noise-overlay"></div>
+    <div
+        v-if="show"
+        class="fixed inset-0 pointer-events-none z-0 noise-overlay"
+        :style="{ top: 'var(--vp-nav-height)' }"
+    ></div>
 </template>
 
 <style scoped>
@@ -318,6 +325,7 @@ watch(
     will-change: transform, opacity;
     transform: translateZ(0);
     contain: layout style paint;
+    z-index: -1 !important;
 }
 .orb {
     will-change: transform, opacity;
@@ -388,18 +396,6 @@ watch(
     -webkit-mask-image: linear-gradient(to bottom, var(--vp-c-bg-dark) 0%, transparent 100%);
     z-index: -1;
     mix-blend-mode: screen;
-}
-
-.orbs-overlay {
-    background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 0%,
-        color-mix(in srgb, var(--vp-c-bg-dark) 25%, transparent) 50%,
-        color-mix(in srgb, var(--vp-c-bg-dark) 100%, transparent) 100%
-    );
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 1;
 }
 </style>
 

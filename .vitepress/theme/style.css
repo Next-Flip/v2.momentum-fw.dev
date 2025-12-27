@@ -162,7 +162,7 @@
 .theme-pink ::selection,
 .theme-skyline ::selection {
     background-color: color-mix(in srgb, var(--vp-c-brand-1) 60%, transparent);
-    color: black;
+    color: white;
 }
 
 .theme-purp.dark ::selection,
@@ -282,6 +282,10 @@ body {
     display: none !important;
 }
 
+.VPNavBarMenu.menu {
+    user-select: none !important;
+}
+
 .vpi-social-x {
     width: 19px !important;
     height: 19px !important;
@@ -309,10 +313,6 @@ body {
 
 .VPButton.brand:hover {
     background-color: var(--vp-c-brand-3) !important;
-}
-
-.VPFeatures {
-    padding: 0 !important;
 }
 
 .VPFeature {
@@ -391,6 +391,7 @@ body {
     height: auto;
     display: flex;
     justify-content: center;
+    width: 100% !important;
 }
 
 @media (max-width: 640px) {
@@ -817,6 +818,9 @@ body[data-route*="/wiki"] {
 .VPSidebarItem.level-0 {
     padding-bottom: 10px !important;
 }
+.VPSidebarItem .item {
+    user-select: none !important;
+}
 
 .VPSwitch.VPSwitchAppearance {
     transition: border-color 0.1s !important;
@@ -890,6 +894,9 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
 .aside-curtain {
     background: linear-gradient(transparent, var(--vp-c-bg-dark) 70%) !important;
 }
+.VPDocAside {
+    user-select: none !important;
+}
 
 .VPDoc {
     padding-bottom: 0 !important;
@@ -940,6 +947,9 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
 
 .VPNavBarTitle.has-sidebar .title {
     border-bottom-color: transparent !important;
+}
+.VPNavBarTitle {
+    user-select: none !important;
 }
 
 .VPNavBar:not(.home.top) .divider-line {
@@ -994,6 +1004,7 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
 
 .VPLink.link {
     transition: background-color 0.1s !important;
+    user-select: none !important;
 }
 
 .VPSidebarItem.level-1.is-active .text {
@@ -1309,6 +1320,12 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
 .dark .shadow-grow-yellow:hover {
     animation: growShadowYellowDark 0.1s steps(4, end) forwards;
 }
+.shadow-grow-orange:hover {
+    animation: growShadowOrange 0.1s steps(4, end) forwards;
+}
+.dark .shadow-grow-orange:hover {
+    animation: growShadowOrangeDark 0.1s steps(4, end) forwards;
+}
 
 /* prettier-ignore */
 @keyframes growShadowYellow {
@@ -1317,6 +1334,22 @@ body:not([data-route^="/wiki"]) .VPNavBar .content-body {
     50% { box-shadow: 0 0 0 2px color-mix(in srgb, rgb(234 179 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
     75% { box-shadow: 0 0 0 3px color-mix(in srgb, rgb(234 179 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
     100% { box-shadow: 0 0 0 4px color-mix(in srgb, rgb(234 179 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+}
+/* prettier-ignore */
+@keyframes growShadowOrange {
+    0% { box-shadow: 0 0 0 0px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+    25% { box-shadow: 0 0 0 1px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+    50% { box-shadow: 0 0 0 2px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+    75% { box-shadow: 0 0 0 3px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+    100% { box-shadow: 0 0 0 4px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 15%, transparent); }
+}
+/* prettier-ignore */
+@keyframes growShadowOrangeDark {
+    0% { box-shadow: 0 0 0 0px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 10%, transparent); }
+    25% { box-shadow: 0 0 0 1px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 10%, transparent); }
+    50% { box-shadow: 0 0 0 2px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 10%, transparent); }
+    75% { box-shadow: 0 0 0 3px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 10%, transparent); }
+    100% { box-shadow: 0 0 0 4px color-mix(in srgb, rgb(234 100 8 / var(--tw-border-opacity, 1)) 10%, transparent); }
 }
 /* prettier-ignore */
 @keyframes growShadowYellowDark {

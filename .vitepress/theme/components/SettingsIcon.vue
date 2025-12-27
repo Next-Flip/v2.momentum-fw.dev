@@ -141,5 +141,6 @@ const handleButtonLeave = () => {
     text-align: left;
     min-width: 65px;
     margin-right: 20px;
+    user-select: none;
 }
 </style>

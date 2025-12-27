@@ -32,10 +32,10 @@ import {
     supportsSerialPort,
 } from "../util";
 
-import Tooltip from "./Tooltip.vue";
 import UpdaterChangelog from "./UpdaterChangelog.vue";
 import UpdaterControls from "./UpdaterControls.vue";
 import UpdaterDeviceInfo from "./UpdaterDeviceInfo.vue";
+import UpdaterFileUpload from "./UpdaterFileUpload.vue";
 import UpdaterGlow from "./UpdaterGlow.vue";
 import UpdaterLogs from "./UpdaterLogs.vue";
 import UpdaterOverlay from "./UpdaterOverlay.vue";
@@ -45,7 +45,7 @@ const { tr, getLocalizedPath } = useI18n();
 const { width: windowWidth, height: windowHeight } = useWindowSize();
 const { flags, isConnected: connectionIsConnected } = useConnectionInfo();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
-const { currentTheme, ifCurrentTheme } = useThemeSwitcher();
+const { currentTheme } = useThemeSwitcher();
 const { screenColor } = useSettings();
 
 const {
@@ -61,6 +61,12 @@ const {
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<ReleaseChannel | null>(null);
+
+const logToSerial = (level: "info" | "warning" | "error", message: string) => {
+    if (serialConnection && serialConnection.addLog) {
+        serialConnection.addLog(level, message);
+    }
+};
 
 const { selectedRelease, selectRelease } = useReleaseNavigation({
     basePath: "/update",
@@ -79,7 +85,6 @@ const { selectedRelease, selectRelease } = useReleaseNavigation({
 
 const uploadedFile = ref<File | null>(null);
 const uploadedFileRelease = ref<ReleaseItem | null>(null);
-const fileInputRef = ref<HTMLInputElement | null>(null);
 const dropZoneRef = ref<HTMLDivElement | null>(null);
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
@@ -94,7 +99,7 @@ const triggerLogsScroll = () => {
 
 provide("logsScrollTrigger", logsScrollTrigger);
 
-const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false);
+const showUpdateOverlay = computed(() => serialConnection?.flags.updateInProgress || false); // TEST: DO NOT leave this as true
 const isConnected = computed(() => connectionIsConnected.value);
 const isNarrowViewport = computed(() => windowHeight.value < 1024);
 const isBranchRelease = computed(() => selectedChannel.value === "branch");
@@ -141,8 +146,8 @@ const currentChangelogRelease = computed(() => {
 });
 
 watch(
-    [() => selectedChannel.value, () => isMatchingRelease.value],
-    ([newChannel, newIsMatching], [oldChannel, oldIsMatching]) => {
+    [() => selectedChannel.value, () => isMatchingRelease.value, () => selectedRelease.value],
+    ([newChannel, newIsMatching, newRelease], [oldChannel, oldIsMatching, oldRelease]) => {
         if (typeof window !== "undefined") {
             if (newChannel !== oldChannel) {
                 if (newChannel && selectedRelease.value) {
@@ -160,6 +165,16 @@ watch(
                         selectedRelease.value = null;
                     }
                 }
+            }
+
+            if (newRelease && newRelease !== oldRelease && newChannel === "branch") {
+                const branchLink = newRelease.pr
+                    ? `<a href="${githubPullRequestUrl(newRelease.pr)}" target="_blank">${newRelease.version}</a>`
+                    : newRelease.version;
+                logToSerial(
+                    "warning",
+                    `[Branch] Selected experimental branch: ${branchLink}. Proceed at your own risk.`,
+                );
             }
 
             if (newIsMatching && !oldIsMatching) {
@@ -201,12 +216,6 @@ watch(
         }
     },
 );
-
-const logToSerial = (level: "info" | "warning" | "error", message: string) => {
-    if (serialConnection && serialConnection.addLog) {
-        serialConnection.addLog(level, message);
-    }
-};
 
 const processFile = (file: File, source: "uploaded" | "selected") => {
     if (!file.name.endsWith(".tgz")) {
@@ -300,13 +309,19 @@ const handleFlashFirmware = async () => {
 
     const uploadedForTest = uploadedFile.value ?? null;
     const uploadedForUpdate = uploadedFile.value ?? undefined;
+    const trackingVersion =
+        releaseArg?.version || uploadedFile.value?.name.replace(".tgz", "") || "null";
+    if (uploadedFile.value) {
+        clearUploadedFile(false);
+    }
+
     const success = testMode.value
         ? await serialConnection.testUpdateFirmware(releaseArg, uploadedForTest, loopMode.value)
         : await serialConnection.updateFirmware(releaseArg, uploadedForUpdate);
 
     if (success) {
         track("firmware_flash", {
-            version: releaseArg?.version || uploadedFile.value?.name.replace(".tgz", "") || "null",
+            version: trackingVersion,
             theme: `${currentTheme.value}_${screenColor.value}`,
         });
     }
@@ -328,25 +343,16 @@ const handleDownloadRelease = () => {
     }
 };
 
-const handleFileUpload = () => {
-    if (flags.value.updateInProgress) return;
-    fileInputRef.value?.click();
+const handleFileSelected = (file: File) => {
+    processFile(file, "selected");
 };
 
-const handleFileChange = (event: Event) => {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) processFile(file, "selected");
-};
-
-const clearUploadedFile = () => {
+const clearUploadedFile = (log: boolean = true) => {
     const fileName = uploadedFile.value?.name;
     uploadedFile.value = null;
     uploadedFileRelease.value = null;
-    if (fileInputRef.value) {
-        fileInputRef.value.value = "";
-    }
 
-    if (fileName) {
+    if (fileName && log) {
         logToSerial("info", `[Upload] File removed: ${fileName}`);
     }
 };
@@ -381,6 +387,15 @@ const toggleLogs = () => {
 
     // if were closing logs and have changelog content but it's closed, open it
     if (!newLogsState && hasChangelogContent.value && isChangelogClosed.value) {
+        changelogState.value = "open";
+    }
+};
+
+const clearLogs = () => {
+    if (serialConnection && serialConnection.clearLogs) {
+        serialConnection.clearLogs();
+    }
+    if (isChangelogClosed.value && hasChangelogContent.value) {
         changelogState.value = "open";
     }
 };
@@ -456,12 +471,10 @@ onMounted(() => {
     if (changelogState.value === "expanded") {
         changelogState.value = "open";
     }
-
     // if logs are marked as open but have no content, and we have changelog content, ensure changelog is open
     if (isLogsOpen.value && !hasLogsContent.value && hasChangelogContent.value) {
         changelogState.value = "open";
     }
-
     if (!supportsSerialPort()) {
         changelogState.value = "open";
     }
@@ -488,24 +501,19 @@ onBeforeUnmount(() => {
                 windowWidth >= 1024 && isNarrowViewport,
         }"
     >
-        <div
-            class="absolute top-0 left-0 w-full h-[121px] border-b border-vp-divider z-[-1]"
-            :class="{
-                'h-[97px]': !isNarrowViewport,
-                'h-[81px]': isNarrowViewport,
-            }"
-        ></div>
+        <UpdaterGlow :show="showUpdateOverlay" />
 
-        <div
-            class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0 rounded-xl overflow-clip lg:border border-vp-divider bg-vp-dark"
-        >
+        <div class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0">
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
-                <div class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full">
+                <div
+                    class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full gap-4 px-0 sm:px-4 lg:px-0"
+                >
                     <div
-                        class="device-info-wrapper flex flex-col w-full lg:w-[32%] h-fit lg:h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start"
+                        class="device-info-wrapper sm:rounded-lg border-t sm:border mt-4 lg:mt-0 border-vp-divider flex flex-col w-full lg:w-[32%] h-fit lg:h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start transition-all duration-100 ease-in-out"
                         :class="{
                             'lg:h-full': !isConnected && supportsSerialPort(),
                             'lg:h-screen': !isConnected && isNarrowViewport && supportsSerialPort(),
+                            '!border-vp-brand-1': isInstallButtonHovered,
                         }"
                         :style="windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height));' : ''"
                         :data-connected="isConnected"
@@ -517,45 +525,30 @@ onBeforeUnmount(() => {
                     </div>
 
                     <div
-                        class="hidden lg:block w-px bg-vp-divider z-10"
-                        :class="{
-                            'h-full': !isNarrowViewport,
-                            'min-h-screen': isNarrowViewport,
-                        }"
-                    ></div>
-
-                    <div
                         ref="dropZoneRef"
-                        class="flex flex-col pb-5 lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 overflow-hidden"
+                        class="flex flex-col lg:w-2/3 min-w-0 relative flex-1 min-h-0 max-h-full transition-all duration-300 gap-y-4"
                         :class="{
                             'border-vp-3/60 bg-vp-dark/10 border-dashed': isOverDropZone,
                         }"
                     >
-                        <UpdaterGlow :show="showUpdateOverlay" />
-
                         <div
                             v-if="isOverDropZone"
                             class="absolute inset-0 bg-vp-dark/10 rounded-xl flex items-center justify-center"
                         ></div>
 
-                        <div
-                            v-if="!isChangelogExpanded"
-                            class="relative flex flex-col z-10"
-                            :class="{
-                                'min-h-[185px]': flags.updateInProgress,
-                                'border-vp-divider/50': isInstallButtonHovered,
-                            }"
-                        >
-                            <UpdaterOverlay
-                                :show-update-overlay="showUpdateOverlay"
-                                :is-changelog-expanded="isChangelogExpanded"
-                            />
-
-                            <Transition name="slide-up" mode="out-in">
-                                <div
-                                    v-if="!showUpdateOverlay"
-                                    class="flex flex-col border-t lg:border-t-0 border-vp-divider"
-                                >
+                        <Transition name="slide-up" mode="out-in">
+                            <div
+                                v-if="
+                                    !isChangelogExpanded &&
+                                    !showUpdateOverlay &&
+                                    (isMatchingRelease || (isBranchRelease && !uploadedFile))
+                                "
+                                class="bg-vp-dark/75 mt-4 lg:mt-0"
+                                :class="{
+                                    'opacity-30': isOverDropZone,
+                                }"
+                            >
+                                <div class="updater-warning-container">
                                     <UpdaterWarning
                                         :is-over-drop-zone="isOverDropZone"
                                         :is-branch-release="isBranchRelease"
@@ -563,21 +556,28 @@ onBeforeUnmount(() => {
                                         :selected-release="selectedRelease"
                                         :is-matching-release="isMatchingRelease"
                                     />
+                                </div>
+                            </div>
+                        </Transition>
+
+                        <Transition name="slide-up" mode="out-in">
+                            <div
+                                v-if="!isChangelogExpanded && !showUpdateOverlay"
+                                class="relative flex flex-col z-10 sm:rounded-lg border-y sm:border border-vp-divider bg-vp-dark/75 py-5"
+                                :class="{
+                                    'border-vp-divider/45': isInstallButtonHovered,
+                                }"
+                            >
+                                <div class="flex flex-col">
                                     <div
-                                        v-if="!isChangelogExpanded"
-                                        class="flex-shrink-0 !z-10 transition-all duration-300 px-3.5 sm:px-5"
+                                        class="flex flex-col flex-shrink-0 !z-10 transition-all duration-300 px-3.5 sm:px-5 gap-4"
                                         :class="{
-                                            'opacity-0': showUpdateOverlay,
-                                            'h-0 overflow-hidden':
-                                                showUpdateOverlay && isChangelogExpanded,
                                             'opacity-30': isOverDropZone && !uploadedFile,
-                                            'opacity-30 pointer-events-none':
-                                                showUpdateOverlay && !isChangelogExpanded,
                                         }"
                                     >
                                         <h3
                                             v-if="supportsSerialPort()"
-                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mt-5"
+                                            class="text-[13px] leading-3 uppercase font-semibold text-vp-1 select-none"
                                             :class="{
                                                 'opacity-40 transition-opacity duration-200':
                                                     isInstallButtonHovered ||
@@ -588,10 +588,9 @@ onBeforeUnmount(() => {
                                             {{ tr("updater_select_firmware") }}
                                         </h3>
                                         <div
-                                            class="transition-opacity duration-300 !z-20 mt-4"
+                                            class="transition-opacity duration-300 !z-20"
                                             :class="{
                                                 'opacity-30': isOverDropZone,
-                                                'opacity-30 pointer-events-none': showUpdateOverlay,
                                             }"
                                         >
                                             <UpdaterControls
@@ -607,247 +606,53 @@ onBeforeUnmount(() => {
                                             />
                                         </div>
                                     </div>
-                                </div>
-                            </Transition>
 
-                            <Transition name="slide-up" mode="out-in">
-                                <div v-if="!isChangelogExpanded">
-                                    <div
-                                        v-if="!showUpdateOverlay && supportsSerialPort()"
-                                        class="h-px border-b border-solid border-vp-3/25 w-auto mt-5 mx-3.5 sm:mx-5"
-                                        :class="{
-                                            'opacity-30': isOverDropZone,
-                                        }"
-                                    ></div>
-                                    <div
-                                        class="flex flex-col items-start w-full relative flex-shrink-0 z-[1] transition-all duration-300 px-3.5 sm:px-5 pt-5 gap-y-5 gap-x-3"
-                                        :class="{
-                                            'opacity-50 transition-opacity duration-200':
-                                                isInstallButtonHovered,
-                                            'opacity-0': showUpdateOverlay,
-                                            'h-0 overflow-hidden':
-                                                showUpdateOverlay && isChangelogExpanded,
-                                            'opacity-90': isOverDropZone && !showUpdateOverlay,
-                                            'opacity-0 pointer-events-none':
-                                                showUpdateOverlay && !isChangelogExpanded,
-                                            'mb-0': supportsSerialPort(),
-                                        }"
-                                    >
+                                    <template v-if="supportsSerialPort()">
                                         <div
-                                            v-if="supportsSerialPort()"
-                                            class="flex items-end justify-start gap-2"
-                                        >
-                                            <div class="flex items-center justify-start gap-2">
-                                                <Tooltip
-                                                    :aria-label="tr('releases_install')"
-                                                    :delay="0"
-                                                    :hide-delay="100"
-                                                    :max-width="'315px'"
-                                                    class="files-tooltip z-[1]"
-                                                >
-                                                    <div
-                                                        class="flex items-center justify-center text-vp-3/70 hover:!text-vp-2 transition-colors duration-200 cursor-help"
-                                                    >
-                                                        <v-icon
-                                                            name="md-infooutline-round"
-                                                            scale="0.9"
-                                                        />
-                                                    </div>
-                                                    <template #content>
-                                                        <div
-                                                            class="prose prose-sm dark:prose-invert !text-white max-w-none text-center justify-center"
-                                                        >
-                                                            <span
-                                                                v-html="
-                                                                    tr(
-                                                                        'updater_install_from_file_tooltip',
-                                                                        {
-                                                                            url: getLocalizedPath(
-                                                                                `/releases`,
-                                                                            ),
-                                                                            text: `here`,
-                                                                        },
-                                                                    )
-                                                                "
-                                                            ></span>
-                                                        </div>
-                                                    </template>
-                                                </Tooltip>
-                                                <h3
-                                                    class="text-[13px] leading-3 uppercase font-semibold text-vp-1 mr-2 whitespace-nowrap"
-                                                >
-                                                    {{ tr("updater_or_install_from_file") }}
-                                                </h3>
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            v-if="supportsSerialPort() && uploadedFile"
-                                            class="w-full"
-                                        >
-                                            <div
-                                                class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-border/75 rounded-lg border-dashed"
-                                                :class="{ 'border-vp-3/65': isOverDropZone }"
-                                            >
-                                                <div class="flex items-center gap-4">
-                                                    <div
-                                                        class="flex items-center text-sm rounded-md p-1.5 border transition-all duration-100"
-                                                        :class="
-                                                            uploadedFileRelease
-                                                                ? 'text-green-700 dark:text-green-500 bg-green-300/20 dark:bg-green-900/15 border-green-800/15'
-                                                                : 'text-yellow-600 dark:text-yellow-500 bg-yellow-300/20 dark:bg-yellow-900/15 border-yellow-800/15'
-                                                        "
-                                                        :aria-label="tr('releases_current_version')"
-                                                    >
-                                                        <v-icon
-                                                            name="bi-file-earmark-zip"
-                                                            scale="0.95"
-                                                        />
-                                                    </div>
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="flex flex-col gap-0.5">
-                                                            <span
-                                                                class="text-sm font-medium text-vp-1"
-                                                            >
-                                                                {{ uploadedFile.name }}
-                                                            </span>
-                                                            <div
-                                                                class="flex items-center gap-1 text-xs text-vp-2/80 font-medium"
-                                                            >
-                                                                <span
-                                                                    v-if="
-                                                                        uploadedFileRelease?.version
-                                                                    "
-                                                                >
-                                                                    {{
-                                                                        uploadedFileRelease?.version
-                                                                    }}
-                                                                </span>
-                                                                <span
-                                                                    v-if="
-                                                                        uploadedFileRelease?.version
-                                                                    "
-                                                                    class="!text-vp-3/70 select-none"
-                                                                    >{{ "·" }}</span
-                                                                >
-                                                                <span>{{ displayFileSize }}</span>
-                                                                <span
-                                                                    class="!text-vp-3/70 select-none"
-                                                                    >{{ "·" }}</span
-                                                                >
-                                                                <span>{{ displayFileDate }}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <button
-                                                        class="px-3 py-[7px] text-xs font-medium !text-vp-2 hover:!text-vp-1 !bg-vp-3/10 hover:!bg-vp-3/25 dark:!bg-vp-3/10 dark:hover:!bg-vp-3/25 rounded-md transition-colors whitespace-nowrap select-none"
-                                                        @click="handleFileUpload"
-                                                    >
-                                                        {{ tr("updater_change_button") }}
-                                                    </button>
-                                                    <button
-                                                        class="px-3 py-[7px] text-xs font-medium !text-red-500 hover:!text-red-600 !bg-red-500/10 hover:!bg-red-500/25 dark:!bg-red-600/10 dark:hover:!bg-red-500/15 rounded-md transition-colors whitespace-nowrap select-none"
-                                                        @click="clearUploadedFile"
-                                                    >
-                                                        {{ tr("updater_remove_button") }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            v-else-if="supportsSerialPort()"
-                                            class="w-full border border-dashed border-vp-border/75 rounded-lg flex items-center justify-center cursor-pointer relative h-min lg:h-[72px] z-10 p-0.5 group transition-colors duration-100"
+                                            class="h-px border-b border-solid border-vp-3/25 w-auto mt-5 mx-3.5 sm:mx-5"
                                             :class="{
-                                                'bg-vp-3/10 !border-vp-brand-1': isOverDropZone,
-                                                'opacity-50 !cursor-not-allowed':
-                                                    flags.updateInProgress,
-                                                'hover:bg-vp-brand-3/5 hover:dark:bg-vp-brand-3/5 hover:border-vp-brand-1':
-                                                    !flags.updateInProgress,
+                                                'opacity-30': isOverDropZone,
                                             }"
-                                            @click="handleFileUpload"
-                                        >
-                                            <div
-                                                class="flex flex-col items-start gap-0.5 text-center select-none bg-vp-dark/60 dark:bg-vp-bg/80 w-full h-full pt-4 pb-4 px-4 rounded-[5px]"
-                                                :class="{
-                                                    'dark:!bg-vp-bg/50': ifCurrentTheme([
-                                                        'skyline',
-                                                    ]),
-                                                }"
-                                            >
-                                                <div
-                                                    class="flex flex-row justify-start w-full items-center gap-4 -mt-px -ml-px"
-                                                >
-                                                    <div
-                                                        class="flex-shrink-0 text-vp-2/80 group-hover:text-vp-brand-3 group-hover:dark:text-vp-brand-1 transition-colors duration-200 mt-px"
-                                                    >
-                                                        <v-icon
-                                                            :name="
-                                                                isOverDropZone
-                                                                    ? 'bi-folder2-open'
-                                                                    : 'oi-upload'
-                                                            "
-                                                            scale="1.2"
-                                                            class="stroke-vp-dark stroke-[0.25] group-hover:scale-105 transition-transform duration-100 ease-in"
-                                                            :class="{
-                                                                'scale-105 text-vp-brand-3 dark:text-vp-brand-1 !stroke-0':
-                                                                    isOverDropZone,
-                                                            }"
-                                                        />
-                                                    </div>
-                                                    <div
-                                                        class="flex flex-col items-start gap-0.5 -mt-px"
-                                                    >
-                                                        <p
-                                                            class="text-sm text-left text-vp-1 font-medium tracking-tight dark:font-normal"
-                                                        >
-                                                            {{
-                                                                isOverDropZone
-                                                                    ? tr("updater_drop_file_here")
-                                                                    : tr("updater_drop_file_browse")
-                                                            }}
-                                                        </p>
-                                                        <p
-                                                            class="text-xs text-left text-vp-2/80 font-medium dark:font-normal italic"
-                                                        >
-                                                            {{ tr("updater_file_example") }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        ></div>
 
-                                        <input
-                                            ref="fileInputRef"
-                                            type="file"
-                                            accept=".tgz"
-                                            class="hidden"
-                                            @change="handleFileChange"
+                                        <UpdaterFileUpload
+                                            :is-over-drop-zone="isOverDropZone"
+                                            :show-update-overlay="showUpdateOverlay"
+                                            :uploaded-file="uploadedFile"
+                                            :uploaded-file-release="uploadedFileRelease"
+                                            :display-file-size="displayFileSize"
+                                            :display-file-date="displayFileDate"
+                                            :is-install-button-hovered="isInstallButtonHovered"
+                                            :is-changelog-expanded="isChangelogExpanded"
+                                            @file-selected="handleFileSelected"
+                                            @clear-file="clearUploadedFile"
                                         />
-                                    </div>
-                                    <div
-                                        v-if="!showUpdateOverlay"
-                                        class="h-px border-b border-solid border-vp-3/25 w-auto mx-0 sm:mx-10 mt-5"
-                                        :class="{
-                                            'opacity-30': isOverDropZone,
-                                        }"
-                                    ></div>
+                                    </template>
                                 </div>
-                            </Transition>
-                        </div>
+                            </div>
+                        </Transition>
+
+                        <Transition name="slide-up" mode="out-in">
+                            <div
+                                v-if="!isChangelogExpanded && showUpdateOverlay"
+                                class="relative flex flex-col z-10 lg:rounded-lg border lg:border border-vp-divider bg-vp-dark/45 py-5 min-h-[150px]"
+                            >
+                                <UpdaterOverlay
+                                    :show-update-overlay="showUpdateOverlay"
+                                    :is-changelog-expanded="isChangelogExpanded"
+                                />
+                            </div>
+                        </Transition>
 
                         <div
                             v-if="windowWidth >= 1024 || selectedRelease || uploadedFileRelease"
                             ref="panelContainerRef"
-                            class="flex flex-col transition-opacity duration-250 overflow-hidden"
+                            class="flex flex-col transition-opacity duration-250 overflow-hidden z-[1]"
                             :class="{
                                 'min-h-0 flex-1': !isNarrowViewport,
                                 'max-h-[1325px] h-full': isNarrowViewport,
                                 'opacity-50': isInstallButtonHovered,
                                 'opacity-30': isOverDropZone,
-                                'mt-5': selectedRelease || uploadedFileRelease,
                             }"
                         >
                             <div
@@ -885,13 +690,13 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div
-                                v-if="supportsSerialPort()"
+                                v-if="supportsSerialPort() && hasChangelogContent"
                                 ref="dividerRef"
-                                class="flex flex-row min-h-5 w-full items-center justify-center relative px-7 lg:px-10 cursor-row-resize select-none transition-all duration-200"
+                                class="flex flex-row min-h-4 items-center justify-center relative px-5 cursor-row-resize select-none transition-all duration-200"
                                 :class="{
                                     'opacity-55 dark:opacity-65':
                                         effectiveChangelogOpen && effectiveLogsOpen,
-                                    'opacity-0 pointer-events-none': !(
+                                    'opacity-0 pointer-events-none mt-0.5': !(
                                         effectiveChangelogOpen && effectiveLogsOpen
                                     ),
                                 }"
@@ -944,6 +749,7 @@ onBeforeUnmount(() => {
                                     :is-changelog-closed="!effectiveChangelogOpen"
                                     :is-narrow-viewport="isNarrowViewport"
                                     :is-selected-or-uploaded-file="hasChangelogContent"
+                                    @clearlogs="clearLogs"
                                     @toggle="toggleLogs"
                                 />
                             </div>
@@ -1016,35 +822,6 @@ onBeforeUnmount(() => {
 .device-info-wrapper[data-hovered="true"]:after {
     opacity: 0.01;
 }
-.logs-expand-enter-active,
-.logs-expand-leave-active {
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-}
-
-.logs-expand-enter-from {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-}
-
-.logs-expand-enter-to {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-.logs-expand-leave-from {
-    opacity: 1;
-    max-height: 1000px;
-    transform: translateY(0);
-}
-
-.logs-expand-leave-to {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-}
 
 .slide-up-enter-active,
 .slide-up-leave-active {
@@ -1074,30 +851,5 @@ onBeforeUnmount(() => {
     opacity: 0;
     max-height: 0;
     transform: translateY(-20px);
-}
-
-.fade-drop-enter-active,
-.fade-drop-leave-active {
-    transition: all 0.4s ease-out;
-}
-
-.fade-drop-enter-from {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-.fade-drop-enter-to {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.fade-drop-leave-from {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.fade-drop-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
 }
 </style>

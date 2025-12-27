@@ -16,6 +16,7 @@ interface Props {
     disabled?: boolean;
     acceptHover?: boolean;
     forceVisible?: boolean;
+    select?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     disabled: false,
     acceptHover: true,
     forceVisible: false,
+    select: false,
 });
 
 const isVisible = ref(false);
@@ -214,7 +216,10 @@ onBeforeUnmount(() => {
                     @mouseenter="keepTooltipVisible"
                     @mouseleave="hideTooltipImmediate"
                 >
-                    <div class="text-center relative z-10 max-w-full">
+                    <div
+                        class="text-center relative z-10 max-w-full"
+                        :class="!props.select && 'select-none'"
+                    >
                         <slot name="content"></slot>
                     </div>
                 </div>

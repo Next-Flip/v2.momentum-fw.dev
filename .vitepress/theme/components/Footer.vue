@@ -60,17 +60,17 @@ const navigationLinks = computed(() => [
         class="footer pt-6 sm:pt-10 xl:pt-0 max-w-3xl mx-auto lg:max-w-full w-full relative"
         :style="{ '--footer-bg-width': '1152px' }"
     >
-        <div class="max-w-full mx-auto pb-16 sm:pb-20 xl:pb-32" :class="isWiki ? 'py-0' : 'py-16'">
+        <div class="max-w-full mx-auto pb-16 sm:pb-20 xl:pb-32" :class="isWiki ? 'py-0' : 'py-10'">
             <div
-                class="flex flex-col-reverse xl:flex-row xl:justify-between gap-16 mx-auto max-w-7xl"
-                :class="isWiki ? '2xl:pl-[71px] sm:px-8' : 'lg:pl-16 sm:px-16'"
+                class="flex flex-col-reverse lg:flex-row lg:justify-between gap-16 mx-auto max-w-7xl"
+                :class="isWiki ? '2xl:pl-[71px] sm:px-8' : 'px-8 lg:pl-16 sm:px-16'"
             >
                 <div class="lg:max-w-md flex flex-col justify-start z-50 group/logo">
                     <div class="flex flex-col pl-3.5 -ml-3.5 pt-3.5 -mt-3.5">
                         <div class="flex flex-row items-center gap-3 pb-3.5">
                             <a
                                 href="/"
-                                class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center"
+                                class="footer-logo inline-block transition-transform hover:scale-105 w-8 h-8 object-contain object-center select-none"
                                 @mouseenter="handleLogoHover"
                                 @mouseleave="handleLogoLeave"
                             >
@@ -99,7 +99,7 @@ const navigationLinks = computed(() => [
                             </span>
                         </div>
 
-                        <p class="text-sm text-vp-2 max-w-72">
+                        <p class="text-sm text-vp-2 max-w-72 select-none">
                             {{ siteDescription }}
                         </p>
                     </div>
@@ -112,7 +112,7 @@ const navigationLinks = computed(() => [
                                 :href="`${githubBlobUrl('dev/LICENSE')}`"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline"
+                                class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline select-none"
                             >
                                 GPL-3.0 © 2025 Next-Flip
                             </a>
@@ -120,18 +120,18 @@ const navigationLinks = computed(() => [
                         <img
                             src="/svg/yapluv.png"
                             alt="Yap"
-                            class="w-5 h-5 object-contain object-center cursor-pointer hover:scale-105 transition-transform duration-100"
+                            class="w-5 h-5 object-contain object-center cursor-pointer hover:scale-105 transition-transform duration-100 select-none"
                         />
                     </div>
 
                     <div
-                        class="flex flex-row gap-1.5 mt-3 sm:mt-10 xl:mt-auto justify-start items-center leading-none"
+                        class="flex flex-row gap-1.5 mt-3 sm:mt-auto xl:mt-auto justify-start items-center leading-none"
                     >
                         <p class="text-xs text-vp-3/50">
                             {{ tr("footer_last_update") }}: {{ formattedLastUpdate }}
                         </p>
                         <template v-if="buildInfo.commitHash">
-                            <span class="text-vp-3/40">·</span>
+                            <span class="text-vp-3/40 select-none">·</span>
                             <a
                                 class="text-[13px] font-normal text-vp-3/50 hover:underline hover:text-vp-brand-1 transition-colors duration-100"
                                 :href="`https://github.com/Next-Flip/v2.momentum-fw.dev/commit/${buildInfo.commitHash}`"

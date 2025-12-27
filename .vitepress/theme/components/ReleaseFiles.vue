@@ -127,10 +127,10 @@ watch(
             class="relative z-[1] flex flex-row justify-start items-center gap-1.5 pb-2 mb-3 border-b border-vp-divider pointer-events-auto"
         >
             <div class="flex items-center justify-center text-sm text-vp-2/80">
-                <v-icon name="oi-download" :scale="0.95" />
+                <v-icon name="oi-download" scale="1.0" />
             </div>
             <span
-                class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase"
+                class="text-vp-1 text-[13px] font-semibold py-1 leading-6 tracking-wide uppercase select-none"
                 >{{ tr("releases_files") }}</span
             >
             <div
@@ -169,14 +169,14 @@ watch(
                 <v-icon
                     name="oi-chevron-down"
                     scale="0.8"
-                    class="transition-transform duration-200 text-vp-2"
+                    class="transition-transform duration-200 text-vp-2 select-none"
                     :class="{ '-rotate-180': props.devFilesOpen }"
                 />
                 <span
-                    class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-100"
+                    class="text-sm text-vp-2 font-medium group-hover:text-vp-1 transition-colors duration-100 select-none"
                     >{{ tr("releases_files_dev") }}</span
                 >
-                <span class="text-xs text-vp-3 mt-px ml-px mr-0.5">{{
+                <span class="text-xs text-vp-3 mt-px ml-px mr-0.5 select-none">{{
                     categorizedFiles.development.length
                 }}</span>
                 <div class="flex-1 bg-vp-divider w-full h-px"></div>
@@ -193,7 +193,7 @@ watch(
                 <div v-if="props.devFilesOpen" class="mt-1">
                     <div class="flex flex-col gap-5">
                         <div class="flex-shrink-0">
-                            <p class="text-xs text-vp-3 leading-relaxed my-0">
+                            <p class="text-xs text-vp-3 leading-relaxed my-0 select-none">
                                 {{ tr("releases_files_dev_description") }}
                             </p>
                         </div>
@@ -226,7 +226,7 @@ watch(
                     </div>
                     <template #content>
                         <div
-                            class="prose prose-sm dark:prose-invert !text-white max-w-none text-left justify-center"
+                            class="prose prose-sm dark:prose-invert !text-white max-w-none text-left justify-center leading-5"
                         >
                             <span
                                 v-html="
@@ -240,7 +240,7 @@ watch(
                     </template>
                 </Tooltip>
                 <span
-                    class="text-vp-1 text-base font-medium py-1 leading-6 tracking-wide whitespace-nowrap"
+                    class="text-vp-1 text-base font-medium py-1 leading-6 tracking-wide whitespace-nowrap select-none"
                 >
                     {{ isCurrentVersion ? tr("releases_reinstall") : tr("releases_install") }}
                 </span>
@@ -253,7 +253,7 @@ watch(
                         :href="method.href"
                         :target="method.isExternal ? '_blank' : undefined"
                         rel="noopener"
-                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55"
+                        class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55 select-none"
                         :class="[
                             method.show
                                 ? 'opacity-100 visible relative pointer-events-auto'

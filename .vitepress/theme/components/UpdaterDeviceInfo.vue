@@ -332,20 +332,14 @@ const deviceSections = computed(() => {
 
 <template>
     <div
-        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full transition-all duration-100 ease-in-out lg:py-0 bg-vp-dark/85"
+        class="device-info-container lg:rounded-tl-xl lg:rounded-bl-xl max-h-[calc(49vh-var(--vp-nav-height))] lg:max-h-full h-full flex flex-col w-full min-w-0 max-w-full transition-all duration-100 ease-in-out lg:py-0 bg-vp-dark/80"
         :class="{
-            'pt-14 lg:pt-8 lg:py-8 pb-12': !isConnected,
+            'py-12 lg:py-8 !bg-vp-dark/90': !isConnected,
         }"
         :data-connected="isConnected"
         :data-hovered="isInstallButtonHovered"
     >
-        <div
-            v-if="!isConnected"
-            class="absolute inset-0 w-full h-full box-border border border-transparent transition-all duration-100 ease-in-out lg:rounded-tl-xl lg:rounded-bl-xl"
-            :class="{
-                'border-vp-brand-1': isInstallButtonHovered,
-            }"
-        ></div>
+        <div v-if="!isConnected" class="absolute inset-0 w-full h-full"></div>
         <Transition name="slide-down">
             <div
                 v-if="isConnected"
@@ -355,7 +349,7 @@ const deviceSections = computed(() => {
                 <ScreenDisplay ref="screenDisplayRef" />
 
                 <div
-                    class="py-3 flex-shrink-0 bg-vp-dark dark:bg-vp-dark z-10"
+                    class="py-3 flex-shrink-0 z-10"
                     :class="{
                         'sticky bottom-0': isNarrowViewport,
                     }"
@@ -393,11 +387,11 @@ const deviceSections = computed(() => {
                             :aria-label="connectionTr('connection_disconnect')"
                             :disabled="flags.updateInProgress"
                             :class="[
-                                'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10 select-none',
+                                'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-950/30 select-none',
                                 flags.updateInProgress &&
                                     'opacity-40 !cursor-not-allowed !bg-vp-soft !text-vp-3/70 dark:!bg-vp-soft dark:!text-vp-3/70',
                                 !flags.updateInProgress &&
-                                    'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
+                                    'dark:hover:!bg-red-900/25 hover:!bg-red-500/25 hover:!text-red-600',
                             ]"
                             @click="handleDisconnect"
                         >
@@ -429,7 +423,7 @@ const deviceSections = computed(() => {
                                 ></div>
                                 <v-icon name="bi-usb-symbol" scale="1.75" class="text-vp-3" />
                             </div>
-                            <div class="flex flex-col items-center gap-2 px-1">
+                            <div class="flex flex-col items-center gap-2 px-1 select-none">
                                 <p class="text-lg font-medium text-vp-1">
                                     {{ getConnectionDisplay.title }}
                                 </p>
@@ -466,42 +460,40 @@ const deviceSections = computed(() => {
                 </div>
 
                 <div v-else key="connected" class="flex-1 flex flex-col min-h-0 relative">
-                    <div class="bg-vp-divider/30">
-                        <div class="flex flex-row gap-px">
-                            <div
-                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-[38px]"
+                    <div class="flex flex-row gap-px">
+                        <div
+                            class="flex-1 flex items-center justify-center border-b border-vp-divider box-border cursor-pointer group h-[38px]"
+                            :class="{
+                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-vp-dark':
+                                    activeTab === 'info',
+                            }"
+                            @click="handleTabChange('info')"
+                        >
+                            <span
+                                class="px-4 text-[13px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
                                 :class="{
-                                    'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
-                                        activeTab === 'info',
+                                    '!text-vp-neutral': activeTab === 'info',
                                 }"
-                                @click="handleTabChange('info')"
                             >
-                                <span
-                                    class="px-4 text-[12px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
-                                    :class="{
-                                        '!text-vp-neutral': activeTab === 'info',
-                                    }"
-                                >
-                                    {{ tr("updater_parsed_tab") }}
-                                </span>
-                            </div>
-                            <div
-                                class="flex-1 flex items-center justify-center bg-vp-dark border-b border-vp-divider box-border cursor-pointer group h-[38px]"
+                                {{ tr("updater_parsed_tab") }}
+                            </span>
+                        </div>
+                        <div
+                            class="flex-1 flex items-center justify-center border-b border-vp-divider box-border cursor-pointer group h-[38px]"
+                            :class="{
+                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-vp-dark':
+                                    activeTab === 'raw',
+                            }"
+                            @click="handleTabChange('raw')"
+                        >
+                            <span
+                                class="px-4 text-[13px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
                                 :class="{
-                                    'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/60 to-vp-dark':
-                                        activeTab === 'raw',
+                                    '!text-vp-neutral': activeTab === 'raw',
                                 }"
-                                @click="handleTabChange('raw')"
                             >
-                                <span
-                                    class="px-4 text-[12px] font-medium text-vp-2/70 group-hover:text-vp-1 transition-colors duration-100 box-border text-center select-none"
-                                    :class="{
-                                        '!text-vp-neutral': activeTab === 'raw',
-                                    }"
-                                >
-                                    {{ tr("updater_raw_tab") }}
-                                </span>
-                            </div>
+                                {{ tr("updater_raw_tab") }}
+                            </span>
                         </div>
                     </div>
                     <template v-if="!isNarrowViewport">
@@ -534,13 +526,15 @@ const deviceSections = computed(() => {
                             </h2>
                             <div class="flex flex-col space-y-0 pb-[7px]">
                                 <template v-for="section in deviceSections" :key="section.title">
-                                    <div class="section-header">{{ section.title }}</div>
+                                    <div class="section-header select-none">
+                                        {{ section.title }}
+                                    </div>
                                     <div
                                         v-for="item in section.items"
                                         :key="item.label"
                                         class="menu-item"
                                     >
-                                        <span class="menu-label">{{ item.label }}</span>
+                                        <span class="menu-label select-none">{{ item.label }}</span>
                                         <a
                                             v-if="item.isLink"
                                             class="menu-value vp-external-link-icon hover:underline"

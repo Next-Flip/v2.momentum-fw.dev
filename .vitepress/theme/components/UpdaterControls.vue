@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useScroll } from "@vueuse/core";
-import { computed, inject, nextTick, ref, useTemplateRef, watch } from "vue";
+import { computed, inject, nextTick, ref, watch } from "vue";
 import {
     branchReleases,
     devbuildReleases,
@@ -18,14 +17,9 @@ import {
     useTempState,
     useThemeSwitcher,
 } from "../composables";
-import { formatDate } from "../date";
+import { formatDate, formatTimestamp } from "../date";
 import { supportsSerialPort } from "../util";
-
-import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
-
-const el = useTemplateRef<HTMLElement>("el");
-const { arrivedState } = useScroll(el);
 
 const { tr } = useI18n();
 const { dots } = useDots();
@@ -145,6 +139,10 @@ const releaseLabel = computed(() => {
     })`;
 });
 
+const timestampLabel = (timestamp: number | string) => {
+    return timestamp ? formatTimestamp(timestamp.toString()) : tr("updater_unknown_date");
+};
+
 const toggleChannelDropdown = () => {
     if (props.uploadedFile) return;
     if (isChannelDropdownOpen.value) {
@@ -231,11 +229,11 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 
 <template>
     <div class="rounded-xl">
-        <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 items-end">
+        <div class="flex flex-col md:flex-row gap-2 md:gap-3 items-end">
             <div class="flex flex-row gap-3 items-end w-full min-w-0 flex-1">
                 <div class="relative flex-shrink-0 max-w-[200px]">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3 select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{ tr("updater_channel_label") }}
@@ -272,7 +270,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                     <span
                                         v-for="channel in channelOptions"
                                         :key="channel.value"
-                                        class="dropdown-item items-center justify-start px-3 py-2 cursor-pointer flex w-full z-[5] text-[13px] overflow-hidden min-w-0"
+                                        class="dropdown-item items-center justify-start pl-3 pr-2.5 h-[53.33px] cursor-pointer flex w-full z-[5] text-[13px] overflow-hidden min-w-0"
                                         :class="{
                                             'is-selected': selectedChannel === channel.value,
                                             'is-branch': channel.value === 'branch',
@@ -280,37 +278,38 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                         @click="selectChannel(channel.value as ReleaseChannel)"
                                     >
                                         <div
-                                            class="flex flex-row items-center gap-3 min-w-0 flex-1"
+                                            class="flex flex-row items-center justify-center gap-3 min-w-0 flex-1"
                                         >
                                             <div class="flex flex-col min-w-0 flex-1">
-                                                <span
-                                                    class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis select-none"
-                                                >
-                                                    {{ channel.label }}
-                                                </span>
+                                                <div class="flex flex-row gap-x-1.5 items-start">
+                                                    <span
+                                                        class="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis select-none"
+                                                    >
+                                                        {{ channel.label }}
+                                                    </span>
+                                                    <div
+                                                        v-if="channel.value === 'branch'"
+                                                        class="flex-shrink-0"
+                                                    >
+                                                        <v-icon
+                                                            name="md-warningamber-round"
+                                                            :scale="0.75"
+                                                            class="text-yellow-600 dark:text-orange-400/90"
+                                                        />
+                                                    </div>
+                                                </div>
                                                 <span
                                                     class="text-xs text-vp-3 whitespace-nowrap overflow-hidden text-ellipsis select-none"
                                                     :class="{
                                                         'text-vp-brand-1/60':
                                                             selectedChannel === channel.value,
-                                                        'text-orange-700/80 dark:text-orange-500/50':
+                                                        'text-yellow-700/80 dark:text-orange-500/50':
                                                             selectedChannel === channel.value &&
                                                             channel.value === 'branch',
                                                     }"
                                                 >
                                                     {{ channel.description }}
                                                 </span>
-                                            </div>
-
-                                            <div
-                                                v-if="channel.value === 'branch'"
-                                                class="flex-shrink-0"
-                                            >
-                                                <v-icon
-                                                    name="md-warningamber-round"
-                                                    :scale="0.75"
-                                                    class="text-orange-600 dark:text-orange-500"
-                                                />
                                             </div>
                                         </div>
                                     </span>
@@ -322,7 +321,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 
                 <div class="relative flex-1 min-w-0">
                     <label
-                        class="block text-sm font-normal text-vp-2 mb-3"
+                        class="block text-sm font-normal text-vp-2 mb-3 select-none"
                         :class="{ 'opacity-50': uploadedFile || isInstallButtonHovered }"
                     >
                         {{
@@ -350,6 +349,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                         <div
                             v-if="
                                 shouldScrollReleaseText() &&
+                                !uploadedFile &&
                                 (isReleaseButtonHovered || isReleaseDropdownOpen)
                             "
                             class="marquee relative w-full overflow-hidden min-w-0 flex-1 pointer-events-none"
@@ -375,28 +375,16 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                     </button>
                     <Transition name="fade-dropdown">
                         <div v-if="isReleaseDropdownOpen" class="dropdown-menu-container right-0">
-                            <ScrollFade
-                                :show="!arrivedState.top && selectedChannel !== 'branch'"
-                                position="top"
-                                :opacity="25"
-                                class="mr-4 z-10"
-                            />
-                            <ScrollFade
-                                :show="!arrivedState.bottom && selectedChannel !== 'branch'"
-                                position="bottom"
-                                :opacity="25"
-                                class="mr-4 z-10"
-                            />
                             <div
                                 class="dropdown-menu"
                                 :class="{
                                     'is-visible': isReleaseDropdownOpen,
-                                    'lg:pr-[7px]': selectedChannel === 'branch',
+                                    'md:pr-[7px]': selectedChannel === 'branch',
                                 }"
                             >
                                 <div
                                     ref="el"
-                                    class="flex flex-col overflow-hidden max-h-[238px] py-[7px] pr-[7px] lg:pr-0 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
+                                    class="flex flex-col overflow-hidden max-h-[174px] py-[7px] pr-[7px] md:pr-0 overflow-y-auto rounded-[4px] bg-vp-soft-mute"
                                 >
                                     <div
                                         v-for="(release, index) in channelReleases"
@@ -407,7 +395,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 selectedRelease?.version === release.version,
                                             'rounded-t-[4px]': index === 0,
                                             'rounded-b-[4px]': index === channelReleases.length - 1,
-                                            '!bg-orange-600/5 hover:!bg-orange-500/10 is-branch':
+                                            'bg-yellow-600/5 dark:bg-orange-600/5 hover:!bg-yellow-500/10 dark:hover:!bg-orange-500/10 is-branch':
                                                 isBranchSelected(selectedChannel, release.version),
                                         }"
                                         @click="selectRelease(release)"
@@ -431,7 +419,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                             'text-vp-brand-1':
                                                                 selectedRelease?.version ===
                                                                 release.version,
-                                                            'text-orange-700 dark:text-orange-500':
+                                                            'text-yellow-700 dark:text-orange-500':
                                                                 isBranchSelected(
                                                                     selectedChannel,
                                                                     release.version,
@@ -455,7 +443,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                         'text-vp-brand-1':
                                                             selectedRelease?.version ===
                                                             release.version,
-                                                        'text-orange-700 dark:text-orange-500':
+                                                        'text-yellow-700 dark:text-orange-500':
                                                             isBranchSelected(
                                                                 selectedChannel,
                                                                 release.version,
@@ -481,7 +469,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 :z-index="9999"
                                             >
                                                 <div
-                                                    class="flex items-center text-sm rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/20 hover:border-vp-alternate-1/40 transition-all duration-100 cursor-help"
+                                                    class="flex items-center text-sm rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/10 hover:border-vp-alternate-1/20 transition-all duration-100 cursor-help"
                                                     :class="[
                                                         ifCurrentTheme(['white'])
                                                             ? 'text-vp-brand-1 dark:text-vp-brand-1/60'
@@ -500,12 +488,14 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 'tracking-tighter': selectedChannel !== 'branch',
                                                 'text-vp-brand-1/60':
                                                     selectedRelease?.version === release.version,
-                                                'text-orange-700/80 dark:text-orange-500/60':
+                                                'text-yellow-700/80 dark:text-orange-500/60':
                                                     isBranchSelected(
                                                         selectedChannel,
                                                         release.version,
                                                     ),
                                             }"
+                                            :aria-label="timestampLabel(release.timestamp || '')"
+                                            :title="timestampLabel(release.timestamp || '')"
                                         >
                                             {{
                                                 isBranchRelease
@@ -523,7 +513,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
             </div>
 
-            <div class="flex flex-row gap-3 items-end w-full lg:w-auto flex-shrink-0">
+            <div class="flex flex-row gap-3 items-end w-full md:w-auto flex-shrink-0">
                 <div
                     class="hidden xl:block h-6 mb-2 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                     :class="{ 'opacity-60': isInstallButtonHovered }"
@@ -580,15 +570,15 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 </div>
 
                 <div
-                    class="rounded-full transition-all duration-200 border border-vp-divider box-border mt-3 select-none min-w-32 w-full lg:w-auto group"
+                    class="rounded-full transition-all duration-200 border border-vp-divider box-border mt-3 select-none min-w-32 w-full md:w-auto group"
                     :class="[
                         canFlash &&
-                            !isMatchingRelease &&
-                            !isBranchRelease &&
+                            ((!isMatchingRelease && !isBranchRelease) || uploadedFile) &&
                             '!border-vp-brand-1 hover:!border-vp-brand-2 hover:bg-vp-brand-3 shadow-grow',
                         canFlash &&
                             (isMatchingRelease || isBranchRelease) &&
-                            'bg-yellow-300/5 dark:bg-yellow-900/5 border-yellow-400 dark:border-yellow-500 hover:!border-yellow-400 hover:!bg-yellow-400 dark:hover:!border-yellow-500 dark:hover:!bg-yellow-500 shadow-grow-yellow',
+                            !uploadedFile &&
+                            'bg-yellow-300/5 dark:bg-orange-900/5 border-yellow-400 dark:border-orange-500 hover:!border-yellow-300 hover:!bg-yellow-400 dark:hover:!border-orange-400/70 dark:hover:!bg-orange-500 shadow-grow-yellow dark:shadow-grow-orange',
                         isInstallButtonHovered && 'opacity-90 transition-all duration-200',
                         canFlash && 'cursor-pointer',
                         installPressedState.isPressed.value && 'scale-[0.98]',
@@ -616,6 +606,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                     : 'text-vp-3 cursor-not-allowed opacity-50 px-12',
                                 canFlash &&
                                     (isMatchingRelease || isBranchRelease) &&
+                                    !uploadedFile &&
                                     'group-hover:!text-black',
                             ]"
                             @click="handleFlashFirmware"
@@ -773,7 +764,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
 }
 
 .dropdown-item.is-branch.is-selected {
-    @apply bg-orange-600/5 text-orange-700 dark:text-orange-500 hover:bg-orange-500/10;
+    @apply bg-yellow-600/5 dark:bg-orange-600/5 text-yellow-700 dark:text-orange-500 hover:bg-yellow-500/10 dark:hover:bg-orange-500/10;
 }
 
 .fade-dropdown-enter-active,

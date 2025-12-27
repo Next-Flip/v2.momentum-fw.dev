@@ -27,6 +27,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
     toggle: [];
+    clearlogs: [];
 }>();
 
 const { tr, translateLog } = useI18n();
@@ -92,12 +93,6 @@ const scrollToBottom = () => {
     }
 };
 
-const clearLogs = () => {
-    if (serialConnection && serialConnection.clearLogs) {
-        serialConnection.clearLogs();
-    }
-};
-
 const handleToggle = () => {
     emit("toggle");
     if (logs.value.length > 0) {
@@ -160,7 +155,7 @@ onMounted(() => {
 
 <template>
     <div
-        class="bg-vp-dark dark:bg-neutral-950/80 overflow-hidden group flex flex-col mx-3.5 sm:mx-5 rounded-lg border border-vp-divider h-full min-h-0"
+        class="bg-vp-dark/75 dark:bg-neutral-950/80 overflow-hidden group flex flex-col sm:rounded-lg border-y sm:border border-vp-divider h-full min-h-0"
         :class="{
             'border-b border-vp-divider': !props.isChangelogOpen && !showLogs,
             'min-h-[250px]': props.isNarrowViewport && showLogs,
@@ -186,7 +181,7 @@ onMounted(() => {
                         <v-icon name="fa-terminal" scale="0.8" />
                     </div>
                     <h2
-                        class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5"
+                        class="text-[13px] leading-3 font-semibold text-vp-1 uppercase mt-0.5 select-none"
                         :class="{
                             'opacity-50': !showLogs,
                         }"
@@ -195,7 +190,7 @@ onMounted(() => {
                     </h2>
                     <span
                         v-if="logs.length > 0"
-                        class="text-xs font-medium font-mono py-[3px] text-vp-2 text-start mt-0.5 ml-0.5 rounded-md px-1.5 bg-vp-neutral/[1%] border border-vp-divider/70"
+                        class="text-xs font-medium select-none font-mono py-[3px] text-vp-2 text-start mt-0.5 ml-0.5 rounded-full px-[7px] bg-vp-neutral/[1%] border border-vp-divider/70"
                     >
                         {{ groupedLogs.length }}
                     </span>
@@ -209,7 +204,7 @@ onMounted(() => {
                                 'group-hover:opacity-100': showButtons,
                             }"
                             :aria-label="tr('updater_clear_logs')"
-                            @click="clearLogs"
+                            @click="$emit('clearlogs')"
                         >
                             <v-icon name="pr-refresh" :scale="0.9" />
                         </button>
@@ -241,7 +236,7 @@ onMounted(() => {
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            '!hidden !cursor-default pointer-events-none':
+                            '!opacity-35 !cursor-default pointer-events-none':
                                 logs.length === 0 || isChangelogClosed || !isSelectedOrUploadedFile,
                             'opacity-100 hover:text-vp-brand-1 cursor-pointer': logs.length > 0,
                         }"
@@ -302,7 +297,7 @@ onMounted(() => {
                                     v-memo="[group.count, group.log.level]"
                                     class="flex items-start gap-1 text-xs pl-2 min-h-5 justify-start relative"
                                     :class="{
-                                        'bg-[#FEF6D5] dark:bg-yellow-400/10':
+                                        'bg-[#FEF6D5] dark:bg-orange-400/10':
                                             group.log.level === 'warning',
                                         'bg-[#FCEBEB] dark:bg-red-400/10':
                                             group.log.level === 'error',
@@ -314,7 +309,7 @@ onMounted(() => {
                                     <div
                                         class="absolute left-0 top-0 h-full w-0.5"
                                         :class="{
-                                            'bg-yellow-300 dark:bg-yellow-600/60':
+                                            'bg-yellow-300 dark:bg-orange-600/60':
                                                 group.log.level === 'warning',
                                             'bg-red-300 dark:bg-red-600/60':
                                                 group.log.level === 'error',
@@ -326,7 +321,7 @@ onMounted(() => {
                                         :title="formatDate(group.log.timestamp, 'withTime')"
                                         class="text-vp-3 flex-shrink-0 w-[60px] text-left h-min tracking-tight leading-5"
                                         :class="{
-                                            'text-neutral-900 dark:text-yellow-400/60':
+                                            'text-neutral-900 dark:text-orange-400/60':
                                                 group.log.level === 'warning',
                                             'text-neutral-900 dark:text-red-500/70':
                                                 group.log.level === 'error',
@@ -339,7 +334,7 @@ onMounted(() => {
                                     <span
                                         class="text-vp-1 flex-1 min-w-0 text-left message-text whitespace-pre-wrap leading-5"
                                         :class="{
-                                            'text-neutral-950 dark:text-yellow-400/80':
+                                            'text-neutral-950 dark:text-orange-400/80':
                                                 group.log.level === 'warning',
                                             'text-neutral-950 dark:text-red-500/95':
                                                 group.log.level === 'error',
@@ -351,7 +346,7 @@ onMounted(() => {
                                     </span>
                                     <span
                                         v-if="group.count > 1"
-                                        class="text-vp-3/50 flex-shrink-0 text-xs font-medium ml-1 px-1.5 leading-5"
+                                        class="text-vp-3/35 flex-shrink-0 text-xs font-medium ml-1 px-1.5 leading-5"
                                     >
                                         {{ group.count }}
                                     </span>

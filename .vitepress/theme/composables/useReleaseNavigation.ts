@@ -51,9 +51,8 @@ export function useReleaseNavigation(config: ReleaseNavigationConfig) {
         if (!config.updatePageTitle) return;
 
         const isMainline = mainlineReleases.some((r) => r.version === release.version);
-        const displayVersion = release.version.toUpperCase();
-        const title = `${displayVersion} | ${isMainline ? "Mainline Release" : "Dev build"}`;
-        const description = `Changelog and downloads for the ${displayVersion} ${isMainline ? "release" : "devbuild"}`;
+        const title = `${release.version} | ${isMainline ? "Mainline Release" : "Dev build"}`;
+        const description = `Changelog and downloads for the ${release.version} ${isMainline ? "release" : "devbuild"}`;
 
         headConfig.value = {
             title,

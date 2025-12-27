@@ -173,7 +173,7 @@ const filteredAssetPacks = computed(() => {
 
 <template>
     <div class="relative w-full pb-1 pt-12 md:pt-16 md:pb-8 px-0 items-center justify-center">
-        <div v-if="title || description" class="text-center z-[5] pb-10 md:pb-9">
+        <div v-if="title || description" class="text-center z-[5] pb-10 md:pb-9 select-none">
             <h1
                 v-if="title"
                 class="text-vp-1 text-center font-medium tracking-normal text-[32px] md:text-[40px] leading-8 md:leading-10 md:tracking-tight"

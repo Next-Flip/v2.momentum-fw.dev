@@ -139,7 +139,7 @@ const expandDisabled = computed(() => {
 
 <template>
     <div
-        class="changelog-content group mx-3.5 sm:mx-5"
+        class="changelog-content group"
         :class="{
             'max-h-[calc(100vh-var(--vp-nav-height)-24px)]':
                 windowWidth < 1024 && !isNarrowViewport,
@@ -149,11 +149,11 @@ const expandDisabled = computed(() => {
         }"
     >
         <div
-            class="border rounded-lg border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
+            class="border-y sm:border sm:rounded-lg border-vp-divider bg-vp-dark/75 flex flex-col overflow-hidden relative"
             :class="{
                 'changelog-expanded': isExpanded,
                 'flex-1 min-h-0': !isClosed,
-                'flex-shrink-0': isClosed,
+                'flex-shrink-0 !bg-vp-dark': isClosed,
             }"
         >
             <div
@@ -200,7 +200,7 @@ const expandDisabled = computed(() => {
                                 :href="releaseHref"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="text-sm font-semibold text-vp-1 lowercase font-mono transition-all duration-100 flex items-center justify-center vp-external-link-icon hover:underline mt-px"
+                                class="text-[13px] font-semibold text-vp-1 lowercase font-mono transition-all duration-100 flex items-center justify-start vp-external-link-icon hover:underline mt-px text-ellipsis overflow-hidden whitespace-nowrap text-start"
                             >
                                 {{ displayVersion }}
                             </a>
@@ -236,48 +236,40 @@ const expandDisabled = computed(() => {
                         <div
                             class="block h-5 mx-1 w-px bg-vp-divider transition-opacity duration-200"
                         />
-                        <span class="text-[13px] font-normal text-vp-2/80 mt-px">
+                        <span class="text-[13px] font-normal text-vp-2/80 mt-px select-none">
                             {{ tr("updater_changelog") }}
                         </span>
                     </template>
                 </div>
                 <div v-if="supportsSerialPort()" class="flex items-center gap-1 flex-shrink-0">
-                    <Tooltip
-                        :delay="0"
-                        :z-index="9999"
-                        :disabled="!!expandDisabled || !supportsSerialPort()"
+                    <button
+                        class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
+                        :class="{
+                            'opacity-0 pointer-events-none': showUpdateOverlay,
+                            'opacity-0': windowWidth > 1024,
+                            'opacity-100': isAccessible && isExpanded,
+                            'group-hover:opacity-100':
+                                isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
+                            'opacity-0 pointer-events-none cursor-not-allowed':
+                                (!uploadedFileRelease && !selectedRelease && !isExpanded) ||
+                                isClosed,
+                        }"
+                        :disabled="!!expandDisabled"
+                        :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
+                        :title="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
+                        @click="handleToggleExpand"
                     >
-                        <button
-                            class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
-                            :class="{
-                                'opacity-0 pointer-events-none': showUpdateOverlay,
-                                'opacity-0': windowWidth > 1024,
-                                'opacity-100': isAccessible && isExpanded,
-                                'group-hover:opacity-100':
-                                    isAccessible && (isOpen || isExpanded) && !showUpdateOverlay,
-                                'opacity-0 pointer-events-none cursor-not-allowed':
-                                    (!uploadedFileRelease && !selectedRelease && !isExpanded) ||
-                                    isClosed,
-                            }"
-                            :disabled="!!expandDisabled"
-                            :aria-label="isExpanded ? tr('updater_collapse') : tr('updater_expand')"
-                            @click="handleToggleExpand"
-                        >
-                            <v-icon
-                                :name="isExpanded ? 'hi-minus-sm' : 'hi-plus-sm'"
-                                scale="1"
-                                class="transition-transform duration-200 ease-in-out"
-                            />
-                        </button>
-                        <template #content>{{
-                            isExpanded ? tr("updater_collapse") : tr("updater_expand")
-                        }}</template>
-                    </Tooltip>
+                        <v-icon
+                            :name="isExpanded ? 'hi-minus-sm' : 'hi-plus-sm'"
+                            scale="1"
+                            class="transition-transform duration-200 ease-in-out"
+                        />
+                    </button>
                     <button
                         v-if="isAccessible"
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5"
                         :class="{
-                            '!hidden pointer-events-none hover:text-vp-3':
+                            '!opacity-35 pointer-events-none hover:text-vp-3':
                                 isExpanded || !isLogsOpen,
                         }"
                         @click="handleToggleOpenClose"
@@ -299,9 +291,9 @@ const expandDisabled = computed(() => {
                 :show="!arrivedState.top"
                 position="top"
                 class="mr-4 top-[56px]"
-                :opacity="30"
+                :opacity="40"
             />
-            <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" :opacity="30" />
+            <ScrollFade :show="!arrivedState.bottom" position="bottom" class="mr-4" :opacity="40" />
 
             <div
                 v-if="isAccessible && !isClosed"

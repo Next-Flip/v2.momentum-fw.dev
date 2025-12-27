@@ -7,7 +7,13 @@ import { ConnectionState } from "../types";
 import { supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
-import { useConnectionInfo, useDots, useSettings, useSharedHover } from "../composables";
+import {
+    useConnectionInfo,
+    useDots,
+    useSettings,
+    useSharedHover,
+    useThemeSwitcher,
+} from "../composables";
 import SettingsIcon from "./SettingsIcon.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -33,6 +39,7 @@ const {
     getLocalizedPath,
 } = useConnectionInfo();
 const { isSettingEnabled } = useSettings();
+const { ifCurrentTheme } = useThemeSwitcher();
 
 const flyoutOpen = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
@@ -150,7 +157,7 @@ onMounted(() => {
         :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
         class="mr-auto"
     >
-        <div class="flex items-center ml-8 gap-x-2">
+        <div class="flex items-center ml-8 gap-x-3">
             <SettingsIcon />
 
             <div
@@ -169,7 +176,7 @@ onMounted(() => {
                     >
                         <button
                             :class="[
-                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all select-none duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
                             ]"
                             type="button"
                             :aria-expanded="flyoutOpen"
@@ -180,7 +187,12 @@ onMounted(() => {
                                 class="relative w-4 h-4 rounded-full flex items-center justify-center"
                             >
                                 <div
-                                    class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-alternate-1 animate-spin"
+                                    class="absolute inset-0 rounded-full border-2 border-transparent animate-spin"
+                                    :class="
+                                        ifCurrentTheme(['white'])
+                                            ? 'border-t-vp-brand-1'
+                                            : 'border-t-vp-alternate-1'
+                                    "
                                 ></div>
                             </div>
                             <span v-else class="relative flex size-2 mr-2">
@@ -349,11 +361,11 @@ onMounted(() => {
                                     <button
                                         :disabled="flags.updateInProgress"
                                         :class="[
-                                            'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-500/10',
+                                            'action-button !text-red-500 !bg-red-500/10 dark:!bg-red-950/30 select-none',
                                             flags.updateInProgress &&
                                                 'opacity-50 !cursor-not-allowed',
                                             !flags.updateInProgress &&
-                                                'dark:hover:!bg-red-500/15 hover:!bg-red-500/25 hover:!text-red-600',
+                                                'dark:hover:!bg-red-900/25 hover:!bg-red-500/25 hover:!text-red-600',
                                         ]"
                                         @click="handleDisconnect"
                                     >
@@ -513,6 +525,7 @@ body[data-route*="/wiki"] {
     color: var(--vp-c-text-2);
     text-align: left;
     min-width: 65px;
+    user-select: none;
 }
 
 .menu-value {

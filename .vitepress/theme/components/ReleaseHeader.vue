@@ -166,7 +166,7 @@ const handleHeaderClick = () => {
                         :offset="8"
                     >
                         <div
-                            class="flex items-center gap-4 text-sm text-vp-1/80 rounded-md bg-vp-neutral/[1%] hover:bg-vp-neutral/[2%] hover:border-vp-divider/90 px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm cursor-help tracking-wider transition-all duration-100"
+                            class="flex items-center gap-4 text-sm text-vp-1/80 rounded-full bg-vp-neutral/[1%] hover:bg-vp-neutral/[2%] hover:border-vp-divider/90 px-2.5 py-1 border border-vp-divider/70 backdrop-blur-sm cursor-help tracking-wider transition-all duration-100"
                         >
                             <span>{{ formatDate(selectedRelease?.date || "", "fullYear") }}</span>
                         </div>

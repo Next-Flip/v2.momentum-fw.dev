@@ -87,7 +87,9 @@ onMounted(() => {
 
 <template>
     <div class="flex flex-col">
-        <h2 class="text-[13px] font-semibold text-vp-1 pb-2 leading-6 uppercase tracking-wide">
+        <h2
+            class="text-[13px] font-semibold text-vp-1 pb-2 leading-6 uppercase tracking-wide select-none"
+        >
             {{ title }}
         </h2>
         <div ref="containerRef" class="overflow-y-auto flex flex-col pr-1 pl-0 relative">
@@ -131,7 +133,7 @@ onMounted(() => {
             >
                 <span
                     :class="[
-                        'text-sm font-medium truncate text-left font-mono pointer-events-none whitespace-nowrap lowercase',
+                        'text-sm font-medium truncate text-left font-mono pointer-events-none whitespace-nowrap lowercase select-none',
                         isSelected(release)
                             ? 'text-vp-brand-1'
                             : 'text-vp-2 group-hover:text-vp-brand-1',
@@ -141,7 +143,7 @@ onMounted(() => {
                 </span>
                 <Tooltip position="right" :delay="400" :offset="18">
                     <span
-                        class="text-[11px] text-right font-mono pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap tracking-tighter"
+                        class="text-[11px] text-right font-mono pointer-events-none overflow-hidden text-ellipsis whitespace-nowrap tracking-tighter select-none"
                         :class="[isSelected(release) ? 'text-vp-brand-1/60' : '!text-vp-3']"
                     >
                         {{ formatDate(release.date || "", "short") }}

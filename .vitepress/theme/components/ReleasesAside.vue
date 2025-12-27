@@ -111,7 +111,10 @@ watch(
 <template>
     <aside class="hidden lg:block flex-shrink flex-grow-0 w-52 xl:w-60 pl-8 pt-5 pb-8">
         <div class="sticky top-20 lg:top-24 flex flex-col">
-            <span class="text-vp-2 text-sm font-normal mb-0.5" v-html="tr('aside_desc')"></span>
+            <span
+                class="text-vp-2 text-sm font-normal mb-0.5 select-none"
+                v-html="tr('aside_desc')"
+            ></span>
 
             <div class="border-t border-[var(--vp-c-divider)] my-4"></div>
 
@@ -122,7 +125,7 @@ watch(
                     :key="item.key"
                     class="flex flex-col items-start gap-y-0.5"
                 >
-                    <span class="text-vp-3 text-[11px] font-semibold uppercase">
+                    <span class="text-vp-3 text-[11px] font-semibold uppercase select-none">
                         {{ tr(item.key) }}
                     </span>
                     <div class="flex flex-row gap-x-1 items-center">
@@ -159,7 +162,7 @@ watch(
 
             <div class="space-y-2">
                 <h3
-                    class="text-[13px] font-semibold text-vp-1 pb-3 leading-6 uppercase tracking-wide"
+                    class="text-[13px] font-semibold text-vp-1 pb-3 leading-6 uppercase tracking-wide select-none"
                 >
                     {{ tr("aside_support") }}
                 </h3>
@@ -170,7 +173,7 @@ watch(
                         :href="link.href"
                         :target="link.external ? '_blank' : undefined"
                         :rel="link.external ? 'noopener noreferrer' : undefined"
-                        class="block text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 font-medium vp-external-link-icon"
+                        class="block text-vp-2 hover:text-vp-brand-1 transition-colors duration-100 font-medium vp-external-link-icon select-none"
                     >
                         {{ tr(link.key) }}
                     </a>

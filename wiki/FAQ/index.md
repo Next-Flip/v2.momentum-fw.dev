@@ -37,6 +37,8 @@ next:
 
 # Frequently Asked Questions
 
+If a question you have is not here yet, you can check the [faq](https://discord.gg/juBGZ5fP7H), [general](https://discord.gg/CyZN9JSA4j), [flipper-noobs](https://discord.gg/xJx824rDd9), [help](https://discord.gg/68jcdsPnSx) or any other channels in the [Discord](https://discord.gg/momentum) for solutions.
+
 ---
 
 #### Table of Contents
@@ -51,12 +53,6 @@ next:
 - [Mobile app doesn't connect?](#mobile-app-doesn-t-connect)
 - ["Transmission is blocked"?](#transmission-is-blocked)
 - [Forgot my PIN, can I reset it?](#forgot-my-pin-can-i-reset-it)
-
-<div class="mntm custom-block">
-
-If a question you have is not here yet, you can check the [faq](https://discord.gg/juBGZ5fP7H), [general](https://discord.gg/CyZN9JSA4j), [flipper-noobs](https://discord.gg/xJx824rDd9), [help](https://discord.gg/68jcdsPnSx) or any other channels in the [Discord](https://discord.gg/momentum) for solutions.
-
-</div>
 
 </div>
 
