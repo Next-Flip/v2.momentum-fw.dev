@@ -231,8 +231,8 @@ watch(
                             <span
                                 v-html="
                                     tr('releases_install_tooltip', {
-                                        url: getLocalizedPath(`/wiki/installation`),
-                                        text: `momentum-fw.dev${getLocalizedPath(`/wiki/installation`)}`,
+                                        url: getLocalizedPath(`/wiki/Installation`),
+                                        text: `momentum-fw.dev${getLocalizedPath(`/wiki/Installation`)}`,
                                     })
                                 "
                             ></span>
