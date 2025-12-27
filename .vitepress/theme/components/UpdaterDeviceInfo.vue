@@ -464,7 +464,7 @@ const deviceSections = computed(() => {
                         <div
                             class="flex-1 flex items-center justify-center border-b border-vp-divider box-border cursor-pointer group h-[38px]"
                             :class="{
-                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-vp-dark':
+                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-transparent':
                                     activeTab === 'info',
                             }"
                             @click="handleTabChange('info')"
@@ -481,7 +481,7 @@ const deviceSections = computed(() => {
                         <div
                             class="flex-1 flex items-center justify-center border-b border-vp-divider box-border cursor-pointer group h-[38px]"
                             :class="{
-                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-vp-dark':
+                                'border-vp-brand-1 border-b !border-b-vp-brand-1 bg-gradient-to-t from-vp-soft/65 to-transparent':
                                     activeTab === 'raw',
                             }"
                             @click="handleTabChange('raw')"
