@@ -138,12 +138,22 @@ More info for all these possible errors and what to do can be found in the [SubG
 
 ## [Forgot my PIN, can I reset it?](#forgot-my-pin-can-i-reset-it)
 
+##### Option A: <sup>(if you forgot your pin and can't use it)</sup>
+
 1. Hold `UP` + `BACK` together for 30 seconds
-2. Once your Flipper's screen says `PIN and Factory Reset`, follow the instructions on the screen!
+2. Once your Flipper's screen says `PIN and Factory Reset`
+
+##### Option B: <sup>(if you have access to the setting on the Flipper, but also forgot the pin)</sup>
+
+1. On the Desktop click `UP`
+2. Open `Settings > Storage`
+3. Click `Factory Reset`
+
+<sup>Then just follow the instructions on screen. Your XP progress will be kept.</sup>
 
 ---
 
-<span id="format-warning"><sup>1. **WARNING**: Formatting the SD card deletes all the data on it and you'll need to install again. Refer to the [Backup methods](https://github.com/Next-Flip/Momentum-Firmware/wiki/Installation#back-up-your-data) before proceeding.</sup></span>
+<span id="format-warning"><sup>1. **WARNING**: Formatting the SD card deletes all the data on it and you'll need to install again. Refer to the [Backup methods](https://momentum-fw.dev/wiki/Installation/) before proceeding.</sup></span>
 
 <style>
 .custom-toc li a {
