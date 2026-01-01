@@ -59,9 +59,35 @@ There are 4 methods to install Momentum. We recommend using the **Web Updater**,
 
 ### [Web Updater](Installation#Web-Updater-Browser)
 
-1. Open the [Web Updater](https://momentum-fw.dev/update)
-2. Click `Connect` and select your Flipper from the list
-3. Click `Flash` and wait for the update to complete
+1. Open the [Web Updater](https://momentum-fw.dev/update) (https://momentum-fw.dev/update)
+2. Click `Connect` (select your Flipper from the list if needed)
+3. Select the `Channel` and `Version` you want to install, or upload a `.tgz` file
+3. Click `Install` and wait for the update to complete (do not disconnect your Flipper)
+
+<br>
+
+###### *If you are having trouble connecting, pay attention to the messages shown:*
+
+<table>
+<tbody>
+<tr>
+    <td><b>Flipper Locked</b><br><br>You may have <b>Allow USB RPC While Locked</b> option <b>OFF</b> in <b>MNTM > Interface > Lockscreen</b>.</td>
+    <td><img src="/wiki/flipper-locked.png" width="600" /></td>
+</tr>
+<tr>
+    <td><b>Not Connected</b><br><br>Click <b>Connect</b> and make sure that nothing else is using your Flipper.</td>
+    <td><img src="/wiki/not-connected.png" width="600" /></td>
+</tr>
+<tr>
+    <td><b>Connection Error</b><br><br>You have something open that's blocking the serial connection, you need to close it!</td>
+    <td><img src="/wiki/connection-error.png" width="600" /></td>
+</tr>
+<tr>
+    <td><b>Unsupported Browser</b><br><br>Your browser does not support Web Serial, you need to switch to one that does.</td>
+    <td><img src="/wiki/unsupported-browser.png" width="600" /></td>
+</tr>
+</tbody>
+</table>
 
 ---
 
@@ -104,3 +130,10 @@ Manual installation via SD card:
 3. Open [qFlipper](https://flipperzero.one/update), head to `SD/update` and simply move the firmware folder there
 4. On the Flipper, hit the `Arrow Down` button, this will get you to the file menu. In there simply search for your updates folder
 5. Inside that folder, select the Firmware you just moved onto it, and run the file that's simply called `Update`
+
+
+<style scoped>
+.dark .vp-doc tbody tr:nth-child(2n) {
+    background-color: transparent !important;
+}
+</style>
