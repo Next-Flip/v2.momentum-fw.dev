@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { getBranchMessage } from "../../../_data/messages";
 import type { ReleaseItem } from "../../../_data/releases";
 import { useI18n, useSerialConnection } from "../composables";
-import { githubPullRequestUrl } from "../util";
+import { githubPullRequestUrl, replaceIssuesAndMentions } from "../util";
 
 const props = defineProps<{
     isOverDropZone: boolean;
@@ -19,7 +18,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("
 
 const additionalMessage = computed(() => {
     if (!props.isBranchRelease || !props.selectedRelease) return undefined;
-    return getBranchMessage(props.selectedRelease.version) ?? undefined;
+    return replaceIssuesAndMentions(props.selectedRelease.description ?? "", true) ?? undefined;
 });
 
 const currentDeviceVersion = computed(() => {
@@ -97,7 +96,7 @@ const currentDeviceVersion = computed(() => {
                     ></div>
 
                     <p
-                        class="message text-xs font-medium text-yellow-600 dark:text-orange-400 text-center py-3 px-8 hover:*:underline *:underline-offset-4 *:dark:decoration-orange-200/20 *:decoration-yellow-950/20 hover:*:decoration-yellow-950/50 hover:*:dark:decoration-orange-200/40 transition-all duration-100 *:text-yellow-950/90 *:dark:text-orange-300/90 hover:*:text-yellow-100/90 hover:*:dark:text-yellow-100/90"
+                        class="message text-xs font-medium text-yellow-600 dark:text-orange-400 text-center py-3 px-8 transition-all duration-100"
                         v-html="additionalMessage"
                     ></p>
                 </div>

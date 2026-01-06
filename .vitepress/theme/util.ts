@@ -108,13 +108,18 @@ export const getRadioStackType = (radioStackType: string | number | undefined) =
 export const replaceIssuesAndMentions = (text: string, isBranchRelease = false): string => {
     const a = (href: string, className: string, content: string) =>
         `<a href="${href}" target="_blank" rel="noopener noreferrer" class="${className} font-bold transition-colors duration-100 no-underline hover:underline">${content}</a>`;
+    const code = (content: string) => `<code class="font-mono text-yellow-950/90 dark:text-orange-300/90">${content}</code>`;
 
     let result = text;
 
     if (isBranchRelease) {
         result = result.replace(/\\n/g, '\n')
             .replace(/(\[`[a-f0-9]{8}`\])/g, '\n$1')
-            .replace(/^\n+/, '');
+            .replace(/^\n+/, '')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) =>
+                a(url, "hover:underline underline-offset-4 dark:decoration-orange-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 hover:dark:decoration-orange-200/40 text-yellow-950/90 dark:text-orange-300/90 hover:text-yellow-100/90 hover:dark:text-yellow-100/90", text)
+            )
+            .replace(/`([^`]+)`/g, (_, c) => code(c));
     }
 
     result = result.replace(/(?<![a-zA-Z])@([a-zA-Z0-9_-]+)/g, (_, username) =>
@@ -128,7 +133,7 @@ export const replaceIssuesAndMentions = (text: string, isBranchRelease = false):
     result = result.replace(/#(\d+)/g, (_, issueNumber) =>
         a(
             `${githubUrl}/issues/${issueNumber}`,
-            "!text-vp-alternate-1 hover:!text-vp-alternate-2",
+            isBranchRelease ? "text-vp-brand-1 hover:text-vp-brand-2" : "text-vp-alternate-1 hover:text-vp-alternate-2",
             `#${issueNumber}`,
         ),
     );

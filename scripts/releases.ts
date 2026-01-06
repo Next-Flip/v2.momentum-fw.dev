@@ -20,6 +20,7 @@ export interface ReleaseItem {
     version: string;
     branch?: string;
     date?: string;
+    description?: string;
     commit?: string;
     pr?: string;
     timestamp?: number;
@@ -514,6 +515,7 @@ async function getExtraBranches(
                 // NOTE: yes these are backwards, makes things simpler in the updater controls
                 version: replacePrNumber(branch.id),
                 branch: branch.versions[0].version,
+                description: branch.description,
                 pr: getPrNumber(branch.id),
                 timestamp: branch.versions[0].timestamp,
                 changelog: branch.versions[0].changelog,
@@ -576,6 +578,7 @@ export interface ReleaseItem {
     version: string;
     branch?: string;
     date?: string;
+    description?: string;
     commit?: string;
     pr?: string;
     timestamp?: number;
