@@ -117,7 +117,7 @@ export const replaceIssuesAndMentions = (text: string, isBranchRelease = false):
             .replace(/(\[`[a-f0-9]{8}`\])/g, '\n$1')
             .replace(/^\n+/, '')
             .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) =>
-                a(url, "hover:underline underline-offset-4 dark:decoration-orange-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 hover:dark:decoration-orange-200/40 text-yellow-950/90 dark:text-orange-300/90 hover:text-yellow-100/90 hover:dark:text-yellow-100/90", text)
+                a(url, "hover:underline underline-offset-4 dark:decoration-orange-200/20 decoration-yellow-950/20 hover:decoration-yellow-950/50 hover:dark:decoration-orange-200/40 text-yellow-800/90 dark:text-orange-300/90 hover:text-yellow-700/90 hover:dark:text-yellow-100/90", text)
             )
             .replace(/`([^`]+)`/g, (_, c) => code(c));
     }
