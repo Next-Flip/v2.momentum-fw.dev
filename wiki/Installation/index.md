@@ -102,7 +102,7 @@ There are 4 methods to install Momentum. We recommend using the **Web Updater**,
 
 #### Mobile
 
-1. Make sure you have the [Flipper Mobile App](https://docs.flipper.net/mobile-app) installed and paired
+1. Make sure you have the [Flipper Mobile App](https://docs.flipper.net/zero/mobile-app) installed and paired
 2. Open the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
 3. Click the `☁️ Flipper Lab/App (chrome/mobile)` link
 4. Accept the prompt to open the link in the Flipper Mobile App
