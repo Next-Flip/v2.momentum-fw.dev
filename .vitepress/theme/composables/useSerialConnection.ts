@@ -29,6 +29,7 @@ import {
     replaceIn,
     unpack,
 } from "../util";
+import { useWakeLock } from "@vueuse/core";
 import { useProxiedUrl } from "./useProxiedUrl";
 import { useSettings } from "./useSettings";
 
@@ -135,6 +136,12 @@ export const useSerialConnection = () => {
     const clearLogs = () => {
         logs.value = [];
     };
+
+    const {
+        isSupported: isWakeLockSupported,
+        request: requestWakeLock,
+        release: releaseWakeLock,
+    } = useWakeLock();
 
     if (typeof window === "undefined" || typeof navigator === "undefined") {
         return {
@@ -1822,6 +1829,11 @@ export const useSerialConnection = () => {
         flags.updateInProgress = true;
         flags.progress = 0;
 
+        if (isWakeLockSupported.value) {
+            await requestWakeLock("screen");
+            addLog("verbose", "[Firmware] Screen wake lock acquired");
+        }
+
         flags.screenStreamPaused = true;
         if (flags.screenStream) {
             try {
@@ -1850,6 +1862,10 @@ export const useSerialConnection = () => {
             flags.updateInProgress = false;
             flags.progress = 0;
             flags.screenStreamPaused = false;
+            if (isWakeLockSupported.value) {
+                await releaseWakeLock();
+                addLog("verbose", "[Firmware] Screen wake lock released");
+            }
         }
     };
 
@@ -1912,6 +1928,11 @@ export const useSerialConnection = () => {
             flags.progress = 0;
             flags.screenStreamPaused = true;
 
+            if (isWakeLockSupported.value) {
+                await requestWakeLock("screen");
+                addLog("verbose", "[{{Test}}] Screen wake lock acquired");
+            }
+
             if (flags.screenStream) {
                 try {
                     await stopScreenStream();
@@ -1931,12 +1952,20 @@ export const useSerialConnection = () => {
                 flags.updateInProgress = false;
                 flags.progress = 0;
                 flags.screenStreamPaused = false;
+                if (isWakeLockSupported.value) {
+                    await releaseWakeLock();
+                    addLog("verbose", "[{{Test}}] Screen wake lock released");
+                }
                 throw error;
             }
 
             flags.updateInProgress = false;
             flags.progress = 0;
             flags.screenStreamPaused = false;
+            if (isWakeLockSupported.value) {
+                await releaseWakeLock();
+                addLog("verbose", "[{{Test}}] Screen wake lock released");
+            }
 
             if (loop) {
                 addLog("verbose", "[{{Test}}] Continuing firmware test loop");
