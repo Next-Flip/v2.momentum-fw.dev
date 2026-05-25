@@ -16,3 +16,4 @@ export * from "./useSharedHover";
 export * from "./useSticky";
 export * from "./useTempState";
 export * from "./useThemeSwitcher";
+export * from "./useUpdateTimer";

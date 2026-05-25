@@ -19,6 +19,10 @@ export function supportsSerialPort(): boolean {
     return typeof window !== "undefined" && typeof navigator !== "undefined" && "serial" in navigator;
 }
 
+export function supportsBluetooth(): boolean {
+    return typeof window !== "undefined" && typeof navigator !== "undefined" && "bluetooth" in navigator;
+}
+
 export function devMode() {
     if (typeof window === "undefined") return false;
     const host = window.location.hostname;
@@ -382,15 +386,23 @@ export const getBgContainerClass = (theme: LogoColor, screenColor: ScreenColor):
     return getThemeConfig(theme, screenColor).bgContainer;
 };
 
+export const formatFileSize = (bytes: number): string => {
+    const kb = bytes / 1024;
+    if (kb >= 1024) {
+        return `${(kb / 1024).toFixed(1)} MB`;
+    }
+    return `${kb.toFixed(1)} KB`;
+};
+
 export const formatDuration = (milliseconds: number): string => {
     const seconds = Math.floor(milliseconds / 1000);
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
 
     if (minutes > 0) {
-        return `<code>${minutes}</code>min, <code>${remainingSeconds}</code>s`;
+        return `<code>${minutes}min</code>, <code>${remainingSeconds}s</code>`;
     } else {
-        return `<code>${remainingSeconds}</code>s`;
+        return `<code>${remainingSeconds}s</code>`;
     }
 };
 

@@ -85,6 +85,14 @@ async function startRpcSession (f) {
   return system.ping()
 }
 
+// BLE auto-starts RPC mode on connect — no CLI handshake needed
+async function startBleRpcSession (f) {
+  flipper = f
+  flipper.read('raw')
+  await asyncSleep(300)
+  return system.ping()
+}
+
 function stopRpcSession () {
   return new Promise((resolve) => {
     const commandId = enqueue({
@@ -104,7 +112,7 @@ function stopRpcSession () {
 
 export {
     emitter,
-    enqueue, gui, startRpcSession,
+    enqueue, gui, startBleRpcSession, startRpcSession,
     stopRpcSession, storage, system
 }
 

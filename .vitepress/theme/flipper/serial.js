@@ -1,5 +1,6 @@
 import * as flipper from './core'
 import { Operation } from './util'
+import { BluetoothTransport } from './webBluetooth'
 
 const operation = new Operation()
 const filters = [
@@ -8,9 +9,8 @@ const filters = [
 
 let serial = null
 
-// Only create worker in browser environment
-if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
-  serial = new Worker(new URL('./workers/webSerial.js', import.meta.url))
+function setupTransport (transport) {
+  serial = transport
   serial.onmessage = (e) => {
     if (e.data.operation === 'cli output') {
       flipper.emitter.emit('cli output', e.data.data)
@@ -18,13 +18,23 @@ if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
       flipper.emitter.emit('raw output', e.data.data)
     } else if (e.data.operation === 'write/end') {
       flipper.emitter.emit('write/end')
+    } else if (e.data.operation === 'disconnect') {
+      flipper.emitter.emit('disconnect')
     } else {
       operation.terminate(e.data)
     }
   }
-  navigator.serial.addEventListener("disconnect", () => {
-    flipper.emitter.emit('disconnect')
-  })
+}
+
+// Only create the USB worker in browser environments
+if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
+  setupTransport(new Worker(new URL('./workers/webSerial.js', import.meta.url)))
+
+  if (navigator.serial) {
+    navigator.serial.addEventListener('disconnect', () => {
+      flipper.emitter.emit('disconnect')
+    })
+  }
 }
 
 async function connect () {
@@ -35,16 +45,28 @@ async function connect () {
   if (ports.length === 0) {
     throw new Error('No known ports')
   }
-  const connect = operation.create(serial, 'connect')
-  await connect
+  const conn = operation.create(serial, 'connect')
+  await conn
+}
+
+async function connectBluetooth (device) {
+  if (typeof window === 'undefined') {
+    throw new Error('Not in browser environment')
+  }
+  if (!('bluetooth' in navigator)) {
+    throw new Error('Web Bluetooth not supported')
+  }
+  const bt = new BluetoothTransport()
+  setupTransport(bt)
+  await operation.create(serial, 'connect', device)
 }
 
 async function disconnect () {
   if (!serial) {
     throw new Error('Serial worker not available (SSR environment)')
   }
-  const disconnect = operation.create(serial, 'disconnect')
-  await disconnect
+  const conn = operation.create(serial, 'disconnect')
+  await conn
 }
 
 async function write (mode, data) {
@@ -52,8 +74,8 @@ async function write (mode, data) {
     throw new Error('Serial worker not available (SSR environment)')
   }
   if (mode !== 'raw') {
-    const write = operation.create(serial, 'write', { mode: mode, data: [data] })
-    await write
+    const w = operation.create(serial, 'write', { mode: mode, data: [data] })
+    await w
   } else {
     serial.postMessage({ operation: 'write', data: { mode: mode, data: [data] } })
   }
@@ -74,7 +96,6 @@ function closeReader () {
 }
 
 export {
-    closeReader, connect,
-    disconnect, read, write
+  closeReader, connect, connectBluetooth,
+  disconnect, read, write
 }
-

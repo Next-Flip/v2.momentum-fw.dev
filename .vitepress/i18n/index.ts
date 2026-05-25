@@ -226,6 +226,15 @@ export type MessageSchema = {
     connection_verbose_logs: string;
     connection_screen_color: string;
     connection_unplug_warning: string;
+    connection_disconnect_warning: string;
+    connection_preferred_connection: string;
+    connection_preferred_both: string;
+    connection_preferred_usb: string;
+    connection_preferred_bt: string;
+    connection_connect_usb: string;
+    connection_connect_bt: string;
+    connection_bt_recommended_usb: string;
+    connection_bt_show_all: string;
     missing: string;
     corrupt: string;
     installed: string;
@@ -362,6 +371,7 @@ export type MessageSchema = {
     updater_resize_panels: string;
     updater_screenshot: string;
     updater_screenshoted: string;
+    updater_bluetooth_warning: string;
 };
 
 const messages = { en } as const;

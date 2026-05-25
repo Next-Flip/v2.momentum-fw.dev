@@ -15,6 +15,7 @@ const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("
 const updateStage = computed(() => serialConnection?.firmwareState.updateStage || "");
 const updateStageContext = computed(() => serialConnection?.firmwareState.updateStageContext || {});
 const updateProgress = computed(() => serialConnection?.flags.progress || 0);
+const connectionTransport = computed(() => serialConnection?.flags.connectionTransport || null);
 
 const showWarning = computed(() => {
     const stage = updateStage.value;
@@ -26,6 +27,13 @@ const showWarning = computed(() => {
         "update_stage_rebooting",
     ];
     return warningStages.includes(stage);
+});
+
+const warningText = computed(() => {
+    if (connectionTransport.value === "bt") {
+        return tr("connection_disconnect_warning");
+    }
+    return tr("connection_unplug_warning");
 });
 </script>
 
@@ -48,7 +56,7 @@ const showWarning = computed(() => {
                     <Transition name="warning-fade">
                         <div v-if="showWarning" class="absolute -top-6 mt-px left-0 z-60">
                             <div class="text-vp-3 dark:text-vp-3/85 text-[11px] font-normal">
-                                {{ tr("connection_unplug_warning") }}
+                                {{ warningText }}
                             </div>
                         </div>
                     </Transition>

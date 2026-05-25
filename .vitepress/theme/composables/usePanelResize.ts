@@ -1,5 +1,5 @@
 import { useStorage } from "@vueuse/core";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, type Ref } from "vue";
 import { STORAGE_KEYS } from "../types";
 
 interface PanelResizeOptions {
@@ -10,6 +10,8 @@ interface PanelResizeOptions {
     storageKey?: string;
     snapPoints?: number[];
     snapThreshold?: number;
+    containerRef?: Ref<HTMLElement | null>;
+    dividerRef?: Ref<HTMLElement | null>;
 }
 
 export function usePanelResize(options: PanelResizeOptions = {}) {
@@ -29,8 +31,8 @@ export function usePanelResize(options: PanelResizeOptions = {}) {
     });
 
     const isDragging = ref(false);
-    const containerRef = ref<HTMLElement | null>(null);
-    const dividerRef = ref<HTMLElement | null>(null);
+    const containerRef = options.containerRef ?? ref<HTMLElement | null>(null);
+    const dividerRef = options.dividerRef ?? ref<HTMLElement | null>(null);
     const topPanelHeight = computed(() => `${panelSizes.value.top}%`);
     const bottomPanelHeight = computed(() => `${panelSizes.value.bottom}%`);
     const topPanelHeightWhenBottomClosed = computed(() => "100%");

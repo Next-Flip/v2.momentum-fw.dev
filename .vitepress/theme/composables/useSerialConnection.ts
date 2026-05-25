@@ -1,11 +1,12 @@
 import log from "loglevel";
 import semver from "semver";
-import { reactive, ref, shallowRef } from "vue";
+import { reactive, ref, shallowRef, watch } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
 import {
     ConnectionState,
     InstallStatus,
     LogEntry,
+    STORAGE_KEYS,
     type AssetPack,
     type ConnectionFlags,
     type DeviceInfo,
@@ -22,6 +23,7 @@ import {
     fetchFirmware,
     fetchRegions,
     formatDuration,
+    formatFileSize,
     getCurrentLocale,
     getFirmwareDownloadUrl,
     replaceIn,
@@ -29,6 +31,16 @@ import {
 } from "../util";
 import { useProxiedUrl } from "./useProxiedUrl";
 import { useSettings } from "./useSettings";
+
+// Web Bluetooth API is not in the default TypeScript DOM lib — extend Navigator here.
+declare global {
+    interface Navigator {
+        bluetooth?: {
+            getDevices(): Promise<{ id: string; name?: string; gatt: unknown }[]>;
+            requestDevice(options: object): Promise<{ id: string; name?: string; gatt: unknown }>;
+        };
+    }
+}
 
 const asyncSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -95,7 +107,12 @@ export const useSerialConnection = () => {
             logs.value = newLogs;
         }
 
-        const cleanMessage = message.replace(/{{/g, "").replace(/}}/g, "");
+        const cleanMessage = message
+            .replace(/{{/g, "")
+            .replace(/}}/g, "")
+            .replace(/<a[^>]*>([^<]*)<\/a>/g, "$1")
+            .replace(/<code>([^<]*)<\/code>/g, "$1")
+            .replace(/<[^>]+>/g, "");
 
         switch (level) {
             case "debug":
@@ -119,7 +136,7 @@ export const useSerialConnection = () => {
         logs.value = [];
     };
 
-    if (typeof window === "undefined" || typeof navigator === "undefined" || !navigator.serial) {
+    if (typeof window === "undefined" || typeof navigator === "undefined") {
         return {
             connectionData: reactive<SerialConnectionData>({
                 state: ConnectionState.DISCONNECTED,
@@ -127,8 +144,10 @@ export const useSerialConnection = () => {
             }),
             flags: reactive<ConnectionFlags>({
                 serialSupported: false,
+                bluetoothSupported: false,
                 portSelectRequired: false,
                 connected: false,
+                connectionTransport: null,
                 rpcActive: false,
                 rpcToggling: false,
                 updateInProgress: false,
@@ -148,8 +167,10 @@ export const useSerialConnection = () => {
             firmwareState: reactive<FirmwareState>({
                 updateStage: "",
                 updateStageContext: {},
+                updateTimerElapsed: null,
             }),
             connect: () => Promise.reject(new Error("Serial not available in SSR")),
+            connectBluetooth: () => Promise.reject(new Error("Bluetooth not available in SSR")),
             disconnect: () => Promise.reject(new Error("Serial not available in SSR")),
             installAssetPack: () => Promise.reject(new Error("Serial not available in SSR")),
             enqueue: () => Promise.reject(new Error("Serial not available in SSR")),
@@ -191,8 +212,10 @@ export const useSerialConnection = () => {
 
     const flags = reactive<ConnectionFlags>({
         serialSupported: "serial" in navigator,
+        bluetoothSupported: "bluetooth" in navigator,
         portSelectRequired: false,
         connected: false,
+        connectionTransport: null,
         rpcActive: false,
         rpcToggling: false,
         updateInProgress: false,
@@ -214,6 +237,7 @@ export const useSerialConnection = () => {
     const firmwareState = reactive<FirmwareState>({
         updateStage: "",
         updateStageContext: {},
+        updateTimerElapsed: null,
     });
 
     const setUpdateStage = (stage: string, context?: Record<string, string | number>) => {
@@ -221,37 +245,84 @@ export const useSerialConnection = () => {
         firmwareState.updateStageContext = context || {};
     };
 
-    navigator.serial.addEventListener("disconnect", () => {
-        if (flags.connected) {
-            const wasUpdating = flags.updateInProgress;
+    let updateTimerInterval: ReturnType<typeof setInterval> | null = null;
+    let updateTimerStart: number | null = null;
 
-            if (wasUpdating) {
-                addLog(
-                    "error",
-                    "[{{Serial}}] Firmware update interrupted by disconnect - avoid unplugging during file uploads and before the Flipper fully reboots",
-                );
-            } else {
-                addLog("info", "[{{Serial}}] Physical disconnect detected - disconnected");
+    const startUpdateTimer = () => {
+        if (updateTimerInterval) return;
+        updateTimerStart = performance.now();
+        firmwareState.updateTimerElapsed = 0;
+        updateTimerInterval = setInterval(() => {
+            if (updateTimerStart !== null) {
+                firmwareState.updateTimerElapsed = performance.now() - updateTimerStart;
+            }
+        }, 100);
+    };
+
+    const stopUpdateTimer = () => {
+        if (updateTimerInterval) {
+            clearInterval(updateTimerInterval);
+            updateTimerInterval = null;
+        }
+        updateTimerStart = null;
+    };
+
+    watch(
+        () => firmwareState.updateStage,
+        (stage) => {
+            if (stage === "update_stage_rebooting") {
+                stopUpdateTimer();
+                return;
+            }
+            if (stage && firmwareState.updateTimerElapsed === null) {
+                startUpdateTimer();
+            }
+        },
+    );
+
+    watch(
+        () => flags.updateInProgress,
+        (inProgress) => {
+            if (!inProgress) {
+                firmwareState.updateTimerElapsed = null;
+            }
+        },
+    );
+
+    if (navigator.serial) {
+        navigator.serial.addEventListener("disconnect", () => {
+            if (flags.connected) {
+                const wasUpdating = flags.updateInProgress;
+
+                if (wasUpdating) {
+                    addLog(
+                        "error",
+                        "[{{Serial}}] Firmware update interrupted by disconnect - avoid unplugging during file uploads and before the Flipper fully reboots",
+                    );
+                } else {
+                    addLog("info", "[{{Serial}}] Physical disconnect detected - disconnected");
+                }
+
+                resetFlagsAndState();
+            }
+        });
+
+        navigator.serial.addEventListener("connect", () => {
+            if (flags.connected) {
+                addLog("info", "[{{Serial}}] Flipper is already connected, skipping connection");
+                return;
             }
 
-            resetFlagsAndState();
-        }
-    });
-
-    navigator.serial.addEventListener("connect", () => {
-        if (flags.connected) {
-            addLog("info", "[{{Serial}}] Flipper is already connected, skipping connection");
-            return;
-        }
-
-        if (isSettingEnabled("autoConnect")) {
-            addLog("info", "[{{Serial}}] Autoconnect enabled, attempting auto-connect");
-            autoConnect(1, 500);
-        }
-    });
+            if (isSettingEnabled("autoConnect")) {
+                addLog("info", "[{{Serial}}] Autoconnect enabled, attempting auto-connect");
+                autoConnect(1, 500);
+            }
+        });
+    }
 
     const resetFlagsAndState = () => {
         flags.connected = false;
+        flags.connectionTransport = null;
         flags.rpcActive = false;
         flags.rpcToggling = false;
         flags.portSelectRequired = true;
@@ -277,6 +348,8 @@ export const useSerialConnection = () => {
 
         firmwareState.updateStage = "";
         firmwareState.updateStageContext = {};
+        firmwareState.updateTimerElapsed = null;
+        stopUpdateTimer();
         loadingInstalledPacks = false;
     };
 
@@ -367,6 +440,7 @@ export const useSerialConnection = () => {
     };
 
     const findKnownDevices = async () => {
+        if (!navigator.serial) return [];
         const filters = [{ usbVendorId: 0x0483, usbProductId: 0x5740 }];
         const ports = await navigator.serial.getPorts({ filters });
         return ports;
@@ -394,6 +468,28 @@ export const useSerialConnection = () => {
         }
     };
 
+    const startBleRpc = async () => {
+        flags.rpcToggling = true;
+
+        try {
+            const flipperModule = await getFlipperModule();
+            addLog("verbose", "[{{RPC}}] Starting BLE RPC session");
+            const ping = await flipperModule.commands.startBleRpcSession(flipperModule);
+
+            if (!ping.resolved || ping.error) {
+                throw new Error("Could not start BLE RPC session");
+            }
+
+            flags.rpcActive = true;
+            flags.rpcToggling = false;
+            addLog("success", "[{{Bluetooth}}] BLE RPC session started successfully");
+        } catch (error) {
+            flags.rpcToggling = false;
+            addLog("error", `[{{Bluetooth}}] BLE RPC session failed: ${error}`);
+            throw error;
+        }
+    };
+
     const stopRpc = async () => {
         flags.rpcToggling = true;
         addLog("debug", "[{{Serial}}] Stopping RPC session");
@@ -412,6 +508,7 @@ export const useSerialConnection = () => {
     };
 
     const requestPort = async () => {
+        if (!navigator.serial) throw new Error("Web Serial not supported");
         const filters = [{ usbVendorId: 0x0483, usbProductId: 0x5740 }];
         try {
             const port = await navigator.serial.requestPort({ filters });
@@ -622,6 +719,7 @@ export const useSerialConnection = () => {
                 addLog("verbose", "[{{Connection}}] Establishing serial connection");
                 await flipper.connect();
                 flags.connected = true;
+                flags.connectionTransport = "usb";
             } catch (flipperError) {
                 if (
                     flipperError instanceof Error &&
@@ -702,6 +800,167 @@ export const useSerialConnection = () => {
             connectionData.state = ConnectionState.ERROR;
             connectionData.error = userFriendlyError;
             addLog("error", `[{{Serial}}] Connection failed: ${userFriendlyError}`);
+            throw error;
+        }
+    };
+
+    const connectBluetooth = async (showAll = false) => {
+        if (!flags.bluetoothSupported) {
+            addLog("error", "[{{Bluetooth}}] Web Bluetooth API not supported in this browser");
+            connectionData.state = ConnectionState.ERROR;
+            connectionData.error = "Bluetooth not supported";
+            return;
+        }
+        if (flags.connected) return;
+
+        // Flipper advertises 0x3080 (+ hardware color: 0x3081 black, 0x3082 white, 0x3083 transparent)
+        // as a 16-bit UUID in the BLE advertisement. The 128-bit serial service (8fe5b3d5-...)
+        // is only available after connecting via optionalServices — not in the advertisement.
+        // ref: Momentum-Firmware/targets/f7/ble_glue/profiles/serial_profile.c
+        const flipperFilters = [
+            { services: [0x3080] }, // color unknown
+            { services: [0x3081] }, // black
+            { services: [0x3082] }, // white
+            { services: [0x3083] }, // transparent
+            { namePrefix: "Flipper" }, // stock firmware name fallback
+        ];
+        const BLE_SERIAL_SERVICE = "8fe5b3d5-2e7f-4a98-2a48-7acc60fe0000";
+        const BLE_DEVICE_ID_KEY = STORAGE_KEYS.BLE_DEVICE_ID;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let device: any = null;
+        let usedCachedDevice = false;
+
+        // First, try to reconnect to a device we've already paired with — no picker, no scan.
+        // NOTE: getDevices() is still behind #enable-experimental-web-platform-features in Chrome
+        // (as of 2026) so knownDevices will be empty on most installs. The localStorage ID is
+        // stored anyway so this path activates automatically once Chrome ships it unflagged.
+        if (!showAll) {
+            try {
+                const knownDevices: { id: string; name?: string; gatt: unknown }[] =
+                    (await navigator.bluetooth?.getDevices?.()) ?? [];
+                const storedId = localStorage.getItem(BLE_DEVICE_ID_KEY);
+                addLog(
+                    "verbose",
+                    `[{{Bluetooth}}] getDevices() returned <code>${knownDevices.length}</code> known device(s)${storedId ? `, stored ID: <code>${storedId.slice(0, 8)}…</code>` : ""}`,
+                );
+                if (storedId && knownDevices.length > 0) {
+                    const known = knownDevices.find((d) => d.id === storedId);
+                    if (known) {
+                        addLog(
+                            "info",
+                            `[{{Bluetooth}}] Found previously connected Flipper "<code>${known.name || "Flipper"}</code>", attempting direct reconnect...`,
+                        );
+                        device = known;
+                        usedCachedDevice = true;
+                    }
+                }
+            } catch {
+                // getDevices() not supported or no localStorage — fall back to picker
+            }
+        }
+
+        // requestDevice() must come before any other awaits that eat the user activation.
+        if (!device) {
+            try {
+                const requestOptions = showAll
+                    ? { acceptAllDevices: true, optionalServices: [BLE_SERIAL_SERVICE] }
+                    : { filters: flipperFilters, optionalServices: [BLE_SERIAL_SERVICE] };
+                // @ts-expect-error - navigator.bluetooth not in default TS DOM lib
+                device = await navigator.bluetooth.requestDevice(requestOptions);
+            } catch (error) {
+                if (error instanceof Error && error.name === "NotFoundError") return; // they bailed on the picker
+                addLog("error", `[{{Bluetooth}}] Device selection failed: ${error}`);
+                return;
+            }
+        }
+
+        connectionData.state = ConnectionState.CONNECTING;
+        connectionData.error = undefined;
+
+        try {
+            flipper = await getFlipperModule();
+
+            try {
+                flipper.emitter.events = {};
+                // @ts-expect-error - flipper module is JavaScript
+                const rpcModule = await import("../flipper/protobuf/rpc");
+                rpcModule.flushCommandQueue();
+            } catch (error) {
+                addLog("debug", `[{{Bluetooth}}] Proactive cleanup (normal): ${error}`);
+            }
+
+            addLog(
+                "verbose",
+                `[{{Connection}}] Connecting to Bluetooth device${usedCachedDevice ? " (cached)" : ""}`,
+            );
+            await flipper.connectBluetooth(device);
+
+            try {
+                localStorage.setItem(BLE_DEVICE_ID_KEY, device.id);
+            } catch {
+                // localStorage unavailable
+            }
+
+            flags.connected = true;
+            flags.connectionTransport = "bt";
+            addLog("info", "[{{Bluetooth}}] Bluetooth connection established");
+
+            try {
+                const rpcTimeout = new Promise<never>((_, reject) => {
+                    setTimeout(() => reject(new Error("RPC_TIMEOUT")), 5000);
+                });
+                await Promise.race([startBleRpc(), rpcTimeout]);
+            } catch (rpcError) {
+                if (rpcError instanceof Error && rpcError.message === "RPC_TIMEOUT") {
+                    addLog("warning", "[{{Bluetooth}}] RPC timeout - flipper appears to be locked");
+                    resetFlagsAndState();
+                    connectionData.state = ConnectionState.LOCKED;
+                    connectionData.error =
+                        "Flipper appears to be locked - please unlock and try again";
+                    return;
+                }
+                throw rpcError;
+            }
+
+            addLog("verbose", "[{{Flipper}}] Reading basic information");
+            await readBasicInfo();
+            await asyncSleep(100);
+            await updateExtractCapability();
+            await updateFirmwareCapability();
+
+            flipper.emitter.on("disconnect", () => {
+                resetFlagsAndState();
+            });
+
+            connectionData.state = ConnectionState.CONNECTED;
+            addLog(
+                "success",
+                `[{{Bluetooth}}] Hello <code>${connectionData.deviceInfo?.hardware_name}</code>... you are connected via Bluetooth!`,
+            );
+        } catch (error) {
+            flags.connected = false;
+            flags.rpcActive = false;
+
+            // Cached device failed — forget the ID so we go to the picker next time instead of retrying a stale one
+            if (usedCachedDevice) {
+                try {
+                    localStorage.removeItem(BLE_DEVICE_ID_KEY);
+                } catch {
+                    // unavailable
+                }
+                addLog(
+                    "warning",
+                    "[{{Bluetooth}}] Cached device unreachable — will show picker on next attempt",
+                );
+            }
+
+            const userFriendlyError =
+                error instanceof Error ? mapErrorToUserFriendly(error) : "Connection failed";
+
+            connectionData.state = ConnectionState.ERROR;
+            connectionData.error = userFriendlyError;
+            addLog("error", `[{{Bluetooth}}] Connection failed: ${userFriendlyError}`);
             throw error;
         }
     };
@@ -1360,7 +1619,9 @@ export const useSerialConnection = () => {
             setUpdateStage("update_stage_extracted_files", { count: files.length });
         }
 
+        addLog("verbose", "[Firmware] Preparing update directory");
         await createUpdateDirectory(flipperModule);
+        addLog("debug", "[Firmware] Update directory ready");
 
         let path = "/ext/update/";
         let fileIndex = 0;
@@ -1385,6 +1646,11 @@ export const useSerialConnection = () => {
                     name: file.name.split("/").pop() || file.name,
                 });
 
+                addLog(
+                    "verbose",
+                    `[Firmware] Starting upload of <code>${file.name}</code> (<code>${file.buffer?.byteLength || 0}</code> bytes)`,
+                );
+
                 const unbind = flipperModule.emitter.on(
                     "storageWriteRequest/progress",
                     (e: { progress: number; total: number }) => {
@@ -1392,14 +1658,62 @@ export const useSerialConnection = () => {
                     },
                 );
 
-                await flipperModule.commands.storage.write("/ext/update/" + file.name, file.buffer);
-                unbind();
-                addLog("debug", `[Firmware] Uploaded file: <code>${file.name}</code>`);
+                try {
+                    const writeTimeoutMs =
+                        flags.connectionTransport === "bt"
+                            ? Math.max(120000, Math.ceil(file.buffer.byteLength / 2048) * 1000)
+                            : Math.max(
+                                  60000,
+                                  Math.ceil(file.buffer.byteLength / (30 * 1024)) * 1000,
+                              );
+                    let rejectOnDisconnect: ((reason: Error) => void) | null = null;
+                    const disconnectUnbind = flipperModule.emitter.on("disconnect", () => {
+                        if (rejectOnDisconnect) {
+                            rejectOnDisconnect(new Error("Connection lost during file upload"));
+                        }
+                    });
+                    const disconnectPromise = new Promise<never>((_, reject) => {
+                        rejectOnDisconnect = reject;
+                    });
 
-                flags.progress = 1;
-                await asyncSleep(100);
-                flags.progress = 0;
-                await asyncSleep(100);
+                    const uploadStart = performance.now();
+                    await Promise.race([
+                        flipperModule.commands.storage.write(
+                            "/ext/update/" + file.name,
+                            file.buffer,
+                        ),
+                        new Promise<never>((_, reject) =>
+                            setTimeout(
+                                () =>
+                                    reject(
+                                        new Error(
+                                            `storage.write timed out after ${writeTimeoutMs}ms`,
+                                        ),
+                                    ),
+                                writeTimeoutMs,
+                            ),
+                        ),
+                        disconnectPromise,
+                    ]);
+                    disconnectUnbind();
+                    const uploadElapsedMs = performance.now() - uploadStart;
+                    addLog(
+                        "debug",
+                        `[Firmware] Uploaded file: <code>${file.name}</code> — <code>${formatFileSize(file.buffer.byteLength)}</code> (${formatDuration(uploadElapsedMs)})`,
+                    );
+                } catch (error) {
+                    addLog(
+                        "error",
+                        `[Firmware] Failed to upload <code>${file.name}</code>: ${error}`,
+                    );
+                    throw error;
+                } finally {
+                    unbind();
+                    flags.progress = 1;
+                    await asyncSleep(100);
+                    flags.progress = 0;
+                    await asyncSleep(100);
+                }
             }
         }
 
@@ -1408,6 +1722,7 @@ export const useSerialConnection = () => {
         }
 
         setUpdateStage("update_stage_loading_manifest");
+        addLog("verbose", "[Firmware] Loading update manifest");
         await flipperModule.commands.system.update(path + "/update.fuf");
         addLog("debug", "[Firmware] Loaded update manifest");
         flags.progress = 1;
@@ -1426,6 +1741,7 @@ export const useSerialConnection = () => {
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
         flags.updateInProgress = false;
+        addLog("verbose", "[Firmware] Sending reboot command");
         await flipperModule.commands.system.reboot(2);
     };
 
@@ -1522,7 +1838,11 @@ export const useSerialConnection = () => {
             await loadFirmware(release, uploadedFile);
             return true;
         } catch (error) {
-            if (error instanceof Error && !error.message.includes("disconnected")) {
+            if (
+                error instanceof Error &&
+                !error.message.includes("disconnected") &&
+                !error.message.includes("Connection lost")
+            ) {
                 addLog("error", `[Firmware] Firmware update failed: ${error}`);
             }
             throw error;
@@ -1538,6 +1858,17 @@ export const useSerialConnection = () => {
 
         if ((flags.connected && flags.rpcActive && !flags.restarting) || force) {
             flags.restarting = true;
+
+            if (flags.connectionTransport === "bt") {
+                addLog("verbose", "[RPC] Restarting Bluetooth connection");
+                await disconnect();
+                await asyncSleep(500);
+                await connectBluetooth();
+                flags.restarting = false;
+                addLog("success", "[{{Bluetooth}}] RPC connection restarted successfully");
+                return;
+            }
+
             addLog("verbose", "[RPC] Closing reader for restart");
             await flipper.closeReader();
             await asyncSleep(300);
@@ -1563,57 +1894,64 @@ export const useSerialConnection = () => {
         uploadedFile?: File | null,
         loop: boolean = false,
     ): Promise<boolean> => {
-        if (!flags.connected || !flags.rpcActive) {
-            addLog("warning", "[{{Test}}] Firmware update without connection");
-        }
+        do {
+            if (!flags.connected || !flags.rpcActive) {
+                addLog(
+                    "warning",
+                    "[{{Test}}] Simulating firmware update without a live connection",
+                );
+            }
 
-        if (!flags.ableToUpdate) {
-            addLog("warning", "[{{Test}}] Firmware update on unsupported flipper");
-        }
+            if (!flags.ableToUpdate) {
+                addLog("warning", "[{{Test}}] Firmware update on unsupported flipper");
+            }
 
-        firmwareState.updateStage = "";
-        firmwareState.updateStageContext = {};
-        flags.updateInProgress = true;
-        flags.progress = 0;
-        flags.screenStreamPaused = true;
+            firmwareState.updateStage = "";
+            firmwareState.updateStageContext = {};
+            flags.updateInProgress = true;
+            flags.progress = 0;
+            flags.screenStreamPaused = true;
 
-        if (flags.screenStream) {
+            if (flags.screenStream) {
+                try {
+                    await stopScreenStream();
+                    addLog("info", "[{{Test}}] Stopped screen stream for firmware update");
+                    await asyncSleep(500);
+                } catch (error) {
+                    addLog("warning", `[{{Test}}] Failed to stop screen stream: ${error}`);
+                }
+            }
+
             try {
-                await stopScreenStream();
-                addLog("info", "[{{Test}}] Stopped screen stream for firmware update");
-                await asyncSleep(500);
+                await testLoadFirmware(release, uploadedFile);
             } catch (error) {
-                addLog("warning", `[{{Test}}] Failed to stop screen stream: ${error}`);
+                if (error instanceof Error && !error.message.includes("disconnected")) {
+                    addLog("error", `[{{Test}}] Test firmware update failed: ${error}`);
+                }
+                flags.updateInProgress = false;
+                flags.progress = 0;
+                flags.screenStreamPaused = false;
+                throw error;
             }
-        }
 
-        try {
-            await testLoadFirmware(release, uploadedFile);
-            return true;
-        } catch (error) {
-            if (error instanceof Error && !error.message.includes("disconnected")) {
-                addLog("error", `[{{Test}}] Test firmware update failed: ${error}`);
-            }
-            throw error;
-        } finally {
             flags.updateInProgress = false;
             flags.progress = 0;
             flags.screenStreamPaused = false;
-            await asyncSleep(2000);
+
             if (loop) {
                 addLog("verbose", "[{{Test}}] Continuing firmware test loop");
-                await testUpdateFirmware(release, uploadedFile, true);
+                await asyncSleep(2000);
             }
-        }
+        } while (loop);
+
+        return true;
     };
 
     const testLoadFirmware = async (
         release?: ReleaseItem,
         uploadedFile?: File | null,
     ): Promise<void> => {
-        if (!flags.connected || !flags.rpcActive) {
-            throw new Error("Flipper not connected or RPC not active");
-        }
+        const startedConnected = flags.connected && flags.rpcActive;
 
         const uploadStartTime = performance.now();
 
@@ -1678,7 +2016,8 @@ export const useSerialConnection = () => {
 
         let fileIndex = 0;
         for (const file of files) {
-            if (!flags.connected || !flags.rpcActive) {
+            // Only bail on a mid-transfer disconnection, not on "never connected" test mode.
+            if (startedConnected && (!flags.connected || !flags.rpcActive)) {
                 throw new Error("Flipper disconnected during test firmware update");
             }
 
@@ -1703,16 +2042,20 @@ export const useSerialConnection = () => {
                 const progressSteps = 20;
                 const stepDuration = uploadDuration / progressSteps;
 
+                const fileUploadStart = performance.now();
                 for (let i = 0; i <= progressSteps; i++) {
-                    if (!flags.connected || !flags.rpcActive) {
+                    if (startedConnected && (!flags.connected || !flags.rpcActive)) {
                         throw new Error("Flipper disconnected during test firmware update");
                     }
-                    const progress = i / progressSteps;
-                    flags.progress = progress;
+                    flags.progress = i / progressSteps;
                     await asyncSleep(stepDuration);
                 }
 
-                addLog("debug", `[{{Test}}] Uploaded file: <code>${file.name}</code>`);
+                const fileElapsedMs = performance.now() - fileUploadStart;
+                addLog(
+                    "debug",
+                    `[{{Test}}] Uploaded file: <code>${file.name}</code> — <code>${formatFileSize(file.size)}</code> (${formatDuration(fileElapsedMs)})`,
+                );
 
                 flags.progress = 1;
                 await asyncSleep(100);
@@ -1721,7 +2064,7 @@ export const useSerialConnection = () => {
             }
         }
 
-        if (!flags.connected || !flags.rpcActive) {
+        if (startedConnected && (!flags.connected || !flags.rpcActive)) {
             throw new Error("Flipper disconnected during test firmware update");
         }
 
@@ -1743,7 +2086,6 @@ export const useSerialConnection = () => {
         await asyncSleep(2000);
         setUpdateStage("update_stage_flipper_updating");
         await asyncSleep(2000);
-        flags.updateInProgress = false;
     };
 
     return {
@@ -1755,6 +2097,7 @@ export const useSerialConnection = () => {
         screenScale,
         autoConnect,
         connect,
+        connectBluetooth,
         disconnect,
         startRpc,
         stopRpc,

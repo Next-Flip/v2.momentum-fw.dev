@@ -114,7 +114,7 @@ const navigationLinks = computed(() => [
                                 rel="noopener noreferrer"
                                 class="hover:text-vp-brand-1 transition-colors duration-100 hover:underline select-none"
                             >
-                                GPL-3.0 © 2025 Next-Flip
+                                GPL-3.0 © 2026 Next-Flip
                             </a>
                         </p>
                         <img

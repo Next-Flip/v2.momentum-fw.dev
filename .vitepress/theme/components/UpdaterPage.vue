@@ -48,16 +48,17 @@ const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-b
 const { currentTheme } = useThemeSwitcher();
 const { screenColor } = useSettings();
 
+const panelContainerRef = ref<HTMLElement | null>(null);
+const dividerRef = ref<HTMLElement | null>(null);
+
 const {
-    containerRef: panelContainerRef,
-    dividerRef,
     isDragging,
     topPanelHeight,
     bottomPanelHeight,
     topPanelHeightWhenBottomClosed,
     bottomPanelHeightWhenTopClosed,
     startDrag,
-} = usePanelResize({});
+} = usePanelResize({ containerRef: panelContainerRef, dividerRef });
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<ReleaseChannel | null>(null);
@@ -305,7 +306,10 @@ const handleFlashFirmware = async () => {
         ? undefined
         : uploadedFileRelease.value || selectedRelease.value || undefined;
 
-    if (!testMode.value && !isConnected.value) return;
+    if (!testMode.value && !isConnected.value) {
+        logToSerial("warning", "[Firmware] Install blocked: not connected");
+        return;
+    }
 
     const uploadedForTest = uploadedFile.value ?? null;
     const uploadedForUpdate = uploadedFile.value ?? undefined;
@@ -322,6 +326,7 @@ const handleFlashFirmware = async () => {
     if (success) {
         track("firmware_flash", {
             version: trackingVersion,
+            connection: serialConnection.flags.connectionTransport || "unknown",
             theme: `${currentTheme.value}_${screenColor.value}`,
         });
     }
@@ -506,7 +511,7 @@ onBeforeUnmount(() => {
         <div class="max-w-6xl mx-auto flex-1 flex flex-col w-full min-h-0">
             <div class="flex flex-col h-full space-y-6 w-full min-h-0">
                 <div
-                    class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full gap-4 px-0 sm:px-4 lg:px-0"
+                    class="flex flex-col lg:flex-row flex-1 w-full min-h-0 h-full gap-y-0 sm:gap-4 px-0 sm:px-4 lg:px-0"
                 >
                     <div
                         class="device-info-wrapper sm:rounded-lg border-t sm:border mt-4 lg:mt-0 border-vp-divider flex flex-col w-full lg:w-[32%] h-fit lg:h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start transition-all duration-100 ease-in-out"

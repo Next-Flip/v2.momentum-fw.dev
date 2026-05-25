@@ -74,7 +74,7 @@ const clearUploadedFile = () => {
                     </div>
                     <template #content>
                         <div
-                            class="prose prose-sm !leading-5 dark:prose-invert !text-white max-w-none text-center justify-center"
+                            class="prose prose-sm !leading-4 dark:prose-invert !text-white max-w-none text-xs text-center justify-center"
                         >
                             <span
                                 v-html="

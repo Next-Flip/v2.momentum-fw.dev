@@ -469,7 +469,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                                                 :z-index="9999"
                                             >
                                                 <div
-                                                    class="flex items-center text-sm rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/10 hover:border-vp-alternate-1/20 transition-all duration-100 cursor-help"
+                                                    class="flex items-center text-xs rounded-full bg-vp-alternate-1/5 dark:bg-vp-alternate-1/10 p-0.5 border border-vp-alternate-1/10 hover:border-vp-alternate-1/20 transition-all duration-100 cursor-help"
                                                     :class="[
                                                         ifCurrentTheme(['white'])
                                                             ? 'text-vp-brand-1 dark:text-vp-brand-1/60'
@@ -535,7 +535,7 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                             <button
                                 :disabled="!!uploadedFile || !selectedRelease"
                                 :aria-label="downloadState.currentText.value"
-                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-sm w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
+                                class="download-button-small inline-flex text-center font-semibold whitespace-nowrap transition-all duration-100 rounded-full py-0 px-0 leading-[38px] text-xs w-full items-center justify-center h-10 box-border select-none pointer-events-auto !z-[999]"
                                 :class="
                                     !uploadedFile && selectedRelease
                                         ? 'text-vp-2/80 hover:text-vp-brand-1 cursor-pointer hover:bg-vp-soft border-vp-divider/70'

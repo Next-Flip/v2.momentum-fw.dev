@@ -48,10 +48,18 @@ const closeReader = async () => {
   return module.closeReader()
 }
 
+const connectBluetooth = async (device) => {
+  if (!serialModule) {
+    throw new Error('Serial not available in SSR')
+  }
+  const module = await serialModule
+  return module.connectBluetooth(device)
+}
+
 import * as commands from './protobuf/commands/core';
 
 export {
-    closeReader,
+    closeReader, connectBluetooth,
     commands, connect,
     disconnect, emitter, read, write
 };

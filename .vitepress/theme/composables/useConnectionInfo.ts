@@ -28,6 +28,7 @@ export function useConnectionInfo() {
         () =>
             serialConnection?.flags || {
                 connected: false,
+                connectionTransport: null,
                 serialSupported: false,
                 portSelectRequired: false,
                 rpcActive: false,
@@ -48,6 +49,7 @@ export function useConnectionInfo() {
             serialConnection?.firmwareState || {
                 updateStage: "",
                 updateStageContext: {},
+                updateTimerElapsed: null,
             },
     );
 
@@ -153,6 +155,16 @@ export function useConnectionInfo() {
         }
     };
 
+    const handleConnectBluetooth = async (showAll = false) => {
+        if (
+            !flags.value.connected &&
+            connectionState.value !== "disconnecting" &&
+            serialConnection
+        ) {
+            await serialConnection.connectBluetooth?.(showAll);
+        }
+    };
+
     const handleDisconnect = async () => {
         if (serialConnection) {
             await serialConnection.disconnect();
@@ -182,6 +194,7 @@ export function useConnectionInfo() {
         saveState,
         exportDeviceInfo,
         handleConnect,
+        handleConnectBluetooth,
         testConnecting,
         handleDisconnect,
         tr,

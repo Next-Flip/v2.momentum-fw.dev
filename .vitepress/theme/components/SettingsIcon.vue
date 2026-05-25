@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { supportsSerialPort } from "../util";
+import { supportsBluetooth, supportsSerialPort } from "../util";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
@@ -8,8 +8,17 @@ import { useI18n, useSettings } from "../composables";
 import Toggle from "./Toggle.vue";
 
 const { tr } = useI18n();
-const { isSettingEnabled, toggleSetting } = useSettings();
+const { isSettingEnabled, toggleSetting, preferredConnection } = useSettings();
 const flyoutOpen = ref(false);
+
+const canConnect = supportsSerialPort() || supportsBluetooth();
+const showPreferredConnection = supportsSerialPort() && supportsBluetooth();
+
+const preferredOptions = [
+    { value: "both", labelKey: "connection_preferred_both" as const },
+    { value: "usb", labelKey: "connection_preferred_usb" as const },
+    { value: "bt", labelKey: "connection_preferred_bt" as const },
+];
 
 const handleButtonEnter = () => {
     flyoutOpen.value = true;
@@ -21,7 +30,7 @@ const handleButtonLeave = () => {
 
 <template>
     <div
-        v-if="supportsSerialPort()"
+        v-if="canConnect"
         class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group bg-vp-dark"
         @mouseenter="handleButtonEnter"
         @mouseleave="handleButtonLeave"
@@ -38,8 +47,27 @@ const handleButtonLeave = () => {
             />
         </button>
         <div class="menu">
-            <div class="menu-content">
-                <div class="menu-item mt-2 mx-3">
+            <div class="menu-content pt-2">
+                <div v-if="showPreferredConnection" class="menu-item mx-3">
+                    <span class="menu-label">{{ tr("connection_preferred_connection") }}:</span>
+                    <div class="dropdown-button">
+                        <select v-model="preferredConnection" class="dropdown-select">
+                            <option
+                                v-for="opt in preferredOptions"
+                                :key="opt.value"
+                                :value="opt.value"
+                            >
+                                {{ tr(opt.labelKey) }}
+                            </option>
+                        </select>
+                        <!-- <div
+                            class="absolute right-1.5 flex items-center text-vp-3 pointer-events-none select-none"
+                        >
+                            <v-icon name="oi-chevron-down" scale="0.85" />
+                        </div> -->
+                    </div>
+                </div>
+                <div class="menu-item mx-3">
                     <span class="menu-label">{{ tr("connection_autoconnect") }}:</span>
                     <AutoconnectToggle />
                 </div>
@@ -140,7 +168,55 @@ const handleButtonLeave = () => {
     color: var(--vp-c-text-2);
     text-align: left;
     min-width: 65px;
-    margin-right: 20px;
+    margin-right: 10px;
     user-select: none;
+    white-space: nowrap;
+}
+
+.dropdown-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--vp-c-divider);
+    background-color: color-mix(in srgb, var(--vp-c-bg-elv) 95%, transparent);
+    border-radius: 6px;
+    padding: 0;
+    font-size: 12px;
+    min-height: 28px;
+    /* min-width: 90px; */
+    max-width: 120px;
+    transition: all 0.1s;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.dropdown-button:hover {
+    border-color: var(--vp-c-brand-1);
+}
+
+.dropdown-select {
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--vp-c-text-1);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 4px 7px 4px 8px;
+    line-height: 1.4;
+    min-width: 0;
+    flex: 1;
+}
+
+.dropdown-select:focus {
+    outline: none;
+}
+
+.select-icon {
+    flex-shrink: 0;
+    padding-right: 6px;
 }
 </style>

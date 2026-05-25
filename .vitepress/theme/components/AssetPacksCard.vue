@@ -448,7 +448,7 @@ onUnmounted(() => {
                 <span class="text-[19px] font-medium text-vp-1 z-[5] leading-6">{{ name }}</span>
                 <div class="flex items-center gap-[10px] text-vp-2 w-full z-[5] text-[14px]">
                     <div class="flex items-center gap-[5px] min-w-0 max-w-full overflow-hidden">
-                        <span class="shrink-0">{{ tr("by") }}</span>
+                        <span class="shrink-0 select-none">{{ tr("by") }}</span>
                         <Tooltip
                             :disabled="!githubUrl || !author"
                             :position="'right'"
@@ -460,7 +460,7 @@ onUnmounted(() => {
                                 :href="githubUrl"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="hover:underline truncate block overflow-hidden text-ellipsis max-w-full"
+                                class="hover:underline truncate block overflow-hidden text-ellipsis max-w-full select-none"
                                 :class="
                                     ifCurrentTheme(['orange'])
                                         ? 'text-vp-alternate-1 hover:text-vp-alternate-2'
@@ -470,7 +470,7 @@ onUnmounted(() => {
                             >
                             <span
                                 v-else-if="author"
-                                class="block overflow-hidden text-ellipsis truncate max-w-full whitespace-nowrap font-medium transition-colors duration-200"
+                                class="block overflow-hidden text-ellipsis truncate max-w-full whitespace-nowrap font-medium transition-colors duration-200 select-none"
                                 >{{ author }}</span
                             >
                             <template #content>
@@ -485,7 +485,7 @@ onUnmounted(() => {
                     </div>
                     <Tooltip v-if="shortTimeAgo" :delay="300" class="shrink-0">
                         <span
-                            class="text-right text-[13px] text-vp-2 opacity-70 italic whitespace-nowrap cursor-help"
+                            class="text-right text-[13px] text-vp-2 opacity-70 italic whitespace-nowrap cursor-help select-none"
                             >{{ shortTimeAgo }}</span
                         >
                         <template #content>
@@ -504,7 +504,7 @@ onUnmounted(() => {
                     </Tooltip>
                 </div>
                 <span
-                    class="text-[14px] text-vp-2 leading-[22px] z-[5] grow xs:two-line-description"
+                    class="text-[14px] text-vp-2 leading-5 z-[5] grow xs:two-line-description select-none"
                     >{{ description }}</span
                 >
                 <div

@@ -1,6 +1,12 @@
 import { useStorage } from "@vueuse/core";
 import { computed } from "vue";
-import { BooleanSetting, SCREEN_COLORS, STORAGE_KEYS, ScreenColor } from "../types";
+import {
+    BooleanSetting,
+    PreferredConnection,
+    SCREEN_COLORS,
+    STORAGE_KEYS,
+    ScreenColor,
+} from "../types";
 
 export function useSettings() {
     // prettier-ignore
@@ -9,6 +15,8 @@ export function useSettings() {
     const verboseLogsEnabled = useStorage(STORAGE_KEYS.VERBOSE_LOGS, false, undefined, { initOnMounted: true });
     // prettier-ignore
     const screenColor = useStorage<ScreenColor>(STORAGE_KEYS.SCREEN_COLOR, "default", undefined, { initOnMounted: true });
+    // prettier-ignore
+    const preferredConnection = useStorage<PreferredConnection>(STORAGE_KEYS.PREFERRED_CONNECTION, "both", undefined, { initOnMounted: true });
 
     const getBool = (setting: BooleanSetting) => {
         const map = {
@@ -47,6 +55,7 @@ export function useSettings() {
         autoconnectEnabled,
         verboseLogsEnabled,
         screenColor,
+        preferredConnection,
         getBool,
         toggleBool,
         isSettingEnabled,

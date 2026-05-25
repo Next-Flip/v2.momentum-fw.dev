@@ -217,7 +217,7 @@ onBeforeUnmount(() => {
                     @mouseleave="hideTooltipImmediate"
                 >
                     <div
-                        class="text-center relative z-10 max-w-full"
+                        class="text-center relative z-10 max-w-full text-xs"
                         :class="!props.select && 'select-none'"
                     >
                         <slot name="content"></slot>

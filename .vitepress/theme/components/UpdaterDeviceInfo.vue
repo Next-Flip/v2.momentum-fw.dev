@@ -4,11 +4,12 @@ import { computed, ref, useTemplateRef } from "vue";
 import { formatDate } from "../date";
 import type { DeviceInfo } from "../types";
 import { STORAGE_KEYS } from "../types";
-import { bytesToSize, supportsSerialPort } from "../util";
+import { bytesToSize, supportsBluetooth, supportsSerialPort } from "../util";
 
 import {
     useConnectionInfo,
     useI18n,
+    useSettings,
     useSharedHover,
     useTempState,
     useThemeSwitcher,
@@ -21,6 +22,7 @@ const el = useTemplateRef<HTMLElement>("el");
 const { arrivedState } = useScroll(el);
 const { tr } = useI18n();
 const { ifCurrentTheme } = useThemeSwitcher();
+const { preferredConnection } = useSettings();
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 const { height: windowHeight } = useWindowSize();
 const isNarrowViewport = computed(() => windowHeight.value < 1024);
@@ -36,6 +38,7 @@ const {
     saveState,
     exportDeviceInfo,
     handleConnect,
+    handleConnectBluetooth,
     handleDisconnect,
     tr: connectionTr,
     getLocalizedPath,
@@ -71,6 +74,8 @@ const getActionButtons = computed(() => {
         {
             state: screenShotState,
             action: handleScreenshot,
+            disabled: flags.value.updateInProgress,
+            hideOnMobile: true,
         },
     ];
 });
@@ -104,8 +109,38 @@ const formatJsonDisplay = computed(() => {
     return JSON.stringify(deviceInfo.value, null, 2);
 });
 
+const canConnect = computed(() => supportsSerialPort() || supportsBluetooth());
+
+const showUSBButton = computed(() => {
+    if (!supportsSerialPort()) return false;
+    if (preferredConnection.value === "bt") return false;
+    return true;
+});
+
+const showBTButton = computed(() => {
+    if (!supportsBluetooth()) return false;
+    if (preferredConnection.value === "usb") return false;
+    return true;
+});
+
+const showSingleConnectButton = computed(() => {
+    return (
+        (showUSBButton.value && !showBTButton.value) || (showBTButton.value && !showUSBButton.value)
+    );
+});
+
+const singleConnectIcon = computed(() => {
+    if (showBTButton.value && !showUSBButton.value) return "md-bluetooth";
+    return "md-usb";
+});
+
+const singleConnectHandler = computed(() => {
+    if (showBTButton.value && !showUSBButton.value) return () => handleConnectBluetooth(false);
+    return handleConnect;
+});
+
 const getConnectionDisplay = computed(() => {
-    if (!supportsSerialPort()) {
+    if (!canConnect.value) {
         return {
             title: tr("updater_serial_unsupported"),
             subtitle: tr("updater_serial_unsupported_subtitle"),
@@ -341,12 +376,8 @@ const deviceSections = computed(() => {
     >
         <div v-if="!isConnected" class="absolute inset-0 w-full h-full"></div>
         <Transition name="slide-down">
-            <div
-                v-if="isConnected"
-                key="connected-controls"
-                class="flex-shrink-0 hidden lg:block relative z-0"
-            >
-                <ScreenDisplay ref="screenDisplayRef" />
+            <div v-if="isConnected" key="connected-controls" class="flex-shrink-0 relative z-0">
+                <ScreenDisplay ref="screenDisplayRef" class="hidden lg:block" />
 
                 <div
                     class="py-3 flex-shrink-0 z-10"
@@ -354,34 +385,55 @@ const deviceSections = computed(() => {
                         'sticky bottom-0': isNarrowViewport,
                     }"
                 >
-                    <div class="action-buttons px-5 lg:px-3">
+                    <div class="action-buttons px-3">
                         <template
                             v-for="button in getActionButtons"
                             :key="button.state.currentText.value"
                         >
-                            <Tooltip v-if="deviceInfo" :delay="0" :z-index="9999" :offset="6">
-                                <button
-                                    class="action-button export-button !text-vp-2 hover:!text-vp-brand-1 transition-transform duration-100 ease-out flex items-center justify-center"
-                                    :aria-label="button.state.currentText.value"
-                                    @click="() => button.action()"
-                                    @mousedown="button.state.handleMouseDown"
-                                    @mouseup="button.state.handleMouseUp"
-                                    @mouseleave="button.state.handleMouseLeave"
+                            <div
+                                v-if="deviceInfo"
+                                :class="{ 'hidden lg:flex': button.hideOnMobile }"
+                            >
+                                <Tooltip
+                                    :delay="0"
+                                    :z-index="9999"
+                                    :offset="6"
+                                    :disabled="button.disabled"
                                 >
-                                    <v-icon
+                                    <button
+                                        class="action-button export-button !text-vp-2 transition-transform duration-100 ease-out flex items-center justify-center"
                                         :class="{
-                                            'scale-95': button.state.isPressed.value,
+                                            'hover:!text-vp-brand-1': !button.disabled,
+                                            'opacity-40 !cursor-not-allowed': button.disabled,
                                         }"
-                                        :name="button.state.currentIcon.value"
-                                        :scale="
-                                            button.state.currentIcon.value === 'oi-check'
-                                                ? 0.95
-                                                : 0.8
+                                        :aria-label="button.state.currentText.value"
+                                        :disabled="button.disabled"
+                                        @click="() => !button.disabled && button.action()"
+                                        @mousedown="
+                                            !button.disabled && button.state.handleMouseDown()
                                         "
-                                    />
-                                </button>
-                                <template #content>{{ button.state.currentText.value }}</template>
-                            </Tooltip>
+                                        @mouseup="!button.disabled && button.state.handleMouseUp()"
+                                        @mouseleave="
+                                            !button.disabled && button.state.handleMouseLeave()
+                                        "
+                                    >
+                                        <v-icon
+                                            :class="{
+                                                'scale-95': button.state.isPressed.value,
+                                            }"
+                                            :name="button.state.currentIcon.value"
+                                            :scale="
+                                                button.state.currentIcon.value === 'oi-check'
+                                                    ? 0.95
+                                                    : 0.8
+                                            "
+                                        />
+                                    </button>
+                                    <template #content>{{
+                                        button.state.currentText.value
+                                    }}</template>
+                                </Tooltip>
+                            </div>
                         </template>
                         <button
                             :aria-label="connectionTr('connection_disconnect')"
@@ -415,15 +467,23 @@ const deviceSections = computed(() => {
                     <div class="text-center">
                         <div class="flex flex-col items-center gap-1">
                             <div
-                                class="relative w-14 h-14 rounded-full flex items-center justify-center"
+                                class="relative w-12 h-12 rounded-full flex items-center justify-center"
                             >
                                 <div
                                     v-if="getConnectionDisplay.showProgress"
                                     class="absolute inset-0 rounded-full border-2 border-transparent border-t-vp-brand-2 dark:border-t-vp-brand-1 animate-spin"
                                 ></div>
-                                <v-icon name="bi-usb-symbol" scale="1.75" class="text-vp-3" />
+                                <v-icon
+                                    v-if="!getConnectionDisplay.showProgress"
+                                    name="bi-usb-c"
+                                    scale="2.25"
+                                    class="text-vp-3"
+                                />
                             </div>
-                            <div class="flex flex-col items-center gap-2 px-1 select-none">
+                            <div
+                                class="flex flex-col items-center gap-2 px-1 select-none"
+                                :class="{ 'mt-2': getConnectionDisplay.showProgress }"
+                            >
                                 <p class="text-lg font-medium text-vp-1">
                                     {{ getConnectionDisplay.title }}
                                 </p>
@@ -436,24 +496,90 @@ const deviceSections = computed(() => {
                                 <Transition name="button-height">
                                     <div
                                         v-if="getConnectionDisplay.showConnectButton"
-                                        class="button-container mb-3"
+                                        class="button-container mb-3 flex gap-3 flex-wrap justify-center"
+                                        :class="[{ 'wiggle-loop': isInstallButtonHovered }]"
                                     >
-                                        <a
-                                            :class="[
-                                                'px-6 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55 shadow-grow',
-                                                'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
-                                                { 'wiggle-loop': isInstallButtonHovered },
-                                                ifCurrentTheme(['orange'])
-                                                    ? 'hover:text-black'
-                                                    : ifCurrentTheme(['white', 'skyline'])
-                                                      ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
-                                                      : 'hover:text-white',
-                                            ]"
-                                            @click="handleConnect"
-                                            >{{ tr("updater_connect_button") }}</a
-                                        >
+                                        <template v-if="showSingleConnectButton">
+                                            <a
+                                                :class="[
+                                                    'pr-5 pl-3.5 flex items-center gap-2 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55 shadow-grow',
+                                                    'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
+                                                    // { 'wiggle-loop': isInstallButtonHovered },
+                                                    ifCurrentTheme(['orange'])
+                                                        ? 'hover:text-black'
+                                                        : ifCurrentTheme(['white', 'skyline'])
+                                                          ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
+                                                          : 'hover:text-white',
+                                                ]"
+                                                @click="singleConnectHandler"
+                                            >
+                                                <v-icon :name="singleConnectIcon" scale="0.9" />{{
+                                                    connectionTr("connection_connect")
+                                                }}
+                                            </a>
+                                        </template>
+                                        <template v-else>
+                                            <a
+                                                v-if="showUSBButton"
+                                                :class="[
+                                                    'pr-5 pl-3.5 flex items-center gap-2 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55 shadow-grow group',
+                                                    'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
+                                                    // { 'wiggle-loop': isInstallButtonHovered },
+                                                    ifCurrentTheme(['orange'])
+                                                        ? 'hover:text-black'
+                                                        : ifCurrentTheme(['white', 'skyline'])
+                                                          ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
+                                                          : 'hover:text-white',
+                                                ]"
+                                                @click="handleConnect"
+                                            >
+                                                <v-icon
+                                                    name="md-usb"
+                                                    scale="0.9"
+                                                    class="opacity-65 group-hover:opacity-85"
+                                                />Web Serial
+                                            </a>
+                                            <a
+                                                v-if="showBTButton"
+                                                :class="[
+                                                    'pr-5 pl-3.5 flex items-center gap-2 text-sm leading-9 font-semibold rounded-full border text-vp-1 transition-all duration-100 cursor-pointer backdrop-blur-md bg-vp-dark/55 shadow-grow group',
+                                                    'border-vp-brand-1 hover:bg-vp-brand-3 hover:border-vp-brand-2/50 select-none',
+                                                    ifCurrentTheme(['orange'])
+                                                        ? 'hover:text-black'
+                                                        : ifCurrentTheme(['white', 'skyline'])
+                                                          ? 'hover:text-vp-neutral-inverse dark:hover:text-vp-neutral-inverse'
+                                                          : 'hover:text-white',
+                                                ]"
+                                                @click="handleConnectBluetooth(false)"
+                                            >
+                                                <v-icon
+                                                    name="md-bluetooth"
+                                                    scale="0.9"
+                                                    class="opacity-65 group-hover:opacity-85"
+                                                />Bluetooth
+                                            </a>
+                                        </template>
                                     </div>
                                 </Transition>
+                                <p
+                                    v-if="showBTButton && getConnectionDisplay.showConnectButton"
+                                    class="text-[10px] text-vp-3/50 leading-relaxed"
+                                    v-html="
+                                        tr('updater_bluetooth_warning', {
+                                            url: getLocalizedPath(
+                                                '/wiki/Installation/#browser-compatibility',
+                                            ),
+                                        })
+                                    "
+                                ></p>
+                                <!-- <button
+                                    v-if="showBTButton && getConnectionDisplay.showConnectButton"
+                                    class="text-[10px] text-vp-3/50 hover:text-vp-3 transition-colors leading-none cursor-pointer select-none mt-1"
+                                    type="button"
+                                    @click="handleConnectBluetooth(true)"
+                                >
+                                    {{ tr("connection_bt_show_all") }}
+                                </button> -->
                             </div>
                         </div>
                     </div>
@@ -548,20 +674,17 @@ const deviceSections = computed(() => {
                             </div>
                         </div>
 
-                        <div
-                            v-else
-                            key="raw"
-                            ref="el"
-                            class="relative z-0 overflow-y-scroll overflow-x-scroll"
-                            :class="{
-                                'flex-1 min-h-0': !isNarrowViewport,
-                            }"
-                        >
-                            <pre
-                                tabindex="0"
-                                class="text-xs text-start text-vp-1 font-mono whitespace-pre break-all p-4 m-0 outline-none"
-                                >{{ formatJsonDisplay }}</pre
+                        <div v-else key="raw" class="relative z-0 flex flex-col flex-1 min-h-0">
+                            <div
+                                ref="el"
+                                class="overflow-y-scroll overflow-x-scroll flex-1 min-h-0"
                             >
+                                <pre
+                                    tabindex="0"
+                                    class="text-xs text-start text-vp-1 font-mono whitespace-pre break-all p-4 m-0 outline-none"
+                                    >{{ formatJsonDisplay }}</pre
+                                >
+                            </div>
                         </div>
                     </Transition>
                 </div>

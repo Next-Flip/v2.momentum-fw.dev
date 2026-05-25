@@ -47,8 +47,10 @@ export interface SerialConnectionData {
 
 export interface ConnectionFlags {
     serialSupported: boolean;
+    bluetoothSupported: boolean;
     portSelectRequired: boolean;
     connected: boolean;
+    connectionTransport: "usb" | "bt" | null;
     rpcActive: boolean;
     rpcToggling: boolean;
     updateInProgress: boolean;
@@ -145,6 +147,7 @@ export interface QueueState {
 export interface FirmwareState {
     updateStage: string;
     updateStageContext: Record<string, string | number>;
+    updateTimerElapsed: number | null;
 }
 
 export interface FirmwareChannel {
@@ -190,6 +193,7 @@ export interface FlipperEmitter {
 
 export interface FlipperCommands {
     startRpcSession(module: unknown): Promise<{ resolved: boolean; error?: unknown }>;
+    startBleRpcSession(module: unknown): Promise<{ resolved: boolean; error?: unknown }>;
     stopRpcSession(): Promise<void>;
     system: {
         deviceInfo(): Promise<Array<{ key: string; value: unknown }>>;
@@ -215,6 +219,7 @@ export interface FlipperCommands {
 
 export interface FlipperModule {
     connect(): Promise<void>;
+    connectBluetooth(device: unknown): Promise<void>;
     disconnect(): Promise<void>;
     closeReader(): Promise<void>;
     emitter: FlipperEmitter;
@@ -253,6 +258,7 @@ export type ScreenColor = "primary" | "secondary" | "default" | "white";
 export const SCREEN_COLORS: ScreenColor[] = ["primary", "secondary", "default", "white"];
 
 export type BooleanSetting = "autoConnect" | "verboseLogs";
+export type PreferredConnection = "both" | "usb" | "bt";
 
 export const STORAGE_KEYS = {
     ASSET_PACK_SORT_FIELD: "momentum-asset-packs_sort-field",
@@ -269,4 +275,6 @@ export const STORAGE_KEYS = {
     THEME_LOCKED: "momentum-theme-locked",
     THEME: "momentum-theme",
     UPDATER_PANEL_SIZES: "momentum-updater-panel-sizes",
+    PREFERRED_CONNECTION: "momentum-preferred-connection",
+    BLE_DEVICE_ID: "momentum-ble-device-id",
 } as const;

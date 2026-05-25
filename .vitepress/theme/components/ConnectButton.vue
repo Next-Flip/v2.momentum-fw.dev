@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useMagicKeys, useWindowSize, whenever } from "@vueuse/core";
 import { useRoute } from "vitepress";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from "vue";
 import { formatDate } from "../date";
 import { ConnectionState } from "../types";
-import { supportsSerialPort } from "../util";
+import { supportsBluetooth, supportsSerialPort } from "../util";
 
 import { MessageSchema } from ".vitepress/i18n";
 import {
@@ -13,7 +13,9 @@ import {
     useSettings,
     useSharedHover,
     useThemeSwitcher,
+    useUpdateTimer,
 } from "../composables";
+import type { useSerialConnection } from "../composables/useSerialConnection";
 import SettingsIcon from "./SettingsIcon.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -34,14 +36,22 @@ const {
     saveState,
     exportDeviceInfo,
     handleConnect,
+    handleConnectBluetooth,
     handleDisconnect,
     tr,
     getLocalizedPath,
 } = useConnectionInfo();
-const { isSettingEnabled } = useSettings();
+const { isSettingEnabled, preferredConnection } = useSettings();
 const { ifCurrentTheme } = useThemeSwitcher();
 
+const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
+const { timerDisplayCompact } = useUpdateTimer(
+    serialConnection?.firmwareState || { updateTimerElapsed: null },
+);
+
 const flyoutOpen = ref(false);
+const pickMode = ref(false);
+const metaHeld = ref(false);
 const autoOpenTimeout = ref<NodeJS.Timeout | null>(null);
 const isAutoOpen = ref(false);
 const { dots: connectingDots } = useDots();
@@ -54,8 +64,30 @@ const updateStage = computed(() => firmwareState.value.updateStage || "");
 const updateStageContext = computed(() => firmwareState.value.updateStageContext || {});
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
+const flyoutRef = useTemplateRef<HTMLElement>("flyoutRef");
+
+const canConnect = computed(() => supportsSerialPort() || supportsBluetooth());
+
+const showUSBButton = computed(() => {
+    if (!supportsSerialPort()) return false;
+    if (preferredConnection.value === "bt") return false;
+    return true;
+});
+
+const showBTButton = computed(() => {
+    if (!supportsBluetooth()) return false;
+    if (preferredConnection.value === "usb") return false;
+    return true;
+});
+
+const showSingleConnectButton = computed(() => {
+    return (
+        (showUSBButton.value && !showBTButton.value) || (showBTButton.value && !showUSBButton.value)
+    );
+});
+
 const getConnectionDisplay = computed(() => {
-    if (!supportsSerialPort()) {
+    if (!canConnect.value) {
         return {
             text: tr("connection_serial_not_supported"),
             indicatorClass: "bg-red-500 animate-pulse border border-red-600",
@@ -96,11 +128,64 @@ const formatBuildDate = (date: string) => {
     return formatDate(isoDate, "fullYear");
 };
 
+const showTransportPicker = computed(
+    () =>
+        supportsSerialPort() &&
+        supportsBluetooth() &&
+        preferredConnection.value === "both" &&
+        !isConnected.value &&
+        connectionState.value === "disconnected",
+);
+
+const singleTransportIcon = computed(() => {
+    if (preferredConnection.value === "bt") return "md-bluetooth";
+    return "md-usb";
+});
+
+const connectionIcon = computed(() => {
+    if (!isConnected.value) return null;
+    return flags.value.connectionTransport === "bt" ? "md-bluetooth" : "md-usb";
+});
+
 const checkConnect = () => {
-    if (supportsSerialPort()) {
+    if (isConnected.value) return;
+    if (showTransportPicker.value) {
+        pickMode.value = true;
+        return;
+    }
+    const pref = preferredConnection.value;
+    if (pref === "bt" || (!supportsSerialPort() && supportsBluetooth())) {
+        handleConnectBluetooth();
+    } else {
         handleConnect();
     }
 };
+
+const connectUSB = () => {
+    pickMode.value = false;
+    metaHeld.value = false;
+    handleConnect();
+};
+const connectBT = (showAll = false) => {
+    pickMode.value = false;
+    metaHeld.value = false;
+    handleConnectBluetooth(showAll);
+};
+
+const handleMouseDownOutside = (e: MouseEvent) => {
+    if (!pickMode.value) return;
+    if (flyoutRef.value && !flyoutRef.value.contains(e.target as Node)) {
+        pickMode.value = false;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener("mousedown", handleMouseDownOutside);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener("mousedown", handleMouseDownOutside);
+});
 
 const handleMouse = (v: boolean) => {
     if (!isAutoOpen.value && !isUpdatePage.value) {
@@ -108,13 +193,36 @@ const handleMouse = (v: boolean) => {
     }
 };
 
-const { cmd_enter } = useMagicKeys({
+const { cmd_enter, cmd_u, cmd_b } = useMagicKeys({
     passive: false,
     onEventFired(e) {
         if (e.metaKey && e.key === "enter" && e.type === "keyup") e.preventDefault();
+        if ((e.key === "Meta" || e.key === "Control") && showTransportPicker.value) {
+            metaHeld.value = e.type === "keydown";
+        }
+        if (pickMode.value && e.type === "keydown" && !e.metaKey && !e.ctrlKey) {
+            if (e.key === "u" || e.key === "U") {
+                e.preventDefault();
+                connectUSB();
+            }
+            if (e.key === "b" || e.key === "B") {
+                e.preventDefault();
+                connectBT();
+            }
+            if (e.key === "Escape") {
+                e.preventDefault();
+                pickMode.value = false;
+            }
+        }
     },
 });
 whenever(cmd_enter, () => checkConnect());
+whenever(cmd_u, () => {
+    if (showTransportPicker.value) connectUSB();
+});
+whenever(cmd_b, () => {
+    if (showTransportPicker.value) connectBT();
+});
 
 watch(connectionState, (newState, oldState) => {
     if (newState === "connected" && oldState !== "connected") {
@@ -129,6 +237,12 @@ watch(connectionState, (newState, oldState) => {
             isAutoOpen.value = false;
             autoOpenTimeout.value = null;
         }, 2000);
+    }
+});
+
+watch(pickMode, (val) => {
+    if (val) {
+        flyoutOpen.value = false;
     }
 });
 
@@ -157,17 +271,65 @@ onMounted(() => {
         :force-visible="isInstallButtonHovered && !isSettingEnabled('autoConnect')"
         class="mr-auto"
     >
-        <div class="flex items-center ml-8 gap-x-3">
+        <div ref="flyoutRef" class="flex items-center ml-8 gap-x-3">
             <SettingsIcon />
 
             <div
-                :class="['VPFlyout', supportsSerialPort()]"
+                :class="['VPFlyout', canConnect]"
                 @mouseenter="handleMouse(true)"
                 @mouseleave="handleMouse(false)"
             >
                 <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
+                    <!-- Pick mode: show USB + BT side by side -->
+                    <div
+                        v-if="(pickMode || metaHeld) && showTransportPicker"
+                        class="flex flex-col items-center gap-2"
+                    >
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="connect-button-action bg-vp-dark shadow-sm rounded-lg group flex items-center h-[40px] whitespace-nowrap transition-all select-none duration-100 ease-in-out cursor-pointer"
+                                type="button"
+                                @click="connectUSB"
+                            >
+                                <v-icon
+                                    name="md-usb"
+                                    scale="0.85"
+                                    class="flex-shrink-0 ml-2.5 mr-2 opacity-65"
+                                />
+                                <span class="text-sm font-medium">Web Serial</span>
+                                <kbd
+                                    class="bg-vp-soft-mute border border-vp-divider rounded px-1.5 py-1 text-[11px] leading-none text-vp-2 font-mono font-medium ml-3 mr-[9px]"
+                                    >U</kbd
+                                >
+                            </button>
+                            <Tooltip :delay="0" :z-index="9999" :offset="4" position="bottom">
+                                <button
+                                    class="connect-button-action bg-vp-dark shadow-sm rounded-lg group flex items-center h-[40px] whitespace-nowrap transition-all select-none duration-100 ease-in-out cursor-pointer"
+                                    type="button"
+                                    @click="connectBT(false)"
+                                >
+                                    <v-icon
+                                        name="md-bluetooth"
+                                        scale="0.85"
+                                        class="flex-shrink-0 ml-2.5 mr-2 opacity-65"
+                                    />
+                                    <span class="text-sm font-medium">Bluetooth</span>
+                                    <kbd
+                                        class="bg-vp-soft-mute border border-vp-divider rounded px-1.5 py-1 text-[11px] leading-none text-vp-2 font-mono font-medium ml-3 mr-[9px]"
+                                        >B</kbd
+                                    >
+                                </button>
+                                <template #content>{{
+                                    tr("connection_bt_recommended_usb")
+                                }}</template>
+                            </Tooltip>
+                        </div>
+                    </div>
+
+                    <!-- Normal connect button -->
                     <Tooltip
-                        :disabled="supportsSerialPort()"
+                        v-else
+                        :disabled="canConnect"
                         :delay="0"
                         :hide-delay="100"
                         :z-index="9999"
@@ -176,7 +338,11 @@ onMounted(() => {
                     >
                         <button
                             :class="[
-                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all select-none duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-3 h-[40px] min-w-10 w-auto whitespace-nowrap overflow-hidden transition-all select-none duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && canConnect ? 'cursor-pointer' : '!cursor-default'}`,
+                                canConnect &&
+                                    connectionState === 'disconnected' &&
+                                    showTransportPicker &&
+                                    '!pr-[7px]',
                             ]"
                             type="button"
                             :aria-expanded="flyoutOpen"
@@ -195,7 +361,37 @@ onMounted(() => {
                                     "
                                 ></div>
                             </div>
-                            <span v-else class="relative flex size-2 mr-2">
+                            <span
+                                v-if="flags.updateInProgress && timerDisplayCompact"
+                                class="text-xs ml-2.5 font-mono text-vp-2 tabular-nums"
+                                >{{ timerDisplayCompact }}</span
+                            >
+                            <span
+                                v-if="
+                                    (!flags.updateInProgress || !timerDisplayCompact) &&
+                                    (connectionIcon ||
+                                        (!showTransportPicker &&
+                                            !singleTransportIcon &&
+                                            connectionState === 'disconnected'))
+                                "
+                                class="flex items-center"
+                                :class="flags.updateInProgress ? 'ml-2 mr-2 hidden' : 'mr-2'"
+                                :style="isConnected ? 'color: rgb(34 197 94)' : ''"
+                            >
+                                <v-icon
+                                    :name="connectionIcon || singleTransportIcon"
+                                    scale="0.9"
+                                    :class="
+                                        isConnected && !flags.updateInProgress
+                                            ? 'animate-pulse'
+                                            : ''
+                                    "
+                                />
+                            </span>
+                            <span
+                                v-else-if="!flags.updateInProgress"
+                                class="relative flex size-2 mr-2"
+                            >
                                 <span
                                     v-if="isConnected"
                                     :class="`absolute inline-flex h-full w-full animate-ping rounded-full ${getConnectionDisplay.indicatorClass} opacity-75`"
@@ -205,14 +401,7 @@ onMounted(() => {
                                 ></span>
                             </span>
 
-                            <span
-                                v-if="isUpdatePage || !isUpdatePage"
-                                :class="[
-                                    `connect-button-text text-sm font-medium min-h-5 ${
-                                        isConnected && !flags.updateInProgress ? 'mr-3' : ''
-                                    } ${!isUpdatePage && flags.updateInProgress ? 'ml-3' : ''}`,
-                                ]"
-                            >
+                            <span :class="[`connect-button-text text-sm font-medium min-h-5`]">
                                 {{
                                     isUpdatePage && !flags.updateInProgress
                                         ? getConnectionDisplay.text
@@ -229,7 +418,7 @@ onMounted(() => {
 
                             <span
                                 v-if="isConnected && !flags.updateInProgress"
-                                :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] mr-px text-left ${
+                                :class="`text-sm font-medium text-vp-2 min-h-[1.25rem] ml-[7px] text-left ${
                                     !deviceInfo?.hardware_name ? 'w-3' : ''
                                 }`"
                             >
@@ -246,12 +435,20 @@ onMounted(() => {
                             </span>
 
                             <div
-                                v-if="supportsSerialPort() && connectionState === 'disconnected'"
+                                v-if="
+                                    canConnect &&
+                                    connectionState === 'disconnected' &&
+                                    showTransportPicker
+                                "
                                 class="DocSearch-Button"
                             >
                                 <span class="DocSearch-Button-Keys"
                                     ><kbd class="DocSearch-Button-Key"></kbd
-                                    ><kbd class="DocSearch-Button-Key">↵</kbd></span
+                                    ><kbd
+                                        class="DocSearch-Button-Key"
+                                        :class="!showSingleConnectButton && '!pl-0'"
+                                        >{{ showSingleConnectButton ? "↵" : "" }}</kbd
+                                    ></span
                                 >
                             </div>
                         </button>
@@ -430,6 +627,21 @@ onMounted(() => {
     color: var(--vp-c-text-2);
 }
 
+.connect-button-action {
+    border: 1px solid var(--vp-c-divider);
+    color: var(--vp-c-text-1);
+    transition:
+        border-color 0.1s ease-in-out,
+        background-color 0.1s ease-in-out,
+        color 0.1s ease-in-out;
+}
+
+.connect-button-action:hover {
+    border-color: var(--vp-c-brand-1);
+    background-color: color-mix(in srgb, var(--vp-c-bg-soft) 55%, transparent);
+    color: var(--vp-c-text-2);
+}
+
 .VPFlyout {
     position: relative;
 }
@@ -440,9 +652,17 @@ body[data-route*="/wiki"] {
     }
 }
 
-.VPFlyout:hover {
+/* .VPFlyout:hover {
     color: var(--vp-c-brand-1);
     transition: color 0.25s;
+} */
+
+.VPFlyout:hover .connect-button-action {
+    color: var(--vp-c-text-1);
+}
+
+.VPFlyout:hover .connect-button-action:hover {
+    color: var(--vp-c-brand-1);
 }
 
 .connect-button[aria-expanded="false"] + .menu {

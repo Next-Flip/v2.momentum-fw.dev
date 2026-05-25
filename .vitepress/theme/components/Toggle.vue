@@ -5,6 +5,7 @@ interface Props {
     label?: string;
     checked: boolean;
     callback?: () => void;
+    disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -12,6 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
     scale: 0.65,
     label: "",
     callback: undefined,
+    disabled: false,
 });
 
 const emit = defineEmits<{
@@ -19,6 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const handleToggle = () => {
+    if (props.disabled) return;
     if (props.callback) {
         props.callback();
     } else {
@@ -34,6 +37,8 @@ const handleToggle = () => {
         :aria-checked="checked"
         :aria-label="label"
         class="VPSwitch"
+        :class="{ disabled: disabled }"
+        :disabled="disabled"
         @click="handleToggle"
     >
         <span
@@ -66,6 +71,15 @@ const handleToggle = () => {
 
 .VPSwitch:hover {
     border-color: var(--vp-c-brand-1);
+}
+
+.VPSwitch.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.VPSwitch.disabled:hover {
+    border-color: var(--vp-input-border-color);
 }
 
 .VPSwitch[aria-checked="true"] .check {
