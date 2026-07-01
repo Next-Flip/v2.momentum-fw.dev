@@ -1,8 +1,10 @@
 import { useStorage } from "@vueuse/core";
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, type ShallowRef } from "vue";
 import { STORAGE_KEYS } from "../types";
 
 interface PanelResizeOptions {
+    containerRef?: ShallowRef<HTMLElement | null>;
+    dividerRef?: ShallowRef<HTMLElement | null>;
     defaultTopPercentage?: number;
     defaultBottomPercentage?: number;
     minTopPercentage?: number;
@@ -14,6 +16,8 @@ interface PanelResizeOptions {
 
 export function usePanelResize(options: PanelResizeOptions = {}) {
     const {
+        containerRef: externalContainerRef,
+        dividerRef: externalDividerRef,
         defaultTopPercentage = 70,
         defaultBottomPercentage = 30,
         minTopPercentage = 30,
@@ -29,8 +33,8 @@ export function usePanelResize(options: PanelResizeOptions = {}) {
     });
 
     const isDragging = ref(false);
-    const containerRef = ref<HTMLElement | null>(null);
-    const dividerRef = ref<HTMLElement | null>(null);
+    const containerRef = externalContainerRef ?? ref<HTMLElement | null>(null);
+    const dividerRef = externalDividerRef ?? ref<HTMLElement | null>(null);
     const topPanelHeight = computed(() => `${panelSizes.value.top}%`);
     const bottomPanelHeight = computed(() => `${panelSizes.value.bottom}%`);
     const topPanelHeightWhenBottomClosed = computed(() => "100%");

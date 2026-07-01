@@ -10,6 +10,7 @@ import { MessageSchema } from ".vitepress/i18n";
 import {
     useConnectionInfo,
     useDots,
+    useMounted,
     useSettings,
     useSharedHover,
     useThemeSwitcher,
@@ -54,8 +55,10 @@ const updateStage = computed(() => firmwareState.value.updateStage || "");
 const updateStageContext = computed(() => firmwareState.value.updateStageContext || {});
 const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-button");
 
+const isMounted = useMounted();
+
 const getConnectionDisplay = computed(() => {
-    if (!supportsSerialPort()) {
+    if (isMounted.value && !supportsSerialPort()) {
         return {
             text: tr("connection_serial_not_supported"),
             indicatorClass: "bg-red-500 animate-pulse border border-red-600",
@@ -161,13 +164,13 @@ onMounted(() => {
             <SettingsIcon />
 
             <div
-                :class="['VPFlyout', supportsSerialPort()]"
+                :class="['VPFlyout', isMounted && supportsSerialPort()]"
                 @mouseenter="handleMouse(true)"
                 @mouseleave="handleMouse(false)"
             >
                 <div :class="['flex items-center justify-center h-[var(--vp-nav-height)]']">
                     <Tooltip
-                        :disabled="supportsSerialPort()"
+                        :disabled="isMounted && supportsSerialPort()"
                         :delay="0"
                         :hide-delay="100"
                         :z-index="9999"
@@ -176,7 +179,7 @@ onMounted(() => {
                     >
                         <button
                             :class="[
-                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all select-none duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
+                                `connect-button bg-vp-dark shadow-sm rounded-lg group flex items-center pl-[11px] pr-[11px] h-[40px] w-auto whitespace-nowrap overflow-hidden min-w-fit transition-all select-none duration-100 ease-in-out ${(connectionState === ConnectionState.DISCONNECTED || connectionState === ConnectionState.ERROR) && isMounted && supportsSerialPort() ? 'cursor-pointer' : '!cursor-default'}`,
                             ]"
                             type="button"
                             :aria-expanded="flyoutOpen"
@@ -246,7 +249,11 @@ onMounted(() => {
                             </span>
 
                             <div
-                                v-if="supportsSerialPort() && connectionState === 'disconnected'"
+                                v-if="
+                                    isMounted &&
+                                    supportsSerialPort() &&
+                                    connectionState === 'disconnected'
+                                "
                                 class="DocSearch-Button"
                             >
                                 <span class="DocSearch-Button-Keys"

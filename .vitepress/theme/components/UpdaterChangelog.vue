@@ -10,7 +10,7 @@ import {
     supportsSerialPort,
 } from "../util";
 
-import { useI18n } from "../composables";
+import { useI18n, useMounted } from "../composables";
 import ScrollFade from "./ScrollFade.vue";
 import Tooltip from "./Tooltip.vue";
 
@@ -135,6 +135,8 @@ const expandDisabled = computed(() => {
         !!hasUploadedFileWithoutChangelog.value
     );
 });
+
+const isMounted = useMounted();
 </script>
 
 <template>
@@ -241,7 +243,10 @@ const expandDisabled = computed(() => {
                         </span>
                     </template>
                 </div>
-                <div v-if="supportsSerialPort()" class="flex items-center gap-1 flex-shrink-0">
+                <div
+                    v-if="isMounted && supportsSerialPort()"
+                    class="flex items-center gap-1 flex-shrink-0"
+                >
                     <button
                         class="rounded-lg transition-all duration-200 text-vp-3 hover:text-vp-brand-1 flex items-center justify-center flex-shrink-0 p-1.5 icon-button-opacity"
                         :class="{

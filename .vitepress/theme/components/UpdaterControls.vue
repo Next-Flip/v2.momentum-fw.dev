@@ -11,6 +11,7 @@ import {
     useConnectionInfo,
     useDots,
     useI18n,
+    useMounted,
     usePressedState,
     useSerialConnection,
     useSharedHover,
@@ -62,8 +63,11 @@ const emit = defineEmits<{
 
 const isBranchRelease = computed(() => props.selectedChannel === "branch");
 const isConnected = computed(() => connectionIsConnected.value);
+
+const isMounted = useMounted();
+
 const canFlash = computed(() => {
-    if (!supportsSerialPort()) return false;
+    if (isMounted.value && !supportsSerialPort()) return false;
     const hasReleaseOrFile = props.selectedRelease || props.uploadedFile;
     const notUpdating = !serialConnection?.flags.updateInProgress;
 
@@ -591,7 +595,10 @@ const isBranchSelected = (channel: ReleaseChannel | null, version: string) => {
                 >
                     <Tooltip
                         :disabled="
-                            !supportsSerialPort() || !!canFlash || connectionState === 'connecting'
+                            !isMounted ||
+                            !supportsSerialPort() ||
+                            !!canFlash ||
+                            connectionState === 'connecting'
                         "
                         :delay="0"
                         :offset="18"

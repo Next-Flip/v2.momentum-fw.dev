@@ -9,6 +9,7 @@ import { bytesToSize, supportsSerialPort } from "../util";
 import {
     useConnectionInfo,
     useI18n,
+    useMounted,
     useSharedHover,
     useTempState,
     useThemeSwitcher,
@@ -104,8 +105,10 @@ const formatJsonDisplay = computed(() => {
     return JSON.stringify(deviceInfo.value, null, 2);
 });
 
+const isMounted = useMounted();
+
 const getConnectionDisplay = computed(() => {
-    if (!supportsSerialPort()) {
+    if (isMounted.value && !supportsSerialPort()) {
         return {
             title: tr("updater_serial_unsupported"),
             subtitle: tr("updater_serial_unsupported_subtitle"),

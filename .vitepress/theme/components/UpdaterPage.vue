@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { track } from "@vercel/analytics";
 import { useDropZone, useStorage, useWindowSize } from "@vueuse/core";
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
+import {
+    computed,
+    inject,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    provide,
+    ref,
+    useTemplateRef,
+    watch,
+} from "vue";
 import type { ReleaseChannel, ReleaseItem } from "../../../_data/releases";
 import {
     branchReleases,
@@ -12,6 +22,7 @@ import {
 import {
     useConnectionInfo,
     useI18n,
+    useMounted,
     usePanelResize,
     useReleaseNavigation,
     useSerialConnection,
@@ -48,16 +59,20 @@ const { isHovered: isInstallButtonHovered } = useSharedHover("disabled-install-b
 const { currentTheme } = useThemeSwitcher();
 const { screenColor } = useSettings();
 
+const panelContainerRef = useTemplateRef<HTMLElement>("panelContainerRef");
+const dividerRef = useTemplateRef<HTMLElement>("dividerRef");
+
 const {
-    containerRef: panelContainerRef,
-    dividerRef,
     isDragging,
     topPanelHeight,
     bottomPanelHeight,
     topPanelHeightWhenBottomClosed,
     bottomPanelHeightWhenTopClosed,
     startDrag,
-} = usePanelResize({});
+} = usePanelResize({
+    containerRef: panelContainerRef,
+    dividerRef,
+});
 
 const serialConnection = inject<ReturnType<typeof useSerialConnection> | null>("serialConnection");
 const selectedChannel = ref<ReleaseChannel | null>(null);
@@ -86,6 +101,8 @@ const { selectedRelease, selectRelease } = useReleaseNavigation({
 const uploadedFile = ref<File | null>(null);
 const uploadedFileRelease = ref<ReleaseItem | null>(null);
 const dropZoneRef = ref<HTMLDivElement | null>(null);
+
+const isMounted = useMounted();
 
 const changelogState = useStorage(STORAGE_KEYS.UPDATER_CHANGELOG_STATE, "open");
 const isLogsOpen = useStorage(STORAGE_KEYS.UPDATER_LOGS_STATE, false);
@@ -511,8 +528,12 @@ onBeforeUnmount(() => {
                     <div
                         class="device-info-wrapper sm:rounded-lg border-t sm:border mt-4 lg:mt-0 border-vp-divider flex flex-col w-full lg:w-[32%] h-fit lg:h-full flex-shrink-0 overflow-hidden min-w-0 lg:min-w-80 sticky self-start transition-all duration-100 ease-in-out"
                         :class="{
-                            'lg:h-full': !isConnected && supportsSerialPort(),
-                            'lg:h-screen': !isConnected && isNarrowViewport && supportsSerialPort(),
+                            'lg:h-full': !isConnected && isMounted && supportsSerialPort(),
+                            'lg:h-screen':
+                                !isConnected &&
+                                isNarrowViewport &&
+                                isMounted &&
+                                supportsSerialPort(),
                             '!border-vp-brand-1': isInstallButtonHovered,
                         }"
                         :style="windowWidth >= 1024 ? 'top: calc(var(--vp-nav-height));' : ''"
@@ -576,7 +597,7 @@ onBeforeUnmount(() => {
                                         }"
                                     >
                                         <h3
-                                            v-if="supportsSerialPort()"
+                                            v-if="isMounted && supportsSerialPort()"
                                             class="text-[13px] leading-3 uppercase font-semibold text-vp-1 select-none"
                                             :class="{
                                                 'opacity-40 transition-opacity duration-200':
@@ -607,7 +628,7 @@ onBeforeUnmount(() => {
                                         </div>
                                     </div>
 
-                                    <template v-if="supportsSerialPort()">
+                                    <template v-if="isMounted && supportsSerialPort()">
                                         <div
                                             class="h-px border-b border-solid border-vp-3/25 w-auto mt-5 mx-3.5 sm:mx-5"
                                             :class="{
@@ -680,7 +701,7 @@ onBeforeUnmount(() => {
                                     :uploaded-file="uploadedFile"
                                     :uploaded-file-release="uploadedFileRelease"
                                     :changelog-state="
-                                        supportsSerialPort() ? changelogState : 'open'
+                                        isMounted && supportsSerialPort() ? changelogState : 'open'
                                     "
                                     :is-logs-open="effectiveLogsOpen"
                                     :is-narrow-viewport="isNarrowViewport"
@@ -690,7 +711,7 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div
-                                v-if="supportsSerialPort() && hasChangelogContent"
+                                v-if="isMounted && supportsSerialPort() && hasChangelogContent"
                                 ref="dividerRef"
                                 class="flex flex-row min-h-4 items-center justify-center relative px-5 cursor-row-resize select-none transition-all duration-200"
                                 :class="{
@@ -724,7 +745,7 @@ onBeforeUnmount(() => {
                             </div>
 
                             <div
-                                v-if="supportsSerialPort()"
+                                v-if="isMounted && supportsSerialPort()"
                                 class="min-h-14 flex flex-col"
                                 :class="{
                                     'transition-all duration-200': !isDragging,

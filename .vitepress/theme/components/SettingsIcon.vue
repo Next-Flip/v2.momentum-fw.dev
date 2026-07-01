@@ -4,7 +4,7 @@ import { supportsSerialPort } from "../util";
 import AutoconnectToggle from "./AutoconnectToggle.vue";
 import ScreenColorSelector from "./ScreenColorSelector.vue";
 
-import { useI18n, useSettings } from "../composables";
+import { useI18n, useMounted, useSettings } from "../composables";
 import Toggle from "./Toggle.vue";
 
 const { tr } = useI18n();
@@ -17,11 +17,13 @@ const handleButtonEnter = () => {
 const handleButtonLeave = () => {
     flyoutOpen.value = false;
 };
+
+const isMounted = useMounted();
 </script>
 
 <template>
     <div
-        v-if="supportsSerialPort()"
+        v-if="isMounted && supportsSerialPort()"
         class="settings-container VPFlyout border border-vp-divider rounded-lg w-10 h-10 flex items-center justify-center hover:border-vp-brand-1 transition-colors duration-100 group bg-vp-dark"
         @mouseenter="handleButtonEnter"
         @mouseleave="handleButtonLeave"

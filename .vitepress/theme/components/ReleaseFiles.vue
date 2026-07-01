@@ -6,7 +6,7 @@ import type {
     MainlineFile,
     ReleaseItem,
 } from "../../../_data/releases";
-import { useI18n } from "../composables";
+import { useI18n, useMounted } from "../composables";
 import { supportsSerialPort } from "../util";
 
 import FileGrid from "./FileGrid.vue";
@@ -28,7 +28,7 @@ const emit = defineEmits<{
 
 const installMethods = computed(() => [
     {
-        show: supportsSerialPort(),
+        show: isMounted.value && supportsSerialPort(),
         name: tr("releases_web_updater"),
         href: getLocalizedPath(`/update?version=${props.selectedRelease?.version}`),
         isExternal: false,
@@ -118,6 +118,8 @@ watch(
         emit("toggleDevFilesOpen", false);
     },
 );
+
+const isMounted = useMounted();
 </script>
 
 <template>

@@ -6,6 +6,7 @@ export * from "./useGalleryState";
 export * from "./useHead";
 export * from "./useI18n";
 export * from "./useImageCache";
+export * from "./useMounted";
 export * from "./usePanelResize";
 export * from "./usePressedState";
 export * from "./useProxiedUrl";

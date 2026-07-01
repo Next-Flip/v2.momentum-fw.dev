@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { ReleaseItem } from "../../../_data/releases";
-import { useI18n, useThemeSwitcher } from "../composables";
+import { useI18n, useMounted, useThemeSwitcher } from "../composables";
 import { supportsSerialPort } from "../util";
 
 import Tooltip from "./Tooltip.vue";
@@ -44,6 +44,8 @@ const clearUploadedFile = () => {
         fileInputRef.value.value = "";
     }
 };
+
+const isMounted = useMounted();
 </script>
 
 <template>
@@ -55,10 +57,10 @@ const clearUploadedFile = () => {
             'h-0 overflow-hidden': showUpdateOverlay && isChangelogExpanded,
             'opacity-90': isOverDropZone && !showUpdateOverlay,
             'opacity-0 pointer-events-none': showUpdateOverlay && !isChangelogExpanded,
-            'mb-0': supportsSerialPort(),
+            'mb-0': isMounted && supportsSerialPort(),
         }"
     >
-        <div v-if="supportsSerialPort()" class="flex items-end justify-start gap-2">
+        <div v-if="isMounted && supportsSerialPort()" class="flex items-end justify-start gap-2">
             <div class="flex items-center justify-start gap-2">
                 <Tooltip
                     :aria-label="tr('releases_install')"
@@ -95,7 +97,7 @@ const clearUploadedFile = () => {
             </div>
         </div>
 
-        <div v-if="supportsSerialPort() && uploadedFile" class="w-full">
+        <div v-if="isMounted && supportsSerialPort() && uploadedFile" class="w-full">
             <div
                 class="flex items-center justify-between p-4 bg-vp-bg/55 border border-vp-border/75 rounded-lg border-dashed gap-4"
                 :class="{ 'border-vp-3/65': isOverDropZone }"
@@ -151,7 +153,7 @@ const clearUploadedFile = () => {
         </div>
 
         <div
-            v-else-if="supportsSerialPort()"
+            v-else-if="isMounted && supportsSerialPort()"
             class="w-full border border-dashed border-vp-border/75 rounded-lg flex items-center justify-center cursor-pointer relative h-min lg:h-[72px] z-10 p-0.5 group transition-colors duration-100"
             :class="{
                 'bg-vp-3/10 !border-vp-brand-1': isOverDropZone,
