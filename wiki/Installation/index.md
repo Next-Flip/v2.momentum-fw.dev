@@ -95,18 +95,21 @@ There are 4 methods to install Momentum. We recommend using the **Web Updater**,
 
 #### Browser
 
-1. Open the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
-2. Click the `☁️ Flipper Lab/App (chrome/mobile)` link
+1. Open the [Releases page](/releases/) or the [latest GitHub release](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
+2. Click `Flipper Lab` under `Install via...` (on GitHub this is the `☁️ Flipper Lab/App (chrome/mobile)` link)
 3. Click `Connect` and select your Flipper from the list
 4. Click `Install` and wait for the update to complete
 
 #### Mobile
 
-1. Make sure you have the [Flipper Mobile App](https://docs.flipper.net/zero/mobile-app) installed and paired
-2. Open the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
-3. Click the `☁️ Flipper Lab/App (chrome/mobile)` link
-4. Accept the prompt to open the link in the Flipper Mobile App
-5. Confirm to proceed with the install and wait for the update to complete
+> [!IMPORTANT]
+The [Flipper Mobile App](https://docs.flipper.net/zero/mobile-app) must be installed, open and paired with your Flipper.
+> 
+
+1. Open the [Releases page](/releases/) or the [latest GitHub release](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
+2. Click `Flipper App` under `Install via...` (on GitHub this is the `☁️ Flipper Lab/App (chrome/mobile)` link)
+3. Accept the prompt to open the link in the Flipper Mobile App
+4. Click `Update` to proceed with the install and wait for the update to complete
 
 ---
 
@@ -114,7 +117,7 @@ There are 4 methods to install Momentum. We recommend using the **Web Updater**,
 
 Install using the official qFlipper application:
 
-1. Download the qFlipper package (.tgz) from the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
+1. Download the qFlipper package (.tgz) from the [Releases page](/releases/) or the [latest GitHub release](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
 2. Open [qFlipper](https://flipperzero.one/update) and connect your Flipper
 3. Click `Install from file`
 4. Select the .tgz you downloaded and wait for the update to complete
@@ -125,7 +128,7 @@ Install using the official qFlipper application:
 
 Manual installation via SD card:
 
-1. Download the zipped archive (.zip) from the [latest release page](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
+1. Download the zipped archive (.zip) from the [Releases page](/releases/) or the [latest GitHub release](https://github.com/Next-Flip/Momentum-Firmware/releases/latest)
 2. Extract the archive. This is now your new Firmware folder
 3. Open [qFlipper](https://flipperzero.one/update), head to `SD/update` and simply move the firmware folder there
 4. On the Flipper, hit the `Arrow Down` button, this will get you to the file menu. In there simply search for your updates folder

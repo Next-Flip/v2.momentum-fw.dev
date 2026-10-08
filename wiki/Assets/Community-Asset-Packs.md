@@ -88,6 +88,16 @@ Based on the puzzle video game by the same name <a href="https://github.com/Skyh
 
 ---
 
+<ScreenColorImage src="https://up.momentum-fw.dev/builds/asset-packs/back-to-the-flipper/preview/1.gif" width="200" class="asset-pack-image-right"/>
+
+#### <a href="https://github.com/pho5nix/BackToTheFlipper-Asset-Pack">Back To The Flipper</a>
+
+Set of animations and icons inspired by Back to the future movie <a href="https://github.com/pho5nix" class="pack-author">pho5nix</a> (2026-05-12)
+
+<sub><i>Anims: <b>3</b> &nbsp;&nbsp; Passports: <b>3</b> &nbsp;&nbsp; Icons: <b>23</b></i></sub>
+
+---
+
 <ScreenColorImage src="https://up.momentum-fw.dev/builds/asset-packs/betterpet/preview/1.gif" width="200" class="asset-pack-image-right"/>
 
 #### <a href="https://github.com/vollukas/Momentum-Firmware/tree/better-pet/assets/packs/Better-Pet">Better Pet</a>
@@ -195,6 +205,16 @@ Mega-corp logos from the Cyberpunk 2077 video game <a href="https://github.com/K
 Motor companies logos from the Cyberpunk 2077 video game <a href="https://github.com/Kuronons" class="pack-author">Kuronons</a> (2024-10-08)
 
 <sub><i>Anims: <b>15</b></i></sub>
+
+---
+
+<ScreenColorImage src="https://up.momentum-fw.dev/builds/asset-packs/cute-face/preview/1.gif" width="200" class="asset-pack-image-right"/>
+
+#### <a href="https://github.com/Orgamorsh/Flipper-Cute-Face-Assets">Cute Face</a>
+
+Some simple cute faces <a href="https://github.com/Orgamorsh" class="pack-author">Orgamorsh</a> (2026-01-01)
+
+<sub><i>Anims: <b>7</b> &nbsp;&nbsp; Passports: <b>3</b> &nbsp;&nbsp; Icons: <b>24</b></i></sub>
 
 ---
 

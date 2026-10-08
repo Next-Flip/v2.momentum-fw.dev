@@ -19,6 +19,23 @@ export function supportsSerialPort(): boolean {
     return typeof window !== "undefined" && typeof navigator !== "undefined" && "serial" in navigator;
 }
 
+export const flipperAppStoreUrl = "https://apps.apple.com/app/flipper-mobile-app/id1534655259";
+export const flipperPlayStoreUrl = "https://play.google.com/store/apps/details?id=com.flipperdevices.app";
+
+export type MobilePlatform = "ios" | "android" | null;
+
+export function getMobilePlatform(): MobilePlatform {
+    if (typeof navigator === "undefined") return null;
+
+    const ua = navigator.userAgent;
+    // iPadOS 13+ reports itself as "Macintosh"
+    const isIPadOS = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+
+    if (/iPad|iPhone|iPod/.test(ua) || isIPadOS) return "ios";
+    if (/Android/.test(ua)) return "android";
+    return null;
+}
+
 export function devMode() {
     if (typeof window === "undefined") return false;
     const host = window.location.hostname;

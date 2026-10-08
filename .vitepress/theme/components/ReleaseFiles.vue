@@ -7,7 +7,12 @@ import type {
     ReleaseItem,
 } from "../../../_data/releases";
 import { useI18n, useMounted } from "../composables";
-import { supportsSerialPort } from "../util";
+import {
+    flipperAppStoreUrl,
+    flipperPlayStoreUrl,
+    getMobilePlatform,
+    supportsSerialPort,
+} from "../util";
 
 import FileGrid from "./FileGrid.vue";
 import Tooltip from "./Tooltip.vue";
@@ -26,27 +31,78 @@ const emit = defineEmits<{
     toggleDevFilesOpen: [devFilesOpen: boolean];
 }>();
 
+const isMounted = useMounted();
+
+const mobilePlatform = computed(() => (isMounted.value ? getMobilePlatform() : null));
+
 const installMethods = computed(() => [
     {
         show: isMounted.value && supportsSerialPort(),
         name: tr("releases_web_updater"),
         href: getLocalizedPath(`/update?version=${props.selectedRelease?.version}`),
         isExternal: false,
+        storeFallback: null,
     },
     {
         show: true,
-        name: tr("releases_flipper_lab"),
-        href: flipperLabUrl(props.selectedRelease as ReleaseItem),
+        name: mobilePlatform.value ? tr("releases_flipper_app") : tr("releases_flipper_lab"),
+        href: installHref.value,
         isExternal: true,
+        storeFallback:
+            mobilePlatform.value === "ios"
+                ? flipperAppStoreUrl
+                : mobilePlatform.value === "android"
+                  ? flipperPlayStoreUrl
+                  : null,
     },
 ]);
 
-const flipperLabUrl = (release: ReleaseItem): string => {
+const installHref = computed(() => {
+    const release = props.selectedRelease as ReleaseItem | null;
+    if (!release) return "#";
+
+    return mobilePlatform.value ? flipperAppDeepLink(release) : flipperLabUrl(release);
+});
+
+/** Query string understood by both apps for `lab.flipper.net` web update links. */
+const webUpdateQuery = (release: ReleaseItem): string => {
     const tgzDir = release.commit ? "dev" : release.version;
     const tgzUrl = `https://up.momentum-fw.dev/builds/firmware/${tgzDir}/${findUpdateTgz(release.files as DevbuildFile[])}`;
     const channel = release.commit ? "dev" : "release";
     const version = (release.commit ? "mntm-dev-" : "") + release.version;
-    return `https://lab.flipper.net/?url=${tgzUrl}&channel=${channel}-cfw&version=${version}`;
+    return `url=${tgzUrl}&channel=${channel}-cfw&version=${version}`;
+};
+
+const flipperLabUrl = (release: ReleaseItem): string =>
+    `https://lab.flipper.net/?${webUpdateQuery(release)}`;
+
+const flipperAppDeepLink = (release: ReleaseItem): string => {
+    const query = webUpdateQuery(release);
+
+    if (mobilePlatform.value === "android") {
+        const fallback = encodeURIComponent(flipperPlayStoreUrl);
+        return `intent://lab.flipper.net/?${query}#Intent;scheme=https;package=com.flipperdevices.app;S.browser_fallback_url=${fallback};end`;
+    }
+
+    // lab.flipper.net has no apple-app-site-association, so a universal link never opens the app
+    return `flipper://lab.flipper.net/?${query}`;
+};
+
+/** Falls back to the store when the custom scheme did not open the app. */
+const onInstallClick = (
+    method: { href: string; storeFallback: string | null },
+    event: MouseEvent,
+) => {
+    if (!method.storeFallback) return;
+
+    event.preventDefault();
+    window.location.href = method.href;
+
+    window.setTimeout(() => {
+        if (document.visibilityState === "visible") {
+            window.location.href = method.storeFallback as string;
+        }
+    }, 1500);
 };
 
 const findUpdateTgz = (files: DevbuildFile[]): string | undefined => {
@@ -118,8 +174,6 @@ watch(
         emit("toggleDevFilesOpen", false);
     },
 );
-
-const isMounted = useMounted();
 </script>
 
 <template>
@@ -253,7 +307,7 @@ const isMounted = useMounted();
                 <template v-for="method in installMethods" :key="method.name">
                     <a
                         :href="method.href"
-                        :target="method.isExternal ? '_blank' : undefined"
+                        :target="method.isExternal && !method.storeFallback ? '_blank' : undefined"
                         rel="noopener"
                         class="text-vp-2 sm:text-vp-1 sm:hover:text-vp-2 transition-all duration-100 no-underline font-medium whitespace-nowrap sm:py-1 sm:pl-3 sm:pr-2.5 sm:border sm:border-vp-divider sm:rounded-full sm:hover:border-vp-brand-1 sm:hover:bg-vp-soft/55 select-none"
                         :class="[
@@ -262,6 +316,7 @@ const isMounted = useMounted();
                                 : 'opacity-0 invisible absolute pointer-events-none',
                             method.isExternal ? 'vp-external-link-icon' : 'sm:pr-3',
                         ]"
+                        @click="onInstallClick(method, $event)"
                     >
                         {{ method.name }}
                     </a>

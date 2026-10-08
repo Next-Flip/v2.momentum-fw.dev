@@ -152,7 +152,8 @@ const messages: MessageSchema = {
     releases_install_tooltip:
         "For more info on these installation methods or using a zipped archive, you can go here: <a href='{{url}}' target='_blank' rel='noopener' class='text-vp-alternate-1 hover:text-vp-alternate-2 underline transition-colors duration-100 font-medium'>{{text}}</a>",
     releases_web_updater: "Web Updater",
-    releases_flipper_lab: "Flipper Lab/App",
+    releases_flipper_lab: "Flipper Lab",
+    releases_flipper_app: "Flipper App",
     releases_qflipper: "qFlipper",
     releases_files: "Files",
     releases_files_q: "...",

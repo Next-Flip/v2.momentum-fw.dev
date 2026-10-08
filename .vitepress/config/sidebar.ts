@@ -40,7 +40,7 @@ const generateWikiSidebar = (
                     text: override("Web Updater (Browser)", o, "webUpdater"),
                 },
                 {
-                    page: "Installation#flipper-labapp-browsermobile",
+                    page: "Installation/#flipper-lab-app",
                     text: override("Flipper Lab/App (Mobile)", o, "flipperLab"),
                 },
                 {
@@ -155,7 +155,7 @@ const generateWikiSidebar = (
                                     text: "Allow BLE RPC",
                                 },
                                 {
-                                    page: "Interface/Lockscreen#allow-poweroff-while-locked",
+                                    page: "Interface/Lockscreen#allow-poweroff",
                                     text: "Allow Poweroff",
                                 },
                                 {

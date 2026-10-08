@@ -150,6 +150,7 @@ export type MessageSchema = {
     releases_install_tooltip: string;
     releases_web_updater: string;
     releases_flipper_lab: string;
+    releases_flipper_app: string;
     releases_qflipper: string;
     releases_files: string;
     releases_files_q: string;
